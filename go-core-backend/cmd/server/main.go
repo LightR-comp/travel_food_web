@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"go-core-backend/internal/config"
+	"go-core-backend/internal/routes"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +15,7 @@ func main() {
 
 	// Khởi tạo server Gin mặc định
 	r :=gin.Default()
+	
 
 	// Thêm dòng này để tắt cảnh báo "Trusted Proxies"
 	r.SetTrustedProxies(nil)
@@ -28,6 +30,9 @@ func main() {
 		})
 	})
 		
+	// Thiết lập các route
+	routes.SetupRouter(r)
+
 	//Lấy port từ file config
 	port := config.AppConfig.Port
 	fmt.Print("Server is running on port: ", port)

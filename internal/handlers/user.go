@@ -9,11 +9,6 @@ import (
 	"smart-tourism/internal/services"
 )
 
-// Login godoc
-// POST /api/auth/login
-// Body: { "id_token": "<Google ID Token từ client>" }
-//
-// Luồng: Nhận token -> Verify qua Firebase -> Check user trong DB -> Nếu chưa có thì tạo mới -> Trả profile
 func Login(c *gin.Context) {
 	var req struct {
 		IDToken string `json:"id_token" binding:"required"`
@@ -23,7 +18,6 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// 1. Verify token
 	token, err := services.VerifyIDToken(c.Request.Context(), req.IDToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token không hợp lệ"})
@@ -35,7 +29,6 @@ func Login(c *gin.Context) {
 	name, _ := token.Claims["name"].(string)
 	avatar, _ := token.Claims["picture"].(string)
 
-	// 2. Check user trong DB, nếu chưa có thì upsert
 	user, err := services.UpsertUser(c.Request.Context(), uid, email, name, avatar)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi lưu thông tin user"})
@@ -48,10 +41,6 @@ func Login(c *gin.Context) {
 	})
 }
 
-// GetProfile godoc
-// GET /api/users/profile
-// Header: Authorization: Bearer <token>
-// Middleware FirebaseAuth đã gắn uid vào context trước đó.
 func GetProfile(c *gin.Context) {
 	uid := c.GetString("uid")
 
@@ -64,10 +53,6 @@ func GetProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// UpdateProfile godoc
-// PUT /api/users/profile
-// Header: Authorization: Bearer <token>
-// Body: UserPreferences (ăn kiêng, số người, kinh phí mặc định,...)
 func UpdateProfile(c *gin.Context) {
 	uid := c.GetString("uid")
 

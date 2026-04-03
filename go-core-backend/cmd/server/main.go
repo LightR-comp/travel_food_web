@@ -37,8 +37,5 @@ func main() {
 	port := config.AppConfig.Port
 	fmt.Print("Server is running on port: ", port)
 
-	// Chạy server trên port đã cấu hình
-	if err := r.Run(":" + port); err != nil {
-		fmt.Print("Failed to start server: ", err)
-	}
+
 }

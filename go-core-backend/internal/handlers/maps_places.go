@@ -10,7 +10,7 @@ import (
 func PreparePlaceResponse(id string, service *services.GMapsClient) map[string]interface{} {
 	raw := service.GetMockDetails(id)
 
-	// Kết hợp logic của Minh và chuẩn API-CONTRACT
+	
 	return map[string]interface{}{
 		"success": true,
 		"message": "Mock data success",

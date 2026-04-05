@@ -21,7 +21,7 @@ type RecommendRequest struct {
 	RadiusKm        float64  `json:"radius_km"`
 }
 
-func Recommend(c *gin.Context) {
+func GetRecommendations(c *gin.Context) {
 	var req RecommendRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Thiếu latitude/longitude"})

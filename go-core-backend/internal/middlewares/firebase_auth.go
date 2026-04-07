@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"smart-tourism/internal/services"
+	"go-core-backend/internal/services"
 )
 
 func FirebaseAuth() gin.HandlerFunc {

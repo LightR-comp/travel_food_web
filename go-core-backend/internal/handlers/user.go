@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"smart-tourism/internal/models"
-	"smart-tourism/internal/services"
+	"go-core-backend/internal/models"
+	"go-core-backend/internal/services"
 )
 
 func Login(c *gin.Context) {

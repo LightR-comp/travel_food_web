@@ -1,38 +1,51 @@
-	package utils
+package utils
 
 import (
-	"fmt"
-	"regexp"
+	
 	"strconv"
 	"strings"
 )
 
-var numberRegex = regexp.MustCompile(`[0-9]*\.?[0-9]+`)
-
-func ExtractNumber(input string) float64 {
-	match := numberRegex.FindString(input)
-	if match == "" { return 0 }
-	val, _ := strconv.ParseFloat(match, 64)
-	return val
-}
-
-// 1. Chuyển đổi Khoảng cách về đơn vị KM
-func FormatDistance(input string) float64 {
-	cleanInput := strings.ToLower(strings.ReplaceAll(input, " ", ""))
-	val := ExtractNumber(cleanInput)
-	if strings.Contains(cleanInput, "m") && !strings.Contains(cleanInput, "km") {
-		return val / 1000
+// FormatPrice: Chuyển đổi số nguyên (ví dụ: 550000) thành chuỗi có dấu phân cách (550.000)
+func FormatPrice(price int) string {
+	s := strconv.Itoa(price)
+	n := len(s)
+	if n <= 3 {
+		return s
 	}
-	return val
+
+	var result []string
+	// Duyệt từ cuối chuỗi lên để thêm dấu chấm phân cách hàng nghìn
+	for i := n; i > 0; i -= 3 {
+		start := i - 3
+		if start < 0 {
+			start = 0
+		}
+		result = append([]string{s[start:i]}, result...)
+	}
+
+	return strings.Join(result, ".")
 }
 
-// 2. Định dạng giá tiền kiểu "40k-70k"
-func FormatPriceK(amount int) string {
-	return fmt.Sprintf("%dk", amount/1000)
+// FormatDistance: Chuyển đổi chuỗi khoảng cách từ API (ví dụ: "1200m") sang số thực km (1.2)
+func FormatDistance(rawDist string) float64 {
+	// Loại bỏ chữ "m" và khoảng trắng nếu có
+	cleanStr := strings.TrimSuffix(strings.ToLower(rawDist), "m")
+	cleanStr = strings.TrimSpace(cleanStr)
+
+	meters, err := strconv.ParseFloat(cleanStr, 64)
+	if err != nil {
+		return 0.0
+	}
+
+	// Chuyển từ mét sang kilomet
+	return meters / 1000
 }
 
-// 3. Format trạng thái hoạt động
+// FormatStatusText: Chuyển đổi giá trị bool thành văn bản hiển thị trạng thái
 func FormatStatusText(isOpen bool) string {
-	if isOpen { return "Đang mở cửa" }
+	if isOpen {
+		return "Đang mở cửa"
+	}
 	return "Đã đóng cửa"
 }

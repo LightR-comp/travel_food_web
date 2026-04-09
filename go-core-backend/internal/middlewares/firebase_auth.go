@@ -1,3 +1,8 @@
+// firebase_auth.go chứa middleware để xác thực người dùng thông qua Firebase Authentication.
+// Middleware này sẽ được áp dụng cho các route cần bảo vệ, đảm bảo rằng chỉ những người dùng đã đăng nhập mới có thể truy cập vào các API đó.
+// Middleware sẽ kiểm tra header Authorization, xác thực token với Firebase, và nếu hợp lệ, sẽ lưu thông tin người dùng vào context để các handler có thể sử dụng.
+// Đây là một phần quan trọng để đảm bảo an toàn cho API của chúng ta, ngăn chặn truy cập trái phép và bảo vệ dữ liệu người dùng.
+
 package middlewares
 
 import (

@@ -1,3 +1,7 @@
+# nlp_parser.py chứa các hàm để phân tích ý định của người dùng từ tin nhắn, giúp chatbot hiểu được người dùng đang hỏi về điều gì và trả lời một cách phù hợp.
+# Đây là nơi chúng ta sẽ xây dựng các hàm để phân tích ý định của người dùng từ tin nhắn, bao gồm việc nhận diện các từ khóa và cụm từ liên quan đến các chủ đề như giờ mở cửa, địa chỉ, thực đơn, và các câu hỏi chung khác về quán ăn.
+# Hàm chính sẽ là hàm detect_intent, nhận vào một chuỗi văn bản và trả về một intent (ý định) cụ thể, sau đó sẽ được sử dụng trong quá trình xây dựng phản hồi cho người dùng.
+
 from flask import Flask, request, jsonify # Lần lượt để gọi API, nhận data từ Go và đóng gói thành file json
 
 app = Flask(__name__) # Tạo API webserver tên là app (chatbot)

@@ -1,4 +1,6 @@
-
+// maps_places.go chứa các hàm xử lý liên quan đến việc lấy thông tin chi tiết của một quán ăn từ API
+// Đây là nơi chúng ta sẽ xây dựng logic để gọi Google Maps API (hoặc dịch vụ bản đồ khác) để lấy thông tin chi tiết về một quán ăn dựa trên ID của nó
+// Hàm này sẽ được gọi khi frontend yêu cầu thông tin chi tiết về một quán ăn cụ thể, và chúng ta sẽ trả về dữ liệu đã được format chuẩn để frontend dễ dàng hiển thị.
 package handlers
 
 import (

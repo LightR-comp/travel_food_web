@@ -1,3 +1,8 @@
+# main.py là điểm khởi đầu của Python AI Service
+# nơi chúng ta sẽ thiết lập FastAPI và gắn các router (API) từ thư mục 'api' vào app chính.
+# Đây là nơi chúng ta sẽ định nghĩa các endpoint chính của service, bao gồm cả endpoint gợi ý quán ăn và endpoint để kiểm tra trạng thái của service.
+
+
 from fastapi import FastAPI
 from api import engine_api, chatbot_api
 

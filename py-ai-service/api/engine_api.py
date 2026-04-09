@@ -1,3 +1,7 @@
+# engine_api.py chứa các endpoint liên quan đến việc gợi ý quán ăn, bao gồm endpoint chính để nhận yêu cầu từ Go Core Backend và trả về danh sách quán ăn đã được chấm điểm và lý do.
+# Đây là nơi chúng ta sẽ xây dựng các endpoint để xử lý yêu cầu gợi ý
+# từ Go Core Backend, bao gồm việc nhận dữ liệu về người dùng và danh sách quán ăn, sau đó sử dụng các hàm trong thư mục 'recommendation_engine' để tính toán điểm số và xây dựng lý do cho từng quán ăn, cuối cùng trả về kết quả cho Go Core Backend.
+
 from fastapi import APIRouter
 from schemas.payloads import RecommendRequest, RecommendResponse, AIResultItem
 

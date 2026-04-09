@@ -1,0 +1,3 @@
+# config.py chứa các cấu hình chung cho Python AI Service
+# bao gồm các hằng số, biến môi trường và các thiết lập liên quan đến việc kết nối với Go Core Backend, cấu hình AI, và các thông số khác cần thiết cho hoạt động của service.
+# Đây là nơi chúng ta sẽ xây dựng các cấu hình chung để đảm bảo rằng service hoạt động một cách nhất quán và dễ dàng bảo trì, đồng thời giúp cho việc phát triển và mở rộng service.

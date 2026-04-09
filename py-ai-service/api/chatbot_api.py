@@ -1,3 +1,9 @@
+# chatbot_api.py chứa các endpoint liên quan đến việc trò chuyện với người dùng, bao gồm endpoint chính để nhận tin nhắn từ người dùng và trả về phản hồi từ AI.
+# Đây là nơi chúng ta sẽ xây dựng các endpoint để xử lý tin nhắn từ người dùng
+#  bao gồm việc nhận dữ liệu về tin nhắn sau đó sử dụng các hàm trong thư mục 'ai_chatbot' để tạo ra phản hồi phù hợp, cuối cùng trả về kết quả cho người dùng.
+# cụ thể phân tích intent của người dùng, gửi cho go chọc vào database, nhận kết quả, sau đó xây dựng câu trả lời cho người dùng dựa trên kết quả đó.
+
+
 from fastapi import APIRouter
 from schemas.payloads import ChatRequest, ChatResponse
 

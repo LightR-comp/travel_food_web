@@ -1,6 +1,8 @@
+# Thống nhất về phong cách lập trình và định dạng json
+
 ## 1. Quy tắc chung (BẮT BUỘC):
 
-# 1.1. Tất cả API phải theo format chuẩn:
+### 1.1. Tất cả API phải theo format chuẩn:
 
 ```json
 {
@@ -11,7 +13,7 @@
 }
 ```
 
-# 1.2. Ý nghĩa field:
+### 1.2. Ý nghĩa field:
 
 | Field   | Kiểu           | Ý nghĩa                     |
 | ------- | -------------- | --------------------------- |
@@ -22,7 +24,7 @@
 
 ## 2. Naming Convention:
 
-# 2.1. Bắt buộc dùng snake_case:
+### 2.1. Bắt buộc dùng snake_case:
 
 Đúng:
 "open_now": true
@@ -31,7 +33,7 @@ Sai:
 "openNow": true
 "PriceRange": "..."
 
-# 2.2. Tên phải rõ nghĩa
+### 2.2. Tên phải rõ nghĩa
 
 | Sai   | Đúng            |
 | ----- | --------------- |
@@ -41,17 +43,17 @@ Sai:
 
 ## 3. Quy định ID:
 
-# 3.1. Tất cả object phải có id
+### 3.1. Tất cả object phải có id
 
 {
 "id": 1
 }
 
-# 3.2. Dùng ID để mapping
+### 3.2. Dùng ID để mapping
 
 ## 4. JSON RULES THEO TỪNG GIAI ĐOẠN:
 
-# 4.1 GIAI ĐOẠN 1 — Frontend → Go:
+### 4.1 GIAI ĐOẠN 1 — Frontend → Go:
 
 Mục tiêu: Thu thập user intent + context
 VD JSON chuẩn:
@@ -72,7 +74,7 @@ VD JSON chuẩn:
 }
 ```
 
-# 4.2 GIAI ĐOẠN 2 — Go → DB Repo:
+### 4.2 GIAI ĐOẠN 2 — Go → DB Repo:
 
 Mục tiêu: Tạo filter để query data
 JSON nội bộ:
@@ -130,7 +132,7 @@ Database trả về:
 }
 ```
 
-# 4.3 GIAI ĐOẠN 3 — Go → Python (AI INPUT):
+### 4.3 GIAI ĐOẠN 3 — Go → Python (AI INPUT):
 
 Mục tiêu: Chuẩn bị dữ liệu cho AI
 
@@ -159,7 +161,7 @@ Mục tiêu: Chuẩn bị dữ liệu cho AI
 }
 ```
 
-# 4.4 GIAI ĐOẠN 4 — Python xử lý (Internal):
+### 4.4 GIAI ĐOẠN 4 — Python xử lý (Internal):
 
 Mục tiêu: Filter + tính điểm
 Filter:
@@ -200,7 +202,7 @@ Scoring:
 }
 ```
 
-# 4.5 GIAI ĐOẠN 5 — Python → Go (AI OUTPUT):
+### 4.5 GIAI ĐOẠN 5 — Python → Go (AI OUTPUT):
 
 ```json
 {
@@ -219,7 +221,7 @@ Scoring:
 }
 ```
 
-# 4.6 GIAI ĐOẠN 6 — Go merge data:
+### 4.6 GIAI ĐOẠN 6 — Go merge data:
 
 Mục tiêu: Kết hợp DB + AI
 Logic:
@@ -252,7 +254,7 @@ JSON:
 }
 ```
 
-# 4.7 Go → Frontend (FINAL RESPONSE):
+### 4.7 Go → Frontend (FINAL RESPONSE):
 
 ```json
 {

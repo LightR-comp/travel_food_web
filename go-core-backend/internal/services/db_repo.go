@@ -41,74 +41,89 @@ func InitDB() {
 // USER
 // ============================================================
 
-func UpsertUser(ctx context.Context, uid, email, name, avatar string) (*models.User, error) {
-	query := `
-		MERGE Users AS target
-		USING (SELECT @uid AS uid) AS source ON target.uid = source.uid
-		WHEN MATCHED THEN
-			UPDATE SET name = @name, avatar = @avatar, updated_at = GETDATE()
-		WHEN NOT MATCHED THEN
-			INSERT (uid, email, name, avatar, created_at, updated_at)
-			VALUES (@uid, @email, @name, @avatar, GETDATE(), GETDATE());
-	`
-	_, err := db.ExecContext(ctx, query,
-		sql.Named("uid", uid),
-		sql.Named("email", email),
-		sql.Named("name", name),
-		sql.Named("avatar", avatar),
+func UpsertUser(ctx context.Context, providerID, email, name, avatar string, provider models.AuthProvider) (*models.User, error) {
+	// 1. Check user đã tồn tại chưa qua email
+	var userID int
+	row := db.QueryRowContext(ctx, `
+		SELECT u.id FROM Users u
+		INNER JOIN UserAuth ua ON u.id = ua.user_id
+		WHERE ua.provider = @provider AND ua.provider_id = @providerID
+	`,
+		sql.Named("provider", provider),
+		sql.Named("providerID", providerID),
 	)
-	if err != nil {
-		return nil, fmt.Errorf("UpsertUser: %w", err)
+
+	err := row.Scan(&userID)
+
+	if err == sql.ErrNoRows {
+		// 2. Chưa có → tạo mới User
+		newRow := db.QueryRowContext(ctx, `
+			INSERT INTO Users (email, name, avatar_url, created_at, updated_at)
+			OUTPUT INSERTED.id
+			VALUES (@email, @name, @avatar, GETDATE(), GETDATE())
+		`,
+			sql.Named("email", email),
+			sql.Named("name", name),
+			sql.Named("avatar", avatar),
+		)
+		if err := newRow.Scan(&userID); err != nil {
+			return nil, fmt.Errorf("UpsertUser insert: %w", err)
+		}
+
+		// 3. Tạo UserAuth
+		_, err = db.ExecContext(ctx, `
+			INSERT INTO UserAuth (user_id, provider, provider_id, created_at)
+			VALUES (@userID, @provider, @providerID, GETDATE())
+		`,
+			sql.Named("userID", userID),
+			sql.Named("provider", provider),
+			sql.Named("providerID", providerID),
+		)
+		if err != nil {
+			return nil, fmt.Errorf("UpsertUser auth: %w", err)
+		}
+	} else if err != nil {
+		return nil, fmt.Errorf("UpsertUser check: %w", err)
 	}
 
-	return GetUserByUID(ctx, uid)
+	return GetUserByID(ctx, userID)
 }
 
-func GetUserByUID(ctx context.Context, uid string) (*models.User, error) {
+func GetUserByID(ctx context.Context, id int) (*models.User, error) {
 	row := db.QueryRowContext(ctx, `
-		SELECT uid, email, name, avatar,
-		       allergies, default_budget, default_people, cuisine_types
-		FROM Users WHERE uid = @uid
-	`, sql.Named("uid", uid))
+		SELECT id, email, name, avatar_url, created_at, updated_at
+		FROM Users WHERE id = @id
+	`, sql.Named("id", id))
 
 	var u models.User
-	var allergiesJSON, cuisineJSON sql.NullString
-
-	err := row.Scan(
-		&u.UID, &u.Email, &u.Name, &u.Avatar,
-		&allergiesJSON, &u.Preferences.DefaultBudget, &u.Preferences.DefaultPeople, &cuisineJSON,
-	)
+	err := row.Scan(&u.ID, &u.Email, &u.Name, &u.AvatarURL, &u.CreatedAt, &u.UpdatedAt)
 	if err == sql.ErrNoRows {
 		return nil, fmt.Errorf("user không tồn tại")
 	}
 	if err != nil {
-		return nil, fmt.Errorf("GetUserByUID: %w", err)
+		return nil, fmt.Errorf("GetUserByID: %w", err)
 	}
-
-	parseJSONStringArray(allergiesJSON.String, &u.Preferences.Allergies)
-	parseJSONStringArray(cuisineJSON.String, &u.Preferences.CuisineTypes)
-
 	return &u, nil
 }
 
-func UpdateUserPreferences(ctx context.Context, uid string, prefs models.UserPreferences) error {
-	allergiesJSON := toJSONArray(prefs.Allergies)
-	cuisineJSON := toJSONArray(prefs.CuisineTypes)
-
+func UpdateUserPreferences(ctx context.Context, userID int, prefs models.UserPreferences) error {
 	_, err := db.ExecContext(ctx, `
-		UPDATE Users SET
-			allergies       = @allergies,
-			default_budget  = @budget,
-			default_people  = @people,
-			cuisine_types   = @cuisine,
-			updated_at      = GETDATE()
-		WHERE uid = @uid
+		MERGE UserPreferences AS target
+		USING (SELECT @userID AS user_id) AS source ON target.user_id = source.user_id
+		WHEN MATCHED THEN
+			UPDATE SET
+				budget_per_person = @budget,
+				dietary           = @dietary,
+				food_types        = @foodTypes,
+				updated_at        = GETDATE()
+		WHEN NOT MATCHED THEN
+			INSERT (user_id, budget_per_person, dietary, food_types, created_at, updated_at)
+			VALUES (@userID, @budget, @dietary, @foodTypes, GETDATE(), GETDATE());
 	`,
-		sql.Named("allergies", allergiesJSON),
-		sql.Named("budget", prefs.DefaultBudget),
-		sql.Named("people", prefs.DefaultPeople),
-		sql.Named("cuisine", cuisineJSON),
-		sql.Named("uid", uid),
+		sql.Named("userID", userID),
+		sql.Named("budget", prefs.BudgetPerPerson),
+		sql.Named("dietary", prefs.Dietary),
+		sql.Named("foodTypes", prefs.FoodTypes),
 	)
 	return err
 }
@@ -431,4 +446,23 @@ func parseJSONStringArray(raw string, dest *[]string) {
 		return
 	}
 	json.Unmarshal([]byte(raw), dest)
+}
+
+func GetUserByProviderID(ctx context.Context, providerID string) (*models.User, error) {
+	row := db.QueryRowContext(ctx, `
+		SELECT u.id, u.email, u.name, u.avatar_url, u.created_at, u.updated_at
+		FROM Users u
+		INNER JOIN UserAuth ua ON u.id = ua.user_id
+		WHERE ua.provider_id = @providerID
+	`, sql.Named("providerID", providerID))
+
+	var u models.User
+	err := row.Scan(&u.ID, &u.Email, &u.Name, &u.AvatarURL, &u.CreatedAt, &u.UpdatedAt)
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("user không tồn tại")
+	}
+	if err != nil {
+		return nil, fmt.Errorf("GetUserByProviderID: %w", err)
+	}
+	return &u, nil
 }

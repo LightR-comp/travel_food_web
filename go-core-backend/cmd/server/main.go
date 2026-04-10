@@ -1,41 +1,46 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"go-core-backend/internal/config"
 	"go-core-backend/internal/routes"
-
-	"github.com/gin-gonic/gin"
+	"go-core-backend/internal/services"
 )
+
 func main() {
-	// Load cấu hình
+	// 🔥 Load config
 	config.LoadConfig()
 
-	// Khởi tạo server Gin mặc định
-	r :=gin.Default()
-	
+	// 🔥 Init Firebase (THÊM DÒNG NÀY)
+	if err := services.InitFirebase(context.Background()); err != nil {
+		panic(err)
+	}
 
-	// Thêm dòng này để tắt cảnh báo "Trusted Proxies"
+	// 🔥 Tạo server
+	r := gin.Default()
+
 	r.SetTrustedProxies(nil)
 
-	// Tạo endpoint test /ping
+	// Test endpoint
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
 			"message": "Go Server is running",
-			"data": nil,
-			"error": nil,
 		})
 	})
-		
-	// Thiết lập các route
+
+	// Setup routes
 	routes.SetupRouter(r)
 
-	//Lấy port từ file config
+	// Lấy port
 	port := config.AppConfig.Port
-	fmt.Print("Server is running on port: ", port)
+	fmt.Println("Server is running on port:", port)
 
-
+	// 🔥 CHẠY SERVER (QUAN TRỌNG)
+	r.Run(":" + port)
 }

@@ -1,3 +1,7 @@
+// main.go là điểm khởi đầu của ứng dụng
+// nơi chúng ta thiết lập server, cấu hình các route và chạy server
+// Đây là nơi chúng ta sẽ load cấu hình, khởi tạo router Gin, thiết lập các route cơ bản và sau đó chạy server trên cổng được chỉ định trong file config.
+
 package main
 
 import (

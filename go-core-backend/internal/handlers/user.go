@@ -1,3 +1,7 @@
+// user.go chứa các hàm xử lý liên quan đến người dùng, bao gồm đăng nhập, lấy thông tin profile và cập nhật profile. 
+// Đây là nơi chúng ta sẽ xây dựng logic để xác thực người dùng thông qua token
+// lưu trữ thông tin người dùng vào cơ sở dữ liệu và cung cấp API để frontend có thể lấy và cập nhật thông tin người dùng một cách dễ dàng.
+
 package handlers
 
 import (

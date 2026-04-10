@@ -1,3 +1,6 @@
+// config.go chứa cấu hình hệ thống, bao gồm các thông tin kết nối cơ sở dữ liệu, cổng server, URL của dịch vụ AI, v.v.
+// ta sẽ sử dụng thư viện godotenv để load các biến môi trường từ file .env vào biến global Config, giúp dễ dàng quản lý và thay đổi cấu hình mà không cần phải sửa code.
+
 package config
 
 import (

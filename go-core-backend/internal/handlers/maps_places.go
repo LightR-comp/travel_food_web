@@ -1,13 +1,12 @@
 package handlers
 
 import (
-
-	"net/http"
-	"strconv"
-	"github.com/gin-gonic/gin"
 	"go-core-backend/internal/services"
 	"go-core-backend/internal/utils"
-	
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type StandardizedPlace struct {
@@ -19,11 +18,17 @@ type StandardizedPlace struct {
 	Price         string
 	Status        string
 }
+
 // Hàm này giả lập việc chuẩn hóa dữ liệu thô từ API Goong thành định dạng chuẩn để trả về cho client.
-// KHông giống với các hàm bên dưới dùng cho frontend 
-func StandardizeData(raw services.GoongDetail, mainText string, secondaryText string) StandardizedPlace {
+// KHông giống với các hàm bên dưới dùng cho frontend
+func StandardizeData(raw services.GoongDetail, mainText string, secondaryText string, latTam float64, lngTam float64) StandardizedPlace {
 	// Giả lập dữ liệu thô cho các hàm utils
-	rawDist := "1000m"
+	quanLat := raw.Result.Geometry.Location.Lat
+	quanLng := raw.Result.Geometry.Location.Lng
+
+	// TÍNH KHOẢNG CÁCH THỰC TẾ
+	khoangCachThuc := utils.CalculateDistance(latTam, lngTam, quanLat, quanLng)
+
 	rawPrice := 550000
 	isOpen := true
 
@@ -33,11 +38,12 @@ func StandardizeData(raw services.GoongDetail, mainText string, secondaryText st
 		FullAddress:   raw.Result.FormattedAddress,
 		Lat:           raw.Result.Geometry.Location.Lat,
 		Lng:           raw.Result.Geometry.Location.Lng,
-		Distance:      utils.FormatDistance(rawDist),
+		Distance:      khoangCachThuc,
 		Price:         utils.FormatPrice(rawPrice),
 		Status:        utils.FormatStatusText(isOpen),
 	}
 }
+
 // --- CÁCH 1: TRẢ VỀ DANH SÁCH 5 QUÁN ĐÃ CHUẨN HÓA ---
 // URL ví dụ: /api/places/search?keyword=com+tam&lat=10.7629&lng=106.6821
 func GetListPlacesHandler(c *gin.Context) {
@@ -66,7 +72,7 @@ func GetListPlacesHandler(c *gin.Context) {
 			continue
 		}
 		// Chuẩn hóa từng quán trước khi cho vào danh sách
-		finalResults = append(finalResults, StandardizeData(detail, p.StructuredFormatting.MainText, p.StructuredFormatting.SecondaryText))
+		finalResults = append(finalResults, StandardizeData(detail, p.StructuredFormatting.MainText, p.StructuredFormatting.SecondaryText, lat, lng))
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -95,7 +101,7 @@ func GetBestMatchPlaceHandler(c *gin.Context) {
 	detail, _ := client.GetPlaceDetail(p.PlaceID)
 
 	// Chuẩn hóa dữ liệu quán cụ thể đó
-	finalData := StandardizeData(detail, p.StructuredFormatting.MainText, p.StructuredFormatting.SecondaryText)
+	finalData := StandardizeData(detail, p.StructuredFormatting.MainText, p.StructuredFormatting.SecondaryText, lat, lng)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,

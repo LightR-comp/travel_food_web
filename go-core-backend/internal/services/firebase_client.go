@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"os"
 	"sync"
 
@@ -13,36 +13,40 @@ import (
 
 var (
 	firebaseAuth *auth.Client
-	firebaseOnce sync.Once
+	once         sync.Once
 )
 
-// InitFirebase khởi tạo Firebase Admin SDK một lần duy nhất (Singleton).
-// Đọc đường dẫn file service account JSON từ biến môi trường FIREBASE_CREDENTIAL_PATH.
-func InitFirebase() {
-	firebaseOnce.Do(func() {
+func InitFirebase(ctx context.Context) error {
+	var errInit error
+
+	once.Do(func() {
 		credPath := os.Getenv("FIREBASE_CREDENTIAL_PATH")
 		if credPath == "" {
-			log.Fatal("[Firebase] FIREBASE_CREDENTIAL_PATH chưa được set trong .env")
+			errInit = fmt.Errorf("missing FIREBASE_CREDENTIAL_PATH")
+			return
 		}
 
-		opt := option.WithCredentialsFile(credPath)
-		app, err := firebase.NewApp(context.Background(), nil, opt)
+		app, err := firebase.NewApp(ctx, nil, option.WithCredentialsFile(credPath))
 		if err != nil {
-			log.Fatalf("[Firebase] Khởi tạo app thất bại: %v", err)
+			errInit = err
+			return
 		}
 
-		authClient, err := app.Auth(context.Background())
+		client, err := app.Auth(ctx)
 		if err != nil {
-			log.Fatalf("[Firebase] Khởi tạo auth client thất bại: %v", err)
+			errInit = err
+			return
 		}
 
-		firebaseAuth = authClient
-		log.Println("[Firebase] Khởi tạo thành công.")
+		firebaseAuth = client
 	})
+
+	return errInit
 }
 
-// VerifyIDToken xác thực Google ID Token gửi lên từ client.
-// Trả về *auth.Token chứa UID và claims nếu hợp lệ.
-func VerifyIDToken(ctx context.Context, idToken string) (*auth.Token, error) {
-	return firebaseAuth.VerifyIDToken(ctx, idToken)
+func VerifyIDToken(ctx context.Context, token string) (*auth.Token, error) {
+	if firebaseAuth == nil {
+		return nil, fmt.Errorf("firebase chưa init")
+	}
+	return firebaseAuth.VerifyIDToken(ctx, token)
 }

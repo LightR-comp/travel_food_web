@@ -5,42 +5,41 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-
 	"go-core-backend/internal/services"
 )
 
-func FirebaseAuth() gin.HandlerFunc {
+func FirebaseAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "Thiếu Authorization header",
-			})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing token"})
 			return
 		}
 
-		parts := strings.SplitN(authHeader, " ", 2)
-		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "Định dạng Authorization không hợp lệ. Dùng: Bearer <token>",
-			})
+		parts := strings.Split(authHeader, " ")
+		if len(parts) != 2 {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid format"})
 			return
 		}
 
 		idToken := parts[1]
 
-		token, err := services.VerifyIDToken(c.Request.Context(), idToken)
+		decoded, err := services.VerifyIDToken(c.Request.Context(), idToken)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "Token không hợp lệ hoặc đã hết hạn",
-			})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 			return
 		}
 
-		c.Set("uid", token.UID)
-		c.Set("email", token.Claims["email"])
-		c.Set("name", token.Claims["name"])
+		// Lấy user từ DB theo Firebase UID
+		user, err := services.GetUserByProviderID(c.Request.Context(), decoded.UID)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+			return
+		}
 
+		c.Set("user_id", user.ID)
 		c.Next()
 	}
 }
+

@@ -14,7 +14,7 @@ import (
 
 	_ "github.com/denisenkom/go-mssqldb"
 
-	"smart-tourism/internal/models"
+	"go-core-backend/internal/models"
 )
 
 var db *sql.DB
@@ -146,16 +146,14 @@ func GetRestaurantsNearby(ctx context.Context, q NearbyQuery) ([]models.Restaura
 	query := `
 		WITH Nearby AS (
 			SELECT
-				r.id, r.name, r.address, r.latitude, r.longitude,
-				r.phone, r.description, r.open_time, r.close_time,
-				r.image_url, r.cuisine_type, r.avg_rating, r.price_range,
+				r.id, r.name, r.address, r.lat, r.lng,
+				r.rating, r.price_range, r.open_time, r.close_time, r.type,
 				6371 * 2 * ASIN(SQRT(
-					POWER(SIN(RADIANS(r.latitude  - @lat) / 2), 2) +
-					COS(RADIANS(@lat)) * COS(RADIANS(r.latitude)) *
-					POWER(SIN(RADIANS(r.longitude - @lng) / 2), 2)
+					POWER(SIN(RADIANS(r.lat - @lat) / 2), 2) +
+					COS(RADIANS(@lat)) * COS(RADIANS(r.lat)) *
+					POWER(SIN(RADIANS(r.lng - @lng) / 2), 2)
 				)) AS distance_km
 			FROM Restaurants r
-			WHERE r.is_active = 1
 		)
 		SELECT * FROM Nearby
 		WHERE distance_km <= @radius
@@ -178,9 +176,8 @@ func GetRestaurantsNearby(ctx context.Context, q NearbyQuery) ([]models.Restaura
 	for rows.Next() {
 		var r models.Restaurant
 		if err := rows.Scan(
-			&r.ID, &r.Name, &r.Address, &r.Latitude, &r.Longitude,
-			&r.Phone, &r.Description, &r.OpenTime, &r.CloseTime,
-			&r.ImageURL, &r.CuisineType, &r.AvgRating, &r.PriceRange,
+			&r.ID, &r.Name, &r.Address, &r.Lat, &r.Lng,
+			&r.Rating, &r.PriceRange, &r.OpenTime, &r.CloseTime, &r.Type,
 			&r.DistanceKm,
 		); err != nil {
 			continue
@@ -200,21 +197,14 @@ func GetRestaurantsNearby(ctx context.Context, q NearbyQuery) ([]models.Restaura
 		}
 	}
 
-	reviewMap, err := getReviewsByRestaurantIDs(ctx, ids)
-	if err == nil {
-		for i := range restaurants {
-			restaurants[i].Reviews = reviewMap[restaurants[i].ID]
-		}
-	}
-
 	return restaurants, nil
 }
 
 func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.MenuItem, error) {
 	query := fmt.Sprintf(`
-		SELECT restaurant_id, id, name, price, description, ingredients, image_url
+		SELECT restaurant_id, id, name, description, price, food_type, ingredients
 		FROM MenuItems
-		WHERE restaurant_id IN (%s) AND is_available = 1
+		WHERE restaurant_id IN (%s)
 	`, intSliceToSQL(ids))
 
 	rows, err := db.QueryContext(ctx, query)
@@ -227,106 +217,64 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 	for rows.Next() {
 		var item models.MenuItem
 		var restaurantID int
-		var ingredientsJSON sql.NullString
 		if err := rows.Scan(
-			&restaurantID, &item.ID, &item.Name, &item.Price,
-			&item.Description, &ingredientsJSON, &item.ImageURL,
+			&restaurantID, &item.ID, &item.Name, &item.Description,
+			&item.Price, &item.FoodType, &item.Ingredients,
 		); err != nil {
 			continue
 		}
-		parseJSONStringArray(ingredientsJSON.String, &item.Ingredients)
 		result[restaurantID] = append(result[restaurantID], item)
 	}
 	return result, nil
 }
 
-func getReviewsByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.Review, error) {
-	query := fmt.Sprintf(`
-		SELECT rv.restaurant_id, rv.id, rv.user_uid, u.name AS user_name,
-		       rv.rating, rv.comment, rv.created_at
-		FROM Reviews rv
-		LEFT JOIN Users u ON rv.user_uid = u.uid
-		WHERE rv.restaurant_id IN (%s)
-		ORDER BY rv.created_at DESC
-	`, intSliceToSQL(ids))
-
-	rows, err := db.QueryContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	result := make(map[int][]models.Review)
-	for rows.Next() {
-		var rv models.Review
-		var restaurantID int
-		if err := rows.Scan(
-			&restaurantID, &rv.ID, &rv.UserUID, &rv.UserName,
-			&rv.Rating, &rv.Comment, &rv.CreatedAt,
-		); err != nil {
-			continue
-		}
-		result[restaurantID] = append(result[restaurantID], rv)
-	}
-	return result, nil
-}
-
-// ============================================================
-// REVIEW
-// ============================================================
-
-func CreateReview(ctx context.Context, rv models.Review) (*models.Review, error) {
+func CreateReview(ctx context.Context, rv models.UserRating) (*models.UserRating, error) {
 	row := db.QueryRowContext(ctx, `
-		INSERT INTO Reviews (restaurant_id, user_uid, rating, comment, created_at)
+		INSERT INTO UserRatings (restaurant_id, user_id, rating, comment, created_at)
 		OUTPUT INSERTED.id, INSERTED.created_at
 		VALUES (@rid, @uid, @rating, @comment, GETDATE())
 	`,
 		sql.Named("rid", rv.RestaurantID),
-		sql.Named("uid", rv.UserUID),
+		sql.Named("uid", rv.UserID),
 		sql.Named("rating", rv.Rating),
 		sql.Named("comment", rv.Comment),
 	)
 	if err := row.Scan(&rv.ID, &rv.CreatedAt); err != nil {
 		return nil, fmt.Errorf("CreateReview: %w", err)
 	}
-
-	go updateAvgRating(rv.RestaurantID)
-
 	return &rv, nil
 }
 
-func GetReviewsByRestaurant(ctx context.Context, restaurantID int) ([]models.Review, error) {
+func GetReviewsByRestaurant(ctx context.Context, restaurantID int) ([]models.UserRating, error) {
 	rows, err := db.QueryContext(ctx, `
-		SELECT rv.id, rv.user_uid, u.name, rv.rating, rv.comment, rv.created_at
-		FROM Reviews rv
-		LEFT JOIN Users u ON rv.user_uid = u.uid
-		WHERE rv.restaurant_id = @rid
-		ORDER BY rv.created_at DESC
+		SELECT id, user_id, restaurant_id, rating, comment, created_at
+		FROM UserRatings
+		WHERE restaurant_id = @rid
+		ORDER BY created_at DESC
 	`, sql.Named("rid", restaurantID))
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var reviews []models.Review
+	var reviews []models.UserRating
 	for rows.Next() {
-		var rv models.Review
-		rv.RestaurantID = restaurantID
-		rows.Scan(&rv.ID, &rv.UserUID, &rv.UserName, &rv.Rating, &rv.Comment, &rv.CreatedAt)
+		var rv models.UserRating
+		rows.Scan(&rv.ID, &rv.UserID, &rv.RestaurantID, &rv.Rating, &rv.Comment, &rv.CreatedAt)
 		reviews = append(reviews, rv)
 	}
 	return reviews, nil
 }
 
-func UpdateReview(ctx context.Context, reviewID int, uid string, update models.Review) error {
+func UpdateReview(ctx context.Context, reviewID int, userID int, update models.UserRating) error {
 	result, err := db.ExecContext(ctx, `
-		UPDATE Reviews SET rating = @rating, comment = @comment
-		WHERE id = @id AND user_uid = @uid
+		UPDATE UserRatings SET rating = @rating, comment = @comment
+		WHERE id = @id AND user_id = @uid
 	`,
 		sql.Named("rating", update.Rating),
 		sql.Named("comment", update.Comment),
 		sql.Named("id", reviewID),
-		sql.Named("uid", uid),
+		sql.Named("uid", userID),
 	)
 	if err != nil {
 		return err
@@ -335,17 +283,15 @@ func UpdateReview(ctx context.Context, reviewID int, uid string, update models.R
 	if n == 0 {
 		return fmt.Errorf("không tìm thấy review hoặc không có quyền")
 	}
-
-	go updateAvgRating(update.RestaurantID)
 	return nil
 }
 
-func DeleteReview(ctx context.Context, reviewID int, uid string) error {
+func DeleteReview(ctx context.Context, reviewID int, userID int) error {
 	result, err := db.ExecContext(ctx, `
-		DELETE FROM Reviews WHERE id = @id AND user_uid = @uid
+		DELETE FROM UserRatings WHERE id = @id AND user_id = @uid
 	`,
 		sql.Named("id", reviewID),
-		sql.Named("uid", uid),
+		sql.Named("uid", userID),
 	)
 	if err != nil {
 		return err
@@ -369,7 +315,7 @@ func updateAvgRating(restaurantID int) {
 // FORUM
 // ============================================================
 
-func CreateTopic(ctx context.Context, topic models.ForumTopic) (*models.ForumTopic, error) {
+/*func CreateTopic(ctx context.Context, topic models.ForumTopic) (*models.ForumTopic, error) {
 	row := db.QueryRowContext(ctx, `
 		INSERT INTO ForumTopics (user_uid, title, content, created_at)
 		OUTPUT INSERTED.id, INSERTED.created_at
@@ -420,7 +366,7 @@ func CreateComment(ctx context.Context, comment models.ForumComment) (*models.Fo
 		return nil, fmt.Errorf("CreateComment: %w", err)
 	}
 	return &comment, nil
-}
+}*/
 
 // ============================================================
 // HELPER UTILS

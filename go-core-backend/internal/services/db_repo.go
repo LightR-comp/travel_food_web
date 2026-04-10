@@ -416,3 +416,20 @@ func GetUserByProviderID(ctx context.Context, providerID string) (*models.User, 
 	}
 	return &u, nil
 }
+
+func GetUserPreferences(ctx context.Context, userID int) (*models.UserPreferences, error) {
+	row := db.QueryRowContext(ctx, `
+		SELECT user_id, budget_per_person, dietary, food_types, created_at, updated_at
+		FROM UserPreferences WHERE user_id = @userID
+	`, sql.Named("userID", userID))
+
+	var p models.UserPreferences
+	err := row.Scan(&p.UserID, &p.BudgetPerPerson, &p.Dietary, &p.FoodTypes, &p.CreatedAt, &p.UpdatedAt)
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("preferences không tồn tại")
+	}
+	if err != nil {
+		return nil, fmt.Errorf("GetUserPreferences: %w", err)
+	}
+	return &p, nil
+}

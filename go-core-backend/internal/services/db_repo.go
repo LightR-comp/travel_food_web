@@ -1,7 +1,6 @@
 // db_repo.go chứa các hàm để tương tác với cơ sở dữ liệu, bao gồm việc lưu trữ và truy xuất thông tin về người dùng, quán ăn, menu và diễn đàn.
 // Đây là nơi chúng ta sẽ xây dựng các hàm để thực hiện các truy vấn SQL, đảm bảo rằng chúng ta có thể lưu trữ và truy xuất dữ liệu một cách hiệu quả và an toàn.
 
-
 package services
 
 import (
@@ -15,6 +14,8 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 
 	"go-core-backend/internal/models"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 var db *sql.DB
@@ -432,4 +433,73 @@ func GetUserPreferences(ctx context.Context, userID int) (*models.UserPreference
 		return nil, fmt.Errorf("GetUserPreferences: %w", err)
 	}
 	return &p, nil
+}
+
+// Local user registration
+func RegisterLocal(ctx context.Context, username, password, name string) (*models.User, error) {
+	// 1. Kiểm tra username đã tồn tại chưa
+	var count int
+	row := db.QueryRowContext(ctx, `
+		SELECT COUNT(*) FROM UserAuth 
+		WHERE provider = 'local' AND provider_id = @username
+	`, sql.Named("username", username))
+	row.Scan(&count)
+	if count > 0 {
+		return nil, fmt.Errorf("username đã được sử dụng")
+	}
+
+	// 2. Hash password
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, fmt.Errorf("lỗi hash password")
+	}
+
+	// 3. Tạo user mới
+	var userID int
+	newRow := db.QueryRowContext(ctx, `
+		INSERT INTO Users (email, name, avatar_url, created_at, updated_at)
+		OUTPUT INSERTED.id
+		VALUES ('', @name, '', GETDATE(), GETDATE())
+	`, sql.Named("name", name))
+	if err := newRow.Scan(&userID); err != nil {
+		return nil, fmt.Errorf("lỗi tạo user")
+	}
+
+	// 4. Lưu UserAuth
+	_, err = db.ExecContext(ctx, `
+		INSERT INTO UserAuth (user_id, provider, provider_id, password_hash, created_at)
+		VALUES (@userID, 'local', @username, @hash, GETDATE())
+	`,
+		sql.Named("userID", userID),
+		sql.Named("username", username),
+		sql.Named("hash", string(hash)),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("lỗi lưu auth")
+	}
+
+	return GetUserByID(ctx, userID)
+}
+
+func LocalLogin(ctx context.Context, username, password string) (*models.User, error) {
+	// 1. Lấy password hash từ DB theo username
+	var userID int
+	var passwordHash string
+	row := db.QueryRowContext(ctx, `
+		SELECT user_id, password_hash FROM UserAuth
+		WHERE provider = 'local' AND provider_id = @username
+	`, sql.Named("username", username))
+
+	if err := row.Scan(&userID, &passwordHash); err == sql.ErrNoRows {
+		return nil, fmt.Errorf("username hoặc mật khẩu không đúng")
+	} else if err != nil {
+		return nil, err
+	}
+
+	// 2. So sánh password
+	if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password)); err != nil {
+		return nil, fmt.Errorf("username hoặc mật khẩu không đúng")
+	}
+
+	return GetUserByID(ctx, userID)
 }

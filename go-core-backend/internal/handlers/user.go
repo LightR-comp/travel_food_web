@@ -78,3 +78,52 @@ func UpdateProfile(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Cập nhật thành công"})
 }
+
+//Đăng ký tài khoản Local
+func Register(c *gin.Context) {
+	var req struct {
+		Username string `json:"username" binding:"required"`
+		Password string `json:"password" binding:"required"`
+		Name     string `json:"name" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Thiếu username, password hoặc name"})
+		return
+	}
+
+	user, err := services.RegisterLocal(c.Request.Context(), req.Username, req.Password, req.Name)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo tài khoản"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Đăng ký thành công",
+		"user":    user,
+	})
+}
+
+func LocalLogin(c *gin.Context) {
+	var req struct {
+		Username string `json:"username" binding:"required"`
+		Password string `json:"password" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Thiếu username hoặc password"})
+		return
+	}
+
+	user, err := services.LocalLogin(c.Request.Context(), req.Username, req.Password)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Tên đăng nhập hoặc mật khẩu không đúng"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Đăng nhập thành công",
+		"user":    user,
+	})
+}
+

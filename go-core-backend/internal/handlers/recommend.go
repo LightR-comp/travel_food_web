@@ -1,7 +1,3 @@
-// recommend.go chứa các hàm xử lý liên quan đến việc gợi ý quán ăn dựa trên vị trí và sở thích của người dùng. 
-// Đây là nơi chúng ta sẽ xây dựng logic chính để nhận yêu cầu từ frontend, phân tích dữ liệu đầu vào, truy vấn cơ sở dữ liệu để tìm các quán ăn phù hợp, chấm điểm và trả về kết quả cho frontend. 
-// Chúng ta sẽ sử dụng thông tin về vị trí hiện tại của người dùng, số lượng người đi cùng, ngân sách, thời gian ăn uống, tâm trạng, thời tiết, dị ứng thực phẩm và loại ẩm thực yêu thích để đưa ra các gợi ý chính xác và phù hợp nhất.
-
 package handlers
 
 import (
@@ -20,8 +16,8 @@ type RecommendRequest struct {
 	MealTime        string   `json:"meal_time"`
 	Mood            string   `json:"mood"`
 	Weather         string   `json:"weather"`
-	Allergies       []string `json:"allergies"`
-	CuisineTypes    []string `json:"cuisine_types"`
+	Dietary         []string `json:"dietary"`
+	FoodTypes       []string `json:"food_types"`
 	RadiusKm        float64  `json:"radius_km"`
 }
 
@@ -38,18 +34,19 @@ func GetRecommendations(c *gin.Context) {
 
 	ctx := c.Request.Context()
 
-	uid := c.GetString("uid")
-	if uid != "" {
-		user, err := services.GetUserByUID(ctx, uid)
+	// Lấy preferences từ DB nếu đã đăng nhập
+	userID := c.GetInt("user_id")
+	if userID != 0 {
+		prefs, err := services.GetUserPreferences(ctx, userID)
 		if err == nil {
-			if len(req.Allergies) == 0 {
-				req.Allergies = user.Preferences.Allergies
+			if len(req.Dietary) == 0 {
+				req.Dietary = []string{prefs.Dietary}
+			}
+			if len(req.FoodTypes) == 0 {
+				req.FoodTypes = []string{prefs.FoodTypes}
 			}
 			if req.BudgetPerPerson == 0 {
-				req.BudgetPerPerson = user.Preferences.DefaultBudget
-			}
-			if req.NumberOfPeople == 0 {
-				req.NumberOfPeople = user.Preferences.DefaultPeople
+				req.BudgetPerPerson = prefs.BudgetPerPerson
 			}
 		}
 	}

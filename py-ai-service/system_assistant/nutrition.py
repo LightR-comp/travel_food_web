@@ -1,21 +1,22 @@
-from core.prompts import ALLERGY_FILTER_PROMPT
+# nutrition.py chứa các hàm tiện ích để xử lý thông tin dinh dưỡng, ăn kiêng
+# nutrition.py chứa các hàm tiện ích để xử lý thông tin dinh dưỡng, ăn kiêng
+# Logic mới: Sử dụng hàm build_allergy_prompt từ prompts.py để chuẩn hóa câu lệnh gửi cho AI
 
-class NutritionAssistant:
-    def __init__(self, ai_engine):
-        self.ai_engine = ai_engine
+from core.prompts import build_allergy_prompt
+from ai_chatbot.consultant_rag import generate_response
 
-    def filter_menu(self, user_allergies, raw_menu):
-        """
-        user_allergies: List các loại dị ứng (ví dụ: ['hải sản', 'đậu phộng'])
-        raw_menu: List các món ăn lấy từ Database sau khi bạn thiết kế xong Models
-        """
-        if not user_allergies:
-            return raw_menu # Không dị ứng thì trả về hết
-            
-        prompt = ALLERGY_FILTER_PROMPT.format(
-            allergies=", ".join(user_allergies),
-            menu=str(raw_menu)
-        )
+def filter_menu(user_allergies, raw_menu):
+    """
+    user_allergies: List các loại dị ứng (ví dụ: ['hải sản', 'đậu phộng'])
+    raw_menu: List các món ăn lấy từ Database (Go-backend gửi sang)
+    """
+    
+    # Nếu không có thông tin dị ứng, trả về menu gốc
+    if not user_allergies:
+        return raw_menu 
         
-        # AI sẽ phân tích món nào có thành phần gây dị ứng và loại bỏ
-        return self.ai_engine.generate_response(prompt)
+    # Bước 1: Gọi hàm từ prompts.py để xây dựng câu lệnh chuẩn cho AI
+    prompt = build_allergy_prompt(user_allergies, raw_menu)
+    
+    # Bước 2: Gọi trực tiếp hàm xử lý AI từ consultant_rag.py để lấy kết quả lọc
+    return generate_response(prompt, str(raw_menu))

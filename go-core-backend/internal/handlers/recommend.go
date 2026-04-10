@@ -1,3 +1,7 @@
+// recommend.go chứa các hàm xử lý liên quan đến việc gợi ý quán ăn dựa trên vị trí và sở thích của người dùng. 
+// Đây là nơi chúng ta sẽ xây dựng logic chính để nhận yêu cầu từ frontend, phân tích dữ liệu đầu vào, truy vấn cơ sở dữ liệu để tìm các quán ăn phù hợp, chấm điểm và trả về kết quả cho frontend. 
+// Chúng ta sẽ sử dụng thông tin về vị trí hiện tại của người dùng, số lượng người đi cùng, ngân sách, thời gian ăn uống, tâm trạng, thời tiết, dị ứng thực phẩm và loại ẩm thực yêu thích để đưa ra các gợi ý chính xác và phù hợp nhất.
+
 package handlers
 
 import (

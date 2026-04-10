@@ -1,9 +1,13 @@
+# consultant_rag.py chứa các hàm để xây dựng phản hồi cho chatbot dựa trên thông tin được tổng hợp từ Go Core Backend, giúp chatbot có thể trả lời các câu hỏi của người dùng một cách chính xác và phù hợp với ngữ cảnh.
+# Đây là nơi chúng ta sẽ xây dựng các hàm để tạo ra phản hồi cho chatbot
+
+
 from flask import Flask, request, jsonify
 # import google.generativeai as genai
 
 app = Flask(__name__)
 
-# Setup Gemini (nếu bạn đã có API Key)
+# Setup Gemini (nếu đã có API Key)
 # genai.configure(api_key="YOUR_GEMINI_API_KEY")
 # model = genai.GenerativeModel('gemini-pro')
 

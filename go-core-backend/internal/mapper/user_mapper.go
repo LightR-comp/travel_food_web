@@ -1,3 +1,5 @@
+// user_mapper.go chứa các hàm để chuyển đổi dữ liệu giữa các mô hình khác nhau liên quan đến người dùng.
+
 package mappers
 
 import (

@@ -50,6 +50,7 @@ func Login(c *gin.Context) {
 	})
 }
 
+
 func GetProfile(c *gin.Context) {
 	userID := c.GetInt("user_id")
 

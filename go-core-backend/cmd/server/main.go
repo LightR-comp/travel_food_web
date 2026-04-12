@@ -17,15 +17,16 @@ import (
 )
 
 func main() {
-	// 🔥 Load config
+	// Load config
 	config.LoadConfig()
-
-	// 🔥 Init Firebase (THÊM DÒNG NÀY)
+	// Khởi tạo Database (
+	services.InitDB()
+	// Init Firebase (THÊM DÒNG NÀY)
 	if err := services.InitFirebase(context.Background()); err != nil {
 		panic(err)
 	}
 
-	// 🔥 Tạo server
+	// Tạo server
 	r := gin.Default()
 
 	r.SetTrustedProxies(nil)
@@ -45,6 +46,6 @@ func main() {
 	port := config.AppConfig.Port
 	fmt.Println("Server is running on port:", port)
 
-	// 🔥 CHẠY SERVER (QUAN TRỌNG)
+	// CHẠY SERVER (QUAN TRỌNG)
 	r.Run(":" + port)
 }

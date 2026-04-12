@@ -1,30 +1,41 @@
-from flask import Flask, request, jsonify # Lần lượt để gọi API, nhận data từ Go và đóng gói thành file json
+import google.generativeai as genai # Temporary
+from typing import Dict, Any
 
-app = Flask(__name__) # Tạo API webserver tên là app (chatbot)
+# config API
+genai.configure(api_key="YOUR_API_KEY")
+model = genai.GenerativeModel('gemini-pro')
 
-# Hàm này là hàm chính để phân tích ý định người dùng
-def detect_intent(text): 
-    text = text.lower() # Chuyển tất cả về chữ thường
-    # Nhận diện cơ bản trước một vài tình huống
-    if any(word in text for word in ["mở cửa", "giờ làm việc", "mấy giờ"]):
-        return "opening_hours" 
-    if any(word in text for word in ["địa chỉ", "ở đâu", "vị trí"]):
-        return "location"
-    if any(word in text for word in ["thực đơn", "món ăn", "menu"]):
-        return "menu_info"
+def detect_intent_with_ai(user_text: str) -> Dict[str, Any]:
+    prompt = f"""
+    Phân tích câu sau: "{user_text}"
+    Trả về JSON với các nhãn:
+    - intent: (find_food, opening_hours, location_query, menu_query, general_consultation)
+    - entities: (budget, people, dietary, mood, location_name)
     
-    return "general_consultation" # Giới thiệu tổng quan theo những mục cố định
-
-@app.route('/parse-intent', methods=['POST']) # Tạo một đường dẫn (endpoint) tên là /parse-intent 
-def parse_intent(): 
-    data = request.json
-    user_text = data.get("text", "") # Trích nội dung querry của người dùng
-    intent = detect_intent(user_text) # Sử dụng hàm phân tích ý định
+    Yêu cầu: snake_case, format JSON.
+    """
     
-    return jsonify({
-        "intent": intent,
-        "confidence": 1.0 # Độ tin cậy trả về
-    })
-
-if __name__ == '__main__':
-    app.run(port=5000) # Mở port webserver đã tạo, Go sẽ gọi vào port này
+    try:
+        response = model.generate_content(prompt)
+        # Đây là ví dụ dữ liệu AI sẽ trả về sau khi parse
+        '''# Giả sử user_text = "Tìm quán bún cá tầm 100k cho 2 người không cay ở Quận 1"
+        mock_ai_response = {
+            "intent": "find_food",
+            "confidence": 0.98,
+            "entities": {
+                "budget": 100000,
+                "people": 2,
+                "dietary": ["no_spicy"],
+                "mood": None,
+                "location_name": "Quận 1"
+            }
+        }'''
+        
+        return response
+        
+    except Exception as e:
+        return {
+            "intent": "general_consultation",
+            "confidence": 0.0,
+            "entities": {}
+        }

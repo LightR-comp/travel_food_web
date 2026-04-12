@@ -3,7 +3,8 @@
 # và thời tiết của người dùng, từ đó sử dụng thông tin này để cải thiện chất lượng gợi ý quán ăn mà AI sẽ trả về.
 import requests
 from core.config import settings
-from core.prompts import WEATHER_EMOTION_PROMPT
+from core.prompts import build_weather_emotion_prompt
+from ai_chatbot.consultant_rag import generate_response
 
 class EmotionWeatherAssistant:
     def __init__(self, ai_engine):
@@ -29,10 +30,10 @@ class EmotionWeatherAssistant:
     def provide_suggestion(self, emotion, city=None):
         weather_info = self.get_weather(city)
         # Format prompt từ core/prompts.py
-        full_prompt = WEATHER_EMOTION_PROMPT.format(
+        full_prompt = build_weather_emotion_prompt(
             weather=weather_info,
             emotion=emotion
         )
         # Gọi sang AI engine để nhận phản hồi thông minh
-        return self.ai_engine.generate_response(full_prompt)
+        return generate_response(full_prompt)
 

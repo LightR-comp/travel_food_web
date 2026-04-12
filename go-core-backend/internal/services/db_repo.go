@@ -436,7 +436,7 @@ func GetUserPreferences(ctx context.Context, userID int) (*models.UserPreference
 	return &p, nil
 }
 
-// Local user registration
+// Local user
 func RegisterLocal(ctx context.Context, username, password, name string) (*models.User, error) {
 	// 1. Kiểm tra username đã tồn tại chưa
 	var count int

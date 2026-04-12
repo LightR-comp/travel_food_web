@@ -1,6 +1,3 @@
-// db_repo.go chứa các hàm để tương tác với cơ sở dữ liệu, bao gồm việc lưu trữ và truy xuất thông tin về người dùng, quán ăn, menu và diễn đàn.
-// Đây là nơi chúng ta sẽ xây dựng các hàm để thực hiện các truy vấn SQL, đảm bảo rằng chúng ta có thể lưu trữ và truy xuất dữ liệu một cách hiệu quả và an toàn.
-
 package services
 
 import (
@@ -21,10 +18,14 @@ import (
 var db *sql.DB
 
 func InitDB() {
-	connStr := os.Getenv("DB_CONNECTION_STRING")
-	if connStr == "" {
-		log.Fatal("[DB] DB_CONNECTION_STRING chưa được set trong .env")
-	}
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+
+	connStr := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s",
+		user, password, host, port, dbName)
 
 	var err error
 	db, err = sql.Open("sqlserver", connStr)

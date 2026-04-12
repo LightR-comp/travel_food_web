@@ -10,7 +10,7 @@ load_dotenv()
 
 class Settings:
     # --- App Settings ---
-    APP_NAME = "SmartTravelAIService"
+    APP_NAME = "YumMap"
     DEBUG = os.getenv("DEBUG", "True") == "True"
     PORT = int(os.getenv("PORT", 8000))
 

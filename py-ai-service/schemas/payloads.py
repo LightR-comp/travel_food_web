@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Any
 
 # GIAI ĐOẠN 3: GO -> PYTHON (INPUT)
 class UserContext(BaseModel):
@@ -35,3 +35,14 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     reply: str
     status: str = "success"
+
+# Intent-parser
+class IntentResponse(BaseModel):
+    intent: str
+    confidence: float    
+    entities: dict       
+
+# Generate response
+class GenerateRequest(BaseModel):
+    user_query: str
+    db_data: Any

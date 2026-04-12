@@ -1,4 +1,7 @@
-	package utils
+// formatter.go chứa các hàm để định dạng dữ liệu về quán ăn, bao gồm việc chuyển đổi khoảng cách về đơn vị KM, định dạng giá tiền kiểu "40k-70k" và format trạng thái hoạt động của quán ăn.
+// Đây là nơi chúng ta sẽ xây dựng các hàm để đảm bảo rằng dữ liệu về quán ăn được trả về cho frontend đã được format chuẩn, giúp cho việc hiển thị thông tin về quán ăn trở nên dễ dàng và thân thiện hơn với người dùng.
+
+package utils
 
 import (
 	"fmt"

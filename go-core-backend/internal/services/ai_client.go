@@ -1,3 +1,6 @@
+// ai_client.go chứa các hàm để giao tiếp với Python AI Service, bao gồm việc gửi yêu cầu và nhận phản hồi từ service đó.
+// Đây là nơi chúng ta sẽ xây dựng logic để gọi Python AI Service, truyền dữ liệu về Intent của người dùng và danh sách các quán ăn, và nhận lại các gợi ý từ AI để trả về cho frontend.
+
 package services
 
 import (
@@ -15,28 +18,13 @@ import (
 	"time"
 	//Lấy URL AI Python từ config
 	"go-core-backend/internal/config"
+
+	"go-core-backend/internal/dto"
 )
 
-//// AIRecommendRequest: Định nghĩa cấu trúc dữ liệu Request gửi từ Go sang Python
-type AIRecommendRequest struct {
-	// Intent của user, ví dụ: "Tôi muốn ăn phở với 10 người, ngân sách 200k/người, ở quận 1"
-	UserIntent  string `json:"user_intent"`
-	// Tạm thời truyền mảng ID, có thể mở rộng thành Struct chứa thông tin chi tiết sau.
-	Restaurants []int  `json:"restaurants"`
-}
-
-// AIRecommendResponse: Định nghĩa cấu trúc dữ liệu Response nhận từ Python về Go
-type AIRecommendResponse struct {
-	// Danh sách ID quán ăn được AI Python đề xuất dựa trên Intent của user và điểm được ai python chấm cho từng quán
-	Recommendations []int `json:"recommendations"`
-	// Điểm số đánh giá của AI Python cho từng quán, ví dụ: 0.85, 0.92
-	Scores          []float64 `json:"scores"`
-	//Câu tư vấn thêm ngắn gọn, ví dụ: quán hơi chật 
-	Reasoning      string `json:"reasoning"`
-}
 
 // CallPythonEngine: Gửi HTTP POST request tới Python AI Service và parse kết quả trả về
-func CallPythonEngine(reqData AIRecommendRequest) (*AIRecommendResponse, error) {
+func CallPythonEngine(reqData dto.AIRecommendRequest) (*dto.AIRecommendResponse, error) {
 	// Bước 1: Serialize struct của Go thành định dạng chuỗi JSON (Marshal)
 	jsonData, err := json.Marshal(reqData)
 	if err != nil {
@@ -68,7 +56,7 @@ func CallPythonEngine(reqData AIRecommendRequest) (*AIRecommendResponse, error) 
 		return nil, fmt.Errorf("lỗi đọc response body từ Python AI Service: %v", err)
 	}	
 	//Bước 6: Deserialize (Unmarshal) chuỗi JSON nhận được thành struct Go
-	var aiResponse AIRecommendResponse
+	var aiResponse dto.AIRecommendResponse
 	if err := json.Unmarshal(bodyBytes, &aiResponse); err != nil {
 		return nil, fmt.Errorf("lỗi parse định dạng JSON từ Python service: %v", err)
 	}	

@@ -18,5 +18,16 @@ func SetupRouter(r *gin.Engine) {
 
 	// Route cho API recommend
 	v1.GET("/recommend", handlers.GetRecommendations)
+
+	// OAuth
+	v1.POST("/auth/oauth", handlers.Login)
+
+	// Local
+	v1.POST("/auth/register", handlers.Register)
+	v1.POST("/auth/login", handlers.LocalLogin)
+
+	// Profile
+	v1.GET("/me", handlers.GetProfile)
+	v1.PUT("/me", handlers.UpdateProfile)
 	}
 }

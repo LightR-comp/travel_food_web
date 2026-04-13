@@ -8,21 +8,45 @@ from pydantic import BaseModel
 from typing import List, Optional, Any
 
 # GIAI ĐOẠN 3: GO -> PYTHON (INPUT)
-class UserContext(BaseModel):
+
+# 1. Các Sub-model cho UserContext (Khớp với models.UserContext của Go)
+class LocationInput(BaseModel):
+    lat: float
+    lng: float
+    radius_km: float = 5.0
+
+class ContextPreferencesInput(BaseModel):
     budget: int
     people: int
-    dietary: List[str]
-    mood: str
+    dietary: List[str] = []
+    food_types: List[str] = []
+    mood: str = ""
+    weather: str = ""
+
+class UserContext(BaseModel):
+    user_id: int
+    location: LocationInput
+    preferences: ContextPreferencesInput
+
+
+# 2. Các Sub-model cho Restaurant (Khớp với dto.AIRestaurantInput của Go)
+class SummaryDishInput(BaseModel):
+    name: str
+    price: float
+    ingredients: List[str] = []
 
 class RestaurantInput(BaseModel):
     id: int
     rating: float
-    price: int
+    price: float  
     distance_km: float
+    type: str    
+    featured_dishes: List[SummaryDishInput] = [] 
 
 class RecommendRequest(BaseModel):
-    user_context: UserContext
+    user_context: UserContext  # Map với json:"user_context" của Go
     restaurants: List[RestaurantInput]
+
 
 # GIAI ĐOẠN 5: PYTHON -> GO (OUTPUT)
 class AIResultItem(BaseModel):
@@ -31,7 +55,8 @@ class AIResultItem(BaseModel):
     reason: str
 
 class RecommendResponse(BaseModel):
-    results: List[AIResultItem]
+    # Đổi tên field cho khớp json:"recommended_restaurants" của Go
+    recommended_restaurants: List[AIResultItem]
     
 # Chatbot 
 class ChatRequest(BaseModel):

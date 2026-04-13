@@ -17,7 +17,7 @@ func SetupRouter(r *gin.Engine) {
 	v1.POST("/chat", handlers.ChatbotProcess)
 
 	// Route cho API recommend
-	v1.GET("/recommend", handlers.GetRecommendations)
+	v1.POST("/recommend", handlers.GetRecommendations)
 
 	// OAuth
 	v1.POST("/auth/oauth", handlers.Login)

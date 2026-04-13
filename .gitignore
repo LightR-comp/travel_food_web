@@ -45,3 +45,5 @@ obj/
 
 # Tệp backup và tệp log
 *.log
+
+serviceAccountKey.json

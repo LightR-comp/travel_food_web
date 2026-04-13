@@ -19,8 +19,9 @@ type Config struct {
 	DBPassword  string
 	DBName      string
 	AIServiceURL string
-	GoogleMapsAPIKey string
+	GoongMapsAPIKey string
 	GeminiAPIKey string
+	FirebaseCredentialPath string
 }
 
 // biến global để DB Repo, AI Client gọi
@@ -42,8 +43,9 @@ func LoadConfig() {
 		DBPassword:       getEnv("DB_PASSWORD", ""),
 		DBName:           getEnv("DB_NAME", "travel_food_db"),
 		AIServiceURL:     getEnv("AI_SERVICE_URL", "http://localhost:8000"),
-		GoogleMapsAPIKey: getEnv("GOOGLE_MAPS_API_KEY", ""),
+		GoongMapsAPIKey: getEnv("GOOng_MAPS_API_KEY", ""),
 		GeminiAPIKey:     getEnv("GEMINI_API_KEY", ""),
+		FirebaseCredentialPath: getEnv("FIREBASE_CREDENTIAL_PATH", "./serviceAccountKey.json"),
 	}
 }	
 

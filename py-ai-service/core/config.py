@@ -31,5 +31,3 @@ class Settings:
     # DB_URL = os.getenv("DATABASE_URL")
 
 settings = Settings()
-
-settings = Settings()

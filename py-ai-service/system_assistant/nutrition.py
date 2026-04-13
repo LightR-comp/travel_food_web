@@ -1,22 +1,41 @@
 # nutrition.py chứa các hàm tiện ích để xử lý thông tin dinh dưỡng, ăn kiêng
-# nutrition.py chứa các hàm tiện ích để xử lý thông tin dinh dưỡng, ăn kiêng
 # Logic mới: Sử dụng hàm build_allergy_prompt từ prompts.py để chuẩn hóa câu lệnh gửi cho AI
 
 from core.prompts import build_allergy_prompt
-from ai_chatbot.consultant_rag import generate_response
-
-def filter_menu(user_allergies, raw_menu):
+def calculate_allergy_penalties(user_allergies, raw_menu):
     """
-    user_allergies: List các loại dị ứng (ví dụ: ['hải sản', 'đậu phộng'])
-    raw_menu: List các món ăn lấy từ Database (Go-backend gửi sang)
+    Tính toán điểm phạt cho từng món ăn dựa trên thành phần dị ứng.
+    
+    Biến:
+    - user_allergies (list): Danh sách chuỗi các chất gây dị ứng (vị dụ: ['hải sản', 'đậu phộng']).
+    - raw_menu (list): Danh sách các đối tượng món ăn. Mỗi đối tượng là một dict:
+        {
+            "id": int,
+            "name": str,
+            "ingredients": list (danh sách nguyên liệu, ví dụ: ['tôm', 'bột mì'])
+        }
+    - scores (dict): Biến lưu trữ trọng số cuối cùng cho từng ID món ăn. 
+      Giá trị -1.0 nghĩa là bị loại bỏ hoàn toàn, 0.0 là an toàn.
     """
     
-    # Nếu không có thông tin dị ứng, trả về menu gốc
+    # Khởi tạo dict: mặc định mọi món ăn đều có trọng số 0
+    scores = {str(item['id']): 0.0 for item in raw_menu}
+    
     if not user_allergies:
-        return raw_menu 
+        return scores
+
+    # Chuyển đổi list dị ứng sang set để tìm kiếm tối ưu hơn
+    allergy_set = set([a.lower() for a in user_allergies])
+
+    for item in raw_menu:
+        # Lấy danh sách nguyên liệu của món ăn
+        ingredients = [i.lower() for i in item.get('ingredients', [])]
         
-    # Bước 1: Gọi hàm từ prompts.py để xây dựng câu lệnh chuẩn cho AI
-    prompt = build_allergy_prompt(user_allergies, raw_menu)
-    
-    # Bước 2: Gọi trực tiếp hàm xử lý AI từ consultant_rag.py để lấy kết quả lọc
-    return generate_response(prompt, str(raw_menu))
+        # Kiểm tra xem có bất kỳ nguyên liệu nào trùng với danh sách dị ứng không
+        for ingredient in ingredients:
+            if any(allergy in ingredient for allergy in allergy_set):
+                # Gán trọng số phạt nặng cho món ăn này
+                scores[str(item['id'])] = -1.0
+                break # Đã tìm thấy thành phần dị ứng, chuyển sang món tiếp theo
+                
+    return scores

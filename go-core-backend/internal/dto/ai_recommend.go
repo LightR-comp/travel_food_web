@@ -3,13 +3,15 @@
 // AIRecommendResponse sẽ chứa danh sách các quán ăn được Python AI Service đánh giá và gợi ý (AIRestaurantOutput), bao gồm ID của quán ăn, điểm số đánh giá tổng hợp từ AI và lý do tại sao quán ăn đó được gợi ý.
 
 package dto
+
 import (
 	"go-core-backend/internal/models"
 )
+
 // AIRecommendRequest: Định nghĩa cấu trúc dữ liệu Request gửi từ Go backend tới Python AI Service
 type AIRecommendRequest struct {
 	// Intent của user, ví dụ: "Tôi muốn ăn phở với 10 người, ngân sách 200k/người, ở quận 1"
-	UserIntent  models.UserContext `json:"user_intent"`
+	UserIntent  models.UserContext `json:"user_context"`
 	// Tạm thời truyền mảng ID, có thể mở rộng thành Struct chứa thông tin chi tiết sau.
 	Restaurants []AIRestaurantInput `json:"restaurants"`
 }

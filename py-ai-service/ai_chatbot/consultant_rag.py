@@ -5,28 +5,7 @@ from typing import Any
 genai.configure(api_key="YOUR_API_KEY")
 model = genai.GenerativeModel('gemini-pro')
 
-<<<<<<< HEAD
-from flask import Flask, request, jsonify
-# import google.generativeai as genai
-
-app = Flask(__name__)
-
-# Setup Gemini (nếu đã có API Key)
-# genai.configure(api_key="YOUR_GEMINI_API_KEY")
-# model = genai.GenerativeModel('gemini-pro')
-
-@app.route('/generate-response', methods=['POST']) # Tạo endpoint
-
-# Hàm tạo câu trả lời
-def generate_response():
-    data = request.json # Nhận phần data đã được tổng hợp từ Go
-    user_query = data.get("query") # Lấy câu hỏi gốc
-    db_data = data.get("db_data") # Thông tin Go lấy từ MSSQL gửi sang
-    
-    # Prompt Engineering: Dùng promt này gửi cho API để nhận được câu trả lời
-=======
 def generate_final_response(user_query: str, db_data: Any) -> str:
->>>>>>> main
     prompt = f"""
     Bạn là trợ lý AI chuyên về ẩm thực. 
     Dữ liệu từ hệ thống (MSSQL): {db_data}

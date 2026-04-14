@@ -18,22 +18,8 @@ class LocationInput(BaseModel):
 class ContextPreferencesInput(BaseModel):
     budget: int
     people: int
-    dietary: List[str] = []
-    food_types: List[str] = []
-    mood: str = ""
-    weather: str = ""
-
-class UserContext(BaseModel):
-    user_id: int
-    location: LocationInput
-    preferences: ContextPreferencesInput
-
-
-# 2. Các Sub-model cho Restaurant (Khớp với dto.AIRestaurantInput của Go)
-class SummaryDishInput(BaseModel):
-    name: str
-    price: float
-    ingredients: List[str] = []
+    dietary: List[str]
+    mood: str
 
 class RestaurantInput(BaseModel):
     id: int
@@ -59,21 +45,40 @@ class RecommendResponse(BaseModel):
     recommended_restaurants: List[AIResultItem]
     
 # Chatbot 
+
+# Phản hồi cho Go
+class BaseResponse(BaseModel): 
+    success: bool
+    message: Optional[str] = ""
+    data: Optional[Any] = None
+    error: Optional[Any] = None
+
+# Nhận từ Go
 class ChatRequest(BaseModel):
     user_id: int
+    session_id: str
     message: str
+    image_url: Optional[str] = None
+    context: Optional[UserContext] = None # Go sẽ gửi kèm cái này nếu cần AI tư vấn sâu
 
-class ChatResponse(BaseModel):
+class ChatData(BaseModel):
     reply: str
-    status: str = "success"
+    intent: Optional[str] = None
+    recommendations: Optional[List[PlaceInfo]] = None
 
-# Intent-parser
+# Ý định
 class IntentResponse(BaseModel):
     intent: str
-    confidence: float    
     entities: dict       
 
-# Generate response
-class GenerateRequest(BaseModel):
-    user_query: str
-    db_data: Any
+# Thông tin vị trí
+class PlaceInfo(BaseModel):
+    id: int
+    name: str
+    address: str
+    rating: float
+    price_range: str
+    image_url: str
+    tags: List[str]
+    allergy_friendly: bool
+    ai_reason: Optional[str] = None # Lý do AI gợi ý 

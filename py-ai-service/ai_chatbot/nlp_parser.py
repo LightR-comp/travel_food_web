@@ -21,7 +21,6 @@ def detect_intent_with_ai(user_text: str) -> Dict[str, Any]:
         '''# Giả sử user_text = "Tìm quán bún cá tầm 100k cho 2 người không cay ở Quận 1"
         mock_ai_response = {
             "intent": "find_food",
-            "confidence": 0.98,
             "entities": {
                 "budget": 100000,
                 "people": 2,

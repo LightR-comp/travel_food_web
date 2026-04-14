@@ -1,41 +1,24 @@
-import google.generativeai as genai # Temporary
+import json
+import re
 from typing import Dict, Any
-
-# config API
-genai.configure(api_key="YOUR_API_KEY")
-model = genai.GenerativeModel('gemini-pro')
+from core.ai_config import shared_model # Import từ core
 
 def detect_intent_with_ai(user_text: str) -> Dict[str, Any]:
     prompt = f"""
-    Phân tích câu sau: "{user_text}"
-    Trả về JSON với các nhãn:
-    - intent: (find_food, opening_hours, location_query, menu_query, general_consultation)
-    - entities: (budget, people, dietary, mood, location_name)
-    
-    Yêu cầu: snake_case, format JSON.
+    Bạn là AI phân tích cho YumMap. Câu hỏi: "{user_text}"
+    Trả về JSON duy nhất:
+    {{
+        "intent": "find_food" | "culture" | "story" | "greeting" | "none",
+        "entities": {{"dish": "", "budget": 0, "people": 0, "location": "", "dietary": []}},
+        "confidence": 0.95
+    }}
+    Lưu ý: Chỉ trả về JSON, không giải thích gì thêm.
     """
-    
     try:
-        response = model.generate_content(prompt)
-        # Đây là ví dụ dữ liệu AI sẽ trả về sau khi parse
-        '''# Giả sử user_text = "Tìm quán bún cá tầm 100k cho 2 người không cay ở Quận 1"
-        mock_ai_response = {
-            "intent": "find_food",
-            "confidence": 0.98,
-            "entities": {
-                "budget": 100000,
-                "people": 2,
-                "dietary": ["no_spicy"],
-                "mood": None,
-                "location_name": "Quận 1"
-            }
-        }'''
-        
-        return response
-        
+        # Sử dụng chung model đã được cấu hình
+        response = shared_model.generate_content(prompt)
+        clean_json = re.sub(r'```json|```', '', response.text).strip()
+        return json.loads(clean_json)
     except Exception as e:
-        return {
-            "intent": "general_consultation",
-            "confidence": 0.0,
-            "entities": {}
-        }
+        print(f"Error in nlp_parser: {e}")
+        return {"intent": "none", "entities": {}, "confidence": 0.0}

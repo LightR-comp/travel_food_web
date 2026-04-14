@@ -1,68 +1,61 @@
-import requests
-from core.config import settings
+# 10 loại Mood và các tag không gian quán tương ứng
+MOOD_MAPPING = {
+    "romantic": ["yen_tinh", "sang_trong", "view_dep", "den_mo"],
+    "sad": ["am_cung", "nhac_nhe", "yen_tinh", "ngot_ngao"],
+    "happy": ["soi_dong", "nhau", "on_ao", "khong_gian_mo"],
+    "chill": ["ngoai_troi", "nhac_acoustic", "view_dep"],
+    "stress": ["thien_nhien", "yen_tinh", "khong_gian_mo"],
+    "tired": ["yen_tinh", "phuc_vu_tot", "thanh_dam"],
+    "excited": ["buffet", "soi_dong", "nhieu_nang_luong"],
+    "angry": ["mat_me", "yen_tinh", "rong_rai"],
+    "lonely": ["am_cung", "quay_bar", "quan_nho"],
+    "family": ["rong_rai", "ban_lon", "khu_vui_choi", "am_cung"]
+}
 
-class ContextScorer:
+# Các tag đồ ăn/không gian phù hợp với thời tiết
+WEATHER_MAPPING = {
+    "rainy": ["lau", "nuong", "sup", "nong_hoi", "am_cung", "trong_nha"],
+    "hot": ["mat_me", "trai_cay", "kem", "salad", "khong_gian_lanh", "may_lanh"],
+    "cold": ["lau", "nuong", "cay_nong", "nhieu_calo"]
+}
+
+def calculate_emotion_weather_match(user_mood, current_weather, restaurant_tags, restaurant_rating):
     """
-    Tính toán trọng số ưu tiên dựa trên ngữ cảnh thực tế.
+    Tính điểm trải nghiệm kết hợp giữa Cảm xúc và Thời tiết.
+    Thang điểm: 0.0 đến 1.0
     """
-    def __init__(self):
-        # Định nghĩa các quy tắc ưu tiên
-        # Key: Từ khóa thời tiết/cảm xúc | Value: Dict {Category: Weight}
-        self.rules = {
-            "mưa": {"Lẩu": 1.5, "Đồ nướng": 1.4, "Soup": 1.3},
-            "nóng": {"Kem": 1.8, "Trà sữa": 1.5, "Salad": 1.3, "Lẩu": 0.5},
-            "lạnh": {"Lẩu": 1.7, "Đồ nướng": 1.6, "Cà phê": 1.2},
-            "buồn": {"Đồ ngọt": 1.5, "Tráng miệng": 1.4, "Comfort Food": 1.3},
-            "stress": {"Cay": 1.4, "Snack": 1.2}
-        }
+    resto_tags_set = set(restaurant_tags)
+    
+    # --- 1. CHẤM ĐIỂM MOOD (Tối đa 0.6) ---
+    mood_score = 0.0
+    target_mood_tags = set(MOOD_MAPPING.get(user_mood, []))
+    
+    if target_mood_tags:
+        mood_match_count = len(target_mood_tags.intersection(resto_tags_set))
+        if mood_match_count >= 2:
+            mood_score = 0.6
+        elif mood_match_count == 1:
+            mood_score = 0.4
+        else:
+            # Bù trừ bằng rating nếu tag không khớp hoàn toàn
+            if user_mood in ["romantic", "family", "chill"] and restaurant_rating >= 4.5:
+                mood_score = 0.3
+            else:
+                mood_score = 0.1
+    else:
+        mood_score = 0.6 # Nếu Frontend không truyền mood, cho mặc định full điểm phần này
 
-    def get_weather_desc(self, city=None):
-        """
-        Lấy mô tả thời tiết từ API.
-        Biến:
-        - city (str): Tên thành phố lấy từ config hoặc request.
-        - response (obj): Đối tượng phản hồi từ OpenWeatherMap.
-        - weather_main (str): Từ khóa chính của thời tiết (ví dụ: 'Rain', 'Clouds', 'Clear').
-        """
-        city = city or settings.DEFAULT_CITY
-        params = {
-            "q": city,
-            "appid": settings.WEATHER_API_KEY,
-            "units": "metric"
-        }
-        try:
-            res = requests.get(settings.WEATHER_BASE_URL, params=params)
-            if res.status_code == 200:
-                data = res.json()
-                # Trả về từ khóa chính của thời tiết để khớp với rules
-                return data['weather'][0]['main'].lower()
-            return "clear"
-        except Exception:
-            return "clear"
-
-    def get_context_multipliers(self, user_emotion, city=None):
-        """
-        Tính toán hệ số nhân cho các danh mục (Categories).
-        Biến:
-        - user_emotion (str): Cảm xúc người dùng gửi lên.
-        - weather_key (str): Từ khóa thời tiết lấy được từ API.
-        - final_weights (dict): Tổng hợp hệ số nhân cuối cùng.
-          Mặc định mỗi Category có trọng số là 1.0 (không đổi).
-        """
-        weather_key = self.get_weather_desc(city)
-        final_weights = {}
-
-        # 1. Kiểm tra trọng số theo thời tiết
-        for key, category_map in self.rules.items():
-            if key in weather_key:
-                for cat, weight in category_map.items():
-                    final_weights[cat] = final_weights.get(cat, 1.0) * weight
+    # --- 2. CHẤM ĐIỂM WEATHER (Tối đa 0.4) ---
+    weather_score = 0.0
+    target_weather_tags = set(WEATHER_MAPPING.get(current_weather, []))
+    
+    if target_weather_tags:
+        weather_match_count = len(target_weather_tags.intersection(resto_tags_set))
+        if weather_match_count >= 1:
+            weather_score = 0.4
+        else:
+            weather_score = 0.1
+    else:
+        weather_score = 0.4 # Nếu Frontend không truyền thời tiết, mặc định full điểm
         
-        # 2. Kiểm tra trọng số theo cảm xúc
-        emotion_key = user_emotion.lower()
-        for key, category_map in self.rules.items():
-            if key in emotion_key:
-                for cat, weight in category_map.items():
-                    final_weights[cat] = final_weights.get(cat, 1.0) * weight
-
-        return final_weights
+    return round(mood_score + weather_score, 2)

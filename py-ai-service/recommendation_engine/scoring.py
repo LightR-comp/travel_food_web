@@ -47,16 +47,17 @@ def determine_dynamic_weights(user_context):
 def process_scoring(ai_input_data):
     """Nhận JSON Giai đoạn 3 và trả về JSON Giai đoạn 5 theo API Contract."""
     user_context = ai_input_data.get("user_context", {})
+    prefs = user_context.get("preferences", {})
+    
+    user_budget = prefs.get("budget", 0)
+    user_people = max(1, prefs.get("people", 1)) # Fix lỗi division by zero
+    user_dietary = prefs.get("dietary", [])
+    user_mood = prefs.get("mood", "")
+    user_weather = prefs.get("weather", "normal")
+    user_tastes = prefs.get("food_types", []) # Đổi từ 'taste' thành 'food_types' cho khớp payloads
+    
     restaurants = ai_input_data.get("restaurants", [])
-    
-    user_budget = user_context.get("budget", 0)
-    user_people = user_context.get("people", 1)
-    user_dietary = user_context.get("dietary", [])
-    user_mood = user_context.get("mood", "")
-    user_weather = user_context.get("weather", "normal")
-    user_tastes = user_context.get("taste", []) 
-    
-    weights = determine_dynamic_weights(user_context)
+    weights = determine_dynamic_weights(prefs)
     results = []
     
     for r in restaurants:

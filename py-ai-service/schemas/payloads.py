@@ -7,10 +7,24 @@
 from pydantic import BaseModel
 from typing import List, Optional, Any
 
+'''
+Tất cả các giao tiếp API với Go phải tuân thủ theo format sau:
+'''
+class BaseResponse(BaseModel):
+    success: bool
+    message: Optional[str] = ""
+    data: Optional[Any] = None
+    error: Optional[Any] = None
+'''
+Trong đó, phần data sẽ được thay thế tùy theo từng trường hợp. 
+'''
+
+### RECOMMEND FLOW
+
 # GIAI ĐOẠN 3: GO -> PYTHON (INPUT)
 
 # 1. Các Sub-model cho UserContext (Khớp với models.UserContext của Go)
-class LocationInput(BaseModel):
+class LocationInput(BaseModel): # Vị trí người dùng
     lat: float
     lng: float
     radius_km: float = 5.0
@@ -37,8 +51,10 @@ class SummaryDishInput(BaseModel):
 
 class RestaurantInput(BaseModel):
     id: int
+    res_name: str
     rating: float
-    price: float  
+    price: float
+    image_url: str  
     distance_km: float
     type: str    
     featured_dishes: List[SummaryDishInput] = [] 
@@ -57,21 +73,43 @@ class AIResultItem(BaseModel):
 class RecommendResponse(BaseModel):
     # Đổi tên field cho khớp json:"recommended_restaurants" của Go
     recommended_restaurants: List[AIResultItem]
-    
-# Chatbot 
-class ChatRequest(BaseModel):
-    user_id: int
+
+
+
+### CHATBOT_FLOW:
+
+
+# Lần gọi 1: Phân tích ý định
+class ChatIntentRequest(BaseModel): # GO trả về
     message: str
+    user_id: int
 
-class ChatResponse(BaseModel):
-    reply: str
-    status: str = "success"
+class IntentData(BaseModel):   # python trả về
+    intent: str               # find_food, allergy_inquiry, greeting
+    entities: dict            # {"food_type": "bún bò", "budget": 50000}
+    confidence: float
 
-# Intent-parser
-class IntentResponse(BaseModel):
+# Lần gọi 2: Tạo câu trả lời tự nhiên
+class ChatGenerationRequest(BaseModel): # GO trả về
+    user_message: str
     intent: str
-    confidence: float    
-    entities: dict       
+    user_context: UserContext             # Thông tin dị ứng, mood của user
+    found_restaurants: List[RestaurantInput] # Danh sách quán Go vừa tìm được. Nếu found_restaurants gửi qua là [],
+    # Python sẽ hiểu là "À, đây là tán gẫu/văn hóa, mình tự bịa nội dung dựa trên user_message thôi".
+
+# Thông tin vị trí
+class PlaceInfo(BaseModel):
+    # Đối tượng gốc nằm ở đây
+    restaurant: RestaurantInput 
+    
+    # Các trường do AI bổ sung
+    ai_reason: Optional[str] = None
+    allergy_friendly: bool = False
+    tags: List[str] = []
+
+class ChatFinalData(BaseModel): # python trả về
+    reply: str                            # Câu trả lời tự nhiên (Natural Language)
+    suggested_places: List[PlaceInfo]  
 
 # Generate response
 class GenerateRequest(BaseModel):

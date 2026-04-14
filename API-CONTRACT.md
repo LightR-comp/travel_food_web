@@ -53,6 +53,8 @@ Sai:
 
 ## 4. JSON RULES THEO TỪNG GIAI ĐOẠN:
 
+### RECOMMEND WORKFLOW
+
 ### 4.1 GIAI ĐOẠN 1 — Frontend → Go:
 
 Mục tiêu: Thu thập user intent + context
@@ -340,3 +342,97 @@ JSON:
   "error": null
 }
 ```
+
+### CHATBOT WORKFLOW
+
+### GIAI ĐOẠN 1 — Go → Python (INTENT PARSE)
+**Mục tiêu:** Giúp Go hiểu người dùng đang muốn gì để đi tìm dữ liệu cho đúng.
+
+**Dữ liệu truyền đi (Request):**
+```json
+{
+  "user_id": 123,
+  "message": "Tìm cho mình quán bún bò không cay cho 2 người ở Quận 1"
+}
+```
+
+**AI trả về cho Go (Response):**
+```json
+{
+  "success": true,
+  "data": {
+    "intent": "find_food",
+    "entities": {
+      "dish": "bún bò",
+      "people": 2,
+      "dietary": ["no_spicy"],
+      "location": "Quận 1"
+    },
+    "confidence": 0.98
+  }
+}
+```
+
+---
+
+### GIAI ĐOẠN 2 — Xử lý nội bộ tại Go (DATABASE FETCH)
+**Mục tiêu:** Go cầm các `entities` ở trên để truy vấn SQL Server.
+* Nếu tìm thấy quán ăn -> Lưu vào danh sách `restaurants`.
+* Nếu là tán gẫu (Intent: `culture`, `story`) -> Danh sách `restaurants` sẽ để trống `[]`.
+
+---
+
+### GIAI ĐOẠN 3 — Go → Python (GENERATE RESPONSE)
+**Mục tiêu:** Gửi toàn bộ "nguyên liệu" đã có cho AI để nó soạn văn. Đây là giai đoạn quan trọng nhất của **YumMap**.
+
+**Dữ liệu truyền đi (Request):**
+```json
+{
+  "user_message": "Tìm cho mình quán bún bò không cay cho 2 người ở Quận 1",
+  "intent": "find_food",
+  "user_context": {
+    "user_id": 123,
+    "preferences": { "dietary": ["no_spicy"], "budget": 100000 }
+  },
+  "found_restaurants": [
+    {
+      "id": 1,
+      "res_name": "Bún Bò Chú Sáng",
+      "rating": 4.6,
+      "price": 50000,
+      "image_url": "https://link-anh.com",
+      "ingredients": ["bún", "bò", "nước dùng không cay"]
+    }
+  ]
+}
+```
+
+---
+
+### GIAI ĐOẠN 4 — Python → Go (FINAL OUTPUT)
+**Mục tiêu:** Trả về câu trả lời tự nhiên kèm dữ liệu đã được "đóng gói" để hiện lên UI.
+
+**Phản hồi cuối cùng (Response):**
+```json
+{
+  "success": true,
+  "message": "Thành công",
+  "data": {
+    "reply": "Dạ, em tìm được quán Bún Bò Chú Sáng ở Quận 1 rất hợp ý bạn, đặc biệt là nước dùng thanh và hoàn toàn không cay ạ!",
+    "suggested_places": [
+      {
+        "restaurant": {
+          "id": 1,
+          "res_name": "Bún Bò Chú Sáng",
+          "image_url": "https://link-anh.com"
+        },
+        "ai_reason": "Quán này cam kết không dùng ớt trong nước dùng bún bò, cực kỳ an toàn cho bạn.",
+        "allergy_friendly": true,
+        "tags": ["Yên tĩnh", "Giá rẻ"]
+      }
+    ]
+  }
+}
+```
+
+

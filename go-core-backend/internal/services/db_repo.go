@@ -20,12 +20,10 @@ var db *sql.DB
 func InitDB() {
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
 
-	connStr := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s",
-		user, password, host, port, dbName)
+	connStr := fmt.Sprintf("sqlserver://%s:%s?database=%s&trusted_connection=yes",
+		host, port, dbName)
 
 	var err error
 	db, err = sql.Open("sqlserver", connStr)
@@ -41,6 +39,7 @@ func InitDB() {
 	db.SetMaxIdleConns(10)
 
 	log.Println("[DB] Kết nối MSSQL thành công.")
+	log.Println("[DB] Database:", os.Getenv("DB_NAME"))
 }
 
 // ============================================================
@@ -463,7 +462,7 @@ func RegisterLocal(ctx context.Context, username, password, name string) (*model
 		VALUES ('', @name, '', GETDATE(), GETDATE())
 	`, sql.Named("name", name))
 	if err := newRow.Scan(&userID); err != nil {
-		return nil, fmt.Errorf("lỗi tạo user")
+		return nil, fmt.Errorf("lỗi tạo user: %w", err)
 	}
 
 	// 4. Lưu UserAuth

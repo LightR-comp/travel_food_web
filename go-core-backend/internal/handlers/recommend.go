@@ -5,72 +5,134 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"go-core-backend/internal/dto"
+	"go-core-backend/internal/models"
 	"go-core-backend/internal/services"
+	"go-core-backend/internal/utils"
 )
 
-type RecommendRequest struct {
-	Latitude        float64  `json:"latitude" binding:"required"`
-	Longitude       float64  `json:"longitude" binding:"required"`
-	NumberOfPeople  int      `json:"number_of_people"`
-	BudgetPerPerson float64  `json:"budget_per_person"`
-	MealTime        string   `json:"meal_time"`
-	Mood            string   `json:"mood"`
-	Weather         string   `json:"weather"`
-	Dietary         []string `json:"dietary"`
-	FoodTypes       []string `json:"food_types"`
-	RadiusKm        float64  `json:"radius_km"`
-}
+
 
 func GetRecommendations(c *gin.Context) {
-	var req RecommendRequest
+	var req dto.RecommendRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Thiếu latitude/longitude"})
+		c.JSON(http.StatusBadRequest, dto.RecommendResponse{
+			Success: false,
+			Message: "Dữ liệu yêu cầu không hợp lệ",
+			Error:   err.Error(),
+		})
 		return
 	}
-
-	if req.RadiusKm == 0 {
-		req.RadiusKm = 5.0
+	// CHỐT BẢO MẬT: LẤY ID TỪ TOKEN
+	authUserID := c.GetInt("user_id")
+	if authUserID > 0 {
+		req.UserID = authUserID
 	}
+	// Hardcode tọa độ demo tại KHTN
+	req.Location.Lat = 10.762622
+	req.Location.Lng = 106.682379
+	if req.Location.RadiusKm == 0 {
+		req.Location.RadiusKm = 5.0
+	}
+
 
 	ctx := c.Request.Context()
 
-	// Lấy preferences từ DB nếu đã đăng nhập
-	userID := c.GetInt("user_id")
-	if userID != 0 {
-		prefs, err := services.GetUserPreferences(ctx, userID)
+	// Ưu tiên 1: Lấy từ DB lấp vào chỗ trống
+	if req.UserID > 0 {
+		prefs, err := services.GetUserPreferences(ctx, req.UserID)
 		if err == nil {
-			if len(req.Dietary) == 0 {
-				req.Dietary = []string{prefs.Dietary}
+			if len(req.Preferences.Dietary) == 0 && prefs.Dietary != "" {
+				req.Preferences.Dietary = utils.SplitCSV(prefs.Dietary)
 			}
-			if len(req.FoodTypes) == 0 {
-				req.FoodTypes = []string{prefs.FoodTypes}
+			if len(req.Preferences.FoodTypes) == 0 && prefs.FoodTypes != "" {
+				req.Preferences.FoodTypes = utils.SplitCSV(prefs.FoodTypes)
 			}
-			if req.BudgetPerPerson == 0 {
-				req.BudgetPerPerson = prefs.BudgetPerPerson
+			if req.Preferences.Budget == 0 && prefs.BudgetPerPerson > 0 {
+				req.Preferences.Budget = int(prefs.BudgetPerPerson)
 			}
 		}
 	}
 
+	// Ưu tiên 2: Xử lý giá trị mặc định
+	if req.Preferences.Budget == 0 { req.Preferences.Budget = 100000 }
+	if req.Preferences.People == 0 { req.Preferences.People = 1 }
+
+	// Truy vấn quán ăn quanh vị trí
 	restaurants, err := services.GetRestaurantsNearby(ctx, services.NearbyQuery{
-		Latitude:  req.Latitude,
-		Longitude: req.Longitude,
-		RadiusKm:  req.RadiusKm,
+		Latitude:  req.Location.Lat,
+		Longitude: req.Location.Lng,
+		RadiusKm:  req.Location.RadiusKm,
 	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi lấy dữ liệu quán ăn"})
+		c.JSON(http.StatusInternalServerError, dto.RecommendResponse{Success: false, Message: "Lỗi DB"})
 		return
 	}
 
 	if len(restaurants) == 0 {
-		c.JSON(http.StatusOK, gin.H{
-			"message":     "Không tìm thấy quán ăn trong khu vực",
-			"restaurants": []interface{}{},
-		})
+		c.JSON(http.StatusOK, dto.RecommendResponse{Success: true, Data: dto.RecommendResponseData{Restaurants: []dto.RestaurantSummary{}}})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message":     "Gợi ý thành công",
-		"restaurants": restaurants,
+	// Payload gửi Python AI
+	var aiInput []dto.AIRestaurantInput
+	for _, r := range restaurants {
+		aiInput = append(aiInput, utils.BuildAIInput(r))
+	}
+
+	aiReq := dto.AIRecommendRequest{
+		UserIntent:  utils.ToUserContext(req),
+		Restaurants: aiInput,
+	}
+
+	// Gọi Python Service chấm điểm
+	aiResp, err := services.CallPythonEngine(aiReq)
+	if err != nil {
+		c.JSON(http.StatusServiceUnavailable, dto.RecommendResponse{Success: false, Message: "AI Service lỗi"})
+		return
+	}
+
+	// Map kết quả trả về cho Frontend
+	var finalResults []dto.RestaurantSummary
+	resMap := make(map[int]models.Restaurant)
+	for _, r := range restaurants {
+		resMap[r.ID] = r
+	}
+
+	for _, aiRes := range aiResp.RecommendedRestaurants {
+		if original, exists := resMap[aiRes.ID]; exists {
+			summary := dto.RestaurantSummary{
+				ID: original.ID,
+				RestaurantInfo: dto.InfoDTO{
+					Name: original.Name,
+					Contact: dto.ContactDTO{Address: original.Address},
+					OperatingHours: dto.HoursDTO{
+						Schedule: original.OpenTime + " - " + original.CloseTime,
+						IsOpenNow: original.IsOpen,
+					},
+				},
+				Meta: dto.MetaDTO{
+					Rating: original.Rating,
+					DistanceKm: original.DistanceKm,
+				},
+				AIAnalysis: dto.AIAnalysisDTO{
+					Score: aiRes.Score,
+					Reason: aiRes.Reason,
+				},
+			}
+			if len(original.Menu) > 0 {
+				summary.SignatureDish = dto.SignatureDishDTO{
+					DishName: original.Menu[0].Name,
+					Description: original.Menu[0].Description,
+				}
+			}
+			finalResults = append(finalResults, summary)
+		}
+	}
+
+	c.JSON(http.StatusOK, dto.RecommendResponse{
+		Success: true,
+		Message: "Thành công",
+		Data:    dto.RecommendResponseData{Restaurants: finalResults},
 	})
 }

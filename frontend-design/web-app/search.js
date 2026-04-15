@@ -37,8 +37,8 @@ let botIdx = 0;
 
 function sendChat() {
   const input = document.getElementById('chatbot-input');
-  const body  = document.getElementById('chatbot-body');
-  const msg   = input.value.trim();
+  const body = document.getElementById('chatbot-body');
+  const msg = input.value.trim();
   if (!msg) return;
   addBubble(body, msg, 'user');
   input.value = '';
@@ -80,14 +80,14 @@ function showToast(msg) {
 
 // ---- Search Logic ----
 const suggestions = [
-  { icon:'🥖', text:'Bánh mì Huỳnh Hoa', type:'Quán ăn' },
-  { icon:'🍜', text:'Bún bò Huế', type:'Món ăn' },
-  { icon:'🍚', text:'Cơm tấm sườn bì chả', type:'Món ăn' },
-  { icon:'🍝', text:'Phở bò gia truyền', type:'Quán ăn' },
-  { icon:'🧋', text:'Trà sữa TuTiMi', type:'Đồ uống' },
-  { icon:'🥘', text:'Lẩu Thái hải sản', type:'Quán ăn' },
-  { icon:'🍡', text:'Ăn vặt gỏi cuốn', type:'Món ăn' },
-  { icon:'🔥', text:'Món ăn no', type:'Từ khóa' },
+  { icon: '🥖', text: 'Bánh mì Huỳnh Hoa', type: 'Quán ăn' },
+  { icon: '🍜', text: 'Bún bò Huế', type: 'Món ăn' },
+  { icon: '🍚', text: 'Cơm tấm sườn bì chả', type: 'Món ăn' },
+  { icon: '🍝', text: 'Phở bò gia truyền', type: 'Quán ăn' },
+  { icon: '🧋', text: 'Trà sữa TuTiMi', type: 'Đồ uống' },
+  { icon: '🥘', text: 'Lẩu Thái hải sản', type: 'Quán ăn' },
+  { icon: '🍡', text: 'Ăn vặt gỏi cuốn', type: 'Món ăn' },
+  { icon: '🔥', text: 'Món ăn no', type: 'Từ khóa' },
 ];
 
 function onSearchInput(val) {
@@ -197,7 +197,7 @@ function filterAndRender() {
 
   cards.forEach(card => {
     const name = card.querySelector('.result-name').textContent.toLowerCase();
-    const cat  = card.dataset.category || '';
+    const cat = card.dataset.category || '';
     const tags = card.dataset.tags || '';
     const price = parseInt(card.dataset.price);
     const rating = parseFloat(card.dataset.rating);
@@ -214,12 +214,12 @@ function filterAndRender() {
     if (price < priceMin || price > priceMax) show = false;
 
     // Checkbox filters
-    if (checks.favorite   && !tags.includes('favorite'))    show = false;
-    if (checks.goodRating && rating < 4.7)                  show = false;
-    if (checks.restaurant && !tags.includes('restaurant'))  show = false;
-    if (checks.budget     && !tags.includes('budget'))      show = false;
-    if (checks.cheapest   && !tags.includes('cheapest'))    show = false;
-    if (checks.family     && !tags.includes('family'))      show = false;
+    if (checks.favorite && !tags.includes('favorite')) show = false;
+    if (checks.goodRating && rating < 4.7) show = false;
+    if (checks.restaurant && !tags.includes('restaurant')) show = false;
+    if (checks.budget && !tags.includes('budget')) show = false;
+    if (checks.cheapest && !tags.includes('cheapest')) show = false;
+    if (checks.family && !tags.includes('family')) show = false;
 
     card.classList.toggle('hidden', !show);
     if (show) visible++;
@@ -242,10 +242,10 @@ function applySorting(val) {
   const cards = Array.from(list.querySelectorAll('.result-card'));
 
   cards.sort((a, b) => {
-    if (val === 'rating')    return parseFloat(b.dataset.rating)   - parseFloat(a.dataset.rating);
-    if (val === 'distance')  return parseFloat(a.dataset.distance) - parseFloat(b.dataset.distance);
-    if (val === 'price_asc') return parseInt(a.dataset.price)      - parseInt(b.dataset.price);
-    if (val === 'price_desc')return parseInt(b.dataset.price)      - parseInt(a.dataset.price);
+    if (val === 'rating') return parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating);
+    if (val === 'distance') return parseFloat(a.dataset.distance) - parseFloat(b.dataset.distance);
+    if (val === 'price_asc') return parseInt(a.dataset.price) - parseInt(b.dataset.price);
+    if (val === 'price_desc') return parseInt(b.dataset.price) - parseInt(a.dataset.price);
     return 0;
   });
   cards.forEach(c => list.appendChild(c));
@@ -263,13 +263,13 @@ function updatePriceRange() {
   }
 
   const fmt = n => n >= 1000000 ? '1.000.000' : n.toLocaleString('vi-VN');
-  document.getElementById('price-min-label').textContent = fmt(Math.min(min,max)) + ' VND';
-  document.getElementById('price-max-label').textContent = fmt(Math.max(min,max)) + ' VND';
+  document.getElementById('price-min-label').textContent = fmt(Math.min(min, max)) + ' VND';
+  document.getElementById('price-max-label').textContent = fmt(Math.max(min, max)) + ' VND';
 
   // Update track
   const total = 1000000;
-  const left  = (Math.min(min,max) / total) * 100;
-  const right = (Math.max(min,max) / total) * 100;
+  const left = (Math.min(min, max) / total) * 100;
+  const right = (Math.max(min, max) / total) * 100;
   const track = document.getElementById('price-track');
   if (track) { track.style.left = left + '%'; track.style.width = (right - left) + '%'; }
 

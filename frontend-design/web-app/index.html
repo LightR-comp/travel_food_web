@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FoodMap - Khám Phá Ẩm Thực Việt Nam</title>
-  <meta name="description" content="Khám phá ẩm thực Việt Nam, tìm kiếm nhà hàng, quán ăn ngon gần bạn với hệ thống gợi ý AI thông minh."/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="style.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YumMap - Khám Phá Ẩm Thực Việt Nam</title>
+  <meta name="description"
+    content="Khám phá ẩm thực Việt Nam, tìm kiếm nhà hàng, quán ăn ngon gần bạn với hệ thống gợi ý AI thông minh." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
   <!-- ===== HEADER ===== -->
@@ -19,7 +24,7 @@
       <div class="logo" id="logo">
         <div class="logo-icon">🍜</div>
         <div class="logo-text">
-          <span class="logo-name">FoodMap</span>
+          <span class="logo-name">YumMap</span>
           <span class="logo-sub">📍 TP. Hồ Chí Minh</span>
         </div>
       </div>
@@ -55,17 +60,20 @@
   <!-- ===== HERO BANNER ===== -->
   <section class="hero" id="hero-section">
     <div class="hero-bg">
-      <img src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=1600&q=80" alt="TP. Hồ Chí Minh" class="hero-img" id="hero-img"/>
+      <img src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=1600&q=80" alt="TP. Hồ Chí Minh"
+        class="hero-img" id="hero-img" />
       <div class="hero-overlay"></div>
     </div>
     <div class="hero-content">
       <h1 class="hero-title">Khám Phá Ẩm Thực Sài Gòn</h1>
       <p class="hero-subtitle">AI gợi ý quán ngon – Đúng khẩu vị, đúng khoảnh khắc</p>
       <div class="hero-search" id="hero-search">
-        <input type="text" id="hero-search-input" placeholder="Tìm món ăn, quán ăn, địa điểm..." class="hero-search-input"/>
+        <input type="text" id="hero-search-input" placeholder="Tìm món ăn, quán ăn, địa điểm..."
+          class="hero-search-input" />
         <button class="hero-search-btn" id="hero-search-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         </button>
       </div>
@@ -109,15 +117,19 @@
           <h2 class="section-title">TOP TRENDINGS <span class="fire-icon">🔥</span></h2>
         </div>
         <div class="trending-scroll-wrapper">
-          <button class="scroll-btn scroll-btn-left" id="trending-scroll-left" onclick="scrollCards('trending-cards', -1)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+          <button class="scroll-btn scroll-btn-left" id="trending-scroll-left"
+            onclick="scrollCards('trending-cards', -1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="15,18 9,12 15,6" />
+            </svg>
           </button>
           <div class="cards-container" id="trending-cards">
 
             <!-- Card 1 -->
             <div class="food-card" id="food-card-1">
               <div class="food-card-img-wrap">
-                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80" alt="Bánh Mì Huỳnh Hoa" class="food-card-img" loading="lazy"/>
+                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80"
+                  alt="Bánh Mì Huỳnh Hoa" class="food-card-img" loading="lazy" />
                 <span class="badge badge-popular">Popular</span>
               </div>
               <div class="food-card-body">
@@ -138,7 +150,8 @@
             <!-- Card 2 -->
             <div class="food-card" id="food-card-2">
               <div class="food-card-img-wrap">
-                <img src="https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=400&q=80" alt="Bún bò Huế" class="food-card-img" loading="lazy"/>
+                <img src="https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=400&q=80" alt="Bún bò Huế"
+                  class="food-card-img" loading="lazy" />
                 <span class="badge badge-musttry">Must try</span>
               </div>
               <div class="food-card-body">
@@ -159,7 +172,8 @@
             <!-- Card 3 -->
             <div class="food-card" id="food-card-3">
               <div class="food-card-img-wrap">
-                <img src="https://images.unsplash.com/photo-1562802378-063ec186a863?w=400&q=80" alt="Bò bía" class="food-card-img" loading="lazy"/>
+                <img src="https://images.unsplash.com/photo-1562802378-063ec186a863?w=400&q=80" alt="Bò bía"
+                  class="food-card-img" loading="lazy" />
               </div>
               <div class="food-card-body">
                 <h3 class="food-card-title">Bò bía</h3>
@@ -179,7 +193,8 @@
             <!-- Card 4 -->
             <div class="food-card" id="food-card-4">
               <div class="food-card-img-wrap">
-                <img src="https://images.unsplash.com/photo-1503764654157-72d979d9af2f?w=400&q=80" alt="Cơm tấm" class="food-card-img" loading="lazy"/>
+                <img src="https://images.unsplash.com/photo-1503764654157-72d979d9af2f?w=400&q=80" alt="Cơm tấm"
+                  class="food-card-img" loading="lazy" />
               </div>
               <div class="food-card-body">
                 <h3 class="food-card-title">Cơm tấm</h3>
@@ -199,7 +214,8 @@
             <!-- Card 5 -->
             <div class="food-card" id="food-card-5">
               <div class="food-card-img-wrap">
-                <img src="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80" alt="Phở bò" class="food-card-img" loading="lazy"/>
+                <img src="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=80" alt="Phở bò"
+                  class="food-card-img" loading="lazy" />
                 <span class="badge badge-popular">Trending</span>
               </div>
               <div class="food-card-body">
@@ -220,7 +236,8 @@
             <!-- Card 6 -->
             <div class="food-card" id="food-card-6">
               <div class="food-card-img-wrap">
-                <img src="https://images.unsplash.com/photo-1511910849309-0dffb8785146?w=400&q=80" alt="Gỏi cuốn" class="food-card-img" loading="lazy"/>
+                <img src="https://images.unsplash.com/photo-1511910849309-0dffb8785146?w=400&q=80" alt="Gỏi cuốn"
+                  class="food-card-img" loading="lazy" />
               </div>
               <div class="food-card-body">
                 <h3 class="food-card-title">Gỏi cuốn tôm thịt</h3>
@@ -238,8 +255,11 @@
             </div>
 
           </div>
-          <button class="scroll-btn scroll-btn-right" id="trending-scroll-right" onclick="scrollCards('trending-cards', 1)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+          <button class="scroll-btn scroll-btn-right" id="trending-scroll-right"
+            onclick="scrollCards('trending-cards', 1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="9,18 15,12 9,6" />
+            </svg>
           </button>
         </div>
       </div>
@@ -256,16 +276,20 @@
           <!-- Post 1 -->
           <article class="post-card" id="post-card-1">
             <div class="post-img-wrap">
-              <img src="https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=800&q=80" alt="Review bánh mì Huỳnh Hoa" class="post-img" loading="lazy"/>
+              <img src="https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=800&q=80"
+                alt="Review bánh mì Huỳnh Hoa" class="post-img" loading="lazy" />
               <div class="post-img-overlay">
                 <button class="play-btn" id="post-play-1" aria-label="Xem bài viết">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5,3 19,12 5,21" />
+                  </svg>
                 </button>
               </div>
             </div>
             <div class="post-body">
               <h3 class="post-title">Review bánh mì Huỳnh Hoa, đặt nhất Sài Gòn nhưng chất lượng có đỉnh nhất?</h3>
-              <p class="post-excerpt">Khi nhắc đến bánh mì Sài Gòn, không thể không nhắc đến cái tên Huỳnh Hoa – thương hiệu đã trở thành huyền thoại gắn liền với ký ức tuổi thơ của nhiều thế hệ...</p>
+              <p class="post-excerpt">Khi nhắc đến bánh mì Sài Gòn, không thể không nhắc đến cái tên Huỳnh Hoa – thương
+                hiệu đã trở thành huyền thoại gắn liền với ký ức tuổi thơ của nhiều thế hệ...</p>
               <div class="post-footer">
                 <span class="post-author">✍️ Admin</span>
                 <span class="post-date">📅 12/04/2026</span>
@@ -276,16 +300,20 @@
           <!-- Post 2 -->
           <article class="post-card" id="post-card-2">
             <div class="post-img-wrap">
-              <img src="https://images.unsplash.com/photo-1555126634-323283e090fa?w=800&q=80" alt="Review cơm tấm Phúc Lộc Thọ" class="post-img" loading="lazy"/>
+              <img src="https://images.unsplash.com/photo-1555126634-323283e090fa?w=800&q=80"
+                alt="Review cơm tấm Phúc Lộc Thọ" class="post-img" loading="lazy" />
               <div class="post-img-overlay">
                 <button class="play-btn" id="post-play-2" aria-label="Xem bài viết">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5,3 19,12 5,21" />
+                  </svg>
                 </button>
               </div>
             </div>
             <div class="post-body">
               <h3 class="post-title">Review mới nhất về quán cơm tấm Phúc Lộc Thọ Kha Vạn Cần</h3>
-              <p class="post-excerpt">Nếu là tín đồ cơm tấm và đang tìm kiếm một địa điểm ăn ngon, cơm tấm Phúc Lộc Thọ Kha Vạn Cần chắc chắn là một lựa chọn đáng thử...</p>
+              <p class="post-excerpt">Nếu là tín đồ cơm tấm và đang tìm kiếm một địa điểm ăn ngon, cơm tấm Phúc Lộc Thọ
+                Kha Vạn Cần chắc chắn là một lựa chọn đáng thử...</p>
               <div class="post-footer">
                 <span class="post-author">✍️ Reviewer</span>
                 <span class="post-date">📅 10/04/2026</span>
@@ -305,14 +333,17 @@
         </div>
         <div class="trending-scroll-wrapper">
           <button class="scroll-btn scroll-btn-left" id="spots-scroll-left" onclick="scrollCards('spots-cards', -1)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="15,18 9,12 15,6" />
+            </svg>
           </button>
           <div class="cards-container" id="spots-cards">
 
             <!-- Spot 1 -->
             <div class="food-card" id="spot-card-1">
               <div class="food-card-img-wrap">
-                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80" alt="TuTiMi" class="food-card-img" loading="lazy"/>
+                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80" alt="TuTiMi"
+                  class="food-card-img" loading="lazy" />
               </div>
               <div class="food-card-body">
                 <h3 class="food-card-title">TuTiMi – Trà Sữa, Cà Phê...</h3>
@@ -332,7 +363,8 @@
             <!-- Spot 2 -->
             <div class="food-card" id="spot-card-2">
               <div class="food-card-img-wrap">
-                <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80" alt="Chân gà sốt Thái" class="food-card-img" loading="lazy"/>
+                <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80"
+                  alt="Chân gà sốt Thái" class="food-card-img" loading="lazy" />
               </div>
               <div class="food-card-body">
                 <h3 class="food-card-title">Chân gà sốt Thái Yến Vi...</h3>
@@ -377,7 +409,8 @@
             <!-- Spot 4 -->
             <div class="food-card" id="spot-card-4">
               <div class="food-card-img-wrap">
-                <img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80" alt="Lẩu Thái" class="food-card-img" loading="lazy"/>
+                <img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80" alt="Lẩu Thái"
+                  class="food-card-img" loading="lazy" />
               </div>
               <div class="food-card-body">
                 <h3 class="food-card-title">Lẩu Thái Hải Sản Nấu Riêu...</h3>
@@ -397,7 +430,8 @@
             <!-- Spot 5 -->
             <div class="food-card" id="spot-card-5">
               <div class="food-card-img-wrap">
-                <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=80" alt="Bún riêu" class="food-card-img" loading="lazy"/>
+                <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=80" alt="Bún riêu"
+                  class="food-card-img" loading="lazy" />
               </div>
               <div class="food-card-body">
                 <h3 class="food-card-title">Bún riêu cua đồng</h3>
@@ -416,7 +450,9 @@
 
           </div>
           <button class="scroll-btn scroll-btn-right" id="spots-scroll-right" onclick="scrollCards('spots-cards', 1)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="9,18 15,12 9,6" />
+            </svg>
           </button>
         </div>
       </div>
@@ -443,9 +479,12 @@
         <div class="chat-bubble bot">Hãy cho tôi biết: ngân sách, số người, và bạn muốn ăn gì?</div>
       </div>
       <div class="chatbot-input-area">
-        <input type="text" id="chatbot-input" placeholder="Nhập tin nhắn..." class="chatbot-input" onkeydown="if(event.key==='Enter') sendChat()"/>
+        <input type="text" id="chatbot-input" placeholder="Nhập tin nhắn..." class="chatbot-input"
+          onkeydown="if(event.key==='Enter') sendChat()" />
         <button class="chatbot-send" id="chatbot-send" onclick="sendChat()">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />
+          </svg>
         </button>
       </div>
     </div>
@@ -534,13 +573,13 @@
           <div class="form-group">
             <label class="form-label">Tài khoản <span class="required">*</span></label>
             <div class="input-wrap">
-              <input type="text" id="login-username" class="form-input" placeholder="Email hoặc tên đăng nhập"/>
+              <input type="text" id="login-username" class="form-input" placeholder="Email hoặc tên đăng nhập" />
             </div>
           </div>
           <div class="form-group">
             <label class="form-label">Mật khẩu <span class="required">*</span></label>
             <div class="input-wrap">
-              <input type="password" id="login-password" class="form-input" placeholder="Nhập mật khẩu"/>
+              <input type="password" id="login-password" class="form-input" placeholder="Nhập mật khẩu" />
               <button class="input-eye" onclick="togglePassword('login-password')" type="button">👁️</button>
             </div>
           </div>
@@ -552,7 +591,8 @@
               <span class="s-icon">f</span> Facebook
             </button>
             <button class="social-login-btn google" id="login-google">
-              <span class="s-icon"><img src="https://www.google.com/favicon.ico" alt="Google" style="width:16px;height:16px;"/></span> Google
+              <span class="s-icon"><img src="https://www.google.com/favicon.ico" alt="Google"
+                  style="width:16px;height:16px;" /></span> Google
             </button>
           </div>
           <div class="divider"><span>Tạo tài khoản mới</span></div>
@@ -561,7 +601,7 @@
           <h3 class="modal-welcome">Chào mừng trở lại</h3>
           <p class="modal-tagline">Du lịch thả ga cùng tớ nha</p>
           <div class="modal-food-img">
-            <img src="https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&q=80" alt="Món ăn Việt Nam"/>
+            <img src="https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&q=80" alt="Món ăn Việt Nam" />
           </div>
         </div>
       </div>
@@ -570,4 +610,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>

@@ -37,8 +37,8 @@ let botIdx = 0;
 
 function sendChat() {
   const input = document.getElementById('chatbot-input');
-  const body  = document.getElementById('chatbot-body');
-  const msg   = input.value.trim();
+  const body = document.getElementById('chatbot-body');
+  const msg = input.value.trim();
   if (!msg) return;
   addBubble(body, msg, 'user');
   input.value = '';
@@ -70,21 +70,22 @@ function showToast(msg) {
     font-size:.87rem;font-weight:600;z-index:999;opacity:0;transition:all .3s ease;
     white-space:nowrap;font-family:'Inter',sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25);`;
   document.body.appendChild(t);
-  requestAnimationFrame(() => { t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(0)'; });
+  requestAnimationFrame(() => { t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)'; });
   setTimeout(() => {
-    t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(8px)';
+    t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(8px)';
     setTimeout(() => t.remove(), 300);
   }, 2800);
 }
 
 // ---- Gallery ----
 const galleryPhotos = [
-  'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=900&q=85',
-  'https://images.unsplash.com/photo-1503764654157-72d979d9af2f?w=900&q=85',
-  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900&q=85',
-  'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=85',
-  'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900&q=85',
-  'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=900&q=85',
+  'https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/592188762_1170454531901258_2007691320621081505_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=13d280&_nc_ohc=ZaIM4B1-zm8Q7kNvwH7K8I_&_nc_oc=AdqxAlIh-tBFd-rJbvq6ggNBrh6shMkdH9KHInYa5x-RAHistdqvHBbN7RnN39FQOwQ&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=VVQFX3iggT75oJvbWT6tCQ&_nc_ss=7a3a8&oh=00_Af2MhSRkCi1goXbFbY5bUAFFy8Lm8PoL5T8Gn-tHNKzWjQ&oe=69E4CC59',
+  'https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/476912150_942135224733191_8095130890254302257_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=105&ccb=1-7&_nc_sid=7b2446&_nc_ohc=_1KzGuio2A4Q7kNvwGHUKE_&_nc_oc=AdpKbQFD5RuWvGyuHZDiOAE6BW0WazDcX5mOQ7lk7K0HhZVOWgHrt_nCF2Kbz3i_RDk&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=A2CNQdmL07TBaW9Ore4_5A&_nc_ss=7a3a8&oh=00_Af08eNVk1y484PxDR6sn3022ttHRGdHe2sC6mJqD3_aPqw&oe=69E4D998',
+  'https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/481998289_955681783378535_7002310910430892755_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=13d280&_nc_ohc=bDPtoHMp--wQ7kNvwF_0ZtB&_nc_oc=AdrEmkeO0g5XpEIUtywV15-LQwsTzkgisX4lb9HZtuFwDSO2tcXd_2sfyh3Z1BG2dZM&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=iZYK8q57mdzJPee5-qGkMA&_nc_ss=7a3a8&oh=00_Af2rDZaMywdi0ANqyjVuizKpZgK_tnntk4b08pZ5JRf_Ew&oe=69E4BB11',
+  'https://scontent.fsgn19-1.fna.fbcdn.net/v/t1.6435-9/191409082_120013160213115_6387530588433904048_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=13d280&_nc_ohc=6LYF3IGRZ0EQ7kNvwEMuq-Y&_nc_oc=AdommhpFgGYXx0fJXHQT7Ql4f31MFOvBF_1WMzRz3PM8EMAsk55RgbTLSzocl0W_8RY&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=SgI2-7hWYLp94OEJQpDh8g&_nc_ss=7a3a8&oh=00_Af3SB1I_oFhr5rMKgblTGSSe3QQN67HtLGFR7t9fb3w4VQ&oe=6A068C9A',
+  'https://scontent.fsgn19-1.fna.fbcdn.net/v/t1.6435-9/210190502_136838851863879_5335509313524999332_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=13d280&_nc_ohc=eR9dNhmgjGgQ7kNvwEhEhGy&_nc_oc=AdpF96y_ziCrtnT0oaDp1SpNLc1sdrXevF8-7LtL5hh_2WVXNaLGpLAF5r9q2ZFF04s&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=G19gmGfdoJpweS0_J1WYyg&_nc_ss=7a3a8&oh=00_Af3b0zLqjWEkRaJGxNhOI_g2QglwknrDiEXu_q5h46PmBg&oe=6A065DF4',
+  'https://scontent.fsgn19-1.fna.fbcdn.net/v/t1.6435-9/190397143_120012436879854_6885151246835106554_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=13d280&_nc_ohc=PxbYDDtDDdkQ7kNvwFxWeGZ&_nc_oc=Adr1ehF_K_4N2qwPFlfnEHlYOB3Q71DIBstU9v7irYQ14fFPzefw6HrvtT2DwdZZHuc&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=qI8bapk9oskiRaZtzwPfpA&_nc_ss=7a3a8&oh=00_Af1sOEmzo51ANQh6ooBzz8RwIYhJsKmse6J8v7Q-qGgYaQ&oe=6A066192',
+  'https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/471946489_918807290333694_7170150079774332134_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=13d280&_nc_ohc=QGoIdj89414Q7kNvwEQZoXq&_nc_oc=AdrrGWPxx04JzKzjGnCdCVfFBSyd3gFb9FiazVOGkzvs4zyrAMprS_HYFwoy_7iLKd4&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=xcCvkIU6mzJpCFl55bS0ZQ&_nc_ss=7a3a8&oh=00_Af11YtQIwzEfOzSJxVyWPMhkycxyKbJtZRDhyp0O2LPrTw&oe=69E4D1F3',
 ];
 let currentPhoto = 0;
 let lightboxOpen = false;
@@ -130,7 +131,7 @@ function lightboxNav(dir) {
 // Keyboard nav for lightbox
 document.addEventListener('keydown', e => {
   if (!lightboxOpen) return;
-  if (e.key === 'ArrowLeft')  lightboxNav(-1);
+  if (e.key === 'ArrowLeft') lightboxNav(-1);
   if (e.key === 'ArrowRight') lightboxNav(1);
 });
 
@@ -158,7 +159,7 @@ function shareRestaurant() {
       title: 'Cơm tấm Sà Bì Chưởng – FoodMap',
       text: 'Quán cơm tấm ngon tại Quận 5, TP.HCM. Đánh giá 4.7 ⭐',
       url: window.location.href
-    }).catch(() => {});
+    }).catch(() => { });
   } else {
     // Fallback: copy link
     navigator.clipboard.writeText(window.location.href).then(() => {

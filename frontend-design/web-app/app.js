@@ -1,5 +1,5 @@
 /* ================================================
-   FOODMAP - JavaScript
+   YUMMAP - JavaScript
    ================================================ */
 
 // ---- Scroll Cards ----
@@ -25,7 +25,7 @@ function toggleMobileMenu() {
 // Close mobile menu on outside click
 document.addEventListener('click', (e) => {
   const menu = document.getElementById('mobile-menu');
-  const btn  = document.getElementById('hamburger-btn');
+  const btn = document.getElementById('hamburger-btn');
   if (menu && menu.classList.contains('open') && !menu.contains(e.target) && !btn.contains(e.target)) {
     menu.classList.remove('open');
   }
@@ -71,8 +71,8 @@ let botReplyIndex = 0;
 
 function sendChat() {
   const input = document.getElementById('chatbot-input');
-  const body  = document.getElementById('chatbot-body');
-  const msg   = input.value.trim();
+  const body = document.getElementById('chatbot-body');
+  const msg = input.value.trim();
   if (!msg) return;
 
   // Add user message
@@ -147,7 +147,7 @@ document.querySelectorAll('.food-card, .post-card, .footer-col').forEach((el, i)
 
 // ---- Food card click ----
 document.querySelectorAll('.food-card').forEach(card => {
-  card.addEventListener('click', function() {
+  card.addEventListener('click', function () {
     window.location.href = 'detail.html';
   });
 });

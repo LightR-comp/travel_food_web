@@ -1,24 +1,18 @@
 // recommend_front.go định nghĩa các cấu trúc dữ liệu Request và Response để giao tiếp giữa frontend và backend trong quá trình gợi ý quán ăn dựa trên sở thích của người dùng. Đây là nơi chúng ta sẽ xây dựng các struct để nhận dữ liệu từ client và trả về kết quả sau khi xử lý yêu cầu gợi ý.
-// RecommendRequest sẽ chứa thông tin về người dùng, vị trí hiện tại, và các sở thích ăn uống của họ. 
+// RecommendRequest sẽ chứa thông tin về người dùng, vị trí hiện tại, và các sở thích ăn uống của họ.
 // RecommendResponse sẽ chứa danh sách các quán ăn được gợi ý, cùng với thông tin chi tiết về từng quán ăn như tên, địa chỉ, món ăn đặc trưng, v.v.
 
 package dto
+
+import "go-core-backend/internal/models"
 
 // RecommendRequest: Định nghĩa cấu trúc dữ liệu Request nhận từ client (frontend) gửi lên Go backend
 type RecommendRequest struct {
 	UserID int `json:"user_id"`
 
-	Location struct {
-		Lat float64 `json:"lat"`
-		Lng float64 `json:"lng"`
-	} `json:"location"`
+	Location models.Location `json:"location"`
 
-	Preferences struct {
-		Budget   int      `json:"budget"`
-		People   int      `json:"people"`
-		Dietary  []string `json:"dietary"`
-		Mood     string   `json:"mood"`
-	} `json:"preferences"`
+	Preferences models.ContextPreferences `json:"preferences"`
 }
 
 // RecommendResponse: Định nghĩa cấu trúc dữ liệu Response trả về cho client sau khi xử lý xong yêu cầu gợi ý

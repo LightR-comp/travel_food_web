@@ -745,28 +745,36 @@ button {
   align-items: center;
   justify-content: center;
   transition: background var(--transition);
+  pointer-events: none;
 }
 
 .post-card:hover .post-img-overlay {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .play-btn {
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transform: scale(0.7);
+  transform: scale(0.6);
   transition: all var(--transition);
+  pointer-events: auto;
+  box-shadow: 0 4px 12px rgba(44, 24, 16, 0.2);
+}
+
+.play-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 6px 16px rgba(44, 24, 16, 0.3);
 }
 
 .play-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   color: var(--primary);
   margin-left: 3px;
 }

@@ -77,3 +77,9 @@ class IntentResponse(BaseModel):
 class GenerateRequest(BaseModel):
     user_query: str
     db_data: Any
+
+class BaseResponse(BaseModel):
+    success: bool
+    message: Optional[str] = ""
+    data: Optional[Any] = None
+    error: Optional[Any] = None

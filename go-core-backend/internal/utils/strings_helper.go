@@ -39,14 +39,15 @@ func ToUserContext(req dto.RecommendRequest) models.UserContext {
 	return models.UserContext{
 		UserID: req.UserID,
 		Location: models.Location{
-			Lat: req.Location.Lat,
-			Lng: req.Location.Lng,
+			Lat: req.Location.Lat, 
+			Lng: req.Location.Lng, 
 			RadiusKm: 5,
 		},
 		Preferences: models.ContextPreferences{
 			Budget: req.Preferences.Budget,
 			People: req.Preferences.People,
 			Dietary: req.Preferences.Dietary,
+			FoodTypes: req.Preferences.FoodTypes,
 			Mood: req.Preferences.Mood,
 		},
 	}

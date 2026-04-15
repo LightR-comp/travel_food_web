@@ -1,8 +1,3 @@
-// firebase_auth.go chứa middleware để xác thực người dùng thông qua Firebase Authentication.
-// Middleware này sẽ được áp dụng cho các route cần bảo vệ, đảm bảo rằng chỉ những người dùng đã đăng nhập mới có thể truy cập vào các API đó.
-// Middleware sẽ kiểm tra header Authorization, xác thực token với Firebase, và nếu hợp lệ, sẽ lưu thông tin người dùng vào context để các handler có thể sử dụng.
-// Đây là một phần quan trọng để đảm bảo an toàn cho API của chúng ta, ngăn chặn truy cập trái phép và bảo vệ dữ liệu người dùng.
-
 package middlewares
 
 import (
@@ -18,13 +13,13 @@ func FirebaseAuthMiddleware() gin.HandlerFunc {
 
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing token"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Thiếu token xác thực"})
 			return
 		}
 
 		parts := strings.Split(authHeader, " ")
-		if len(parts) != 2 {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid format"})
+		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Định dạng token không hợp lệ, dùng: Bearer <token>"})
 			return
 		}
 
@@ -32,14 +27,13 @@ func FirebaseAuthMiddleware() gin.HandlerFunc {
 
 		decoded, err := services.VerifyIDToken(c.Request.Context(), idToken)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Token không hợp lệ hoặc đã hết hạn"})
 			return
 		}
 
-		// Lấy user từ DB theo Firebase UID
 		user, err := services.GetUserByProviderID(c.Request.Context(), decoded.UID)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Không tìm thấy người dùng"})
 			return
 		}
 
@@ -47,4 +41,3 @@ func FirebaseAuthMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
-

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FoodMap - Khám Phá Ẩm Thực Việt Nam</title>
+  <meta name="description" content="Khám phá ẩm thực Việt Nam, tìm kiếm nhà hàng, quán ăn ngon gần bạn với hệ thống gợi ý AI thông minh."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header" id="main-header">
+    <div class="header-inner">
+      <!-- Logo -->
+      <div class="logo" id="logo">
+        <div class="logo-icon">🍜</div>
+        <div class="logo-text">
+          <span class="logo-name">FoodMap</span>
+          <span class="logo-sub">📍 TP. Hồ Chí Minh</span>
+        </div>
+      </div>
+
+      <!-- Right Controls -->
+      <div class="header-right">
+        <div class="weather-widget" id="weather-widget">
+          <span class="weather-icon">🌤️</span>
+          <span class="weather-temp">27°C</span>
+        </div>
+        <div class="currency-widget" id="currency-widget">
+          <span class="currency-icon">💰</span>
+          <span class="currency-label">VND</span>
+        </div>
+        <button class="btn-login" id="btn-login" onclick="openLoginModal()">Đăng nhập</button>
+        <button class="btn-signup" id="btn-signup" onclick="openSignupModal()">Đăng ký</button>
+        <button class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <nav class="mobile-menu" id="mobile-menu">
+      <a href="#" class="mobile-nav-link active">🏠 Dashboard</a>
+      <a href="#" class="mobile-nav-link">🔍 Tìm kiếm</a>
+      <a href="#" class="mobile-nav-link">💬 Diễn đàn</a>
+      <a href="#" class="mobile-nav-link">ℹ️ Về chúng tôi</a>
+      <a href="#" class="mobile-nav-link">🎧 Hỗ trợ</a>
+    </nav>
+  </header>
+
+  <!-- ===== HERO BANNER ===== -->
+  <section class="hero" id="hero-section">
+    <div class="hero-bg">
+      <img src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=1600&q=80" alt="TP. Hồ Chí Minh" class="hero-img" id="hero-img"/>
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <h1 class="hero-title">Khám Phá Ẩm Thực Sài Gòn</h1>
+      <p class="hero-subtitle">AI gợi ý quán ngon – Đúng khẩu vị, đúng khoảnh khắc</p>
+      <div class="hero-search" id="hero-search">
+        <input type="text" id="hero-search-input" placeholder="Tìm món ăn, quán ăn, địa điểm..." class="hero-search-input"/>
+        <button class="hero-search-btn" id="hero-search-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== NAV TABS ===== -->
+  <section class="nav-tabs-section" id="nav-tabs">
+    <div class="container">
+      <div class="nav-tabs-bar">
+        <button class="nav-tab active" id="tab-dashboard" onclick="setActiveTab(this)">
+          <div class="tab-icon">🏠</div>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-tab" id="tab-search" onclick="window.location='search.html'">
+          <div class="tab-icon">🔍</div>
+          <span>Tìm kiếm</span>
+        </button>
+        <button class="nav-tab" id="tab-forum" onclick="setActiveTab(this)">
+          <div class="tab-icon">💬</div>
+          <span>Diễn đàn</span>
+        </button>
+        <button class="nav-tab" id="tab-about" onclick="setActiveTab(this)">
+          <div class="tab-icon">ℹ️</div>
+          <span>Về chúng tôi</span>
+        </button>
+        <button class="nav-tab" id="tab-support" onclick="setActiveTab(this)">
+          <div class="tab-icon">🎧</div>
+          <span>Hỗ trợ</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <main class="main-content">
+
+    <!-- ===== TOP TRENDINGS ===== -->
+    <section class="section" id="top-trendings">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">TOP TRENDINGS <span class="fire-icon">🔥</span></h2>
+        </div>
+        <div class="trending-scroll-wrapper">
+          <button class="scroll-btn scroll-btn-left" id="trending-scroll-left" onclick="scrollCards('trending-cards', -1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+          </button>
+          <div class="cards-container" id="trending-cards">
+
+            <!-- Card 1 -->
+            <div class="food-card" id="food-card-1">
+              <div class="food-card-img-wrap">
+                <img src="https://scontent.fsgn5-21.fna.fbcdn.net/v/t39.30808-6/672665263_947995911524582_5993781312445278232_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=13d280&_nc_ohc=clLTnFJR4zYQ7kNvwGE_FHr&_nc_oc=AdqtBfn5ExSsp55LulH3mjem25PYmFjRm7acv5UNg1IzLVXyP6jVd-0IkCfOJNCCKEk&_nc_zt=23&_nc_ht=scontent.fsgn5-21.fna&_nc_gid=6MCFj09Dv7lTlh-3jSpwog&_nc_ss=7a3a8&oh=00_Af1WDL45mLSvo_U8x9wW5GK3dxpVR5KBqJEwyEQpNpqA4g&oe=69E5448E" alt="Bánh Mì Huynh Hoa" class="food-card-img" loading="lazy"/>
+                <span class="badge badge-popular">Popular</span>
+              </div>
+              <div class="food-card-body">
+                <h3 class="food-card-title">Bánh mì Huynh Hoa</h3>
+                <div class="food-card-meta">
+                  <span class="tag">• Bánh Mì</span>
+                </div>
+                <div class="food-card-stats">
+                  <span class="stat">⭐ 4.8 (80+)</span>
+                  <span class="stat">📍 5.2 km</span>
+                </div>
+                <div class="food-card-price">
+                  <span class="price-tag">🔥 38.000 – 78.000 đ</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="food-card" id="food-card-2">
+              <div class="food-card-img-wrap">
+                <img src="https://scontent.fsgn5-21.fna.fbcdn.net/v/t39.30808-6/671754219_947995924857914_5868219039464999216_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=13d280&_nc_ohc=7isIH7ckNGQQ7kNvwG-icTQ&_nc_oc=AdprXR235qBxuvYBe3l2iIl5RLqYjPVlaGqFws8z2yBLgy17OfL14reLnggMKNXuLiE&_nc_zt=23&_nc_ht=scontent.fsgn5-21.fna&_nc_gid=48dbYZJFcTOwhUzg2eeeMg&_nc_ss=7a3a8&oh=00_Af0UY_X3BvTDDrqVRu0MXPtp5VsHaKYtywjVmEtjelzlbQ&oe=69E53097" alt="Bún bò Huế" class="food-card-img" loading="lazy"/>
+                <span class="badge badge-musttry">Must try</span>
+              </div>
+              <div class="food-card-body">
+                <h3 class="food-card-title">Bún bò Huế</h3>
+                <div class="food-card-meta">
+                  <span class="tag">• Bún</span>
+                </div>
+                <div class="food-card-stats">
+                  <span class="stat">⭐ 4.7 (80+)</span>
+                  <span class="stat">📍 3.7 km</span>
+                </div>
+                <div class="food-card-price">
+                  <span class="price-tag">🔥 35.000 – 60.000 đ</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="food-card" id="food-card-3">
+              <div class="food-card-img-wrap">
+                <img src="https://scontent.fsgn5-21.fna.fbcdn.net/v/t39.30808-6/646905767_1364362819043194_760265342786917317_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=13d280&_nc_ohc=QqmAZM7TpAgQ7kNvwGP-MiS&_nc_oc=AdqwpiiWS4gvFVBJQOTetKTF6u8iJClRsI_xNYOY7sbq24gRgDT3TX0G3xUKj4zpRlc&_nc_zt=23&_nc_ht=scontent.fsgn5-21.fna&_nc_gid=m7SJfqqX5CJM73VFTDN6HQ&_nc_ss=7a3a8&oh=00_Af3FEyhOGA-YK8qyXg3ugD1BODIIjAFKXpvF4ilZ8LFkmw&oe=69E53269" alt="Gà nướng Đệ Nhất" class="food-card-img" loading="lazy"/>
+              </div>
+              <div class="food-card-body">
+                <h3 class="food-card-title">Gà nướng Đệ Nhất</h3>
+                <div class="food-card-meta">
+                  <span class="tag">• Gà</span>
+                </div>
+                <div class="food-card-stats">
+                  <span class="stat">⭐ 4.8 (52)</span>
+                  <span class="stat">📍 2 km</span>
+                </div>
+                <div class="food-card-price">
+                  <span class="price-tag">🔥 100.000 - 200.000 đ</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="food-card" id="food-card-4">
+              <div class="food-card-img-wrap">
+                <img src="https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/476912150_942135224733191_8095130890254302257_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=105&ccb=1-7&_nc_sid=7b2446&_nc_ohc=_1KzGuio2A4Q7kNvwGHUKE_&_nc_oc=AdpKbQFD5RuWvGyuHZDiOAE6BW0WazDcX5mOQ7lk7K0HhZVOWgHrt_nCF2Kbz3i_RDk&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=A2CNQdmL07TBaW9Ore4_5A&_nc_ss=7a3a8&oh=00_Af08eNVk1y484PxDR6sn3022ttHRGdHe2sC6mJqD3_aPqw&oe=69E4D998" alt="Cơm tấm" class="food-card-img" loading="lazy"/>
+              </div>
+              <div class="food-card-body">
+                <h3 class="food-card-title">Cơm tấm Sà Bì Chưởng</h3>
+                <div class="food-card-meta">
+                  <span class="tag">• Cơm</span>
+                </div>
+                <div class="food-card-stats">
+                  <span class="stat">⭐ 4.5 (42)</span>
+                  <span class="stat">📍 1.5 km</span>
+                </div>
+                <div class="food-card-price">
+                  <span class="price-tag">🔥 35.000 – 80.000 đ</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="food-card" id="food-card-5">
+              <div class="food-card-img-wrap">
+                <img src="https://scontent.fsgn5-21.fna.fbcdn.net/v/t39.30808-6/616820086_1189827966689037_798570153473628133_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=102&ccb=1-7&_nc_sid=13d280&_nc_ohc=zprEAUyJmwEQ7kNvwHt5rWo&_nc_oc=Adr3LQMAZj_JKyeBfiyDEDpHUNOsaTI7UtKl3J3XzoWxMPEgEcBOEr8cdZlEVg_fjfw&_nc_zt=23&_nc_ht=scontent.fsgn5-21.fna&_nc_gid=LdhDXuj9m9lImg8ZjYPFUA&_nc_ss=7a3a8&oh=00_Af3ik0dglk5Jcw6VhAmmlzC8ac019oU9slx_hCxxEZIcAg&oe=69E54124" alt="Bánh canh ghẹ Ngọc Lâm" class="food-card-img" loading="lazy"/>
+                <span class="badge badge-popular">Trending</span>
+              </div>
+              <div class="food-card-body">
+                <h3 class="food-card-title">Bánh canh ghẹ Ngọc Lâm</h3>
+                <div class="food-card-meta">
+                  <span class="tag">• Bánh canh</span>
+                </div>
+                <div class="food-card-stats">
+                  <span class="stat">⭐ 4.9 (210+)</span>
+                  <span class="stat">📍 1.2 km</span>
+                </div>
+                <div class="food-card-price">
+                  <span class="price-tag">🔥 50.000 – 90.000 đ</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="food-card" id="food-card-6">
+              <div class="food-card-img-wrap">
+                <img src="https://scontent.fsgn5-21.fna.fbcdn.net/v/t39.30808-6/470201832_122158451192319652_1669797319832146038_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=105&ccb=1-7&_nc_sid=7b2446&_nc_ohc=jlcpf59VoykQ7kNvwEK3xAg&_nc_oc=AdrvfnWa81uSOcuY2LXhQD9jCBUp2FlaFRATZXUfUmGGfO4ijVwwJEfZHh5xJZZMNRU&_nc_zt=23&_nc_ht=scontent.fsgn5-21.fna&_nc_gid=urdseJDSVhtpsCgIP7um_Q&_nc_ss=7a3a8&oh=00_Af3jVFmk4rJb5dKl0l6GndkrFfPNQ-5J4ss7gQyA643gAA&oe=69E53A52" alt="Hủ tiếu nam vang Kim Khánh" class="food-card-img" loading="lazy"/>
+              </div>
+              <div class="food-card-body">
+                <h3 class="food-card-title">Hủ tiếu nam vang Kim Khánh</h3>
+                <div class="food-card-meta">
+                  <span class="tag">• Hủ tiếu</span>
+                </div>
+                <div class="food-card-stats">
+                  <span class="stat">⭐ 4.6 (95)</span>
+                  <span class="stat">📍 0.8 km</span>
+                </div>
+                <div class="food-card-price">
+                  <span class="price-tag">🔥 15.000 – 30.000 đ</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <button class="scroll-btn scroll-btn-right" id="trending-scroll-right" onclick="scrollCards('trending-cards', 1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== POPULAR POSTS ===== -->
+    <section class="section section-alt" id="popular-posts">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">POPULAR POSTS</h2>
+        </div>
+        <div class="posts-grid" id="posts-grid">
+
+          <!-- Post 1 -->
+          <article class="post-card" id="post-card-1">
+            <div class="post-img-wrap">
+              <img src="https://scontent.fsgn5-21.fna.fbcdn.net/v/t39.30808-6/672688209_947995671524606_1246254636217031608_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=13d280&_nc_ohc=heUyspKCgTkQ7kNvwGkRb6m&_nc_oc=AdoQLXLVc4JNMY2xO0UoocvV7Yff7kywKqi_jzkM9dMf6wQoCDMHVpcu7uon1eJ6uBg&_nc_zt=23&_nc_ht=scontent.fsgn5-21.fna&_nc_gid=kOgT6iLiazgnQvRdSoqR0Q&_nc_ss=7a3a8&oh=00_Af1D1pQy28kCe_DKMYLipHoM0KK51XMbw8p70JYw6cE7dA&oe=69E554EE" alt="Review bánh mì Huynh Hoa" class="post-img" loading="lazy"/>
+              <div class="post-img-overlay">
+                <button class="play-btn" id="post-play-1" aria-label="Xem bài viết">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="post-body">
+              <h3 class="post-title">Review bánh mì Huynh Hoa, đặt nhất Sài Gòn nhưng chất lượng có đỉnh nhất?</h3>
+              <p class="post-excerpt">Khi nhắc đến bánh mì Sài Gòn, không thể không nhắc đến cái tên Huỳnh Hoa – thương hiệu đã trở thành huyền thoại gắn liền với ký ức tuổi thơ của nhiều thế hệ...</p>
+              <div class="post-footer">
+                <span class="post-author">✍️ Admin</span>
+                <span class="post-date">📅 12/04/2026</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Post 2 -->
+          <article class="post-card" id="post-card-2">
+            <div class="post-img-wrap">
+              <img src="https://scontent.fsgn5-21.fna.fbcdn.net/v/t39.30808-6/672687675_947995624857944_2382095123524236784_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=13d280&_nc_ohc=o3BxyKrVPmIQ7kNvwG7SHvg&_nc_oc=AdqT7OBA7srelSphk6gFHUkNZSqz4HjPByQNsTi-t2pxHygUU0xruisORnp3EZlNNbY&_nc_zt=23&_nc_ht=scontent.fsgn5-21.fna&_nc_gid=kOgT6iLiazgnQvRdSoqR0Q&_nc_ss=7a3a8&oh=00_Af0CvCJq57JcNTMjKxidglA9tfnAIaziwnBbIj0XCFgTQA&oe=69E53B33" alt="Review cơm tấm Phúc Lộc Thọ" class="post-img" loading="lazy"/>
+              <div class="post-img-overlay">
+                <button class="play-btn" id="post-play-2" aria-label="Xem bài viết">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="post-body">
+              <h3 class="post-title">Review mới nhất về quán cơm tấm Phúc Lộc Thọ Lê Văn Việt</h3>
+              <p class="post-excerpt">Nếu là tín đồ cơm tấm và đang tìm kiếm một địa điểm ăn ngon, cơm tấm Phúc Lộc Thọ Lê Văn Việt chắc chắn là một lựa chọn đáng thử...</p>
+              <div class="post-footer">
+                <span class="post-author">✍️ Reviewer</span>
+                <span class="post-date">📅 10/04/2026</span>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GOOD SPOTS FOR FOOD ===== -->
+    <section class="section" id="good-spots">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">GOOD SPOTS FOR FOOD</h2>
+        </div>
+        <div class="trending-scroll-wrapper">
+          <button class="scroll-btn scroll-btn-left" id="spots-scroll-left" onclick="scrollCards('spots-cards', -1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+          </button>
+          <div class="cards-container" id="spots-cards">
+
+            <!-- Spot 1 -->
+            <div class="food-card" id="spot-card-1">
+              <div class="food-card-img-wrap">
+                <img src="https://scontent.fsgn5-21.fna.fbcdn.net/v/t39.30808-6/672677384_947995584857948_904256356804213902_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=13d280&_nc_ohc=XJx68rdpPKwQ7kNvwG2DM5k&_nc_oc=AdqhBoxkPQ9yjk9vBZPfpXjkR0XJn39tsxZZGGB9VNX9E2WDuiXsV2-FIv3xJy6UUKU&_nc_zt=23&_nc_ht=scontent.fsgn5-21.fna&_nc_gid=owmuoaI8aLEBQKeB8MQYPA&_nc_ss=7a3a8&oh=00_Af3amoSco985L-uObwnmRPkqFYZZhowW6skHpha2IBYZXA&oe=69E54C9D" alt="TuTiMi" class="food-card-img" loading="lazy"/>
+              </div>
+              <div class="food-card-body">
+                <h3 class="food-card-title">TuTiMi – Trà Sữa, Cà Phê...</h3>
+                <div class="food-card-meta">
+                  <span class="tag">• Nước</span>
+                </div>
+                <div class="food-card-stats">
+                  <span class="stat">⭐ 5 (56)</span>
+                  <span class="stat">📍 1.4 km</span>
+                </div>
+                <div class="food-card-price">
+                  <span class="price-tag">🔥 20.000 – 70.000 đ</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Spot 2 -->
+            <div class="food-card" id="spot-card-2">
+              <div class="food-card-img-wrap">
+                <img src="https://scontent.fsgn5-21.fna.fbcdn.net/v/t39.30808-6/671526730_947995554857951_2751555285831806717_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=13d280&_nc_ohc=3rMAxdFzT08Q7kNvwGruHY3&_nc_oc=AdrDmVGhDb-KzGS75oyNxLeuWJ94UE6QGDMB2PVGQUuX4DVsTDuNIxG_zV7SYy_NRSQ&_nc_zt=23&_nc_ht=scontent.fsgn5-21.fna&_nc_gid=A_Y-852Rw73H7qvzhRrWoA&_nc_ss=7a3a8&oh=00_Af0h6_p-QLoegcHlz4MhTV1yHUZXg5Qft-WaxLyAUq0mVg&oe=69E52752" alt="Chân gà sốt Thái" class="food-card-img" loading="lazy"/>
+              </div>
+              <div class="food-card-body">
+                <h3 class="food-card-title">Chân gà sốt Thái Yến Vi...</h3>
+                <div class="food-card-meta">
+                  <span class="tag">• Ăn vặt</span>
+                </div>
+                <div class="food-card-stats">
+                  <span class="stat">⭐ 5 (56)</span>
+                  <span class="stat">📍 1.2 km</span>
+                </div>
+                <div class="food-card-price">
+                  <span class="price-tag">🔥 80.000 – 120.000 đ</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Spot 3 - Special styled -->
+            <div class="food-card food-card-featured" id="spot-card-3">
+              <div class="food-card-img-wrap food-card-dark">
+                <div class="featured-content">
+                  <p class="featured-brand">Phúc Lộc Thọ</p>
+                  <div class="featured-badge">GOOD FOOD</div>
+                  <h3 class="featured-name">CƠM TẤM</h3>
+                  <p class="featured-tagline">ăn PHÚC, uống LỘC, sống THỌ</p>
+                </div>
+              </div>
+              <div class="food-card-body">
+                <h3 class="food-card-title">Cơm tấm Phúc Lộc Thọ Lê...</h3>
+                <div class="food-card-meta">
+                  <span class="tag">• Cơm</span>
+                </div>
+                <div class="food-card-stats">
+                  <span class="stat">⭐ 4.4 (19k+)</span>
+                  <span class="stat">📍 1.8 km</span>
+                </div>
+                <div class="food-card-price">
+                  <span class="price-tag">🔥 40.000 – 90.000 đ</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Spot 4 -->
+            <div class="food-card" id="spot-card-4">
+              <div class="food-card-img-wrap">
+                <img src="https://scontent.fsgn5-21.fna.fbcdn.net/v/t39.30808-6/526929535_1166918508798809_985463433921479655_n.jpg?_nc_cat=1&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=9R8Ox6jwBvkQ7kNvwFr1VeT&_nc_oc=AdodHDPXynmujH3ubTc7Q2IuFY0j1Tpfsr8ezhwh0ELS3-dQlhvw3I8VI4AFtB1aKO0&_nc_zt=23&_nc_ht=scontent.fsgn5-21.fna&_nc_gid=fMWEiC91L4dxM4qFQ-qP3g&_nc_ss=7a3a8&oh=00_Af0OBfFwWbDH2DM8YfuA73zzKj9-Lf1UilAlSvtBtIZHOQ&oe=69E55927" alt="Lotteria - Gà rán" class="food-card-img" loading="lazy"/>
+              </div>
+              <div class="food-card-body">
+                <h3 class="food-card-title">Lotteria - Gà rán, Burger</h3>
+                <div class="food-card-meta">
+                  <span class="tag">• Fast Food</span>
+                </div>
+                <div class="food-card-stats">
+                  <span class="stat">⭐ 4.8034 (5)</span>
+                  <span class="stat">📍 2.1 km</span>
+                </div>
+                <div class="food-card-price">
+                  <span class="price-tag">🔥 40.000 đ</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Spot 5 -->
+            <div class="food-card" id="spot-card-5">
+              <div class="food-card-img-wrap">
+                <img src="https://scontent.fsgn5-21.fna.fbcdn.net/v/t39.30808-6/545658158_772344558870204_7112295386483735101_n.jpg?_nc_cat=1&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=74zg2MoLXCQQ7kNvwH-YbbX&_nc_oc=AdqbmtutmFA-PIncp_CShfzB-5gBKu516nrh77nEXWeWJTj9-lxSTc7CKV9oH8jlm9c&_nc_zt=23&_nc_ht=scontent.fsgn5-21.fna&_nc_gid=L8LJMikC83VNMSSrKyDRUA&_nc_ss=7a3a8&oh=00_Af11baiv-DqdL7wTSV6wp5WqvdnaVJHDqM_rBDLKpN-3EA&oe=69E5485B" alt="Dookki - Buffet lẩu tokkboki" class="food-card-img" loading="lazy"/>
+              </div>
+              <div class="food-card-body">
+                <h3 class="food-card-title">Dookki - Buffet lẩu tokkboki</h3>
+                <div class="food-card-meta">
+                  <span class="tag">• Lẩu</span>
+                </div>
+                <div class="food-card-stats">
+                  <span class="stat">⭐ 4.7 (133)</span>
+                  <span class="stat">📍 3.2 km</span>
+                </div>
+                <div class="food-card-price">
+                  <span class="price-tag">🔥 30.000 – 55.000 đ</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <button class="scroll-btn scroll-btn-right" id="spots-scroll-right" onclick="scrollCards('spots-cards', 1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== AI CHATBOT FLOATING BTN ===== -->
+    <button class="chatbot-btn" id="chatbot-btn" onclick="toggleChatbot()" title="Gợi ý AI">
+      <div class="chatbot-icon">🤖</div>
+      <span class="chatbot-label">AI Gợi ý</span>
+    </button>
+
+    <!-- Chatbot Modal -->
+    <div class="chatbot-modal" id="chatbot-modal">
+      <div class="chatbot-header">
+        <div class="chatbot-avatar">🤖</div>
+        <div>
+          <div class="chatbot-name">FoodMap AI</div>
+          <div class="chatbot-status">Đang hoạt động</div>
+        </div>
+        <button class="chatbot-close" onclick="toggleChatbot()">✕</button>
+      </div>
+      <div class="chatbot-body" id="chatbot-body">
+        <div class="chat-bubble bot">Xin chào! Tôi là AI gợi ý ẩm thực. Bạn đang tìm món gì? 😊</div>
+        <div class="chat-bubble bot">Hãy cho tôi biết: ngân sách, số người, và bạn muốn ăn gì?</div>
+      </div>
+      <div class="chatbot-input-area">
+        <input type="text" id="chatbot-input" placeholder="Nhập tin nhắn..." class="chatbot-input" onkeydown="if(event.key==='Enter') sendChat()"/>
+        <button class="chatbot-send" id="chatbot-send" onclick="sendChat()">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" id="main-footer">
+    <div class="container">
+      <div class="footer-grid">
+
+        <!-- Trợ giúp -->
+        <div class="footer-col" id="footer-help">
+          <h4 class="footer-title">Trợ giúp</h4>
+          <ul class="footer-links">
+            <li><a href="#" class="footer-link">Trung tâm trợ giúp</a></li>
+            <li><a href="#" class="footer-link">Câu hỏi thường gặp</a></li>
+            <li><a href="#" class="footer-link">Chính sách bảo mật</a></li>
+            <li><a href="#" class="footer-link">Điều khoản sử dụng</a></li>
+          </ul>
+        </div>
+
+        <!-- Công ty -->
+        <div class="footer-col" id="footer-company">
+          <h4 class="footer-title">Công ty</h4>
+          <ul class="footer-links">
+            <li><a href="#" class="footer-link">Về chúng tôi</a></li>
+            <li><a href="#" class="footer-link">Liên hệ chúng tôi</a></li>
+          </ul>
+        </div>
+
+        <!-- Theo dõi -->
+        <div class="footer-col" id="footer-social">
+          <h4 class="footer-title">Theo dõi chúng tôi trên</h4>
+          <ul class="footer-social-links">
+            <li>
+              <a href="#" class="social-link" id="social-facebook">
+                <div class="social-icon facebook-icon">f</div>
+                <span>Facebook</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="social-link" id="social-instagram">
+                <div class="social-icon instagram-icon">📷</div>
+                <span>Instagram</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="social-link" id="social-tiktok">
+                <div class="social-icon tiktok-icon">🎵</div>
+                <span>Tiktok</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="social-link" id="social-youtube">
+                <div class="social-icon youtube-icon">▶</div>
+                <span>Youtube</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Logo -->
+        <div class="footer-col footer-logo-col" id="footer-logo-col">
+          <div class="footer-logo-box">
+            <div class="footer-logo-icon">🍜</div>
+            <span class="footer-logo-text">FoodMap</span>
+          </div>
+          <p class="footer-tagline">Ẩm thực Việt – Đúng vị, đúng nơi</p>
+        </div>
+
+      </div>
+      <div class="footer-bottom">
+        <p>Copyright ©️ 2026 "FoodMap". All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== LOGIN MODAL ===== -->
+  <div class="modal-overlay" id="login-modal-overlay" onclick="closeAllModals()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeAllModals()">✕</button>
+      <div class="modal-split">
+        <div class="modal-left">
+          <h2 class="modal-title">ĐĂNG NHẬP</h2>
+          <div class="form-group">
+            <label class="form-label">Tài khoản <span class="required">*</span></label>
+            <div class="input-wrap">
+              <input type="text" id="login-username" class="form-input" placeholder="Email hoặc tên đăng nhập"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mật khẩu <span class="required">*</span></label>
+            <div class="input-wrap">
+              <input type="password" id="login-password" class="form-input" placeholder="Nhập mật khẩu"/>
+              <button class="input-eye" onclick="togglePassword('login-password')" type="button">👁️</button>
+            </div>
+          </div>
+          <button class="btn-submit" id="login-submit">Đăng nhập</button>
+          <p class="form-forgot"><a href="#">Quên mật khẩu?</a></p>
+          <div class="divider"><span>Hoặc đăng nhập bằng</span></div>
+          <div class="social-login">
+            <button class="social-login-btn facebook" id="login-facebook">
+              <span class="s-icon">f</span> Facebook
+            </button>
+            <button class="social-login-btn google" id="login-google">
+              <span class="s-icon"><img src="https://www.google.com/favicon.ico" alt="Google" style="width:16px;height:16px;"/></span> Google
+            </button>
+          </div>
+          <div class="divider"><span>Tạo tài khoản mới</span></div>
+        </div>
+        <div class="modal-right">
+          <h3 class="modal-welcome">Chào mừng trở lại</h3>
+          <p class="modal-tagline">Du lịch thả ga cùng tớ nha</p>
+          <div class="modal-food-img">
+            <img src="https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&q=80" alt="Món ăn Việt Nam"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

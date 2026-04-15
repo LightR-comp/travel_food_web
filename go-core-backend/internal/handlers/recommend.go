@@ -28,9 +28,9 @@ func GetRecommendations(c *gin.Context) {
 	if authUserID > 0 {
 		req.UserID = authUserID
 	}
-	// Hardcode tọa độ demo tại KHTN
-	req.Location.Lat = 10.762622
-	req.Location.Lng = 106.682379
+	// Hardcode tọa độ demo tại Vincom Thủ Đức
+	req.Location.Lat = 10.85027
+	req.Location.Lng = 106.76504
 	if req.Location.RadiusKm == 0 {
 		req.Location.RadiusKm = 5.0
 	}

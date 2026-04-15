@@ -1,4 +1,4 @@
-// user.go chứa các hàm xử lý liên quan đến người dùng, bao gồm đăng nhập, lấy thông tin profile và cập nhật profile. 
+// user.go chứa các hàm xử lý liên quan đến người dùng, bao gồm đăng nhập, lấy thông tin profile và cập nhật profile.
 // Đây là nơi chúng ta sẽ xây dựng logic để xác thực người dùng thông qua token
 // lưu trữ thông tin người dùng vào cơ sở dữ liệu và cung cấp API để frontend có thể lấy và cập nhật thông tin người dùng một cách dễ dàng.
 
@@ -50,7 +50,6 @@ func Login(c *gin.Context) {
 	})
 }
 
-
 func GetProfile(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
@@ -80,7 +79,7 @@ func UpdateProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Cập nhật thành công"})
 }
 
-//Đăng ký tài khoản Local
+// Đăng ký tài khoản Local
 func Register(c *gin.Context) {
 	var req struct {
 		Username string `json:"username" binding:"required"`
@@ -95,7 +94,7 @@ func Register(c *gin.Context) {
 
 	user, err := services.RegisterLocal(c.Request.Context(), req.Username, req.Password, req.Name)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo tài khoản"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -127,4 +126,3 @@ func LocalLogin(c *gin.Context) {
 		"user":    user,
 	})
 }
-

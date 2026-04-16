@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tìm kiếm – FoodMap</title>
-  <meta name="description" content="Tìm kiếm nhà hàng, quán ăn ngon gần bạn tại TP. Hồ Chí Minh với bộ lọc thông minh."/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="search.css"/>
+  <meta name="description"
+    content="Tìm kiếm nhà hàng, quán ăn ngon gần bạn tại TP. Hồ Chí Minh với bộ lọc thông minh." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="search.css" />
 </head>
+
 <body>
 
   <!-- ===== HEADER ===== -->
@@ -52,9 +57,15 @@
         <button class="nav-tab active" id="tab-search">
           <div class="tab-icon">🔍</div><span>Tìm kiếm</span>
         </button>
-        <button class="nav-tab"><div class="tab-icon">💬</div><span>Diễn đàn</span></button>
-        <button class="nav-tab"><div class="tab-icon">ℹ️</div><span>Về chúng tôi</span></button>
-        <button class="nav-tab"><div class="tab-icon">🎧</div><span>Hỗ trợ</span></button>
+        <button class="nav-tab">
+          <div class="tab-icon">💬</div><span>Diễn đàn</span>
+        </button>
+        <button class="nav-tab">
+          <div class="tab-icon">ℹ️</div><span>Về chúng tôi</span>
+        </button>
+        <button class="nav-tab">
+          <div class="tab-icon">🎧</div><span>Hỗ trợ</span>
+        </button>
       </div>
     </div>
   </section>
@@ -65,13 +76,11 @@
       <div class="search-bar-wrap" id="search-bar-wrap">
         <div class="search-bar-inner">
           <svg class="search-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input type="text" id="search-input" class="search-bar-input"
-            placeholder="Tìm món ăn, quán ăn, địa điểm..."
-            value="Món ăn no"
-            oninput="onSearchInput(this.value)"
-            onkeydown="if(event.key==='Enter') doSearch()"/>
+          <input type="text" id="search-input" class="search-bar-input" placeholder="Tìm món ăn, quán ăn, địa điểm..."
+            value="Món ăn no" oninput="onSearchInput(this.value)" onkeydown="if(event.key==='Enter') doSearch()" />
           <button class="search-bar-clear" id="search-clear" onclick="clearSearch()" title="Xóa">✕</button>
           <button class="search-bar-btn" id="search-btn" onclick="doSearch()">Tìm kiếm</button>
         </div>
@@ -92,15 +101,15 @@
           <!-- Map Placeholder -->
           <div class="map-card" id="map-card">
             <div class="map-inner">
-              <div class="map-pin">📍</div>
               <div class="map-google-icon">
                 <svg viewBox="0 0 24 24" width="56" height="56">
-                  <path fill="#4285F4" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-                  <circle fill="white" cx="12" cy="9" r="2.5"/>
+                  <path fill="#4285F4" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                  <circle fill="white" cx="12" cy="9" r="2.5" />
                 </svg>
               </div>
               <p class="map-label">TP. Hồ Chí Minh</p>
-              <button class="map-btn" id="map-open-btn" onclick="showToast('🗺️ Đang mở bản đồ...')">
+              <button class="map-btn" id="map-open-btn"
+                onclick="window.open('https://maps.app.goo.gl/JN4x6eZdxyBeJ4s7A', '_blank')">
                 Xem bản đồ
               </button>
             </div>
@@ -110,8 +119,10 @@
           <div class="filter-card" id="filter-price-card">
             <h3 class="filter-title">Khoảng giá</h3>
             <div class="price-slider-wrap">
-              <input type="range" id="price-min" class="price-slider" min="0" max="1000000" step="10000" value="0" oninput="updatePriceRange()"/>
-              <input type="range" id="price-max" class="price-slider" min="0" max="1000000" step="10000" value="1000000" oninput="updatePriceRange()"/>
+              <input type="range" id="price-min" class="price-slider" min="0" max="1000000" step="10000" value="0"
+                oninput="updatePriceRange()" />
+              <input type="range" id="price-max" class="price-slider" min="0" max="1000000" step="10000" value="1000000"
+                oninput="updatePriceRange()" />
               <div class="price-track" id="price-track"></div>
             </div>
             <div class="price-labels">
@@ -126,32 +137,32 @@
             <h3 class="filter-title">Lọc phổ biến</h3>
             <div class="filter-list">
               <label class="filter-check" id="filter-favorite">
-                <input type="checkbox" id="check-favorite" onchange="applyFilters()"/>
+                <input type="checkbox" id="check-favorite" onchange="applyFilters()" />
                 <span class="checkmark"></span>
                 <span class="check-label">Được yêu thích</span>
               </label>
               <label class="filter-check" id="filter-good-rating">
-                <input type="checkbox" id="check-good-rating" onchange="applyFilters()"/>
+                <input type="checkbox" id="check-good-rating" onchange="applyFilters()" />
                 <span class="checkmark"></span>
                 <span class="check-label">Đánh giá tốt</span>
               </label>
               <label class="filter-check" id="filter-restaurant">
-                <input type="checkbox" id="check-restaurant" onchange="applyFilters()"/>
+                <input type="checkbox" id="check-restaurant" onchange="applyFilters()" />
                 <span class="checkmark"></span>
                 <span class="check-label">Nhà hàng</span>
               </label>
               <label class="filter-check" id="filter-budget">
-                <input type="checkbox" id="check-budget" onchange="applyFilters()"/>
+                <input type="checkbox" id="check-budget" onchange="applyFilters()" />
                 <span class="checkmark"></span>
                 <span class="check-label">Bình dân</span>
               </label>
               <label class="filter-check" id="filter-cheapest">
-                <input type="checkbox" id="check-cheapest" onchange="applyFilters()"/>
+                <input type="checkbox" id="check-cheapest" onchange="applyFilters()" />
                 <span class="checkmark"></span>
                 <span class="check-label">Giá thấp nhất</span>
               </label>
               <label class="filter-check" id="filter-family">
-                <input type="checkbox" id="check-family" onchange="applyFilters()"/>
+                <input type="checkbox" id="check-family" onchange="applyFilters()" />
                 <span class="checkmark"></span>
                 <span class="check-label">Phù hợp cho gia đình</span>
               </label>
@@ -200,105 +211,136 @@
 
           <!-- Skeleton loading -->
           <div class="skeleton-list" id="skeleton-list">
-            <div class="skeleton-item"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line w80"></div><div class="skeleton-line w50"></div><div class="skeleton-line w60"></div></div></div>
-            <div class="skeleton-item"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line w80"></div><div class="skeleton-line w50"></div><div class="skeleton-line w60"></div></div></div>
-            <div class="skeleton-item"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line w80"></div><div class="skeleton-line w50"></div><div class="skeleton-line w60"></div></div></div>
+            <div class="skeleton-item">
+              <div class="skeleton-img"></div>
+              <div class="skeleton-body">
+                <div class="skeleton-line w80"></div>
+                <div class="skeleton-line w50"></div>
+                <div class="skeleton-line w60"></div>
+              </div>
+            </div>
+            <div class="skeleton-item">
+              <div class="skeleton-img"></div>
+              <div class="skeleton-body">
+                <div class="skeleton-line w80"></div>
+                <div class="skeleton-line w50"></div>
+                <div class="skeleton-line w60"></div>
+              </div>
+            </div>
+            <div class="skeleton-item">
+              <div class="skeleton-img"></div>
+              <div class="skeleton-body">
+                <div class="skeleton-line w80"></div>
+                <div class="skeleton-line w50"></div>
+                <div class="skeleton-line w60"></div>
+              </div>
+            </div>
           </div>
 
           <!-- Results List -->
           <div class="results-list" id="results-list" style="display:none">
 
             <!-- Result 1 -->
-            <article class="result-card" id="result-1" data-rating="4.8" data-distance="5.2" data-price="38000" data-category="Bánh mì" data-tags="favorite restaurant" onclick="goToDetail(1)">
+            <article class="result-card" id="result-1" data-rating="4.7" data-distance="5.2" data-price="19000"
+              data-category="Cơm tấm" data-tags="favorite restaurant" onclick="goToDetail(1)">
               <div class="result-img-wrap">
-                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80" alt="Bánh mì Huỳnh Hoa" class="result-img" loading="lazy"/>
-                <span class="result-badge badge-popular">Popular</span>
+                <img
+                  src="https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/476912150_942135224733191_8095130890254302257_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=105&ccb=1-7&_nc_sid=7b2446&_nc_ohc=_1KzGuio2A4Q7kNvwGHUKE_&_nc_oc=AdpKbQFD5RuWvGyuHZDiOAE6BW0WazDcX5mOQ7lk7K0HhZVOWgHrt_nCF2Kbz3i_RDk&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=KOa9EUqEGtVmC9_1FsTWNQ&_nc_ss=7a3a8&oh=00_Af1Ynu4sHs7sK3K-0omP2-jhWHxg571hgzbOzOOghgmAWw&oe=69E511D8"
+                  alt="Cơm tấm Sà Bì Chưởng" class="result-img" loading="lazy" />
+                <span class="result-badge badge-musttry">Must try</span>
               </div>
               <div class="result-body">
                 <div class="result-top">
-                  <h3 class="result-name">Bánh mì Huỳnh Hoa</h3>
+                  <h3 class="result-name">Cơm tấm Sà Bì Chưởng</h3>
                   <div class="result-rating">
                     <span class="star-icon">⭐</span>
-                    <span class="rating-val">4.8</span>
-                    <span class="rating-count">(90+)</span>
+                    <span class="rating-val">4.7</span>
+                    <span class="rating-count">(6700+)</span>
                   </div>
                 </div>
                 <div class="result-address">
                   <span class="addr-icon">📍</span>
-                  <span>26-30-32 Lê Thị Riêng, P. Bến Thành, Quận 1, TP Hồ Chí Minh</span>
+                  <span>179 Trần Bình Trọng, Phường 3, Quận 5, Thành phố Hồ Chí Minh</span>
                   <span class="dist-chip">5.2 km</span>
                 </div>
                 <div class="result-price">
                   <span class="price-icon">🏷️</span>
-                  <span>38.000 – 78.000 đ</span>
+                  <span>19.000 – 84.000 đ</span>
                 </div>
                 <div class="result-tags">
-                  <span class="tag-chip">Bánh mì</span>
+                  <span class="tag-chip">Cơm tấm</span>
                   <span class="tag-chip">Ăn no</span>
                   <span class="tag-chip">Món mặn</span>
                 </div>
               </div>
               <button class="result-arrow" aria-label="Xem chi tiết">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="9,18 15,12 9,6" />
+                </svg>
               </button>
             </article>
 
             <!-- Result 2 -->
-            <article class="result-card" id="result-2" data-rating="4.7" data-distance="3.7" data-price="35000" data-category="Bún" data-tags="good-rating" onclick="goToDetail(2)">
+            <article class="result-card" id="result-2" data-rating="4.7" data-distance="3.7" data-price="175000"
+              data-category="Gà nướng" data-tags="good-rating" onclick="goToDetail(2)">
               <div class="result-img-wrap">
-                <img src="https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=600&q=80" alt="Bún bò Huế Ô Thùy" class="result-img" loading="lazy"/>
+                <img src="https://denhatganuong.com/image/catalog/dat-mon/ga-nuong-than/ga-nhi_11zon.jpg"
+                  alt="Gà nướng Đệ Nhất" class="result-img" loading="lazy" />
               </div>
               <div class="result-body">
                 <div class="result-top">
-                  <h3 class="result-name">Bún bò Huế Ô Thùy</h3>
+                  <h3 class="result-name">Gà nướng Đệ nhất</h3>
                   <div class="result-rating">
                     <span class="star-icon">⭐</span>
                     <span class="rating-val">4.7</span>
-                    <span class="rating-count">(80+)</span>
+                    <span class="rating-count">(400+)</span>
                   </div>
                 </div>
                 <div class="result-address">
                   <span class="addr-icon">📍</span>
-                  <span>220/5 Lê Văn Sỹ, P. 14, Quận 3, TP Hồ Chí Minh</span>
+                  <span>57 Lê Văn Việt, Phường Tăng Nhơn Phú,Thành phố Thủ Đức, TP Hồ Chí Minh</span>
                   <span class="dist-chip">3.7 km</span>
                 </div>
                 <div class="result-price">
                   <span class="price-icon">🏷️</span>
-                  <span>35.000 – 60.000 đ</span>
+                  <span>175.000 – 465.000 đ</span>
                 </div>
                 <div class="result-tags">
-                  <span class="tag-chip">Bún bò</span>
-                  <span class="tag-chip">Món nước</span>
-                  <span class="tag-chip">Ẩm thực Huế</span>
+                  <span class="tag-chip">Gà nướng</span>
+                  <span class="tag-chip">Đồ nướng</span>
                 </div>
               </div>
               <button class="result-arrow" aria-label="Xem chi tiết">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="9,18 15,12 9,6" />
+                </svg>
               </button>
             </article>
 
             <!-- Result 3 -->
-            <article class="result-card" id="result-3" data-rating="4.5" data-distance="4" data-price="35000" data-category="Cơm tấm" data-tags="budget family" onclick="goToDetail(3)">
+            <article class="result-card" id="result-3" data-rating="4.1" data-distance="4" data-price="29000"
+              data-category="Cơm tấm" data-tags="budget family" onclick="goToDetail(3)">
               <div class="result-img-wrap">
-                <img src="https://images.unsplash.com/photo-1503764654157-72d979d9af2f?w=600&q=80" alt="Cơm tấm sườn bì chả" class="result-img" loading="lazy"/>
+                <img src="https://channel.mediacdn.vn/428462621602512896/2022/11/3/photo-1-16674609780162058836455.jpg"
+                  alt="Cơm tấm Phúc Lộc Thọ" class="result-img" loading="lazy" />
               </div>
               <div class="result-body">
                 <div class="result-top">
-                  <h3 class="result-name">Cơm tấm sườn bì chả</h3>
+                  <h3 class="result-name">Cơm tấm Phúc Lộc Thọ</h3>
                   <div class="result-rating">
                     <span class="star-icon">⭐</span>
-                    <span class="rating-val">4.5</span>
-                    <span class="rating-count">(42)</span>
+                    <span class="rating-val">4.1</span>
+                    <span class="rating-count">(1500+)</span>
                   </div>
                 </div>
                 <div class="result-address">
                   <span class="addr-icon">📍</span>
-                  <span>86/16 Thích Quảng Đức, P. 5, Quận Phú Nhuận, TP Hồ Chí Minh</span>
+                  <span>31-33 Lê Văn Việt, Phường Tăng Nhơn Phú, Thành phố Thủ Đức, TP Hồ Chí Minh</span>
                   <span class="dist-chip">4 km</span>
                 </div>
                 <div class="result-price">
                   <span class="price-icon">🏷️</span>
-                  <span>35.000 – 50.000 đ</span>
+                  <span>29.000 – 95.000 đ</span>
                 </div>
                 <div class="result-tags">
                   <span class="tag-chip">Cơm tấm</span>
@@ -306,76 +348,9 @@
                 </div>
               </div>
               <button class="result-arrow" aria-label="Xem chi tiết">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
-              </button>
-            </article>
-
-            <!-- Result 4 -->
-            <article class="result-card" id="result-4" data-rating="4.9" data-distance="1.2" data-price="50000" data-category="Phở" data-tags="favorite good-rating restaurant" onclick="goToDetail(4)">
-              <div class="result-img-wrap">
-                <img src="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=600&q=80" alt="Phở bò gia truyền" class="result-img" loading="lazy"/>
-                <span class="result-badge badge-musttry">Must try</span>
-              </div>
-              <div class="result-body">
-                <div class="result-top">
-                  <h3 class="result-name">Phở bò gia truyền Ông Tám</h3>
-                  <div class="result-rating">
-                    <span class="star-icon">⭐</span>
-                    <span class="rating-val">4.9</span>
-                    <span class="rating-count">(210+)</span>
-                  </div>
-                </div>
-                <div class="result-address">
-                  <span class="addr-icon">📍</span>
-                  <span>123 Nguyễn Huệ, Quận 1, TP Hồ Chí Minh</span>
-                  <span class="dist-chip">1.2 km</span>
-                </div>
-                <div class="result-price">
-                  <span class="price-icon">🏷️</span>
-                  <span>50.000 – 90.000 đ</span>
-                </div>
-                <div class="result-tags">
-                  <span class="tag-chip">Phở</span>
-                  <span class="tag-chip">Ẩm thực Bắc</span>
-                  <span class="tag-chip">Nổi tiếng</span>
-                </div>
-              </div>
-              <button class="result-arrow" aria-label="Xem chi tiết">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
-              </button>
-            </article>
-
-            <!-- Result 5 -->
-            <article class="result-card" id="result-5" data-rating="4.6" data-distance="0.8" data-price="15000" data-category="Ăn vặt" data-tags="budget cheapest" onclick="goToDetail(5)">
-              <div class="result-img-wrap">
-                <img src="https://images.unsplash.com/photo-1511910849309-0dffb8785146?w=600&q=80" alt="Gỏi cuốn tôm thịt" class="result-img" loading="lazy"/>
-              </div>
-              <div class="result-body">
-                <div class="result-top">
-                  <h3 class="result-name">Gỏi cuốn tôm thịt</h3>
-                  <div class="result-rating">
-                    <span class="star-icon">⭐</span>
-                    <span class="rating-val">4.6</span>
-                    <span class="rating-count">(95)</span>
-                  </div>
-                </div>
-                <div class="result-address">
-                  <span class="addr-icon">📍</span>
-                  <span>45 Phan Xích Long, P. 2, Quận Phú Nhuận, TP Hồ Chí Minh</span>
-                  <span class="dist-chip">0.8 km</span>
-                </div>
-                <div class="result-price">
-                  <span class="price-icon">🏷️</span>
-                  <span>15.000 – 30.000 đ</span>
-                </div>
-                <div class="result-tags">
-                  <span class="tag-chip">Gỏi cuốn</span>
-                  <span class="tag-chip">Ăn vặt</span>
-                  <span class="tag-chip">Nhẹ</span>
-                </div>
-              </div>
-              <button class="result-arrow" aria-label="Xem chi tiết">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="9,18 15,12 9,6" />
+                </svg>
               </button>
             </article>
 
@@ -402,16 +377,22 @@
   <div class="chatbot-modal" id="chatbot-modal">
     <div class="chatbot-header">
       <div class="chatbot-avatar">🤖</div>
-      <div><div class="chatbot-name">FoodMap AI</div><div class="chatbot-status">Đang hoạt động</div></div>
+      <div>
+        <div class="chatbot-name">FoodMap AI</div>
+        <div class="chatbot-status">Đang hoạt động</div>
+      </div>
       <button class="chatbot-close" onclick="toggleChatbot()">✕</button>
     </div>
     <div class="chatbot-body" id="chatbot-body">
       <div class="chat-bubble bot">Xin chào! Bạn đang tìm kiếm món gì? 😊</div>
     </div>
     <div class="chatbot-input-area">
-      <input type="text" id="chatbot-input" placeholder="Nhập tin nhắn..." class="chatbot-input" onkeydown="if(event.key==='Enter') sendChat()"/>
+      <input type="text" id="chatbot-input" placeholder="Nhập tin nhắn..." class="chatbot-input"
+        onkeydown="if(event.key==='Enter') sendChat()" />
       <button class="chatbot-send" onclick="sendChat()">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />
+        </svg>
       </button>
     </div>
   </div>
@@ -425,12 +406,13 @@
           <h2 class="modal-title">ĐĂNG NHẬP</h2>
           <div class="form-group">
             <label class="form-label">Tài khoản <span class="required">*</span></label>
-            <div class="input-wrap"><input type="text" id="login-username" class="form-input" placeholder="Email hoặc tên đăng nhập"/></div>
+            <div class="input-wrap"><input type="text" id="login-username" class="form-input"
+                placeholder="Email hoặc tên đăng nhập" /></div>
           </div>
           <div class="form-group">
             <label class="form-label">Mật khẩu <span class="required">*</span></label>
             <div class="input-wrap">
-              <input type="password" id="login-password" class="form-input" placeholder="Nhập mật khẩu"/>
+              <input type="password" id="login-password" class="form-input" placeholder="Nhập mật khẩu" />
               <button class="input-eye" onclick="togglePassword('login-password')" type="button">👁️</button>
             </div>
           </div>
@@ -439,13 +421,15 @@
           <div class="divider"><span>Hoặc đăng nhập bằng</span></div>
           <div class="social-login">
             <button class="social-login-btn facebook"><span class="s-icon">f</span> Facebook</button>
-            <button class="social-login-btn google"><span class="s-icon"><img src="https://www.google.com/favicon.ico" alt="G" style="width:16px;height:16px"/></span> Google</button>
+            <button class="social-login-btn google"><span class="s-icon"><img src="https://www.google.com/favicon.ico"
+                  alt="G" style="width:16px;height:16px" /></span> Google</button>
           </div>
         </div>
         <div class="modal-right">
           <h3 class="modal-welcome">Chào mừng trở lại</h3>
           <p class="modal-tagline">Du lịch thả ga cùng tớ nha</p>
-          <div class="modal-food-img"><img src="https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&q=80" alt="Món ăn"/></div>
+          <div class="modal-food-img"><img src="https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&q=80"
+              alt="Món ăn" /></div>
         </div>
       </div>
     </div>
@@ -453,4 +437,5 @@
 
   <script src="search.js"></script>
 </body>
+
 </html>

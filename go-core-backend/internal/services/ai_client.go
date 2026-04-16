@@ -22,7 +22,6 @@ import (
 	"go-core-backend/internal/dto"
 )
 
-
 // CallPythonEngine: Gửi HTTP POST request tới Python AI Service và parse kết quả trả về
 func CallPythonEngine(reqData dto.AIRecommendRequest) (*dto.AIRecommendResponse, error) {
 	// Bước 1: Serialize struct của Go thành định dạng chuỗi JSON (Marshal)
@@ -38,7 +37,7 @@ func CallPythonEngine(reqData dto.AIRecommendRequest) (*dto.AIRecommendResponse,
 	}
 
 	//Bước 3: Định nghĩa endpoint của Python service.
-	pythonURL := config.AppConfig.AIServiceURL
+	pythonURL := config.AppConfig.AIServiceURL + "/recommend"
 	// Thực thi HTTP POST request với payload là JSON.
 	resp, err := client.Post(pythonURL, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {

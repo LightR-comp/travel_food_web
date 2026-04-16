@@ -1,74 +1,36 @@
-from fastapi import APIRouter, HTTPException
-from schemas.payloads import (
-    ChatRequest,
-    ChatResponse,
-    IntentResponse,
-    PlaceInfo,
-    RecommendResponse
-)
-from ai_chatbot.nlp_parser import *
-from ai_chatbot.consultant_rag import *
-import uvicorn
+from fastapi import FastAPI, APIRouter
+from schemas.payloads import *
+from ai_chatbot.nlp_parser import detect_intent_with_ai
+from ai_chatbot.consultant_rag import generate_final_response
 
+app = FastAPI()
 router = APIRouter()
 
-@router.post("/chat", response_model=ChatResponse)
-async def chat_endpoint(request: ChatRequest):
-    user_msg = request.message.lower()
-    
-    if "chào" in user_msg or "hello" in user_msg:
-        reply_text = "Chào bạn! Tôi là trợ lý AI du lịch ẩm thực. Tôi có thể giúp bạn tìm quán ăn phù hợp với sở thích và tâm trạng hôm nay."
-    
-    elif "đói" in user_msg or "ăn" in user_msg or "gợi ý" in user_msg:
-        reply_text = "Bạn đang muốn tìm món gì? Hãy cho tôi biết sơ qua về ngân sách và bạn đi cùng mấy người nhé!"
-        
-    else:
-        reply_text = f"Tôi đã nhận được tin nhắn: '{request.message}'."
-
-    return ChatResponse(
-        reply=reply_text,
-        status="success"
-    )
-
-@router.post("/parse-intent", response_model = IntentResponse)
-async def parse_intent_endpoint(request: ChatRequest):
-
-    analysis_result = detect_intent_with_ai(request.message)
-    
-    return {
-        "intent": analysis_result["intent"],
-        "confidence": analysis_result["confidence"],
-        "preferences": analysis_result["entities"]
-    }
-
-@router.post("/generate-response", response_model = RecommendResponse)
-async def recommend_endpoint(request: ChatRequest):
+@router.post("/intent_parse", response_model=BaseResponse)
+async def intent_parse_endpoint(request: ChatIntentRequest):
     try:
-        # Đây là nơi bạn xử lý logic để lấy danh sách quán ăn
-        # Giả lập dữ liệu tìm được từ database
-        mock_results = [
-            PlaceInfo(
-                name="Quán Bún Bò Chú Sáng", 
-                address="123 Lê Lợi, Quận 1", 
-                rating=4.5, 
-                price_range="50k - 100k"
-            ),
-            PlaceInfo(
-                name="Cơm Tấm Đêm", 
-                address="456 Nguyễn Huệ, Quận 1", 
-                rating=4.2, 
-                price_range="30k - 60k"
-            )
-        ]
-        
-        return RecommendResponse(
-            recommendations=mock_results,
-            total_found=len(mock_results)
+        # Hàm detect_intent_with_ai tự lấy shared_model từ core
+        result = detect_intent_with_ai(request.message)
+        data = IntentData(
+            intent=result.get("intent", "none"),
+            entities=result.get("entities", {}),
+            confidence=result.get("confidence", 0.0)
         )
+        return BaseResponse(success=True, message="Phân tích thành công", data=data)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Lỗi hệ thống: {str(e)}")
+        return BaseResponse(success=False, error=str(e))
 
+@router.post("/generate_response", response_model=BaseResponse)
+async def generate_response_endpoint(request: ChatGenerationRequest):
+    try:
+        # Hàm generate_final_response tự lấy shared_model từ core
+        final_data = generate_final_response(request)
+        return BaseResponse(success=True, message="Tạo phản hồi thành công", data=final_data)
+    except Exception as e:
+        return BaseResponse(success=False, error=str(e))
 
+app.include_router(router)
 
 if __name__ == "__main__":
-    uvicorn.run(router, host="0.0.0.0", port=8000)
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -218,5 +218,5 @@ document.getElementById('login-submit')?.addEventListener('click', () => {
   closeAllModals();
 });
 
-console.log('%c🍜 FoodMap Dashboard', 'font-size: 18px; font-weight: bold; color: #E8623A;');
+console.log('%c🍜 YumMap Trang chủ', 'font-size: 18px; font-weight: bold; color: #E8623A;');
 console.log('%cKhám phá ẩm thực Việt Nam!', 'color: #4A3728;');

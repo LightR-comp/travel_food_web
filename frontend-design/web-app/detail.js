@@ -156,7 +156,7 @@ function switchMenuTab(tabEl, panelId) {
 function shareRestaurant() {
   if (navigator.share) {
     navigator.share({
-      title: 'Cơm tấm Sà Bì Chưởng – FoodMap',
+      title: 'Cơm tấm Sà Bì Chưởng – YumMap',
       text: 'Quán cơm tấm ngon tại Quận 5, TP.HCM. Đánh giá 4.7 ⭐',
       url: window.location.href
     }).catch(() => { });
@@ -205,4 +205,4 @@ window.addEventListener('DOMContentLoaded', () => {
   }, { passive: true });
 });
 
-console.log('%c🍚 FoodMap Detail', 'font-size:16px;font-weight:bold;color:#E8623A');
+console.log('%c🍚 YumMap Detail', 'font-size:16px;font-weight:bold;color:#E8623A');

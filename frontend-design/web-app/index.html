@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FoodMap - Khám Phá Ẩm Thực Việt Nam</title>
+  <title>YumMap - Khám Phá Ẩm Thực Việt Nam</title>
   <meta name="description" content="Khám phá ẩm thực Việt Nam, tìm kiếm nhà hàng, quán ăn ngon gần bạn với hệ thống gợi ý AI thông minh."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -17,9 +17,8 @@
     <div class="header-inner">
       <!-- Logo -->
       <div class="logo" id="logo">
-        <div class="logo-icon">🍜</div>
+        <img src="assets/YumMap-logo.svg" alt="YumMap Logo" class="brand-logo" />
         <div class="logo-text">
-          <span class="logo-name">FoodMap</span>
           <span class="logo-sub">📍 TP. Hồ Chí Minh</span>
         </div>
       </div>
@@ -44,7 +43,7 @@
 
     <!-- Mobile Menu -->
     <nav class="mobile-menu" id="mobile-menu">
-      <a href="#" class="mobile-nav-link active">🏠 Dashboard</a>
+      <a href="#" class="mobile-nav-link active">🏠 Trang chủ</a>
       <a href="#" class="mobile-nav-link">🔍 Tìm kiếm</a>
       <a href="#" class="mobile-nav-link">💬 Diễn đàn</a>
       <a href="#" class="mobile-nav-link">ℹ️ Về chúng tôi</a>
@@ -59,8 +58,8 @@
       <div class="hero-overlay"></div>
     </div>
     <div class="hero-content">
-      <h1 class="hero-title">Khám Phá Ẩm Thực Sài Gòn</h1>
-      <p class="hero-subtitle">AI gợi ý quán ngon – Đúng khẩu vị, đúng khoảnh khắc</p>
+      <h1 class="hero-title">Khám Phá Ẩm Thực</h1>
+      <p class="hero-subtitle">"Thổ địa số" gợi ý quán ngon – Đúng khẩu vị, đúng khoảnh khắc</p>
       <div class="hero-search" id="hero-search">
         <input type="text" id="hero-search-input" placeholder="Tìm món ăn, quán ăn, địa điểm..." class="hero-search-input"/>
         <button class="hero-search-btn" id="hero-search-btn">
@@ -78,7 +77,7 @@
       <div class="nav-tabs-bar">
         <button class="nav-tab active" id="tab-dashboard" onclick="setActiveTab(this)">
           <div class="tab-icon">🏠</div>
-          <span>Dashboard</span>
+          <span>Trang chủ</span>
         </button>
         <button class="nav-tab" id="tab-search" onclick="window.location='search.html'">
           <div class="tab-icon">🔍</div>
@@ -301,7 +300,7 @@
     <section class="section" id="good-spots">
       <div class="container">
         <div class="section-header">
-          <h2 class="section-title">GOOD SPOTS FOR FOOD</h2>
+          <h2 class="section-title">GỢI Ý QUÁN NGON</h2>
         </div>
         <div class="trending-scroll-wrapper">
           <button class="scroll-btn scroll-btn-left" id="spots-scroll-left" onclick="scrollCards('spots-cards', -1)">
@@ -433,7 +432,7 @@
       <div class="chatbot-header">
         <div class="chatbot-avatar">🤖</div>
         <div>
-          <div class="chatbot-name">FoodMap AI</div>
+          <div class="chatbot-name">YumMap AI</div>
           <div class="chatbot-status">Đang hoạt động</div>
         </div>
         <button class="chatbot-close" onclick="toggleChatbot()">✕</button>
@@ -511,15 +510,14 @@
         <!-- Logo -->
         <div class="footer-col footer-logo-col" id="footer-logo-col">
           <div class="footer-logo-box">
-            <div class="footer-logo-icon">🍜</div>
-            <span class="footer-logo-text">FoodMap</span>
+            <img src="assets/YumMap-logo.svg" alt="YumMap Logo" class="footer-brand-logo" />
           </div>
           <p class="footer-tagline">Ẩm thực Việt – Đúng vị, đúng nơi</p>
         </div>
 
       </div>
       <div class="footer-bottom">
-        <p>Copyright ©️ 2026 "FoodMap". All rights reserved.</p>
+        <p>Copyright ©️ 2026 "YumMap". All rights reserved.</p>
       </div>
     </div>
   </footer>

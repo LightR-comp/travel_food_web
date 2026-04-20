@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tìm kiếm – FoodMap</title>
+  <title>Tìm kiếm – YumMap</title>
   <meta name="description"
     content="Tìm kiếm nhà hàng, quán ăn ngon gần bạn tại TP. Hồ Chí Minh với bộ lọc thông minh." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -22,9 +22,8 @@
   <header class="header" id="main-header">
     <div class="header-inner">
       <div class="logo" id="logo" onclick="window.location='index.html'">
-        <div class="logo-icon">🍜</div>
+        <img src="assets/YumMap-logo.svg" alt="YumMap Logo" class="brand-logo" />
         <div class="logo-text">
-          <span class="logo-name">FoodMap</span>
           <span class="logo-sub">📍 TP. Hồ Chí Minh</span>
         </div>
       </div>
@@ -39,7 +38,7 @@
       </div>
     </div>
     <nav class="mobile-menu" id="mobile-menu">
-      <a href="index.html" class="mobile-nav-link">🏠 Dashboard</a>
+      <a href="index.html" class="mobile-nav-link">🏠 Trang chủ</a>
       <a href="search.html" class="mobile-nav-link active">🔍 Tìm kiếm</a>
       <a href="#" class="mobile-nav-link">💬 Diễn đàn</a>
       <a href="#" class="mobile-nav-link">ℹ️ Về chúng tôi</a>
@@ -52,7 +51,7 @@
     <div class="container">
       <div class="nav-tabs-bar">
         <button class="nav-tab" onclick="window.location='index.html'">
-          <div class="tab-icon">🏠</div><span>Dashboard</span>
+          <div class="tab-icon">🏠</div><span>Trang chủ</span>
         </button>
         <button class="nav-tab active" id="tab-search">
           <div class="tab-icon">🔍</div><span>Tìm kiếm</span>
@@ -369,6 +368,77 @@
     </div>
   </main>
 
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" id="main-footer">
+    <div class="container">
+      <div class="footer-grid">
+
+        <!-- Trợ giúp -->
+        <div class="footer-col" id="footer-help">
+          <h4 class="footer-title">Trợ giúp</h4>
+          <ul class="footer-links">
+            <li><a href="#" class="footer-link">Trung tâm trợ giúp</a></li>
+            <li><a href="#" class="footer-link">Câu hỏi thường gặp</a></li>
+            <li><a href="#" class="footer-link">Chính sách bảo mật</a></li>
+            <li><a href="#" class="footer-link">Điều khoản sử dụng</a></li>
+          </ul>
+        </div>
+
+        <!-- Công ty -->
+        <div class="footer-col" id="footer-company">
+          <h4 class="footer-title">Công ty</h4>
+          <ul class="footer-links">
+            <li><a href="#" class="footer-link">Về chúng tôi</a></li>
+            <li><a href="#" class="footer-link">Liên hệ chúng tôi</a></li>
+          </ul>
+        </div>
+
+        <!-- Theo dõi -->
+        <div class="footer-col" id="footer-social">
+          <h4 class="footer-title">Theo dõi chúng tôi trên</h4>
+          <ul class="footer-social-links">
+            <li>
+              <a href="#" class="social-link" id="social-facebook">
+                <div class="social-icon facebook-icon">f</div>
+                <span>Facebook</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="social-link" id="social-instagram">
+                <div class="social-icon instagram-icon">📷</div>
+                <span>Instagram</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="social-link" id="social-tiktok">
+                <div class="social-icon tiktok-icon">🎵</div>
+                <span>Tiktok</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="social-link" id="social-youtube">
+                <div class="social-icon youtube-icon">▶</div>
+                <span>Youtube</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Logo -->
+        <div class="footer-col footer-logo-col" id="footer-logo-col">
+          <div class="footer-logo-box">
+            <img src="assets/YumMap-logo.svg" alt="YumMap Logo" class="footer-brand-logo" />
+          </div>
+          <p class="footer-tagline">Ẩm thực Việt – Đúng vị, đúng nơi</p>
+        </div>
+
+      </div>
+      <div class="footer-bottom">
+        <p>Copyright ©️ 2026 "YumMap". All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
   <!-- ===== CHATBOT ===== -->
   <button class="chatbot-btn" id="chatbot-btn" onclick="toggleChatbot()">
     <div class="chatbot-icon">🤖</div>
@@ -378,7 +448,7 @@
     <div class="chatbot-header">
       <div class="chatbot-avatar">🤖</div>
       <div>
-        <div class="chatbot-name">FoodMap AI</div>
+        <div class="chatbot-name">YumMap AI</div>
         <div class="chatbot-status">Đang hoạt động</div>
       </div>
       <button class="chatbot-close" onclick="toggleChatbot()">✕</button>

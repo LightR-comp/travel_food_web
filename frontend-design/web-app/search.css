@@ -246,7 +246,6 @@
   position: relative;
   height: 30px;
   margin-bottom: 12px;
-  padding: 0 4px;
 }
 
 .price-slider {
@@ -263,6 +262,8 @@
 
 .price-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
+  appearance: none;
+  margin-top: -7px;
   width: 18px;
   height: 18px;
   border-radius: 50%;

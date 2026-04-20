@@ -1,5 +1,5 @@
 /* ================================================
-   FOODMAP - Main Stylesheet
+   YUMMAP - Main Stylesheet
    ================================================ */
 
 /* ---- Reset & Base ---- */
@@ -132,6 +132,12 @@ button {
   font-size: 0.72rem;
   color: var(--gray);
   font-weight: 500;
+}
+
+.brand-logo {
+  height: 65px;
+  width: auto;
+  object-fit: contain;
 }
 
 /* Header Right */
@@ -1128,10 +1134,6 @@ button {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  padding: 12px 20px;
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .footer-logo-icon {
@@ -1143,6 +1145,12 @@ button {
   font-size: 1.15rem;
   font-weight: 800;
   color: var(--primary-light);
+}
+
+.footer-brand-logo {
+  height: 100px;
+  width: auto;
+  object-fit: contain;
 }
 
 .footer-tagline {

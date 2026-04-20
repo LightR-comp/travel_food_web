@@ -325,4 +325,4 @@ window.addEventListener('DOMContentLoaded', () => {
   }, 800);
 });
 
-console.log('%c🔍 FoodMap Search', 'font-size:16px;font-weight:bold;color:#E8623A');
+console.log('%c🔍 YumMap Search', 'font-size:16px;font-weight:bold;color:#E8623A');

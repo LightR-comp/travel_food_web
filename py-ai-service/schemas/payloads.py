@@ -111,13 +111,3 @@ class ChatFinalData(BaseModel): # python trả về
     reply: str                            # Câu trả lời tự nhiên (Natural Language)
     suggested_places: List[PlaceInfo]  
 
-# Generate response
-class GenerateRequest(BaseModel):
-    user_query: str
-    db_data: Any
-
-class BaseResponse(BaseModel):
-    success: bool
-    message: Optional[str] = ""
-    data: Optional[Any] = None
-    error: Optional[Any] = None

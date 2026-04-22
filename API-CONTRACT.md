@@ -53,7 +53,7 @@ Sai:
 
 ## 4. JSON RULES THEO TỪNG GIAI ĐOẠN:
 
-### RECOMMEND WORKFLOW
+## RECOMMEND WORKFLOW
 
 ### 4.1 GIAI ĐOẠN 1 — Frontend → Go:
 
@@ -343,7 +343,7 @@ JSON:
 }
 ```
 
-### CHATBOT WORKFLOW
+## CHATBOT WORKFLOW
 
 ### GIAI ĐOẠN 1 — Go → Python (INTENT PARSE)
 **Mục tiêu:** Giúp Go hiểu người dùng đang muốn gì để đi tìm dữ liệu cho đúng.

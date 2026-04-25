@@ -167,9 +167,9 @@ const Header = () => {
           {[
             { to: '/', label: '🏠 Dashboard' },
             { to: '/search', label: '🔍 Tìm kiếm' },
-            { to: '#', label: '💬 Diễn đàn' },
-            { to: '#', label: 'ℹ️ Về chúng tôi' },
-            { to: '#', label: '🎧 Hỗ trợ' },
+            { to: '/forum', label: '💬 Diễn đàn' },
+            { to: '/about', label: 'ℹ️ Về chúng tôi' },
+            { to: '/support', label: '🎧 Hỗ trợ' },
           ].map(({ to, label }) => (
             <Link
               key={label}

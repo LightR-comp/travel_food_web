@@ -2,14 +2,15 @@ import { Link } from 'react-router-dom';
 
 const FOOTER_LINKS = {
   'Trợ giúp': [
-    { label: 'Trung tâm trợ giúp', to: '#' },
-    { label: 'Câu hỏi thường gặp', to: '#' },
-    { label: 'Chính sách bảo mật', to: '#' },
-    { label: 'Điều khoản sử dụng', to: '#' },
+    { label: 'Trung tâm trợ giúp', to: '/support' },
+    { label: 'Câu hỏi thường gặp', to: '/support' },
+    { label: 'Chính sách bảo mật', to: '/policy' },
+    { label: 'Điều khoản sử dụng', to: '/terms' },
   ],
   'Công ty': [
-    { label: 'Về chúng tôi', to: '#' },
-    { label: 'Liên hệ chúng tôi', to: '#' },
+    { label: 'Về chúng tôi', to: '/about' },
+    { label: 'Liên hệ chúng tôi', to: '/contact' },
+    { label: 'Diễn đàn', to: '/forum' },
   ],
 };
 

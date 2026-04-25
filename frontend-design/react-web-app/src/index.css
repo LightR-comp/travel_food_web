@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'iCiel';
+  src: url('./fonts/iCiel Koni Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Androgyne';
+  src: url('./fonts/SVN-Androgyne.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @layer base {
   :root {
     --primary: #E8623A;
@@ -63,6 +77,12 @@
   }
   .font-dancing {
     font-family: 'Dancing Script', cursive;
+  }
+  .font-iciel {
+    font-family: 'iCiel', sans-serif;
+  }
+  .font-androgyne {
+    font-family: 'Androgyne', sans-serif;
   }
 
   /* Card scroll container */

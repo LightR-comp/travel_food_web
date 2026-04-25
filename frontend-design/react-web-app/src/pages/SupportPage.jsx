@@ -93,7 +93,7 @@ const SupportPage = () => {
 
           <div className="relative max-w-[1200px] mx-auto px-6 text-center">
             <span className="inline-block text-5xl mb-4" style={{ animation: 'float 3s ease-in-out infinite' }}>🎧</span>
-            <h1 className="font-[Baloo_2,sans-serif] text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 bg-gradient-to-r from-white via-[#F4845A] to-[#F5A623] bg-clip-text text-transparent">
+            <h1 className="font-iciel text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 text-[#F4845A] pb-2">
               Trung Tâm Hỗ Trợ
             </h1>
             <p className="text-white/65 max-w-lg mx-auto text-sm sm:text-base leading-relaxed mb-8">

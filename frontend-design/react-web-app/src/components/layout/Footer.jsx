@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import YumMapLogo from '../../assets/YumMap-logo.svg';
 
 const FOOTER_LINKS = {
   'Trợ giúp': [
@@ -62,10 +63,7 @@ const Footer = () => (
 
         {/* Logo col */}
         <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2 bg-white/6 border border-white/10 rounded-lg px-5 py-3 w-fit">
-            <span className="text-[1.8rem]">🍜</span>
-            <span className="font-[Baloo_2,sans-serif] font-extrabold text-[1.15rem] text-[#F4845A]">YumMap</span>
-          </div>
+          <img src={YumMapLogo} alt="YumMap" className="h-20 w-auto" />
           <p className="text-xs text-white/50 italic">Ẩm thực Việt – Đúng vị, đúng nơi</p>
         </div>
 

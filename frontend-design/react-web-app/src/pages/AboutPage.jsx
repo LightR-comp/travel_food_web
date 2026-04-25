@@ -85,10 +85,8 @@ const AboutPage = () => {
 
           <div className="relative max-w-[1200px] mx-auto px-6 text-center">
             <span className="inline-block text-5xl mb-5" style={{ animation: 'float 3s ease-in-out infinite' }}>🍜</span>
-            <h1 className="font-[Baloo_2,sans-serif] text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-5">
-              <span className="bg-gradient-to-r from-white via-[#F4845A] to-[#F5A623] bg-clip-text text-transparent">
-                Về Chúng Tôi
-              </span>
+            <h1 className="font-iciel text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-5 text-[#F4845A] pb-2">
+              Về Chúng Tôi
             </h1>
             <p className="text-white/65 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
               YumMap không chỉ là ứng dụng tìm kiếm quán ăn – đó là người bạn đồng hành tin cậy, 

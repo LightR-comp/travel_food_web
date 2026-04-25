@@ -216,7 +216,7 @@ const ForumPage = () => {
 
         <div className="relative max-w-[1200px] mx-auto px-6 text-center">
           <span className="inline-block text-5xl mb-4 animate-bounce" style={{ animationDuration: '2s' }}>💬</span>
-          <h1 className="font-[Baloo_2,sans-serif] text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 bg-gradient-to-r from-white via-[#F4845A] to-[#F5A623] bg-clip-text text-transparent">
+          <h1 className="font-iciel text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 text-[#F4845A] pb-2">
             Diễn Đàn Ẩm Thực
           </h1>
           <p className="text-white/70 max-w-lg mx-auto text-sm sm:text-base leading-relaxed">

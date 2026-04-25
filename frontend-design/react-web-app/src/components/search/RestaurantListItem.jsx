@@ -10,19 +10,21 @@ const RestaurantListItem = ({ restaurant }) => {
 
   return (
     <div
-      className="flex gap-5 bg-[#FEFDF9] border border-[#F5EDD8] rounded-2xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer"
+      className="flex gap-5 bg-[#FEFDF9] border border-[#F5EDD8] rounded-2xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group"
       onClick={() => navigate(`/detail/${id}`)}
       id={`result-item-${id}`}
     >
       {/* Food image */}
-      <div className="relative w-[180px] h-[160px] flex-shrink-0">
-        <img
-          src={image_url}
-          alt={restaurant_info.name}
-          loading="lazy"
-          className="w-full h-full object-cover"
-        />
-        {badge && <Badge label={badge} />}
+      <div className="relative w-[180px] h-[160px] flex-shrink-0 p-2.5 pr-0">
+        <div className="w-full h-full rounded-[14px] overflow-hidden relative shadow-sm">
+          <img
+            src={image_url}
+            alt={restaurant_info.name}
+            loading="lazy"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          {badge && <Badge label={badge} />}
+        </div>
       </div>
 
       {/* Info */}

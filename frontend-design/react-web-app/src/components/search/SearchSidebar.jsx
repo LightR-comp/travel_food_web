@@ -23,29 +23,45 @@ const SearchSidebar = ({ priceRange, onPriceChange, filters, onFilterToggle, sor
   return (
     <aside className="w-full lg:w-[280px] flex-shrink-0 flex flex-col gap-5" id="search-sidebar">
 
-      {/* Map placeholder */}
-      <div className="h-[180px] rounded-2xl bg-[#E8F4FD] flex items-center justify-center overflow-hidden border border-[#D0E8F8]">
-        <div className="text-center">
-          <div className="text-5xl mb-2">🗺️</div>
-          <p className="text-sm text-[#4A3728] font-medium">Bản đồ</p>
-          <p className="text-xs text-[#7B7068]">Google Maps sẽ tích hợp sau</p>
-        </div>
+      {/* Map Embed */}
+      <div className="h-[180px] rounded-2xl overflow-hidden border border-[#D0E8F8] relative shadow-inner">
+        <iframe
+          title="Bản đồ TP.HCM"
+          src="https://maps.google.com/maps?q=Hồ%20Chí%20Minh,%20Việt%20Nam&t=&z=12&ie=UTF8&iwloc=&output=embed"
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          allowFullScreen=""
+          loading="lazy"
+          className="absolute inset-0"
+        ></iframe>
       </div>
 
       {/* Price range */}
       <div className="bg-white rounded-2xl border border-[#F5EDD8] p-5">
         <h3 className="font-bold text-[#E8623A] text-base mb-4">Khoảng giá</h3>
 
-        {/* Dual range slider – simplified with two inputs */}
-        <div className="flex flex-col gap-3">
+        {/* Dual range slider combined into one visual track */}
+        <div className="relative h-6 flex items-center mb-2 mt-2">
+          {/* Custom track background */}
+          <div className="absolute w-full h-1.5 bg-[#F5EDD8] rounded-full pointer-events-none"></div>
+          {/* Colored track slice */}
+          <div
+            className="absolute h-1.5 bg-[#E8623A] rounded-full pointer-events-none"
+            style={{
+              left: `${(min / 1000000) * 100}%`,
+              width: `${((max - min) / 1000000) * 100}%`,
+            }}
+          ></div>
+          
           <input
             type="range"
             min={0}
             max={1000000}
             step={10000}
             value={min}
-            onChange={(e) => onPriceChange([+e.target.value, max])}
-            className="w-full accent-[#E8623A] cursor-pointer"
+            onChange={(e) => onPriceChange([Math.min(+e.target.value, max - 10000), max])}
+            className="absolute w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-runnable-track]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#E8623A] [&::-webkit-slider-thumb]:cursor-pointer z-10"
           />
           <input
             type="range"
@@ -53,8 +69,8 @@ const SearchSidebar = ({ priceRange, onPriceChange, filters, onFilterToggle, sor
             max={1000000}
             step={10000}
             value={max}
-            onChange={(e) => onPriceChange([min, +e.target.value])}
-            className="w-full accent-[#E8623A] cursor-pointer"
+            onChange={(e) => onPriceChange([min, Math.max(+e.target.value, min + 10000)])}
+            className="absolute w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-runnable-track]:appearance-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#E8623A] [&::-webkit-slider-thumb]:cursor-pointer z-20"
           />
         </div>
 

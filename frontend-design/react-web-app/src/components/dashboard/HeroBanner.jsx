@@ -25,7 +25,7 @@ const HeroBanner = () => {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center h-full px-6 text-center">
-        <h1 className="font-[Baloo_2,sans-serif] text-[clamp(1.8rem,5vw,3rem)] font-extrabold text-white text-shadow-lg mb-3 animate-fade-up tracking-tight">
+        <h1 className="font-iciel text-[clamp(1.8rem,5vw,3rem)] font-extrabold text-white text-shadow-lg mb-3 animate-fade-up tracking-tight">
           Khám Phá Ẩm Thực Sài Gòn
         </h1>
         <p className="text-[clamp(0.9rem,2.5vw,1.15rem)] text-white/90 mb-7 font-light animate-fade-up" style={{ animationDelay: '0.15s' }}>

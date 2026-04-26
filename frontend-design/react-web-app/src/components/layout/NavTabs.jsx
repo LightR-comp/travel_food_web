@@ -3,9 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const TABS = [
   { id: 'dashboard', label: 'Dashboard', icon: '🏠', path: '/' },
   { id: 'search',    label: 'Tìm kiếm',  icon: '🔍', path: '/search' },
-  { id: 'forum',     label: 'Diễn đàn',  icon: '💬', path: '#' },
-  { id: 'about',     label: 'Về chúng tôi', icon: 'ℹ️', path: '#' },
-  { id: 'support',   label: 'Hỗ trợ',    icon: '🎧', path: '#' },
+  { id: 'forum',     label: 'Diễn đàn',  icon: '💬', path: '/forum' },
+  { id: 'about',     label: 'Về chúng tôi', icon: 'ℹ️', path: '/about' },
+  { id: 'support',   label: 'Hỗ trợ',    icon: '🎧', path: '/support' },
 ];
 
 const NavTabs = () => {
@@ -13,7 +13,7 @@ const NavTabs = () => {
   const location = useLocation();
 
   const isActive = (path) =>
-    path !== '#' && (path === '/' ? location.pathname === '/' : location.pathname.startsWith(path));
+    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
   return (
     <section className="bg-white shadow-[0_2px_8px_rgba(44,24,16,0.06)] sticky top-[65px] z-[90]">
@@ -22,7 +22,7 @@ const NavTabs = () => {
           {TABS.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => tab.path !== '#' && navigate(tab.path)}
+              onClick={() => navigate(tab.path)}
               className={`
                 relative flex flex-col items-center gap-1 px-6 py-2 rounded-xl
                 text-xs font-semibold transition-all duration-200 whitespace-nowrap flex-shrink-0

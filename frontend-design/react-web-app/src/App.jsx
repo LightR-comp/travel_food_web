@@ -5,12 +5,20 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import ChatbotModal, { ChatbotButton } from './components/chatbot/ChatbotModal';
 
-// ---- Pages (lazy-loaded) ----
+// ---- Pages ----
 import HomePage   from './pages/HomePage';
 import SearchPage from './pages/SearchPage';
 import DetailPage from './pages/DetailPage';
 import LoginPage  from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import ForumPage  from './pages/ForumPage';
+import ForumDetailPage from './pages/ForumDetailPage';
+import ForumPostPage from './pages/ForumPostPage';
+import AboutPage  from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import PolicyPage from './pages/PolicyPage';
+import SupportPage from './pages/SupportPage';
+import TermsPage  from './pages/TermsPage';
 
 // Pages that should NOT show the main layout (header/footer/chatbot)
 const AUTH_ROUTES = ['/login', '/signup'];
@@ -38,6 +46,14 @@ const AppLayout = () => {
           <Route path="/"          element={<HomePage />} />
           <Route path="/search"    element={<SearchPage />} />
           <Route path="/detail/:id" element={<DetailPage />} />
+          <Route path="/forum"     element={<ForumPage />} />
+          <Route path="/forum/new-post" element={<ForumPostPage />} />
+          <Route path="/forum/:id" element={<ForumDetailPage />} />
+          <Route path="/about"     element={<AboutPage />} />
+          <Route path="/contact"   element={<ContactPage />} />
+          <Route path="/policy"    element={<PolicyPage />} />
+          <Route path="/support"   element={<SupportPage />} />
+          <Route path="/terms"     element={<TermsPage />} />
           {/* Catch-all */}
           <Route path="*" element={
             <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">

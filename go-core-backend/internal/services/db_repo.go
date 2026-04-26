@@ -439,7 +439,7 @@ func GetUserPreferences(ctx context.Context, userID int) (*models.UserPreference
 }
 
 // Local user
-func RegisterLocal(ctx context.Context, username, password, name string) (*models.User, error) {
+func RegisterLocal(ctx context.Context, username, password, name, email string) (*models.User, error) {
 	// 1. Kiểm tra username đã tồn tại chưa
 	var count int
 	row := db.QueryRowContext(ctx, `
@@ -457,13 +457,16 @@ func RegisterLocal(ctx context.Context, username, password, name string) (*model
 		return nil, fmt.Errorf("lỗi hash password")
 	}
 
-	// 3. Tạo user mới
+	// 3. Tạo user mới với email thật
 	var userID int
 	newRow := db.QueryRowContext(ctx, `
 		INSERT INTO Users (email, name, avatar_url, created_at, updated_at)
 		OUTPUT INSERTED.id
-		VALUES ('', @name, '', GETDATE(), GETDATE())
-	`, sql.Named("name", name))
+		VALUES (@email, @name, '', GETDATE(), GETDATE())
+	`,
+		sql.Named("email", email),
+		sql.Named("name", name),
+	)
 	if err := newRow.Scan(&userID); err != nil {
 		return nil, fmt.Errorf("lỗi tạo user: %w", err)
 	}
@@ -508,42 +511,39 @@ func LocalLogin(ctx context.Context, username, password string) (*models.User, e
 }
 
 // Tạo reset token, lưu DB, trả về token để gửi mail
-func CreatePasswordResetToken(ctx context.Context, username string) (string, error) {
-    // Kiểm tra username tồn tại
+func CreatePasswordResetToken(ctx context.Context, username string) (string, string, error) {
+    // Lấy user_id VÀ email từ DB
     var userID int
+    var email string
     row := db.QueryRowContext(ctx, `
-        SELECT user_id FROM UserAuth
-        WHERE provider = 'local' AND provider_id = @username
+        SELECT ua.user_id, u.email 
+        FROM UserAuth ua
+        INNER JOIN Users u ON ua.user_id = u.id
+        WHERE ua.provider = 'local' AND ua.provider_id = @username
     `, sql.Named("username", username))
-    if err := row.Scan(&userID); err == sql.ErrNoRows {
-        // Trả lỗi chung để tránh lộ thông tin username có tồn tại hay không
-        return "", fmt.Errorf("nếu tài khoản tồn tại, email sẽ được gửi")
+
+    if err := row.Scan(&userID, &email); err == sql.ErrNoRows {
+        return "", "", fmt.Errorf("không tìm thấy tài khoản")
     } else if err != nil {
-        return "", err
+        return "", "", err
     }
 
-    // Tạo token random 32 bytes
+    // Tạo token như cũ
     b := make([]byte, 32)
-    if _, err := rand.Read(b); err != nil {
-        return "", fmt.Errorf("lỗi tạo token")
-    }
+    rand.Read(b)
     token := hex.EncodeToString(b)
     exp := time.Now().Add(15 * time.Minute)
 
-    _, err := db.ExecContext(ctx, `
-        UPDATE UserAuth
-        SET reset_token = @token, reset_token_exp = @exp
+    db.ExecContext(ctx, `
+        UPDATE UserAuth SET reset_token = @token, reset_token_exp = @exp
         WHERE provider = 'local' AND provider_id = @username
     `,
         sql.Named("token", token),
         sql.Named("exp", exp),
         sql.Named("username", username),
     )
-    if err != nil {
-        return "", fmt.Errorf("lỗi lưu token: %w", err)
-    }
 
-    return token, nil
+    return token, email, nil // trả về cả email
 }
 
 // Đổi mật khẩu mới sau khi xác thực token

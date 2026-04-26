@@ -5,7 +5,10 @@
 package handlers
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 
@@ -125,4 +128,58 @@ func LocalLogin(c *gin.Context) {
 		"message": "Đăng nhập thành công",
 		"user":    user,
 	})
+}
+
+// ForgotPassword nhận username, gửi reset link qua email
+func ForgotPassword(c *gin.Context) {
+	var req struct {
+		Username string `json:"username" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Thiếu username"})
+		return
+	}
+
+	token, err := services.CreatePasswordResetToken(c.Request.Context(), req.Username)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"message": "Nếu tài khoản tồn tại, hướng dẫn đặt lại mật khẩu đã được gửi"})
+		return
+	}
+
+	// Dev mode — trả token thẳng ra response để test
+	if os.Getenv("SMTP_HOST") == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"message":    "Dev mode: token đặt lại mật khẩu",
+			"token":      token,
+			"reset_link": fmt.Sprintf("%s/reset-password?token=%s", os.Getenv("FRONTEND_URL"), token),
+		})
+		return
+	}
+
+	// Production — gửi email, không trả token
+	resetLink := fmt.Sprintf("%s/reset-password?token=%s", os.Getenv("FRONTEND_URL"), token)
+	if err := services.SendResetEmail(req.Username, resetLink); err != nil {
+		log.Printf("[ForgotPassword] Lỗi gửi email: %v", err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Nếu tài khoản tồn tại, hướng dẫn đặt lại mật khẩu đã được gửi"})
+}
+
+// ResetPassword xác thực token và đổi mật khẩu mới
+func ResetPassword(c *gin.Context) {
+    var req struct {
+        Token       string `json:"token"        binding:"required"`
+        NewPassword string `json:"new_password" binding:"required,min=6"`
+    }
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Thiếu token hoặc mật khẩu mới (tối thiểu 6 ký tự)"})
+        return
+    }
+
+    if err := services.ResetPassword(c.Request.Context(), req.Token, req.NewPassword); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "Đặt lại mật khẩu thành công"})
 }

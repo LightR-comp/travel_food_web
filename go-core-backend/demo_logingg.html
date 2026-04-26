@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Login</title>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <button onclick="loginGoogle()">Login Google</button>
+    <button onclick="loginFacebook()">Login Facebook</button>
+    <p id="token"></p>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBwgVS1GBF6dFCzpH4zLsI5wtAyunE-Plk",
+            authDomain: "smart-tourism-fdd57.firebaseapp.com",
+            projectId: "smart-tourism-fdd57",
+            storageBucket: "smart-tourism-fdd57.firebasestorage.app",
+            messagingSenderId: "123458721823",
+            appId: "1:123458721823:web:e6e4144c23a3b6bbc59d2a",
+            measurementId: "G-CBGLEEZNRM"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        async function loginGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const result = await firebase.auth().signInWithPopup(provider);
+            const token = await result.user.getIdToken();
+            document.getElementById("token").innerText = token;
+            console.log("Token:", token);
+        }
+
+        async function loginFacebook() {
+            const provider = new firebase.auth.FacebookAuthProvider();
+            const result = await firebase.auth().signInWithPopup(provider);
+            const token = await result.user.getIdToken();
+            document.getElementById("token").innerText = token;
+            console.log("Token:", token);
+        }
+    </script>
+</body>
+</html>

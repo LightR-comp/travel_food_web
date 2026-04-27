@@ -1,30 +1,13 @@
-# payloads.py chứa các mô hình dữ liệu (schemas) để định nghĩa cấu trúc của dữ liệu đầu vào và đầu ra cho các API của Python AI Service.
-# Đây là nơi chúng ta sẽ xây dựng các mô hình dữ liệu sử dụng Pydantic
-# để đảm bảo rằng dữ liệu được gửi đến và trả về từ API đã được kiểm tra và có cấu trúc rõ ràng, giúp cho việc phát triển và bảo trì service trở nên dễ dàng hơn.
-#phù hợp với các endpoint đã được định nghĩa trong main.py và các router trong thư mục 'api'.
-# đồng bộ với các mô hình dữ liệu được sử dụng trong Go Core Backend để đảm bảo rằng dữ liệu được truyền giữa hai service có cấu trúc nhất quán và dễ dàng xử lý.
-
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator, Field
 from typing import List, Optional, Any
 
-'''
-Tất cả các giao tiếp API với Go phải tuân thủ theo format sau:
-'''
 class BaseResponse(BaseModel):
     success: bool
     message: Optional[str] = ""
     data: Optional[Any] = None
     error: Optional[Any] = None
-'''
-Trong đó, phần data sẽ được thay thế tùy theo từng trường hợp. 
-'''
 
-### RECOMMEND FLOW
-
-# GIAI ĐOẠN 3: GO -> PYTHON (INPUT)
-
-# 1. Các Sub-model cho UserContext (Khớp với models.UserContext của Go)
-class LocationInput(BaseModel): # Vị trí người dùng
+class LocationInput(BaseModel):
     lat: float
     lng: float
     radius_km: float = 5.0
@@ -42,8 +25,6 @@ class UserContext(BaseModel):
     location: LocationInput
     preferences: ContextPreferencesInput
 
-
-# 2. Các Sub-model cho Restaurant (Khớp với dto.AIRestaurantInput của Go)
 class SummaryDishInput(BaseModel):
     name: str
     price: float
@@ -54,60 +35,49 @@ class RestaurantInput(BaseModel):
     res_name: str
     rating: float
     price: float
-    image_url: str  
+    image_url: str
     distance_km: float
-    type: str    
-    featured_dishes: List[SummaryDishInput] = [] 
+    type: str
+    featured_dishes: List[SummaryDishInput] = []
 
 class RecommendRequest(BaseModel):
-    user_context: UserContext  # Map với json:"user_context" của Go
+    user_context: UserContext
     restaurants: List[RestaurantInput]
 
-
-# GIAI ĐOẠN 5: PYTHON -> GO (OUTPUT)
 class AIResultItem(BaseModel):
     id: int
     score: float
     reason: str
 
 class RecommendResponse(BaseModel):
-    # Đổi tên field cho khớp json:"recommended_restaurants" của Go
     recommended_restaurants: List[AIResultItem]
 
+class ChatIntentRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=500)
 
+    @field_validator("message")
+    @classmethod
+    def message_not_blank(cls, v):
+        if not v.strip():
+            raise ValueError("Tin nhắn không được để trống")
+        return v.strip()
 
-### CHATBOT_FLOW:
-
-
-# Lần gọi 1: Phân tích ý định
-class ChatIntentRequest(BaseModel): # GO trả về
-    message: str
-    user_id: int
-
-class IntentData(BaseModel):   # python trả về
-    intent: str               # find_food, allergy_inquiry, greeting
-    entities: dict            # {"food_type": "bún bò", "budget": 50000}
+class IntentData(BaseModel):
+    intent: str
+    entities: dict
     confidence: float
 
-# Lần gọi 2: Tạo câu trả lời tự nhiên
-class ChatGenerationRequest(BaseModel): # GO trả về
-    user_message: str
-    intent: str
-    user_context: UserContext             # Thông tin dị ứng, mood của user
-    found_restaurants: List[RestaurantInput] # Danh sách quán Go vừa tìm được. Nếu found_restaurants gửi qua là [],
-    # Python sẽ hiểu là "À, đây là tán gẫu/văn hóa, mình tự bịa nội dung dựa trên user_message thôi".
+class ChatGenerationRequest(BaseModel):
+    user_message: str = Field(min_length=1, max_length=500)
+    found_restaurants: list = Field(max_length=20)
+    user_context: Optional[UserContext] = None
 
-# Thông tin vị trí
 class PlaceInfo(BaseModel):
-    # Đối tượng gốc nằm ở đây
-    restaurant: RestaurantInput 
-    
-    # Các trường do AI bổ sung
+    restaurant: RestaurantInput
     ai_reason: Optional[str] = None
     allergy_friendly: bool = False
     tags: List[str] = []
 
-class ChatFinalData(BaseModel): # python trả về
-    reply: str                            # Câu trả lời tự nhiên (Natural Language)
-    suggested_places: List[PlaceInfo]  
-
+class ChatFinalData(BaseModel):
+    reply: str
+    suggested_places: List[PlaceInfo]

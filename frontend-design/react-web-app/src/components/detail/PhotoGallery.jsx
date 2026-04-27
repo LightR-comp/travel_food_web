@@ -1,17 +1,17 @@
 import { useState } from 'react';
 
 const PhotoGallery = ({ images = [], restaurantName }) => {
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(null);
 
   if (!images.length) return null;
 
   const main = images[0];
-  const thumbs = images.slice(1, 6);
+  const thumbs = images.slice(1, 7);
 
   return (
-    <div className="grid grid-cols-[2fr_1fr] grid-rows-2 gap-2 h-[340px] rounded-2xl overflow-hidden" id="photo-gallery">
+    <div className="grid grid-cols-5 grid-rows-2 gap-2 h-[380px] rounded-2xl overflow-hidden" id="photo-gallery">
       {/* Main large image */}
-      <div className="row-span-2 relative group cursor-pointer" onClick={() => setActive(0)}>
+      <div className="col-span-2 row-span-2 relative group cursor-pointer" onClick={() => setActive(0)}>
         <img
           src={main}
           alt={restaurantName}
@@ -32,9 +32,9 @@ const PhotoGallery = ({ images = [], restaurantName }) => {
             className="w-full h-full object-cover group-hover:brightness-90 group-hover:scale-105 transition-all duration-300"
           />
           {/* "See all" overlay on last thumb */}
-          {i === thumbs.length - 1 && images.length > 6 && (
+          {i === thumbs.length - 1 && images.length > 7 && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">+{images.length - 6} ảnh</span>
+              <span className="text-white font-[Baloo_2,sans-serif] font-bold text-lg">+{images.length - 7} ảnh</span>
             </div>
           )}
         </div>

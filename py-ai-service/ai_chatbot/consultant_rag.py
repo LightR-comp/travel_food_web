@@ -120,4 +120,3 @@ def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
         suggested_places = []  # Fallback — vẫn trả về ai_reply
 
     return ChatFinalData(reply=ai_reply, suggested_places=suggested_places)
-

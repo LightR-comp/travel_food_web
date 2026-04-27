@@ -4,7 +4,7 @@
 #phù hợp với các endpoint đã được định nghĩa trong main.py và các router trong thư mục 'api'.
 # đồng bộ với các mô hình dữ liệu được sử dụng trong Go Core Backend để đảm bảo rằng dữ liệu được truyền giữa hai service có cấu trúc nhất quán và dễ dàng xử lý.
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator, Field
 from typing import List, Optional, Any
 
 '''
@@ -80,9 +80,15 @@ class RecommendResponse(BaseModel):
 
 
 # Lần gọi 1: Phân tích ý định
-class ChatIntentRequest(BaseModel): # GO trả về
-    message: str
-    user_id: int
+class ChatIntentRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=500)
+
+    @field_validator("message")
+    @classmethod
+    def message_not_blank(cls, v):
+        if not v.strip():
+            raise ValueError("Tin nhắn không được để trống")
+        return v.strip()
 
 class IntentData(BaseModel):   # python trả về
     intent: str               # find_food, allergy_inquiry, greeting
@@ -90,12 +96,10 @@ class IntentData(BaseModel):   # python trả về
     confidence: float
 
 # Lần gọi 2: Tạo câu trả lời tự nhiên
-class ChatGenerationRequest(BaseModel): # GO trả về
-    user_message: str
-    intent: str
-    user_context: UserContext             # Thông tin dị ứng, mood của user
-    found_restaurants: List[RestaurantInput] # Danh sách quán Go vừa tìm được. Nếu found_restaurants gửi qua là [],
-    # Python sẽ hiểu là "À, đây là tán gẫu/văn hóa, mình tự bịa nội dung dựa trên user_message thôi".
+class ChatGenerationRequest(BaseModel):
+    user_message: str = Field(min_length=1, max_length=500)
+    found_restaurants: list = Field(max_length=20)  # Tránh list khổng lồ
+    user_context: Optional[UserContext] = None
 
 # Thông tin vị trí
 class PlaceInfo(BaseModel):

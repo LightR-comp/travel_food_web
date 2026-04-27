@@ -7,24 +7,13 @@
 from pydantic import BaseModel, field_validator, Field
 from typing import List, Optional, Any
 
-'''
-Tất cả các giao tiếp API với Go phải tuân thủ theo format sau:
-'''
 class BaseResponse(BaseModel):
     success: bool
     message: Optional[str] = ""
     data: Optional[Any] = None
     error: Optional[Any] = None
-'''
-Trong đó, phần data sẽ được thay thế tùy theo từng trường hợp. 
-'''
 
-### RECOMMEND FLOW
-
-# GIAI ĐOẠN 3: GO -> PYTHON (INPUT)
-
-# 1. Các Sub-model cho UserContext (Khớp với models.UserContext của Go)
-class LocationInput(BaseModel): # Vị trí người dùng
+class LocationInput(BaseModel):
     lat: float
     lng: float
     radius_km: float = 5.0
@@ -42,8 +31,6 @@ class UserContext(BaseModel):
     location: LocationInput
     preferences: ContextPreferencesInput
 
-
-# 2. Các Sub-model cho Restaurant (Khớp với dto.AIRestaurantInput của Go)
 class SummaryDishInput(BaseModel):
     name: str
     price: float
@@ -54,27 +41,32 @@ class RestaurantInput(BaseModel):
     res_name: str
     rating: float
     price: float
-    image_url: str  
+    image_url: str
     distance_km: float
-    type: str    
-    featured_dishes: List[SummaryDishInput] = [] 
+    type: str
+    featured_dishes: List[SummaryDishInput] = []
 
 class RecommendRequest(BaseModel):
-    user_context: UserContext  # Map với json:"user_context" của Go
+    user_context: UserContext
     restaurants: List[RestaurantInput]
 
-
-# GIAI ĐOẠN 5: PYTHON -> GO (OUTPUT)
 class AIResultItem(BaseModel):
     id: int
     score: float
     reason: str
 
 class RecommendResponse(BaseModel):
-    # Đổi tên field cho khớp json:"recommended_restaurants" của Go
     recommended_restaurants: List[AIResultItem]
 
+class ChatIntentRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=500)
 
+    @field_validator("message")
+    @classmethod
+    def message_not_blank(cls, v):
+        if not v.strip():
+            raise ValueError("Tin nhắn không được để trống")
+        return v.strip()
 
 ### CHATBOT_FLOW:
 
@@ -101,17 +93,12 @@ class ChatGenerationRequest(BaseModel):
     found_restaurants: list = Field(max_length=20)  # Tránh list khổng lồ
     user_context: Optional[UserContext] = None
 
-# Thông tin vị trí
 class PlaceInfo(BaseModel):
-    # Đối tượng gốc nằm ở đây
-    restaurant: RestaurantInput 
-    
-    # Các trường do AI bổ sung
+    restaurant: RestaurantInput
     ai_reason: Optional[str] = None
     allergy_friendly: bool = False
     tags: List[str] = []
 
-class ChatFinalData(BaseModel): # python trả về
-    reply: str                            # Câu trả lời tự nhiên (Natural Language)
-    suggested_places: List[PlaceInfo]  
-
+class ChatFinalData(BaseModel):
+    reply: str
+    suggested_places: List[PlaceInfo]

@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"crypto/rand"
+    "encoding/hex"
+    "time"
 
 	_ "github.com/denisenkom/go-mssqldb"
 
@@ -436,7 +439,7 @@ func GetUserPreferences(ctx context.Context, userID int) (*models.UserPreference
 }
 
 // Local user
-func RegisterLocal(ctx context.Context, username, password, name string) (*models.User, error) {
+func RegisterLocal(ctx context.Context, username, password, name, email string) (*models.User, error) {
 	// 1. Kiểm tra username đã tồn tại chưa
 	var count int
 	row := db.QueryRowContext(ctx, `
@@ -454,13 +457,16 @@ func RegisterLocal(ctx context.Context, username, password, name string) (*model
 		return nil, fmt.Errorf("lỗi hash password")
 	}
 
-	// 3. Tạo user mới
+	// 3. Tạo user mới với email thật
 	var userID int
 	newRow := db.QueryRowContext(ctx, `
 		INSERT INTO Users (email, name, avatar_url, created_at, updated_at)
 		OUTPUT INSERTED.id
-		VALUES ('', @name, '', GETDATE(), GETDATE())
-	`, sql.Named("name", name))
+		VALUES (@email, @name, '', GETDATE(), GETDATE())
+	`,
+		sql.Named("email", email),
+		sql.Named("name", name),
+	)
 	if err := newRow.Scan(&userID); err != nil {
 		return nil, fmt.Errorf("lỗi tạo user: %w", err)
 	}
@@ -502,4 +508,78 @@ func LocalLogin(ctx context.Context, username, password string) (*models.User, e
 	}
 
 	return GetUserByID(ctx, userID)
+}
+
+// Tạo reset token, lưu DB, trả về token để gửi mail
+func CreatePasswordResetToken(ctx context.Context, username string) (string, string, error) {
+    // Lấy user_id VÀ email từ DB
+    var userID int
+    var email string
+    row := db.QueryRowContext(ctx, `
+        SELECT ua.user_id, u.email 
+        FROM UserAuth ua
+        INNER JOIN Users u ON ua.user_id = u.id
+        WHERE ua.provider = 'local' AND ua.provider_id = @username
+    `, sql.Named("username", username))
+
+    if err := row.Scan(&userID, &email); err == sql.ErrNoRows {
+        return "", "", fmt.Errorf("không tìm thấy tài khoản")
+    } else if err != nil {
+        return "", "", err
+    }
+
+    // Tạo token như cũ
+    b := make([]byte, 32)
+    rand.Read(b)
+    token := hex.EncodeToString(b)
+    exp := time.Now().Add(15 * time.Minute)
+
+    db.ExecContext(ctx, `
+        UPDATE UserAuth SET reset_token = @token, reset_token_exp = @exp
+        WHERE provider = 'local' AND provider_id = @username
+    `,
+        sql.Named("token", token),
+        sql.Named("exp", exp),
+        sql.Named("username", username),
+    )
+
+    return token, email, nil // trả về cả email
+}
+
+// Đổi mật khẩu mới sau khi xác thực token
+func ResetPassword(ctx context.Context, token, newPassword string) error {
+    var userID int
+    var expTime time.Time
+
+    row := db.QueryRowContext(ctx, `
+        SELECT user_id, reset_token_exp FROM UserAuth
+        WHERE reset_token = @token AND provider = 'local'
+    `, sql.Named("token", token))
+
+    if err := row.Scan(&userID, &expTime); err == sql.ErrNoRows {
+        return fmt.Errorf("token không hợp lệ hoặc đã hết hạn")
+    } else if err != nil {
+        return err
+    }
+
+    if time.Now().After(expTime) {
+        return fmt.Errorf("token đã hết hạn")
+    }
+
+    hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+    if err != nil {
+        return fmt.Errorf("lỗi hash password")
+    }
+
+    _, err = db.ExecContext(ctx, `
+        UPDATE UserAuth
+        SET password_hash   = @hash,
+            reset_token     = NULL,
+            reset_token_exp = NULL
+        WHERE user_id = @userID AND provider = 'local'
+    `,
+        sql.Named("hash", string(hash)),
+        sql.Named("userID", userID),
+    )
+    return err
 }

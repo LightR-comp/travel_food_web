@@ -45,7 +45,7 @@ const PopularPosts = ({ posts = [] }) => (
   <section className="py-12 bg-[#FFF8EE]" id="popular-posts">
     <div className="max-w-[1200px] mx-auto px-6">
       <div className="mb-6">
-        <h2 className="font-[Baloo_2,sans-serif] text-2xl font-extrabold text-[#2C1810] tracking-wide">
+        <h2 className="font-iciel text-2xl font-extrabold text-[#2C1810] tracking-wide">
           POPULAR POSTS
         </h2>
       </div>

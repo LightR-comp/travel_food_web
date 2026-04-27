@@ -62,10 +62,10 @@ const MOCK_RESTAURANTS = [
       flavor_profile: 'Ngọt thơm, đậm đà nước mắm',
       trivia: ['Sườn nướng trên than hoa đặc biệt'],
     },
-    meta: { rating: 4.7, review_count: '6700+', distance_km: 1.8, price_range: '40.000 – 90.000 đ' },
+    meta: { rating: 4.7, review_count: '6700+', distance_km: 1.8, price_range: '19.000 – 84.000 đ' },
     ai_analysis: { score: 0.89, reason: 'Cơm tấm đặc trưng Sài Gòn, no lâu' },
     tags: ['Cơm tấm', 'Sài Gòn'],
-    image_url: 'https://images.unsplash.com/photo-1503764654157-72d979d9af2f?w=400&q=80',
+    image_url: 'https://scontent.fsgn17-1.fna.fbcdn.net/v/t39.30808-6/476912150_942135224733191_8095130890254302257_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=105&ccb=1-7&_nc_sid=7b2446&_nc_ohc=qiy53Lv2GL0Q7kNvwHkhI8q&_nc_oc=Adol8-6-O1u7nQfLcvM7rByNj51ogxH2H-RVhf_i-bDttj0V6tHcYAt3-eJLbL01zBUGKApCQwgXyk6eKHqg0YqM&_nc_zt=23&_nc_ht=scontent.fsgn17-1.fna&_nc_gid=ZeTlkVfQA7by1TtyWx0muQ&_nc_ss=7b2a8&oh=00_Af0b3jzAWWDwWgh8Z8MOqhFbwa8fNSnMAXIg2yNOnc697Q&oe=69F2B158',
     badge: null,
   },
   {

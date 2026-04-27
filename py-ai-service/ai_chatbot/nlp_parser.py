@@ -1,7 +1,7 @@
 import json
 import re
 from typing import Dict, Any
-from core.ai_config import shared_model
+from core.ai_config import shared_model # Import từ core
 from functools import lru_cache
 
 INTENT_PROMPT_TEMPLATE = """Bạn là AI phân tích ý định người dùng cho ứng dụng ẩm thực YumMap.

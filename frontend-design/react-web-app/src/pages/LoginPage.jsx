@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import InputField from '../components/ui/InputField';
 import AuthButton from '../components/ui/AuthButton';
 import { useAuth } from '../context/AuthContext';
+import YumMapLogo from '../assets/YumMap-logo.svg';
 
 // Facebook icon
 const FacebookIcon = () => (
@@ -89,14 +90,8 @@ const LoginPage = () => {
         {/* Left – form */}
         <div className="flex-1 px-10 py-11 flex flex-col items-center">
           {/* Logo */}
-          <div className="mb-4">
-            <img src="/icon_login.svg" alt="YumMap" className="w-[110px] h-auto object-contain"
-              onError={(e) => { e.target.style.display = 'none'; }}
-            />
-            <div className="flex items-center gap-2 justify-center mt-1">
-              <span className="text-2xl">🍜</span>
-              <span className="font-[Baloo_2,sans-serif] text-xl font-extrabold text-[#E8623A]">YumMap</span>
-            </div>
+          <div className="mb-4 flex justify-center">
+            <img src={YumMapLogo} alt="YumMap" className="h-14 w-auto object-contain" />
           </div>
 
           <h1 className="font-[Baloo_2,sans-serif] text-[1.7rem] font-extrabold text-[#5C2A1A] tracking-[2px] mb-7">

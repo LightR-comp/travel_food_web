@@ -61,4 +61,3 @@ INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingre
 (@IdPhucLocTho, N'Canh Rong Biển Thịt Bằm', N'Canh thanh mát giải ngấy', 15000, 'vietnamese', 'seaweed,pork');
 GO
 
-

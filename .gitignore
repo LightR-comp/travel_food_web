@@ -50,5 +50,10 @@ serviceAccountKey.json
 
 __pycache__/
 *.pyc
-*.pyo
-.pytest_cache/
+*.pyd
+*.py[cod]
+*$py.class
+
+__pycache__
+*.py[cod]
+*$py.class

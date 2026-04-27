@@ -4,6 +4,7 @@ import InputField from '../components/ui/InputField';
 import AuthButton from '../components/ui/AuthButton';
 import { useAuth } from '../context/AuthContext';
 import { isValidEmail } from '../utils/formatters';
+import YumMapLogo from '../assets/YumMap-logo.svg';
 
 const SignupPage = () => {
   const { register } = useAuth();
@@ -74,10 +75,7 @@ const SignupPage = () => {
       {/* Logo floating above card */}
       <div className="relative z-10 mb-[-28px]">
         <div className="w-[110px] h-[110px] rounded-full bg-white shadow-[0_6px_24px_rgba(60,20,10,0.18)] flex items-center justify-center p-2">
-          <div className="flex flex-col items-center">
-            <span className="text-4xl">🍜</span>
-            <span className="font-[Baloo_2,sans-serif] text-xs font-extrabold text-[#E8623A] mt-0.5">YumMap</span>
-          </div>
+          <img src={YumMapLogo} alt="YumMap" className="w-full h-full object-contain" />
         </div>
       </div>
 
@@ -114,7 +112,7 @@ const SignupPage = () => {
               onChange={handleChange('full_name')}
               placeholder="Nhập họ và tên"
               error={errors.full_name}
-              inputClassName="bg-[#FAE0CC] focus:bg-white"
+              inputClassName="bg-[#FDFAA4] focus:bg-white"
               icon={
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-[18px] h-[18px]">
                   <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
@@ -131,7 +129,7 @@ const SignupPage = () => {
               onChange={handleChange('email')}
               placeholder="example@email.com"
               error={errors.email}
-              inputClassName="bg-[#FAE0CC] focus:bg-white"
+              inputClassName="bg-[#FDFAA4] focus:bg-white"
               icon={
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-[18px] h-[18px]">
                   <rect x="2" y="4" width="20" height="16" rx="2" /><polyline points="2,4 12,13 22,4" />
@@ -147,7 +145,7 @@ const SignupPage = () => {
               onChange={handleChange('username')}
               placeholder="Tên đăng nhập"
               error={errors.username}
-              inputClassName="bg-[#FAE0CC] focus:bg-white"
+              inputClassName="bg-[#FDFAA4] focus:bg-white"
               icon={
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-[18px] h-[18px]">
                   <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
@@ -164,7 +162,7 @@ const SignupPage = () => {
               onChange={handleChange('password')}
               placeholder="Tối thiểu 8 ký tự"
               error={errors.password}
-              inputClassName="bg-[#FAE0CC] focus:bg-white"
+              inputClassName="bg-[#FDFAA4] focus:bg-white"
             />
 
             <InputField
@@ -176,7 +174,7 @@ const SignupPage = () => {
               onChange={handleChange('confirm_password')}
               placeholder="Nhập lại mật khẩu"
               error={errors.confirm_password}
-              inputClassName="bg-[#FAE0CC] focus:bg-white"
+              inputClassName="bg-[#FDFAA4] focus:bg-white"
             />
 
             <AuthButton

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import YumMapLogo from '../../assets/YumMap-logo.svg';
 
 // ---- Search Icon ----
 const SearchIcon = () => (
@@ -51,14 +52,12 @@ const Header = () => {
       <div className="max-w-[1200px] mx-auto px-6 py-3 flex items-center justify-between gap-4">
 
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 cursor-pointer group" aria-label="YumMap Home">
-          <span className="text-[2rem] group-hover:scale-110 transition-transform">🍜</span>
-          <div className="flex flex-col leading-tight">
-            <span className="font-[Baloo_2,sans-serif] text-[1.3rem] font-extrabold text-[#E8623A] tracking-tight">
-              YumMap
-            </span>
-            <span className="text-[0.7rem] text-[#7B7068] font-medium">📍 TP. Hồ Chí Minh</span>
-          </div>
+        <Link to="/" className="flex items-center cursor-pointer group" aria-label="YumMap Home">
+          <img
+            src={YumMapLogo}
+            alt="YumMap"
+            className="h-16 w-auto group-hover:scale-105 transition-transform"
+          />
         </Link>
 
         {/* Center search (hidden on mobile) */}
@@ -167,9 +166,9 @@ const Header = () => {
           {[
             { to: '/', label: '🏠 Dashboard' },
             { to: '/search', label: '🔍 Tìm kiếm' },
-            { to: '#', label: '💬 Diễn đàn' },
-            { to: '#', label: 'ℹ️ Về chúng tôi' },
-            { to: '#', label: '🎧 Hỗ trợ' },
+            { to: '/forum', label: '💬 Diễn đàn' },
+            { to: '/about', label: 'ℹ️ Về chúng tôi' },
+            { to: '/support', label: '🎧 Hỗ trợ' },
           ].map(({ to, label }) => (
             <Link
               key={label}

@@ -104,7 +104,7 @@ const SearchPage = () => {
             <div className="mb-6 flex items-center gap-2 flex-wrap">
               <h1 className="font-[Baloo_2,sans-serif] text-lg font-bold text-[#E8623A]">
                 Search results for{' '}
-                <em className="font-[Dancing_Script,cursive] text-xl not-italic">
+                <em className="font-androgyne text-2xl not-italic font-normal">
                   "{query || 'Tất cả'}"
                 </em>
               </h1>

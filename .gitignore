@@ -47,6 +47,13 @@ obj/
 *.log
 
 serviceAccountKey.json
+
 __pycache__/
+*.pyc
+*.pyd
+*.py[cod]
+*$py.class
+
+__pycache__
 *.py[cod]
 *$py.class

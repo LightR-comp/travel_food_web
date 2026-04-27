@@ -10,7 +10,6 @@ import (
 
 func FirebaseAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Thiếu token xác thực"})
@@ -23,9 +22,7 @@ func FirebaseAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		idToken := parts[1]
-
-		decoded, err := services.VerifyIDToken(c.Request.Context(), idToken)
+		decoded, err := services.VerifyIDToken(c.Request.Context(), parts[1])
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Token không hợp lệ hoặc đã hết hạn"})
 			return

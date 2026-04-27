@@ -1,63 +1,101 @@
 USE travel_food_db
 GO
 
+-- A. Nạp 5 Users (Tên tiếng Anh random, Avatar NULL)--
 INSERT INTO Users (email, name, avatar_url) VALUES 
-('lecongminhnhut7@gmail.com', N'Nhựt', NULL),
-('kien@gmail.com', N'Kiên', NULL),
-('sang@gmail.com', N'Sáng', NULL),
-('dang@gmail.com', N'Đăng', NULL),
-('minh@gmail.com', N'Minh', NULL);
+('olivia.smith@example.com', 'Olivia Smith', NULL),
+('liam.johnson@example.com', 'Liam Johnson', NULL),
+('emma.williams@example.com', 'Emma Williams', NULL),
+('noah.brown@example.com', 'Noah Brown', NULL),
+('sophia.davis@example.com', 'Sophia Davis', NULL);
 GO
 
-INSERT INTO UserAuth (user_id, provider, provider_id, password_hash) VALUES 
-(1, 'local', 'nhut_local', '$2a$10$X78q45p4l9e6c.8o.U0N/uXyvXfFk2vV6e6l6o.U0N/uXyvXfFk2vV'),
-(2, 'google', 'kien_google_id_123', NULL),
-(3, 'facebook', 'sang_facebook_id_456', NULL),
-(4, 'local', 'dang_local', '$2a$10$X78q45p4l9e6c.8o.U0N/uXyvXfFk2vV6e6l6o.U0N/uXyvXfFk2vV'),
-(5, 'google', 'minh_google_id_789', NULL);
-GO
-
+-- B. Nạp 5 User Preferences (Sở thích tương ứng)--
 INSERT INTO UserPreferences (user_id, budget_per_person, dietary, food_types) VALUES 
-(1, 150000, '', 'bbq,vietnamese'),
-(2, 60000, 'vegan', 'cafe,dessert'),
-(3, 100000, '', 'fastfood,korean'),
-(4, 85000, '', 'chinese,dimsum'),
-(5, 70000, 'vegetarian', 'vietnamese,noodle');
+(1, 150000, '', 'chinese,dimsum'),
+(2, 60000, '', 'korean,spicy'),
+(3, 100000, '', 'fastfood,chicken'),
+(4, 85000, '', 'vietnamese,noodle'),
+(5, 70000, '', 'cafe,milk_tea');
 GO
 
+-- C. Nạp 5 Quán ăn quanh ĐH Khoa học Tự nhiên (Cơ sở 1 - Nguyễn Văn Cừ)--
+-- Tọa độ tâm: 10.7626, 106.6823--
 INSERT INTO Restaurants (name, address, lat, lng, rating, price_range, open_time, close_time, type) VALUES 
-(N'Bánh Canh Ghẹ Ngọc Lâm', N'26 Đ. Lê Văn Việt, Hiệp Phú, TP Thủ Đức', 10.847821, 106.775455, 3.9, 65000, '07:00', '22:30', 'vietnamese'),
-(N'Busan Korean Food', N'25 Đ. Lê Văn Việt, Hiệp Phú, TP Thủ Đức', 10.848344, 106.775172, 4.0, 120000, '11:00', '22:00', 'korean'),
-(N'Hủ Tiếu Nam Vang Kim Khánh', N'110 Đ. Lê Văn Việt, Hiệp Phú, TP Thủ Đức', 10.846560, 106.777395, 4.7, 50000, '06:00', '22:00', 'vietnamese'),
-(N'Gà Nướng Đệ Nhất', N'57 Đ. Lê Văn Việt, Hiệp Phú, TP Thủ Đức', 10.847887, 106.775697, 4.7, 195000, '08:30', '22:00', 'bbq'),
-(N'Cơm Tấm Phúc Lộc Thọ', N'31-33 Đ. Lê Văn Việt, Hiệp Phú, TP Thủ Đức', 10.848209, 106.775322, 4.1, 55000, '06:00', '22:00', 'vietnamese');
+(N'Dimsum Mr Hào', N'171A Nguyễn Văn Cừ, Quận 5', 10.7635, 106.6825, 4.3, 150000, '08:00', '22:00', 'chinese'),
+(N'Mì Cay Naga', N'213F Nguyễn Văn Cừ, Quận 5', 10.7628, 106.6821, 4.0, 60000, '09:00', '22:30', 'korean'),
+(N'Texas Chicken', N'217B Nguyễn Văn Cừ, Quận 5', 10.7622, 106.6820, 4.2, 100000, '09:00', '21:00', 'fastfood'),
+(N'Phở Lệ', N'413-415 Nguyễn Trãi, Quận 5', 10.7585, 106.6763, 4.6, 85000, '06:00', '01:00', 'vietnamese'),
+(N'The Alley', N'151 Nguyễn Văn Cừ, Quận 5', 10.7645, 106.6828, 4.4, 65000, '09:00', '22:00', 'cafe');
 GO
 
-DECLARE @IdNgocLam INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Bánh Canh Ghẹ Ngọc Lâm');
-DECLARE @IdBusan INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Busan Korean Food');
-DECLARE @IdKimKhanh INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Hủ Tiếu Nam Vang Kim Khánh');
-DECLARE @IdDeNhat INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Gà Nướng Đệ Nhất');
-DECLARE @IdPhucLocTho INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Cơm Tấm Phúc Lộc Thọ');
-
+-- D. Nạp Menu cho từng quán (mỗi quán 3 món)--
+-- Quán 1: Dimsum Mr Hào--
 INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingredients) VALUES 
-(@IdNgocLam, N'Bánh Canh Ghẹ Nguyên Con', N'Bánh canh bột lọc, ghẹ nguyên con tươi ngọt', 85000, 'vietnamese', 'crab,noodle,pork'),
-(@IdNgocLam, N'Bánh Canh Ghẹ Tôm', N'Bánh canh kèm thịt ghẹ lột và tôm sú', 65000, 'vietnamese', 'crab,shrimp,noodle'),
-(@IdNgocLam, N'Chả Ghẹ Cuốn', N'Chả ghẹ chiên giòn ăn kèm rau sống', 45000, 'appetizer', 'crab,pork,flour'),
+(1, N'Há Cảo Tôm Tươi', N'Há cảo vỏ mỏng nhân tôm giòn', 45000, 'chinese', 'shrimp,flour'),
+(1, N'Xíu Mại Trứng Muối', N'Xíu mại thịt heo kèm trứng muối', 45000, 'chinese', 'pork,salted egg'),
+(1, N'Bánh Bao Kim Sa', N'Nhân trứng muối tan chảy', 40000, 'dessert', 'flour,egg,milk');
 
-(@IdBusan, N'Cơm Trộn Bibimbap', N'Cơm trộn thố đá nóng hổi', 75000, 'korean', 'rice,beef,egg,vegetable'),
-(@IdBusan, N'Mì Cay Hải Sản', N'Mì cay Hàn Quốc chuẩn vị', 80000, 'korean', 'noodle,shrimp,squid'),
-(@IdBusan, N'Gà Rán Sốt Cay Ngọt', N'Gà rán tẩm sốt Hàn', 95000, 'korean', 'chicken,flour,chili'),
+-- Quán 2: Mì Cay Naga--
+INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingredients) VALUES 
+(2, N'Mì Cay Hải Sản', N'Mì cay cấp độ 1-7', 55000, 'korean', 'noodle,shrimp,squid'),
+(2, N'Mì Cay Bò', N'Mì cay với thịt bò mềm', 50000, 'korean', 'noodle,beef'),
+(2, N'Takoyaki', N'Bánh bạch tuộc nướng', 35000, 'appetizer', 'flour,octopus');
 
-(@IdKimKhanh, N'Hủ Tiếu Nam Vang Khô', N'Hủ tiếu trộn sốt đậm đà, kèm chén súp', 55000, 'vietnamese', 'noodle,pork,shrimp,egg'),
-(@IdKimKhanh, N'Hủ Tiếu Nam Vang Nước', N'Nước xương hầm thanh ngọt', 50000, 'vietnamese', 'noodle,pork,shrimp'),
-(@IdKimKhanh, N'Bún Thái', N'Bún chua cay vị Thái Lan', 55000, 'vietnamese', 'noodle,shrimp,squid,beef'),
+-- Quán 3: Texas Chicken--
+INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingredients) VALUES 
+(3, N'Gà Rán Cay (2 miếng)', N'Gà rán giòn rụm tẩm vị', 75000, 'fastfood', 'chicken,flour'),
+(3, N'Bánh Quy Mật Ong', N'Bánh nướng bơ mật ong', 15000, 'fastfood', 'flour,honey'),
+(3, N'Khoai Tây Chiên', N'Khoai tây vàng giòn', 25000, 'fastfood', 'potato');
 
-(@IdDeNhat, N'Gà Nướng Mắm Nhĩ (Lớn)', N'Gà nướng thơm lừng kèm xôi', 195000, 'bbq', 'chicken,fish sauce,sticky rice'),
-(@IdDeNhat, N'Gà Nướng Muối Ớt (Lớn)', N'Gà nướng cay nồng kèm bánh bao', 195000, 'bbq', 'chicken,chili,salt'),
-(@IdDeNhat, N'Lẩu Gà Ớt Hiểm', N'Lẩu gà cay xé lưỡi, siêu ngon', 245000, 'bbq', 'chicken,chili,vegetable'),
+-- Quán 4: Phở Lệ--
+INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingredients) VALUES 
+(4, N'Phở Tái Nạm', N'Thịt tái và nạm gầu thơm ngon', 75000, 'vietnamese', 'beef,rice noodle'),
+(4, N'Phở Bò Viên', N'Nước dùng trong, bò viên dai', 70000, 'vietnamese', 'beef,rice noodle'),
+(4, N'Trà Đá', N'Giải khát', 5000, 'drink', 'tea');
 
-(@IdPhucLocTho, N'Cơm Tấm Sườn Bì Chả', N'Combo truyền thống trứ danh', 65000, 'vietnamese', 'rice,pork,egg'),
-(@IdPhucLocTho, N'Cơm Tấm Đùi Gà Nướng', N'Đùi gà nướng góc tư sốt mật ong', 55000, 'vietnamese', 'rice,chicken,honey'),
-(@IdPhucLocTho, N'Canh Rong Biển Thịt Bằm', N'Canh thanh mát giải ngấy', 15000, 'vietnamese', 'seaweed,pork');
+-- Quán 5: The Alley--
+INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingredients) VALUES 
+(5, N'Sữa Tươi Trân Châu Đường Đen', N'Best seller của quán', 65000, 'cafe', 'milk,boba,sugar'),
+(5, N'Trà Sữa Lài', N'Hương lài thơm mát', 50000, 'cafe', 'jasmine tea,milk'),
+(5, N'Trà Đào Đào', N'Trà xanh giải nhiệt kèm đào miếng', 55000, 'cafe', 'green tea,peach');
 GO
 
+
+-- 1. Olivia Smith: Đăng nhập bằng tài khoản Local (Username: olivia / Pass: 123456)
+-- Lưu ý: password_hash này là mã hóa của "123456" dùng bcrypt
+INSERT INTO UserAuth (user_id, provider, provider_id, password_hash)
+VALUES (1, 'local', 'olivia', '$2a$10$X78q45p4l9e6c.8o.U0N/uXyvXfFk2vV6e6l6o.U0N/uXyvXfFk2vV');
+
+-- 2. Liam Johnson: Đăng nhập bằng Google
+INSERT INTO UserAuth (user_id, provider, provider_id, password_hash)
+VALUES (2, 'google', 'liam_google_id_123', NULL);
+
+-- 3. Emma Williams: Đăng nhập Local (Username: emma / Pass: 123456)
+INSERT INTO UserAuth (user_id, provider, provider_id, password_hash)
+VALUES (3, 'local', 'emma', '$2a$10$X78q45p4l9e6c.8o.U0N/uXyvXfFk2vV6e6l6o.U0N/uXyvXfFk2vV');
+
+-- 4. Noah Brown: Đăng nhập bằng Google (Test luồng FirebaseAuthMiddleware)
+INSERT INTO UserAuth (user_id, provider, provider_id, password_hash)
+VALUES (4, 'google', 'noah_google_id_456', NULL);
+
+-- 5. Sophia Davis: Đăng nhập Local (Username: sophia / Pass: 123456)
+INSERT INTO UserAuth (user_id, provider, provider_id, password_hash)
+VALUES (5, 'local', 'sophia', '$2a$10$X78q45p4l9e6c.8o.U0N/uXyvXfFk2vV6e6l6o.U0N/uXyvXfFk2vV');
+GO
+
+-- Tạo User trước
+INSERT INTO Users (email, name, created_at, updated_at) 
+VALUES ('kien@test.com', 'Nguyen Le Anh Kien', GETDATE(), GETDATE());
+
+-- Lấy ID vừa tạo (giả sử là 6) và tạo Login cho nó
+-- Lưu ý: password_hash này tương ứng với mật khẩu "123456"
+INSERT INTO UserAuth (user_id, provider, provider_id, password_hash, created_at)
+VALUES (6, 'local', 'kien_pro', '$2a$10$X78q45p4l9e6c.8o.U0N/uXywXfK2vV6e6l6o.U0N/uXywXfK2vV6', GETDATE());
+
+USE travel_food_db
+SELECT * FROM Users
+
+SELECT * FROM UserAuth WHERE provider = 'local'
+
+SELECT * FROM UserAuth WHERE provider = 'google'

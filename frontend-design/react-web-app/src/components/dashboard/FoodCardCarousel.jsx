@@ -65,14 +65,16 @@ export const FoodCard = ({ restaurant, featured = false }) => {
       id={`food-card-${id}`}
     >
       {/* Image */}
-      <div className="relative h-[145px] overflow-hidden">
-        <img
-          src={image_url}
-          alt={restaurant_info.name}
-          loading="lazy"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-        {badge && <Badge label={badge} />}
+      <div className="relative h-[155px] p-2.5 pb-0">
+        <div className="w-full h-full rounded-[14px] overflow-hidden relative shadow-sm">
+          <img
+            src={image_url}
+            alt={restaurant_info.name}
+            loading="lazy"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          {badge && <Badge label={badge} />}
+        </div>
       </div>
 
       {/* Body */}
@@ -105,7 +107,7 @@ const FoodCardCarousel = ({ restaurants = [], title, emoji, sectionId }) => {
       <div className="max-w-[1200px] mx-auto px-6">
         {/* Section header */}
         <div className="mb-6">
-          <h2 className="font-[Baloo_2,sans-serif] text-2xl font-extrabold text-[#2C1810] tracking-wide inline-flex items-center gap-2">
+          <h2 className="font-iciel text-2xl font-extrabold text-[#2C1810] tracking-wide inline-flex items-center gap-2">
             {title}
             {emoji && <span className="animate-flicker">{emoji}</span>}
           </h2>

@@ -11,100 +11,126 @@ from system_assistant.emotion_weather import calculate_emotion_weather_match
 import json
 
 
-def calculate_budget_fit(user_budget, people, restaurant_price, restaurant_tags):
-    """Tính điểm Kinh phí (0.0 -> 1.0) tích hợp tối ưu cho nhóm đông người."""
+def _get_virtual_tags(r_type: str, dishes: list) -> list:
+    """Hàm bổ trợ: Tạo nhãn từ 'type' và 'ingredients'."""
+    tags = {r_type.lower()}
+    for dish in dishes:
+        ingredients = getattr(dish, 'ingredients', []) if not isinstance(dish, dict) else dish.get('ingredients', [])
+        tags.update([ing.lower() for ing in ingredients])
+    return list(tags)
+
+def calculate_budget_fit(user_budget, people, restaurant_price, virtual_tags):
+    """Tính điểm ngân sách dùng hàm mũ."""
     budget_per_person = user_budget / max(1, people)
-    
     if restaurant_price <= budget_per_person:
-        score = 1.0
-    else:
-        penalty_ratio = (restaurant_price - budget_per_person) / budget_per_person
-        score = max(0.0, math.exp(-5 * penalty_ratio))
-        
-    if people >= 4:
-        group_tags = {"buffet", "goi_mon_lon", "combo_gia_dinh", "khau_phan_lon"}
-        if group_tags.intersection(set(restaurant_tags)):
-            score = min(1.0, score + 0.15) 
-            
+        return 1.0
+    
+    penalty_ratio = (restaurant_price - budget_per_person) / budget_per_person
+    score = math.exp(-4 * penalty_ratio)
+    
+    group_indicators = {"bbq", "buffet", "lẩu", "family"}
+    if people >= 4 and any(ind in virtual_tags for ind in group_indicators):
+        score = min(1.0, score + 0.1)
     return round(score, 3)
 
-def determine_dynamic_weights(user_context):
-    """Tự động điều chỉnh trọng số dựa trên ngữ cảnh."""
-    budget = user_context.get("budget", 0)
-    mood = user_context.get("mood", "")
-    people = max(1, user_context.get("people", 1))
+def determine_dynamic_weights(prefs):
+    """Điều chỉnh trọng số thông minh."""
+    budget = prefs.get("budget", 0)
+    people = max(1, prefs.get("people", 1))
+    budget_per_person = budget / people
+    mood = prefs.get("mood", "").lower()
     
-    if budget / people <= 50000:
-        return {"taste": 0.40, "emotion": 0.10, "budget": 0.50}
-    if mood in ["romantic", "family", "chill"]:
-        return {"taste": 0.35, "emotion": 0.50, "budget": 0.15}
-        
-    return {"taste": 0.45, "emotion": 0.35, "budget": 0.20}
+    if budget_per_person <= 55000:
+        return {"taste": 0.3, "emotion": 0.1, "budget": 0.6}
+    if any(m in mood for m in ["chill", "romantic", "stress"]):
+        return {"taste": 0.3, "emotion": 0.5, "budget": 0.2}
+    return {"taste": 0.4, "emotion": 0.3, "budget": 0.3}
+
 # ==========================================
 # 3. HÀM XỬ LÝ CHÍNH GIAO TIẾP VỚI GO BACKEND
 # ==========================================
 
 def process_scoring(ai_input_data):
-    """Nhận JSON Giai đoạn 3 và trả về JSON Giai đoạn 5 theo API Contract."""
     user_context = ai_input_data.get("user_context", {})
+    prefs = user_context.get("preferences", {})
     restaurants = ai_input_data.get("restaurants", [])
     
-    user_budget = user_context.get("budget", 0)
-    user_people = user_context.get("people", 1)
-    user_dietary = user_context.get("dietary", [])
-    user_mood = user_context.get("mood", "")
-    user_weather = user_context.get("weather", "normal")
-    user_tastes = user_context.get("taste", []) 
-    
-    weights = determine_dynamic_weights(user_context)
+    weights = determine_dynamic_weights(prefs)
     results = []
-    
-    for r in restaurants:
-        r_id = r.get("id")
-        r_price = r.get("price", 0)
-        r_rating = r.get("rating", 0.0)
-        r_distance = r.get("distance_km", 0.0)
-        r_tags = r.get("tags", [])
+
+    for r_data in restaurants:
+        # 0. Chuẩn bị dữ liệu và r_id
+        r = r_data if isinstance(r_data, dict) else r_data.dict()
+        r_id = r.get("id") # Định nghĩa r_id ở đây để tránh lỗi Pylance
         
-        # 1. Bức tường lửa (Lọc qua module nutrition)
-        if not is_safe_for_diet(user_dietary, r_tags):
+        v_tags = _get_virtual_tags(r.get("type", ""), r.get("featured_dishes", []))
+        
+        # 1. Firewall (Lọc dị ứng/chế độ ăn)
+        if not is_safe_for_diet(prefs.get("dietary", []), v_tags):
             continue 
-            
-        # 2. Tính điểm thành phần (Gọi module ngoài và hàm cục bộ)
-        taste_score = calculate_taste_match(user_tastes, r_tags)
-        emotion_score = calculate_emotion_weather_match(user_mood, user_weather, r_tags, r_rating)
-        budget_score = calculate_budget_fit(user_budget, user_people, r_price, r_tags)
-        
-        # 3. Tính điểm tổng
-        total_score = (taste_score * weights["taste"]) + \
-                      (emotion_score * weights["emotion"]) + \
-                      (budget_score * weights["budget"])
+
+        # 2. Tính điểm thành phần (Dùng tên biến s_ để ngắn gọn)
+        s_taste = calculate_taste_match(prefs.get("food_types", []), v_tags)
+        s_emotion = calculate_emotion_weather_match(
+            prefs.get("mood", ""), 
+            prefs.get("weather", ""), 
+            v_tags, 
+            r.get("rating", 0)
+        )
+        s_budget = calculate_budget_fit(
+            prefs.get("budget", 0), 
+            prefs.get("people", 1), 
+            r.get("price", 0),
+            v_tags
+        )
+
+        # 3. Tổng hợp điểm theo trọng số
+        total_score = (s_taste * weights["taste"]) + \
+                      (s_emotion * weights["emotion"]) + \
+                      (s_budget * weights["budget"])
         
         # 4. Phạt khoảng cách
-        if r_distance > 5.0:
-            total_score *= 0.85
-        elif r_distance > 10.0:
-            total_score *= 0.60
-            
-        # 5. Sinh lý do
-        reason = "Lựa chọn an toàn, đáp ứng đủ các tiêu chí cơ bản của bạn."
-        if budget_score == 1.0 and user_people >= 4 and set(["buffet", "goi_mon_lon"]).intersection(r_tags):
-            reason = "Cực kỳ tối ưu chi phí cho nhóm đông người."
-        elif emotion_score > 0.85:
-            reason = "Không gian hoàn hảo, cực kỳ phù hợp với ngữ cảnh hiện tại."
-        elif taste_score == 1.0 and r_rating >= 4.5:
-            reason = "Hương vị chuẩn xác đúng những gì bạn thèm, được đánh giá rất cao."
-        elif r_distance <= 1.0 and total_score > 0.7:
-            reason = "Rất gần bạn, tiện lợi di chuyển ngay lúc này."
+        dist = r.get("distance_km", 0)
+        if dist > 1.0:
+            total_score *= math.pow(0.9, dist - 1.0)
+
+        # 5. SINH LÝ DO (Đã sửa lỗi trùng tên biến taste_score -> s_taste)
+        scores_map = {
+            "taste": s_taste,
+            "emotion": s_emotion,
+            "budget": s_budget
+        }
+        
+        best_attr = max(scores_map, key=scores_map.get)
+        worst_attr = min(scores_map, key=scores_map.get)
+
+        if total_score >= 0.7:
+            reasons = {
+                "taste": "Hương vị cực chuẩn gu và đúng món bạn đang tìm.",
+                "emotion": "Không gian xuất sắc, cực kỳ hợp với tâm trạng của bạn.",
+                "budget": "Giá cả vô cùng hợp lý, là lựa chọn cực tiết kiệm."
+            }
+            reason = reasons[best_attr]
+            if dist <= 1.5: reason += " Lại còn rất gần bạn nữa!"
+        elif 0.4 <= total_score < 0.7:
+            reason = "Một lựa chọn ổn, đáp ứng cơ bản các yêu cầu của bạn."
+            if scores_map["budget"] < 0.5:
+                reason = "Món ăn khá ổn nhưng mức giá hơi cao một chút so với dự tính."
+            elif dist > 3.0:
+                reason = "Quán rất ngon nhưng khoảng cách hơi xa, bạn cân nhắc nhé."
+        else:
+            negative_reasons = {
+                "taste": "Khẩu vị quán này có vẻ không phù hợp với sở thích của bạn.",
+                "emotion": "Không gian hoặc đánh giá chưa thực sự tương thích với mood hiện tại.",
+                "budget": "Mức giá quán này vượt quá xa so với ngân sách bạn đề ra."
+            }
+            reason = f"Quán cách bạn tận {dist}km, khá xa để di chuyển." if dist > 7.0 else negative_reasons[worst_attr]
 
         results.append({
             "id": r_id,
             "score": round(total_score, 3),
             "reason": reason
         })
-        
+
     results.sort(key=lambda x: x["score"], reverse=True)
-    
-    return {
-        "results": results
-    }
+    return {"results": results}

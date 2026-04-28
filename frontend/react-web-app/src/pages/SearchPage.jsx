@@ -10,13 +10,13 @@ const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQ = searchParams.get('q') || '';
 
-  const [query,      setQuery]      = useState(initialQ);
-  const [results,    setResults]    = useState([]);
-  const [loading,    setLoading]    = useState(false);
+  const [query, setQuery] = useState(initialQ);
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 1000000]);
-  const [filters,    setFilters]    = useState([]);
-  const [sort,       setSort]       = useState('rating');
-  const [total,      setTotal]      = useState(0);
+  const [filters, setFilters] = useState([]);
+  const [sort, setSort] = useState('rating');
+  const [total, setTotal] = useState(0);
 
   const fetchResults = useCallback(
     debounce(async (q, price, flt, srt) => {
@@ -58,30 +58,24 @@ const SearchPage = () => {
         <div className="max-w-[1200px] mx-auto flex items-center justify-between flex-wrap gap-3">
           {/* Nav links */}
           <nav className="flex gap-8 text-sm font-medium text-[#4A3728]">
-            {['Home', 'Search', 'Forum', 'About us', 'Support'].map((item) => (
+            {[
+              { label: 'Trang chủ', path: '/' },
+              { label: 'Tìm kiếm', path: '/search' },
+              { label: 'Diễn đàn', path: '/forum' },
+              { label: 'Về chúng tôi', path: '/about' },
+              { label: 'Hỗ trợ', path: '/support' },
+            ].map(({ label, path }) => (
               <a
-                key={item}
-                href={item === 'Home' ? '/' : item === 'Search' ? '/search' : '#'}
-                className={`hover:text-[#E8623A] transition-colors ${item === 'Search' ? 'text-[#E8623A] font-bold' : ''}`}
+                key={label}
+                href={path}
+                className={`hover:text-[#E8623A] transition-colors ${path === '/search' ? 'text-[#E8623A] font-bold' : ''}`}
               >
-                {item}
+                {label}
               </a>
             ))}
           </nav>
 
-          {/* Sort dropdown (desktop) */}
-          <div className="hidden lg:flex items-center gap-2">
-            <span className="text-sm text-[#7B7068]">Sắp xếp theo:</span>
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              className="border border-[#E8D5C0] rounded-xl px-3 py-1.5 text-sm bg-[#FFF8EE] text-[#4A3728] outline-none focus:border-[#E8623A] cursor-pointer"
-            >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-          </div>
+
         </div>
       </div>
 
@@ -101,16 +95,32 @@ const SearchPage = () => {
           {/* Results */}
           <div className="flex-1">
             {/* Search header */}
-            <div className="mb-6 flex items-center gap-2 flex-wrap">
-              <h1 className="font-[Baloo_2,sans-serif] text-lg font-bold text-[#E8623A]">
-                Search results for{' '}
-                <em className="font-androgyne text-2xl not-italic font-normal">
-                  "{query || 'Tất cả'}"
-                </em>
-              </h1>
-              {!loading && (
-                <span className="text-sm text-[#7B7068] ml-2">({total} kết quả)</span>
-              )}
+            <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="font-[Baloo_2,sans-serif] text-lg font-bold text-[#E8623A]">
+                  Search results for{' '}
+                  <em className="font-androgyne text-2xl not-italic font-normal">
+                    "{query || 'Tất cả'}"
+                  </em>
+                </h1>
+                {!loading && (
+                  <span className="text-sm text-[#7B7068] ml-2">({total} kết quả)</span>
+                )}
+              </div>
+
+              {/* Sort dropdown */}
+              <div className="hidden lg:flex items-center gap-2">
+                <span className="text-sm text-[#7B7068]">Sắp xếp theo:</span>
+                <select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value)}
+                  className="border border-[#E8D5C0] rounded-xl px-3 py-1.5 text-sm bg-white text-[#4A3728] outline-none focus:border-[#E8623A] cursor-pointer shadow-sm"
+                >
+                  {SORT_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Search input */}

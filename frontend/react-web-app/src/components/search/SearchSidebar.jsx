@@ -1,17 +1,17 @@
 const FILTER_OPTIONS = [
-  { id: 'favorite',  label: 'Được yêu thích' },
+  { id: 'favorite', label: 'Được yêu thích' },
   { id: 'good_rating', label: 'Đánh giá tốt' },
-  { id: 'restaurant',  label: 'Nhà hàng' },
-  { id: 'popular',     label: 'Bình dân' },
-  { id: 'cheapest',    label: 'Giá thấp nhất' },
-  { id: 'family',      label: 'Phù hợp cho gia đình' },
+  { id: 'restaurant', label: 'Nhà hàng' },
+  { id: 'popular', label: 'Bình dân' },
+  { id: 'cheapest', label: 'Giá thấp nhất' },
+  { id: 'family', label: 'Phù hợp cho gia đình' },
 ];
 
 const SORT_OPTIONS = [
-  { value: 'rating',    label: 'Điểm đánh giá' },
-  { value: 'distance',  label: 'Khoảng cách' },
+  { value: 'rating', label: 'Điểm đánh giá' },
+  { value: 'distance', label: 'Khoảng cách' },
   { value: 'price_asc', label: 'Giá thấp → cao' },
-  { value: 'price_desc','label': 'Giá cao → thấp' },
+  { value: 'price_desc', 'label': 'Giá cao → thấp' },
 ];
 
 /**
@@ -53,7 +53,7 @@ const SearchSidebar = ({ priceRange, onPriceChange, filters, onFilterToggle, sor
               width: `${((max - min) / 1000000) * 100}%`,
             }}
           ></div>
-          
+
           <input
             type="range"
             min={0}

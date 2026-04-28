@@ -49,10 +49,10 @@ const FadeSection = ({ children, className = '', delay = 0 }) => {
 
 /* ─── Team data ─── */
 const TEAM = [
-  { name: 'Nguyễn Văn Minh', role: 'Founder & CEO', avatar: '👨‍💼', bio: 'Đam mê ẩm thực và công nghệ, 10 năm kinh nghiệm trong lĩnh vực F&B.' },
-  { name: 'Trần Thị Hoa', role: 'CTO', avatar: '👩‍💻', bio: 'Chuyên gia AI/ML, xây dựng hệ thống gợi ý thông minh cho YumMap.' },
-  { name: 'Lê Quốc Duy', role: 'Head of Design', avatar: '🧑‍🎨', bio: 'Thiết kế trải nghiệm người dùng tuyệt vời, yêu thích typography.' },
-  { name: 'Phạm Ngọc Lan', role: 'Content Lead', avatar: '👩‍✈️', bio: 'Food blogger nổi tiếng, kết nối cộng đồng ẩm thực Việt Nam.' },
+  { name: 'Phạm Nguyễn Quang Sáng', role: 'Founder & CEO', avatar: '👨‍💼', bio: 'Đam mê ẩm thực và công nghệ, 10 năm kinh nghiệm trong lĩnh vực F&B.' },
+  { name: 'Nguyễn Khánh Đăng', role: 'CTO', avatar: '👩‍💻', bio: 'Chuyên gia AI/ML, xây dựng hệ thống gợi ý thông minh cho YumMap.' },
+  { name: 'Nguyễn Lê Anh Kiên', role: 'Head of Design', avatar: '🧑‍🎨', bio: 'Thiết kế trải nghiệm người dùng tuyệt vời, yêu thích typography.' },
+  { name: 'Võ Đình Đình', role: 'Content Lead', avatar: '👩‍✈️', bio: 'Food blogger nổi tiếng, kết nối cộng đồng ẩm thực Việt Nam.' },
 ];
 
 const VALUES = [

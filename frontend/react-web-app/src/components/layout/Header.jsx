@@ -3,12 +3,21 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import YumMapLogo from '../../assets/YumMap-logo.svg';
 
+// ---- Location Pin Icon ----
+const LocationIcon = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-[#E8623A] flex-shrink-0">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+  </svg>
+);
+
 // ---- Search Icon ----
 const SearchIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4">
     <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
   </svg>
 );
+
+
 
 const Header = () => {
   const { user, logout } = useAuth();
@@ -18,6 +27,35 @@ const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQ, setSearchQ] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [address, setAddress] = useState('Đang tìm vị trí...');
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+            const data = await res.json();
+            if (data && data.display_name) {
+              // Lấy 3 phần đầu của địa chỉ cho gọn
+              const parts = data.display_name.split(',').map(s => s.trim());
+              setAddress(parts.slice(0, 3).join(', '));
+            } else {
+              setAddress('Vị trí hiện tại');
+            }
+          } catch (error) {
+            setAddress('Vị trí hiện tại');
+          }
+        },
+        (error) => {
+          setAddress('Chưa cấp quyền vị trí');
+        }
+      );
+    } else {
+      setAddress('Trình duyệt không hỗ trợ định vị');
+    }
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -51,14 +89,23 @@ const Header = () => {
     >
       <div className="max-w-[1200px] mx-auto px-6 py-3 flex items-center justify-between gap-4">
 
-        {/* Logo */}
-        <Link to="/" className="flex items-center cursor-pointer group" aria-label="YumMap Home">
-          <img
-            src={YumMapLogo}
-            alt="YumMap"
-            className="h-16 w-auto group-hover:scale-105 transition-transform"
-          />
-        </Link>
+        {/* Logo + Address */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <Link to="/" className="flex items-center cursor-pointer group" aria-label="YumMap Home">
+            <img
+              src={YumMapLogo}
+              alt="YumMap"
+              className="h-16 w-auto group-hover:scale-105 transition-transform"
+            />
+          </Link>
+          {/* Address display */}
+          <div className="hidden md:flex items-center gap-1.5 bg-[#FFF8EE] border border-[#F5EDD8] rounded-full px-3 py-2 transition-all group cursor-default" title={address}>
+            <LocationIcon />
+            <span className="w-44 truncate bg-transparent text-xs font-medium text-[#2C1810]">
+              {address}
+            </span>
+          </div>
+        </div>
 
         {/* Center search (hidden on mobile) */}
         <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-sm mx-4">
@@ -183,8 +230,16 @@ const Header = () => {
               🔑 Đăng nhập
             </Link>
           )}
+          {/* Address display in mobile menu */}
+          <div className="flex items-center gap-1.5 bg-[#FFF8EE] border border-[#F5EDD8] rounded-full px-4 py-2 gap-2 mb-1" title={address}>
+            <LocationIcon />
+            <span className="flex-1 truncate bg-transparent text-sm font-medium text-[#2C1810]">
+              {address}
+            </span>
+          </div>
         </nav>
       )}
+
     </header>
   );
 };

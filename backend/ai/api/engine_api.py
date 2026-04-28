@@ -5,18 +5,23 @@
 import os
 import json
 import google.generativeai as genai
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from fastapi import APIRouter, HTTPException
 from schemas.payloads import RecommendRequest, RecommendResponse, AIResultItem, BaseResponse
 from recommendation_engine.scoring import process_scoring
+#thêm để liên kết với phần chatbot
+from schemas.payloads import ChatIntentRequest, ChatGenerationRequest
+from ai_chatbot.nlp_parser import detect_intent_with_ai
+from ai_chatbot.consultant_rag import generate_final_response
 
-load_dotenv()
+# Tự động tìm file .env ở bất kỳ đâu trong dự án
+load_dotenv(find_dotenv())
 router = APIRouter()
 
 # Cấu hình Gemini
 api_key = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 @router.post("/recommend", response_model=BaseResponse)
 async def recommend_endpoint(request: RecommendRequest):

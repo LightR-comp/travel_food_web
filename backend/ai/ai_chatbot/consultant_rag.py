@@ -1,4 +1,6 @@
-from core.ai_config import shared_model # Import từ core
+import os
+import google.generativeai as genai
+from dotenv import load_dotenv, find_dotenv
 from schemas.payloads import ChatGenerationRequest, ChatFinalData, PlaceInfo
 import logging
 from google.api_core.exceptions import (
@@ -9,6 +11,15 @@ from google.api_core.exceptions import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Tự động tìm file .env ở bất kỳ đâu trong dự án
+load_dotenv(find_dotenv())
+
+api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+if api_key:
+    genai.configure(api_key=api_key)
+
+shared_model = genai.GenerativeModel('gemini-2.5-flash')
 
 
 # --- Custom Exceptions ---
@@ -22,23 +33,23 @@ class RestaurantFilterError(Exception):
 
 
 def _filter_restaurants(request: ChatGenerationRequest, user_allergies: set):
-    """Tách logic lọc ra riêng — dễ test và catch lỗi độc lập"""
     safe_restaurants = []
     warning_restaurants = []
 
     for res in request.found_restaurants:
         try:
-            ingredients = res.featured_dishes.lower() if res.featured_dishes else ""
-            has_allergen = any(allergen in ingredients for allergen in user_allergies)
+            ingredients_list = res.get('ingredients', [])
+            ingredients_str = ", ".join(ingredients_list).lower()
+            
+            has_allergen = any(allergen in ingredients_str for allergen in user_allergies)
 
             if has_allergen:
                 warning_restaurants.append((res, "Có thể chứa nguyên liệu bạn dị ứng"))
             else:
                 safe_restaurants.append((res, "Phù hợp với yêu cầu của bạn"))
 
-        except AttributeError as e:
-            # Dữ liệu nhà hàng bị thiếu field
-            logger.warning(f"Dữ liệu nhà hàng không hợp lệ (id={getattr(res, 'id', 'unknown')}): {e}")
+        except Exception as e:
+            logger.warning(f"Dữ liệu nhà hàng không hợp lệ: {e}")
             continue  # Bỏ qua nhà hàng lỗi, xử lý tiếp
 
     return safe_restaurants, warning_restaurants
@@ -47,21 +58,16 @@ def _filter_restaurants(request: ChatGenerationRequest, user_allergies: set):
 def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
 
     # --- Bước 1: Xử lý dị ứng ---
-    try:
-        user_allergies = set(a.lower() for a in (request.user_context.preferences.dietary or []))
-    except AttributeError as e:
-        logger.error(f"Không đọc được preferences từ user_context: {e}", exc_info=True)
-        raise AllergyProcessingError("Dữ liệu người dùng không hợp lệ") from e
+    user_allergies = set()
+    if request.user_context and request.user_context.preferences:
+        dietary = request.user_context.preferences.dietary or []
+        user_allergies = set(a.lower() for a in dietary)
 
     # --- Bước 2: Phân loại nhà hàng ---
-    try:
-        safe_restaurants, warning_restaurants = _filter_restaurants(request, user_allergies)
-    except Exception as e:
-        logger.error(f"Lỗi khi phân loại nhà hàng: {e}", exc_info=True)
-        raise RestaurantFilterError("Không thể phân loại nhà hàng") from e
+    safe_restaurants, warning_restaurants = _filter_restaurants(request, user_allergies)
 
-    safe_list = "\n".join(f"- {r.res_name} ({r.price}): {r.featured_dishes}" for r, _ in safe_restaurants)
-    warning_list = "\n".join(f"- {r.res_name}: {reason}" for r, reason in warning_restaurants)
+    safe_list = "\n".join(f"- {r.get('res_name', '')} ({r.get('price', 0)}đ): {', '.join(r.get('ingredients', []))}" for r, _ in safe_restaurants)
+    warning_list = "\n".join(f"- {r.get('res_name', '')}: {reason}" for r, reason in warning_restaurants)
 
     prompt = f"""Bạn là trợ lý ẩm thực YumMap, thân thiện và am hiểu.
     Câu hỏi: "{request.user_message}"
@@ -74,49 +80,50 @@ def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
 
     # --- Bước 3: Gọi AI ---
     try:
-        ai_reply = shared_model.generate_content(prompt).text
-
-    except ResourceExhausted as e:
-        # Hết quota → không retry, báo ngay
-        logger.error(f"Gemini API hết quota: {e}")
-        ai_reply = "Dạ, hệ thống AI đang quá tải, em chưa thể tư vấn ngay được ạ. Bạn thử lại sau ít phút nhé!"
-
-    except DeadlineExceeded as e:
-        # Timeout → có thể retry
-        logger.warning(f"Gemini API timeout: {e}")
-        ai_reply = "Dạ, kết nối AI hơi chậm lúc này ạ. Bạn thử gửi lại câu hỏi nhé!"
-
-    except ServiceUnavailable as e:
-        # Server Gemini down
-        logger.critical(f"Gemini service unavailable: {e}", exc_info=True)
-        ai_reply = "Dạ, dịch vụ AI đang bảo trì ạ. Em vẫn hiển thị danh sách nhà hàng cho bạn!"
-
-    except InvalidArgument as e:
-        # Prompt bị lỗi format — lỗi code, cần fix
-        logger.error(f"Prompt không hợp lệ — kiểm tra lại template: {e}", exc_info=True)
-        ai_reply = "Dạ, em gặp lỗi xử lý câu hỏi ạ."
-
+        if not api_key:
+            raise ValueError("Không tìm thấy file .env hoặc thiếu GEMINI_API_KEY. Vui lòng kiểm tra lại!")
+            
+        # Tắt toàn bộ bộ lọc an toàn để AI không bao giờ từ chối trả lời
+        response = shared_model.generate_content(
+            prompt,
+            safety_settings={
+                'HARM_CATEGORY_HARASSMENT': 'BLOCK_NONE',
+                'HARM_CATEGORY_HATE_SPEECH': 'BLOCK_NONE',
+                'HARM_CATEGORY_SEXUALLY_EXPLICIT': 'BLOCK_NONE',
+                'HARM_CATEGORY_DANGEROUS_CONTENT': 'BLOCK_NONE'
+            }
+        )
+        ai_reply = response.text
+    except ValueError as ve:
+        logger.error(f"Lỗi truy xuất dữ liệu Gemini: {ve}")
+        ai_reply = f"Dạ, câu hỏi này làm AI bối rối một chút. (Lỗi chi tiết: {str(ve)})"
     except Exception as e:
         # Lỗi không xác định — log đầy đủ để debug
         logger.exception(f"Lỗi không xác định khi gọi Gemini: {e}")
-        ai_reply = "Dạ, em đang gặp chút sự cố ạ."
+        ai_reply = f"Dạ, em đang gặp chút sự cố ạ. (Lỗi AI: {str(e)})"
 
     # --- Bước 4: Build response — lỗi ở đây không ảnh hưởng ai_reply ---
+    suggested_places = []
     try:
-        warning_set = {r for r, _ in warning_restaurants}
-        safe_set = {r for r, _ in safe_restaurants}
-
-        suggested_places = [
-            PlaceInfo(
-                restaurant=res,
-                ai_reason=reason,
-                allergy_friendly=res not in warning_set,  # Bỏ list comprehension lồng nhau
-                tags=["An toàn"] if res in safe_set else ["Cần lưu ý"]
-            )
-            for res, reason in safe_restaurants + warning_restaurants
-        ]
+        for is_safe, items in [(True, safe_restaurants), (False, warning_restaurants)]:
+            for res, reason in items:
+                place = PlaceInfo(
+                    restaurant={
+                        "id": res.get("id", 0),
+                        "res_name": res.get("res_name", "Không tên"),
+                        "rating": res.get("rating", 0.0),
+                        "price": res.get("price", 0.0),
+                        "image_url": res.get("image_url", ""),
+                        "distance_km": 0.0,
+                        "type": "restaurant",
+                        "featured_dishes": []
+                    },
+                    ai_reason=reason,
+                    allergy_friendly=is_safe,
+                    tags=["An toàn"] if is_safe else ["Cần lưu ý"]
+                )
+                suggested_places.append(place)
     except Exception as e:
         logger.error(f"Lỗi khi build suggested_places: {e}", exc_info=True)
-        suggested_places = []  # Fallback — vẫn trả về ai_reply
 
     return ChatFinalData(reply=ai_reply, suggested_places=suggested_places)

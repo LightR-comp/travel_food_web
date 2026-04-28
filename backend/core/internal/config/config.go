@@ -10,17 +10,17 @@ import (
 	"github.com/joho/godotenv"
 )
 
-//AppConfig chứa toàn bộ cấu hình hệ thống
+// AppConfig chứa toàn bộ cấu hình hệ thống
 type Config struct {
-	Port        string
-	DBHost      string
-	DBPort      string
-	DBUser      string
-	DBPassword  string
-	DBName      string
-	AIServiceURL string
-	GoongMapsAPIKey string
-	GeminiAPIKey string
+	Port                   string
+	DBHost                 string
+	DBPort                 string
+	DBUser                 string
+	DBPassword             string
+	DBName                 string
+	AIServiceURL           string
+	GoongMapsAPIKey        string
+	GeminiAPIKey           string
 	FirebaseCredentialPath string
 }
 
@@ -36,23 +36,23 @@ func LoadConfig() {
 	}
 
 	AppConfig = Config{
-		Port:             getEnv("PORT", "8080"),
-		DBHost:           getEnv("DB_HOST", "127.0.0.1"),
-		DBPort:           getEnv("DB_PORT", "1433"),
-		DBUser:           getEnv("DB_USER", "sa"),
-		DBPassword:       getEnv("DB_PASSWORD", ""),
-		DBName:           getEnv("DB_NAME", "travel_food_db"),
-		AIServiceURL:     getEnv("AI_SERVICE_URL", "http://localhost:8000"),
-		GoongMapsAPIKey: getEnv("GOOng_MAPS_API_KEY", ""),
-		GeminiAPIKey:     getEnv("GEMINI_API_KEY", ""),
+		Port:                   getEnv("PORT", "8080"),
+		DBHost:                 getEnv("DB_HOST", "127.0.0.1"),
+		DBPort:                 getEnv("DB_PORT", "1433"),
+		DBUser:                 getEnv("DB_USER", "sa"),
+		DBPassword:             getEnv("DB_PASSWORD", ""),
+		DBName:                 getEnv("DB_NAME", "travel_food_db"),
+		AIServiceURL:           getEnv("AI_SERVICE_URL", "http://localhost:8000"),
+		GoongMapsAPIKey:        getEnv("GOOng_MAPS_API_KEY", ""),
+		GeminiAPIKey:           getEnv("GEMINI_API_KEY", ""),
 		FirebaseCredentialPath: getEnv("FIREBASE_CREDENTIAL_PATH", "../../config/serviceAccountKey.json"),
 	}
-}	
+}
 
 // getEnv lấy giá trị từ biến môi trường, nếu không có thì trả về giá trị mặc định
-func getEnv(key string, defaultValue string) string{
-		if value, exists := os.LookupEnv(key); exists {
-			return value
-		}
-		return defaultValue
+func getEnv(key string, defaultValue string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return defaultValue
 }

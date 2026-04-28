@@ -14,7 +14,7 @@ type ChatRequest struct {
 
 // ChatResponse là DTO cho phản hồi chat từ server
 type ChatResponse struct {
-	Reply string `json:"reply"`
+	Reply       string              `json:"reply"`
 	Suggestions []models.Restaurant `json:"suggestions,omitempty"`
 }
 

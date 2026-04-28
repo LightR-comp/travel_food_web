@@ -27,7 +27,7 @@ go.work.sum
 # env file
 .env
 venv/
-
+**/venv/
 # Editor/IDE
 # .idea/
 # .vscode/
@@ -58,3 +58,6 @@ __pycache__/
 __pycache__
 *.py[cod]
 *$py.class
+
+**/__pycache__/
+*.py[cod]

@@ -62,9 +62,9 @@ const Footer = () => (
         </div>
 
         {/* Logo col */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col items-center gap-3">
           <img src={YumMapLogo} alt="YumMap" className="h-20 w-auto" />
-          <p className="text-xs text-white/50 italic">Ẩm thực Việt – Đúng vị, đúng nơi</p>
+          <p className="text-xs text-white/50 italic text-center">Ẩm thực Việt – Đúng vị, đúng nơi</p>
         </div>
 
       </div>

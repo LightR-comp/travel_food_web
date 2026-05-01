@@ -48,23 +48,23 @@ func SetupRouter(r *gin.Engine) {
 
 		// v1.GET("/dishes/trending", handlers.GetTrendingDishes)
 
-		// --- NHÓM BÀI VIẾT (POSTS) ---
-		// posts := v1.Group("/posts")
-		// {
-		// 	// Public routes (Xem không cần đăng nhập)
-		// 	posts.GET("/popular", handlers.GetPopularPosts) // Bài review hot
-		// 	posts.GET("", handlers.GetListPosts)            // Danh sách bài viết (Phân trang/Topic)
-		// 	posts.GET("/:id", handlers.GetPostDetail)       // Chi tiết bài viết + Comments
+		//--- NHÓM BÀI VIẾT (POSTS) ---
+		posts := v1.Group("/posts")
+		{
+			// Public routes (Xem không cần đăng nhập)
+			posts.GET("/popular", handlers.GetPopularPosts) // Bài review hot
+			posts.GET("", handlers.GetListPosts)            // Danh sách bài viết (Phân trang/Topic)
+			posts.GET("/:id", handlers.GetPostDetail)       // Chi tiết bài viết + Comments
 
-		// 	// Private routes (Cần Middleware Auth)
-		// 	authorized := posts.Group("/")
-		// 	authorized.Use(middleware.FirebaseAuthMiddleware())
-		// 	{
-		// 		authorized.POST("", handlers.CreatePost)                // Đăng bài mới
-		// 		authorized.POST("/:id/comments", handlers.AddComment)    // Bình luận bài viết, :id là ID bài viết
-		// 		authorized.POST("/:id/likes", handlers.LikePost)        // Thả tim, :id là ID bài viết
-		// 	}
-		// }
+			// Private routes (Cần Middleware Auth)
+			authorized := posts.Group("/")
+			authorized.Use(middlewares.FirebaseAuthMiddleware())
+			{
+				authorized.POST("", handlers.CreatePost)                // Đăng bài mới
+				authorized.POST("/:id/comments", handlers.AddComment)    // Bình luận bài viết, :id là ID bài viết
+				authorized.POST("/:id/likes", handlers.LikePost)        // Thả tim, :id là ID bài viết
+			}
+		}
 
 		// // --- NHÓM TIỆN ÍCH (Vị trí, Thời tiết, Tiền tệ) ---
 		// utils := v1.Group("/utils")

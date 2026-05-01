@@ -1,141 +1,145 @@
-// forum.go chứa các hàm xử lý liên quan đến diễn đàn (forum) của quán ăn
-
-
 package handlers
 
-// import (
-// 	"net/http"
-// 	"strconv"
+import (
+	"net/http"
+	"strconv"
 
-// 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 
-// 	"go-core-backend/internal/models"
-// 	"go-core-backend/internal/services"
-// )
+	"backend/core/internal/models"
+	"backend/core/internal/services"
+)
 
-// func CreateReview(c *gin.Context) {
-// 	uid := c.GetString("uid")
+// ============================================================
+// POST
+// ============================================================
 
-// 	var review models.Review
-// 	if err := c.ShouldBindJSON(&review); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Dữ liệu không hợp lệ"})
-// 		return
-// 	}
-// 	review.UserUID = uid
+func GetPopularPosts(c *gin.Context) {
+	posts, err := services.GetPopularPosts(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi lấy bài viết hot"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": posts})
+}
 
-// 	created, err := services.CreateReview(c.Request.Context(), review)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo đánh giá"})
-// 		return
-// 	}
+func GetListPosts(c *gin.Context) {
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 
-// 	c.JSON(http.StatusCreated, created)
-// }
+	posts, total, err := services.GetListPosts(c.Request.Context(), page, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi lấy danh sách bài viết"})
+		return
+	}
 
-// func GetReviewsByRestaurant(c *gin.Context) {
-// 	restaurantID, err := strconv.Atoi(c.Param("restaurant_id"))
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "restaurant_id không hợp lệ"})
-// 		return
-// 	}
+	c.JSON(http.StatusOK, gin.H{
+		"data":  posts,
+		"total": total,
+		"page":  page,
+		"limit": limit,
+	})
+}
 
-// 	reviews, err := services.GetReviewsByRestaurant(c.Request.Context(), restaurantID)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi lấy đánh giá"})
-// 		return
-// 	}
+func GetPostDetail(c *gin.Context) {
+	postID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id không hợp lệ"})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, reviews)
-// }
+	post, err := services.GetPostDetail(c.Request.Context(), postID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
 
-// func UpdateReview(c *gin.Context) {
-// 	uid := c.GetString("uid")
-// 	reviewID, err := strconv.Atoi(c.Param("review_id"))
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "review_id không hợp lệ"})
-// 		return
-// 	}
+	c.JSON(http.StatusOK, gin.H{"data": post})
+}
 
-// 	var update models.Review
-// 	if err := c.ShouldBindJSON(&update); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Dữ liệu không hợp lệ"})
-// 		return
-// 	}
+func CreatePost(c *gin.Context) {
+	userID := c.GetInt("user_id")
 
-// 	if err := services.UpdateReview(c.Request.Context(), reviewID, uid, update); err != nil {
-// 		c.JSON(http.StatusForbidden, gin.H{"error": "Không có quyền sửa hoặc review không tồn tại"})
-// 		return
-// 	}
+	var post models.Post
+	if err := c.ShouldBindJSON(&post); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Dữ liệu không hợp lệ"})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, gin.H{"message": "Cập nhật thành công"})
-// }
+	// Giá trị mặc định
+	if post.Type == "" {
+		post.Type = "discussion"
+	}
 
-// func DeleteReview(c *gin.Context) {
-// 	uid := c.GetString("uid")
-// 	reviewID, err := strconv.Atoi(c.Param("review_id"))
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "review_id không hợp lệ"})
-// 		return
-// 	}
+	created, err := services.CreatePost(c.Request.Context(), userID, post)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo bài viết"})
+		return
+	}
 
-// 	if err := services.DeleteReview(c.Request.Context(), reviewID, uid); err != nil {
-// 		c.JSON(http.StatusForbidden, gin.H{"error": "Không có quyền xóa hoặc review không tồn tại"})
-// 		return
-// 	}
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Tạo bài viết thành công",
+		"data":    created,
+	})
+}
 
-// 	c.JSON(http.StatusOK, gin.H{"message": "Xóa thành công"})
-// }
 
-// func CreateTopic(c *gin.Context) {
-// 	uid := c.GetString("uid")
+// ============================================================
+// COMMENT
+// ============================================================
 
-// 	var topic models.ForumTopic
-// 	if err := c.ShouldBindJSON(&topic); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Dữ liệu không hợp lệ"})
-// 		return
-// 	}
-// 	topic.UserUID = uid
+func AddComment(c *gin.Context) {
+	userID := c.GetInt("user_id")
 
-// 	created, err := services.CreateTopic(c.Request.Context(), topic)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo topic"})
-// 		return
-// 	}
+	postID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id không hợp lệ"})
+		return
+	}
 
-// 	c.JSON(http.StatusCreated, created)
-// }
+	var req struct {
+		Content string `json:"content" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Thiếu nội dung bình luận"})
+		return
+	}
 
-// func GetTopics(c *gin.Context) {
-// 	topics, err := services.GetTopics(c.Request.Context())
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi lấy danh sách topic"})
-// 		return
-// 	}
+	comment, err := services.AddComment(c.Request.Context(), userID, postID, req.Content)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo bình luận"})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, topics)
-// }
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Bình luận thành công",
+		"data":    comment,
+	})
+}
 
-// func CreateComment(c *gin.Context) {
-// 	uid := c.GetString("uid")
-// 	topicID, err := strconv.Atoi(c.Param("topic_id"))
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "topic_id không hợp lệ"})
-// 		return
-// 	}
+// ============================================================
+// LIKE
+// ============================================================
 
-// 	var comment models.ForumComment
-// 	if err := c.ShouldBindJSON(&comment); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Dữ liệu không hợp lệ"})
-// 		return
-// 	}
-// 	comment.UserUID = uid
-// 	comment.TopicID = topicID
+func LikePost(c *gin.Context) {
+	userID := c.GetInt("user_id")
 
-// 	created, err := services.CreateComment(c.Request.Context(), comment)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo comment"})
-// 		return
-// 	}
+	postID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id không hợp lệ"})
+		return
+	}
 
-// 	c.JSON(http.StatusCreated, created)
-// }
+	liked, err := services.LikePost(c.Request.Context(), userID, postID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi xử lý like"})
+		return
+	}
+
+	msg := "Đã thích bài viết"
+	if !liked {
+		msg = "Đã bỏ thích bài viết"
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": msg, "liked": liked})
+}

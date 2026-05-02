@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PhotoGallery from '../components/detail/PhotoGallery';
 import MenuSection from '../components/detail/MenuSection';
+import ReviewSection from '../components/detail/ReviewSection';
+
 import { StarRating, OpenStatus, Spinner } from '../components/ui/index.jsx';
 import { getRestaurantByIdApi } from '../api/restaurantApi';
 
@@ -176,6 +178,9 @@ const DetailPage = () => {
             <div className="bg-white rounded-2xl border border-[#F5EDD8] p-6 mt-6">
               <MenuSection />
             </div>
+
+            <ReviewSection />
+
 
           </div>
 

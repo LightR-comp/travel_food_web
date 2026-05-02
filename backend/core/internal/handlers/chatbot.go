@@ -8,6 +8,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -18,8 +19,8 @@ import (
 // ChatbotProcess is the main handler for the /chat endpoint.
 // It orchestrates the entire chatbot workflow as defined in the API contract.
 func ChatbotProcess(c *gin.Context) {
-	// Lấy data từ Request (Tái sử dụng DTO cũ ChatRequest có Message)
-	var req dto.ChatRequest
+	// Lấy data từ Request
+	var req dto.ChatbotMessageRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -31,6 +32,15 @@ func ChatbotProcess(c *gin.Context) {
 	}
 
 	userID := c.GetInt("user_id")
+	// Hỗ trợ lấy user_id từ body Postman để test cho tiện (vì route này đang public)
+	if userID == 0 && req.UserID > 0 {
+		userID = req.UserID
+	}
+
+	// NẾU TEST KHÔNG CẦN XÁC THỰC: Gán cứng userID = 1 để luôn qua được điều kiện lưu DB
+	if userID == 0 {
+		userID = 1
+	}
 
 	// GIAI ĐOẠN 1: Go -> Python (INTENT PARSE)
 	intentReq := dto.AIIntentParseRequest{
@@ -102,11 +112,54 @@ func ChatbotProcess(c *gin.Context) {
 		return
 	}
 
+	// GIAI ĐOẠN 4.5: Lưu lịch sử chat vào Database (chỉ lưu nếu có userID)
+	if userID > 0 {
+		botReply := genRes.Data.Reply
+
+		errDB := services.SaveChatHistory(c.Request.Context(), userID, req.Message, botReply)
+		if errDB != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false,
+				"message": "AI đã trả lời nhưng lỗi lưu Database (Xem chi tiết ở error)",
+				"data":    nil,
+				"error":   errDB.Error(),
+			})
+			return
+		}
+	}
+
 	// GIAI ĐOẠN 4 & FINAL OUTPUT: Python -> Go -> Frontend
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Thành công",
 		"data":    genRes.Data,
 		"error":   nil,
+	})
+}
+
+// GetChatHistory API lấy lịch sử chat
+func GetChatHistory(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("userId"))
+	if err != nil || userID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false, "message": "ID người dùng không hợp lệ", "data": nil, "error": "Invalid User ID",
+		})
+		return
+	}
+
+	history, err := services.GetChatHistoryByUserID(c.Request.Context(), userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false, "message": "Lỗi lấy lịch sử", "data": nil, "error": err.Error(),
+		})
+		return
+	}
+
+	if history == nil {
+		history = []services.ChatHistoryEntry{} // Mảng rỗng nếu chưa có
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true, "message": "Thành công", "data": gin.H{"messages": history}, "error": nil,
 	})
 }

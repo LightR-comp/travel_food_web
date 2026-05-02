@@ -3,6 +3,12 @@
 
 package dto
 
+// ChatbotMessageRequest: Nhận Request tin nhắn từ UI Frontend
+type ChatbotMessageRequest struct {
+	UserID  int    `json:"user_id"`
+	Message string `json:"message" binding:"required"`
+}
+
 // AIIntentParseRequest đại diện cho dữ liệu Go gửi đi ở GIAI ĐOẠN 1
 type AIIntentParseRequest struct {
 	UserID  int    `json:"user_id"`
@@ -17,6 +23,7 @@ type AIIntentParseResponse struct {
 		Entities   map[string]interface{} `json:"entities"`
 		Confidence float64                `json:"confidence"`
 	} `json:"data"`
+	Error interface{} `json:"error"`
 }
 
 // AIChatGenerateRequest đại diện cho dữ liệu Go gửi đi ở GIAI ĐOẠN 3
@@ -35,4 +42,5 @@ type AIChatGenerateResponse struct {
 		Reply           string                   `json:"reply"`
 		SuggestedPlaces []map[string]interface{} `json:"suggested_places"`
 	} `json:"data"`
+	Error interface{} `json:"error"`
 }

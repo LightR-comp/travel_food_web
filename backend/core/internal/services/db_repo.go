@@ -137,6 +137,56 @@ func UpdateUserPreferences(ctx context.Context, userID int, prefs models.UserPre
 }
 
 // ============================================================
+// CHAT HISTORY
+// ============================================================
+
+type ChatHistoryEntry struct {
+	ID          int       `json:"id"`
+	UserID      int       `json:"user_id"`
+	UserMessage string    `json:"user_message"`
+	BotReply    string    `json:"bot_reply"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
+// SaveChatHistory lưu tin nhắn của user và bot vào DB
+func SaveChatHistory(ctx context.Context, userID int, userMessage string, botReply string) error {
+	_, err := db.ExecContext(ctx, `
+		INSERT INTO ChatHistory (user_id, user_message, bot_reply, created_at)
+		VALUES (@uid, @userMsg, @botReply, GETDATE())
+	`,
+		sql.Named("uid", userID),
+		sql.Named("userMsg", userMessage),
+		sql.Named("botReply", botReply),
+	)
+	if err != nil {
+		log.Printf("[DB] Lỗi lưu lịch sử chat: %v", err)
+	}
+	return err
+}
+
+func GetChatHistoryByUserID(ctx context.Context, userID int) ([]ChatHistoryEntry, error) {
+	rows, err := db.QueryContext(ctx, `
+		SELECT id, user_id, user_message, bot_reply, created_at
+		FROM ChatHistory
+		WHERE user_id = @uid
+		ORDER BY created_at ASC
+	`, sql.Named("uid", userID))
+	if err != nil {
+		return nil, fmt.Errorf("GetChatHistoryByUserID: %w", err)
+	}
+	defer rows.Close()
+
+	var history []ChatHistoryEntry
+	for rows.Next() {
+		var h ChatHistoryEntry
+		if err := rows.Scan(&h.ID, &h.UserID, &h.UserMessage, &h.BotReply, &h.CreatedAt); err == nil {
+			history = append(history, h)
+		}
+	}
+	return history, nil
+}
+
+// ============================================================
 // RESTAURANT
 // ============================================================
 
@@ -230,6 +280,64 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 		result[restaurantID] = append(result[restaurantID], item)
 	}
 	return result, nil
+}
+
+// SearchRestaurantsForChatbot truy vấn quán ăn dựa trên các thực thể intent từ người dùng (Chatbot)
+func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interface{}) ([]models.Restaurant, error) {
+	query := `
+		SELECT r.id, r.name, r.address, r.lat, r.lng, r.rating, r.price_range, r.open_time, r.close_time, r.type
+		FROM Restaurants r
+		WHERE 1=1
+	`
+	var namedArgs []interface{}
+
+	// Lọc theo món ăn (nằm trong tên quán hoặc menu)
+	if dish, ok := entities["dish"].(string); ok && dish != "" {
+		query += ` AND (r.name LIKE @dish OR r.id IN (SELECT restaurant_id FROM MenuItems WHERE name LIKE @dish))`
+		namedArgs = append(namedArgs, sql.Named("dish", "%"+dish+"%"))
+	}
+
+	// Lọc theo vị trí (gần đúng qua address)
+	if location, ok := entities["location"].(string); ok && location != "" {
+		query += ` AND r.address LIKE @loc`
+		namedArgs = append(namedArgs, sql.Named("loc", "%"+location+"%"))
+	}
+
+	query += ` ORDER BY r.rating DESC OFFSET 0 ROWS FETCH NEXT 5 ROWS ONLY`
+
+	rows, err := db.QueryContext(ctx, query, namedArgs...)
+	if err != nil {
+		return nil, fmt.Errorf("SearchRestaurantsForChatbot: %w", err)
+	}
+	defer rows.Close()
+
+	var restaurants []models.Restaurant
+	var ids []int
+
+	for rows.Next() {
+		var r models.Restaurant
+		if err := rows.Scan(
+			&r.ID, &r.Name, &r.Address, &r.Lat, &r.Lng,
+			&r.Rating, &r.PriceRange, &r.OpenTime, &r.CloseTime, &r.Type,
+		); err != nil {
+			continue
+		}
+		restaurants = append(restaurants, r)
+		ids = append(ids, r.ID)
+	}
+
+	if len(ids) == 0 {
+		return restaurants, nil
+	}
+
+	menuMap, err := getMenusByRestaurantIDs(ctx, ids)
+	if err == nil {
+		for i := range restaurants {
+			restaurants[i].Menu = menuMap[restaurants[i].ID]
+		}
+	}
+
+	return restaurants, nil
 }
 
 func CreateReview(ctx context.Context, rv models.UserRating) (*models.UserRating, error) {

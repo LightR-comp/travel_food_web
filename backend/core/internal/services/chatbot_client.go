@@ -12,6 +12,7 @@ import (
 	//Đọc response body từ HTTP response
 	"context"
 	"io"
+	"log"
 	"strings"
 	"time"
 
@@ -85,7 +86,48 @@ func CallAIChatGenerate(req dto.AIChatGenerateRequest) (*dto.AIChatGenerateRespo
 
 // FetchRestaurantsFromEntities nhận Entities để chọc vào Database lấy data quán ăn (GIAI ĐOẠN 2)
 func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]interface{}) []map[string]interface{} {
-	// TODO: Sau này sẽ móc vào hàm DB thực tế dùng builder SQL động.
-	// Hiện tại trả về mảng rỗng để pass qua luồng chatbot an toàn.
-	return []map[string]interface{}{}
+	if entities == nil {
+		entities = make(map[string]interface{})
+	}
+
+	restaurants, err := SearchRestaurantsForChatbot(ctx, entities)
+	if err != nil {
+		log.Printf("[Chatbot] Lỗi truy vấn DB: %v", err)
+		return []map[string]interface{}{}
+	}
+
+	var results []map[string]interface{}
+	for _, r := range restaurants {
+		var featuredDishes []map[string]interface{}
+		for _, m := range r.Menu {
+			var ingredients []string
+			if m.Ingredients != "" {
+				json.Unmarshal([]byte(m.Ingredients), &ingredients)
+			}
+			if ingredients == nil {
+				ingredients = []string{}
+			}
+			featuredDishes = append(featuredDishes, map[string]interface{}{
+				"name":        m.Name,
+				"price":       m.Price,
+				"ingredients": ingredients,
+			})
+		}
+
+		results = append(results, map[string]interface{}{
+			"id":              r.ID,
+			"res_name":        r.Name,
+			"rating":          r.Rating,
+			"price":           50000.0, // Đặt mặc định hoặc parse từ price_range, pydantic cần float
+			"image_url":       "https://placehold.co/400x300?text=" + r.Name,
+			"distance_km":     1.5, // Giả định khi không có tọa độ người dùng
+			"type":            r.Type,
+			"featured_dishes": featuredDishes,
+		})
+	}
+
+	if results == nil {
+		return []map[string]interface{}{}
+	}
+	return results
 }

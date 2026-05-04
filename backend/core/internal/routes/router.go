@@ -39,14 +39,14 @@ func SetupRouter(r *gin.Engine) {
 		}
 
 		// --- NHÓM NHÀ HÀNG & MÓN ĂN ---
-		// restaurants := v1.Group("/restaurants")
-		// {
-		// 	restaurants.GET("/popular", handlers.GetPopularRestaurants) // Good spots for food
-		// 	restaurants.GET("/search", handlers.SearchRestaurants)      // Bộ lọc & Tìm kiếm (q, price, sort...)
-		// 	restaurants.GET("/:id", handlers.GetRestaurantDetail)       // Chi tiết nhà hàng.
-		// }
+		restaurants := v1.Group("/restaurants")
+		{
+			restaurants.GET("/popular", handlers.GetPopularRestaurants) // Good spots for food
+		 	restaurants.GET("/search", handlers.SearchRestaurants)      // Bộ lọc & Tìm kiếm (q, price, sort...)
+			restaurants.GET("/:id", handlers.GetRestaurantDetail)       // Chi tiết nhà hàng.
+		}
 
-		// v1.GET("/dishes/trending", handlers.GetTrendingDishes)
+		v1.GET("/dishes/trending", handlers.GetTrendingDishes)
 
 		// --- NHÓM BÀI VIẾT (POSTS) ---
 		// posts := v1.Group("/posts")

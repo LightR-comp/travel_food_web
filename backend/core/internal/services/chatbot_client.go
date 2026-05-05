@@ -18,6 +18,7 @@ import (
 
 	//Lấy URL AI Python từ config
 	"backend/core/internal/config"
+	"backend/core/internal/models"
 
 	"backend/core/internal/dto"
 )
@@ -96,29 +97,85 @@ func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]inter
 		return []map[string]interface{}{}
 	}
 
+	dishQuery, hasDishQuery := entities["dish"].(string)
+
 	var results []map[string]interface{}
+	seenNames := make(map[string]bool) // Map để theo dõi các tên nhà hàng đã được xử lý
+
 	for _, r := range restaurants {
-		var featuredDishes []map[string]interface{}
-		for _, m := range r.Menu {
+		// Bỏ qua nếu tên nhà hàng này đã được thêm vào kết quả
+		if _, seen := seenNames[r.Name]; seen {
+			continue
+		}
+		seenNames[r.Name] = true
+
+		// Khởi tạo là một slice rỗng (non-nil) để đảm bảo JSON output là `[]` thay vì `null`
+		featuredDishes := []map[string]interface{}{}
+		// Helper để tạo map món ăn, tránh lặp code
+		createDishMap := func(m models.MenuItem) map[string]interface{} {
 			var ingredients []string
 			if m.Ingredients != "" {
-				json.Unmarshal([]byte(m.Ingredients), &ingredients)
+				// SỬA LỖI: DB lưu ingredients dạng "shrimp,flour", không phải JSON.
+				// Cần dùng strings.Split để xử lý, tương tự cách xử lý 'dietary' ở chatbot.go.
+				items := strings.Split(m.Ingredients, ",")
+				for _, item := range items {
+					trimmedItem := strings.TrimSpace(item)
+					if trimmedItem != "" {
+						ingredients = append(ingredients, trimmedItem)
+					}
+				}
 			}
 			if ingredients == nil {
 				ingredients = []string{}
 			}
-			featuredDishes = append(featuredDishes, map[string]interface{}{
+			return map[string]interface{}{
 				"name":        m.Name,
 				"price":       m.Price,
 				"ingredients": ingredients,
-			})
+			}
+		}
+
+		if hasDishQuery && dishQuery != "" {
+			// Người dùng tìm món cụ thể
+			lowerDishQuery := strings.ToLower(dishQuery)
+			for _, m := range r.Menu {
+				if strings.Contains(strings.ToLower(m.Name), lowerDishQuery) {
+					featuredDishes = append(featuredDishes, createDishMap(m))
+				}
+			}
+
+			// Nếu không tìm thấy món nào khớp, lấy 3 món đầu tiên làm gợi ý
+			if len(featuredDishes) == 0 && len(r.Menu) > 0 {
+				limit := 3
+				if len(r.Menu) < 3 {
+					limit = len(r.Menu)
+				}
+				for i := 0; i < limit; i++ {
+					featuredDishes = append(featuredDishes, createDishMap(r.Menu[i]))
+				}
+			}
+		} else {
+			// Người dùng không tìm món cụ thể, lấy toàn bộ menu (giữ nguyên hành vi cũ)
+			for _, m := range r.Menu {
+				featuredDishes = append(featuredDishes, createDishMap(m))
+			}
+		}
+
+		// Tính giá trung bình từ menu để thay cho giá hardcode
+		var avgPrice float64
+		if len(r.Menu) > 0 {
+			var totalPrice float64
+			for _, item := range r.Menu {
+				totalPrice += item.Price
+			}
+			avgPrice = totalPrice / float64(len(r.Menu))
 		}
 
 		results = append(results, map[string]interface{}{
 			"id":              r.ID,
 			"res_name":        r.Name,
 			"rating":          r.Rating,
-			"price":           50000.0, // Đặt mặc định hoặc parse từ price_range, pydantic cần float
+			"price":           avgPrice, // Sử dụng giá trung bình tính được
 			"image_url":       "https://placehold.co/400x300?text=" + r.Name,
 			"distance_km":     1.5, // Giả định khi không có tọa độ người dùng
 			"type":            r.Type,

@@ -6,9 +6,11 @@
 package handlers
 
 import (
+	"fmt" // Thêm import fmt để sử dụng fmt.Sprintf
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -55,15 +57,28 @@ func ChatbotProcess(c *gin.Context) {
 			log.Printf("[Chatbot] Dữ liệu trả về từ AI: %+v", intentRes)
 		}
 
+		var errorDetail string
+		if err != nil {
+			errorDetail = err.Error()
+		} else if intentRes != nil && intentRes.Error != nil {
+			if e, ok := intentRes.Error.(string); ok {
+				errorDetail = e
+			} else {
+				errorDetail = fmt.Sprintf("%v", intentRes.Error) // Chuyển đổi lỗi sang string
+			}
+		} else {
+			errorDetail = "Lỗi không xác định khi phân tích ý định."
+		}
+
 		// Soft-fallback: AI lỗi nhưng API vẫn trả về câu thoại chống crash UI
 		c.JSON(http.StatusOK, gin.H{
-			"success": true,
-			"message": "Lỗi tại Intent Parse",
+			"success": false, // Đổi thành false khi có lỗi
+			"message": "Hệ thống AI gặp sự cố khi phân tích ý định của bạn.",
 			"data": gin.H{
 				"reply":            "Xin lỗi, hiện tại tôi đang gặp chút trục trặc. Bạn có thể hỏi lại sau nhé!",
 				"suggested_places": []interface{}{},
 			},
-			"error": nil,
+			"error": errorDetail, // Cung cấp thông tin lỗi chi tiết
 		})
 		return
 	}
@@ -74,15 +89,37 @@ func ChatbotProcess(c *gin.Context) {
 		foundRestaurants = []map[string]interface{}{} // Ép kiểu luôn là mảng rỗng, ngăn chặn giá trị null
 	}
 
-	// Lấy ngữ cảnh user (sở thích lưu nội bộ)
-	// BÁM SÁT THEO PYTHON: Khởi tạo đầy đủ các trường preferences
-	// để Python không bị văng lỗi AttributeError khi cố đọc dữ liệu bên trong.
+	// GIAI ĐOẠN 2.5: Lấy ngữ cảnh user (sở thích đã lưu trong DB)
+	// Khởi tạo user context với giá trị mặc định
 	userContext := map[string]interface{}{
 		"user_id": userID,
 		"preferences": map[string]interface{}{
-			"dietary": []string{}, // Bắt buộc phải là mảng (List) theo đúng chuẩn Pydantic
-			"budget":  0,          // Tránh giá trị null
+			"dietary": []string{},
+			"budget":  nil, // Dùng nil để AI biết là không có budget cụ thể
 		},
+	}
+	// Nếu có userID, thử lấy preferences từ DB
+	if userID > 0 {
+		if prefs, err := services.GetUserPreferences(c.Request.Context(), userID); err == nil && prefs != nil {
+			// Xử lý trường dietary: DB có thể lưu dưới dạng chuỗi "vegan,vegetarian"
+			// Cần chuyển đổi thành mảng ["vegan", "vegetarian"] để khớp với Pydantic model của Python
+			var dietaryPreferences []string
+			if prefs.Dietary != "" {
+				items := strings.Split(prefs.Dietary, ",")
+				for _, item := range items {
+					trimmedItem := strings.TrimSpace(item)
+					if trimmedItem != "" {
+						dietaryPreferences = append(dietaryPreferences, trimmedItem)
+					}
+				}
+			}
+
+			// Ghi đè preferences mặc định bằng dữ liệu từ DB
+			userContext["preferences"] = map[string]interface{}{
+				"dietary": dietaryPreferences,         // Sử dụng slice đã được xử lý
+				"budget":  int(prefs.BudgetPerPerson), // Ép kiểu float64 sang int để khớp với Pydantic
+			}
+		}
 	}
 
 	// GIAI ĐOẠN 3: Go -> Python (GENERATE RESPONSE)
@@ -100,14 +137,27 @@ func ChatbotProcess(c *gin.Context) {
 			log.Printf("[Chatbot] Dữ liệu trả về từ AI: %+v", genRes)
 		}
 
+		var errorDetail string
+		if err != nil {
+			errorDetail = err.Error()
+		} else if genRes != nil && genRes.Error != nil {
+			if e, ok := genRes.Error.(string); ok {
+				errorDetail = e
+			} else {
+				errorDetail = fmt.Sprintf("%v", genRes.Error) // Chuyển đổi lỗi sang string
+			}
+		} else {
+			errorDetail = "Lỗi không xác định trong quá trình tạo câu trả lời."
+		}
+
 		c.JSON(http.StatusOK, gin.H{
-			"success": true,
-			"message": "Lỗi tại Response Generation",
+			"success": false, // Đổi thành false khi có lỗi
+			"message": "Hệ thống AI gặp sự cố khi tạo câu trả lời.",
 			"data": gin.H{
 				"reply":            "Xin lỗi, tôi chưa nghĩ ra câu trả lời phù hợp. Bạn có thể đổi cách hỏi được không?",
 				"suggested_places": []interface{}{},
 			},
-			"error": nil,
+			"error": errorDetail, // Cung cấp thông tin lỗi chi tiết
 		})
 		return
 	}

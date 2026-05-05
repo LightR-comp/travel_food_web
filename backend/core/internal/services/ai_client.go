@@ -20,6 +20,7 @@ import (
 	"backend/core/internal/config"
 
 	"backend/core/internal/dto"
+	"log"
 )
 
 // pythonBaseResponse: Cấu trúc tương ứng với BaseResponse bên Python Pydantic
@@ -37,6 +38,16 @@ func CallPythonEngine(reqData dto.AIRecommendRequest) (*dto.AIRecommendResponse,
 	if err != nil {
 		return nil, fmt.Errorf("lỗi đóng gói JSON payload: %v", err)
 	}
+
+    	// In ra console dạng JSON đẹp (Indent) để Nhựt dễ soi tên trường (Tag)
+    	var prettyJSON bytes.Buffer
+    	if err := json.Indent(&prettyJSON, jsonData, "", "  "); err == nil {
+        	log.Printf("\n[DEBUG_SEND_TO_PYTHON]:\n%s\n", prettyJSON.String())
+    	} else {
+        // Nếu không indent được thì in thẳng chuỗi thô
+        	log.Printf("[DEBUG_SEND_TO_PYTHON_RAW]: %s", string(jsonData))
+	}
+
 
 	// 2. Cấu hình HTTP Client với Timeout
 	client := &http.Client{

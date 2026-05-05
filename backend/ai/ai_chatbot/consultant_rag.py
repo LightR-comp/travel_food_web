@@ -19,7 +19,7 @@ api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
 
-shared_model = genai.GenerativeModel('gemini-2.5-flash')
+shared_model = genai.GenerativeModel('gemini-3.1-pro-preview')
 
 
 # --- Custom Exceptions ---
@@ -38,8 +38,13 @@ def _filter_restaurants(request: ChatGenerationRequest, user_allergies: set):
 
     for res in request.found_restaurants:
         try:
-            ingredients_list = res.get('ingredients', [])
-            ingredients_str = ", ".join(ingredients_list).lower()
+            # Lấy tất cả ingredients từ các món ăn trong 'featured_dishes'
+            all_ingredients = []
+            featured_dishes = res.get('featured_dishes', [])
+            for dish in featured_dishes:
+                all_ingredients.extend(dish.get('ingredients', []))
+
+            ingredients_str = ", ".join(all_ingredients).lower()
             
             has_allergen = any(allergen in ingredients_str for allergen in user_allergies)
 
@@ -116,7 +121,8 @@ def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
                         "image_url": res.get("image_url", ""),
                         "distance_km": 0.0,
                         "type": "restaurant",
-                        "featured_dishes": []
+                        # Dùng `or []` để xử lý cả trường hợp key không tồn tại hoặc giá trị là None
+                        "featured_dishes": res.get("featured_dishes") or []
                     },
                     ai_reason=reason,
                     allergy_friendly=is_safe,

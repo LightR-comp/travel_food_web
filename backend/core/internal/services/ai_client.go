@@ -24,47 +24,72 @@ import (
 	"backend/core/internal/models"
 
 	"backend/core/internal/dto"
+	"log"
 )
 
-// CallPythonEngine: Gửi HTTP POST request tới Python AI Service và parse kết quả trả về
+// pythonBaseResponse: Cấu trúc tương ứng với BaseResponse bên Python Pydantic
+type pythonBaseResponse struct {
+	Success bool                    `json:"success"`
+	Message string                  `json:"message"`
+	Data    dto.AIRecommendResponse `json:"data"`
+	Error   interface{}             `json:"error"`
+}
+
+// CallPythonEngine: Gửi request tới Python AI Service và bóc tách dữ liệu từ BaseResponse
 func CallPythonEngine(reqData dto.AIRecommendRequest) (*dto.AIRecommendResponse, error) {
-	// Bước 1: Serialize struct của Go thành định dạng chuỗi JSON (Marshal)
+	// 1. Chuyển đổi struct Go sang JSON
 	jsonData, err := json.Marshal(reqData)
 	if err != nil {
 		return nil, fmt.Errorf("lỗi đóng gói JSON payload: %v", err)
 	}
-	// Bước 2: Khởi tạo HTTP Client.
-	// Thiết lập Timeout (15s) là bắt buộc để ngăn chặn tình trạng treo luồng (thread blocking)
-	// khi Python AI Service không phản hồi kịp thời hoặc gặp lỗi.
+
+    	// In ra console dạng JSON đẹp (Indent) để Nhựt dễ soi tên trường (Tag)
+    	var prettyJSON bytes.Buffer
+    	if err := json.Indent(&prettyJSON, jsonData, "", "  "); err == nil {
+        	log.Printf("\n[DEBUG_SEND_TO_PYTHON]:\n%s\n", prettyJSON.String())
+    	} else {
+        // Nếu không indent được thì in thẳng chuỗi thô
+        	log.Printf("[DEBUG_SEND_TO_PYTHON_RAW]: %s", string(jsonData))
+	}
+
+
+	// 2. Cấu hình HTTP Client với Timeout
 	client := &http.Client{
 		Timeout: 15 * time.Second,
 	}
 
-	//Bước 3: Định nghĩa endpoint của Python service.
-	pythonURL := config.AppConfig.AIServiceURL + "/recommend"
-	// Thực thi HTTP POST request với payload là JSON.
+	// 3. Gọi API Python
+	pythonURL := config.AppConfig.AIServiceURL + "/api/v1/engine/recommend"
 	resp, err := client.Post(pythonURL, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
-		return nil, fmt.Errorf("lỗi gọi Python AI Service: %v", err)
+		return nil, fmt.Errorf("không thể kết nối tới Python AI Service: %v", err)
 	}
-	// Đảm bảo đóng response body sau khi đọc xong để tránh rò rỉ tài nguyên (resource leak)
 	defer resp.Body.Close()
-	//Bước 4: Kiểm tra HTTP Status Code trả về từ service đích.
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Python AI Service trả về lỗi, status code: %d", resp.StatusCode)
-	}
-	//Bước 5: Đọc luồng dữ liệu thô (raw bytes) từ Response Body
+
+	// 4. Đọc dữ liệu trả về
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("lỗi đọc response body từ Python AI Service: %v", err)
+		return nil, fmt.Errorf("lỗi đọc response body: %v", err)
 	}
-	//Bước 6: Deserialize (Unmarshal) chuỗi JSON nhận được thành struct Go
-	var aiResponse dto.AIRecommendResponse
-	if err := json.Unmarshal(bodyBytes, &aiResponse); err != nil {
-		return nil, fmt.Errorf("lỗi parse định dạng JSON từ Python service: %v", err)
+
+	// Kiểm tra Status Code không phải 200
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("python service báo lỗi HTTP %d: %s", resp.StatusCode, string(bodyBytes))
 	}
-	//Bước 7: Trả về kết quả đã được parse thành struct Go
-	return &aiResponse, nil
+
+	// 5. Parse vào struct trung gian để bóc tách Wrapper JSON
+	var wrapper pythonBaseResponse
+	if err := json.Unmarshal(bodyBytes, &wrapper); err != nil {
+		return nil, fmt.Errorf("lỗi giải mã cấu trúc BaseResponse: %v. Body: %s", err, string(bodyBytes))
+	}
+
+	// 6. Kiểm tra logic success từ phía Python
+	if !wrapper.Success {
+		return nil, fmt.Errorf("python AI xử lý thất bại: %v", wrapper.Message)
+	}
+
+	// Trả về phần Data (chứa RecommendedRestaurants)
+	return &wrapper.Data, nil
 }
 
 // Dùng cho chatbot.go
@@ -232,4 +257,3 @@ func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]inter
 		return []map[string]interface{}{}
 	}
 	return results
-}

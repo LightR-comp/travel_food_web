@@ -34,7 +34,8 @@ async def recommend_endpoint(request: RecommendRequest):
         # Hàm này trả về: {"results": [{"id":..., "score":..., "reason":...}, ...]}
         scoring_output = process_scoring(ai_input_dict)
         results_from_logic = scoring_output.get("results", [])
-
+        # Thêm print này:
+        print(f"[DEBUG] AI Scoring results: {results_from_logic}")
         if not results_from_logic:
             return BaseResponse(
                 success=True,

@@ -138,56 +138,6 @@ func UpdateUserPreferences(ctx context.Context, userID int, prefs models.UserPre
 }
 
 // ============================================================
-// CHAT HISTORY
-// ============================================================
-
-type ChatHistoryEntry struct {
-	ID          int       `json:"id"`
-	UserID      int       `json:"user_id"`
-	UserMessage string    `json:"user_message"`
-	BotReply    string    `json:"bot_reply"`
-	CreatedAt   time.Time `json:"created_at"`
-}
-
-// SaveChatHistory lưu tin nhắn của user và bot vào DB
-func SaveChatHistory(ctx context.Context, userID int, userMessage string, botReply string) error {
-	_, err := db.ExecContext(ctx, `
-		INSERT INTO ChatHistory (user_id, user_message, bot_reply, created_at)
-		VALUES (@uid, @userMsg, @botReply, GETDATE())
-	`,
-		sql.Named("uid", userID),
-		sql.Named("userMsg", userMessage),
-		sql.Named("botReply", botReply),
-	)
-	if err != nil {
-		log.Printf("[DB] Lỗi lưu lịch sử chat: %v", err)
-	}
-	return err
-}
-
-func GetChatHistoryByUserID(ctx context.Context, userID int) ([]ChatHistoryEntry, error) {
-	rows, err := db.QueryContext(ctx, `
-		SELECT id, user_id, user_message, bot_reply, created_at
-		FROM ChatHistory
-		WHERE user_id = @uid
-		ORDER BY created_at ASC
-	`, sql.Named("uid", userID))
-	if err != nil {
-		return nil, fmt.Errorf("GetChatHistoryByUserID: %w", err)
-	}
-	defer rows.Close()
-
-	var history []ChatHistoryEntry
-	for rows.Next() {
-		var h ChatHistoryEntry
-		if err := rows.Scan(&h.ID, &h.UserID, &h.UserMessage, &h.BotReply, &h.CreatedAt); err == nil {
-			history = append(history, h)
-		}
-	}
-	return history, nil
-}
-
-// ============================================================
 // RESTAURANT
 // ============================================================
 
@@ -292,62 +242,35 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 	return result, nil
 }
 
-// SearchRestaurantsForChatbot truy vấn quán ăn dựa trên các thực thể intent từ người dùng (Chatbot)
-func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interface{}) ([]models.Restaurant, error) {
-	query := `
-		SELECT r.id, r.name, r.address, r.lat, r.lng, r.rating, r.price_range, r.open_time, r.close_time, r.type
-		FROM Restaurants r
-		WHERE 1=1
-	`
-	var namedArgs []interface{}
 
-	// Lọc theo món ăn (nằm trong tên quán hoặc menu)
-	if dish, ok := entities["dish"].(string); ok && dish != "" {
-		query += ` AND (r.name LIKE @dish OR r.id IN (SELECT restaurant_id FROM MenuItems WHERE name LIKE @dish))`
-		namedArgs = append(namedArgs, sql.Named("dish", "%"+dish+"%"))
-	}
+// Image handling
+func getImagesByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.RestaurantImage, error) {
+	query := fmt.Sprintf(`
+		SELECT id, restaurant_id, image_url, caption, is_thumbnail, created_at
+		FROM RestaurantImages
+		WHERE restaurant_id IN (%s)
+		ORDER BY is_thumbnail DESC
+	`, intSliceToSQL(ids))
 
-	// Lọc theo vị trí (gần đúng qua address)
-	if location, ok := entities["location"].(string); ok && location != "" {
-		query += ` AND r.address LIKE @loc`
-		namedArgs = append(namedArgs, sql.Named("loc", "%"+location+"%"))
-	}
-
-	query += ` ORDER BY r.rating DESC OFFSET 0 ROWS FETCH NEXT 5 ROWS ONLY`
-
-	rows, err := db.QueryContext(ctx, query, namedArgs...)
+	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
-		return nil, fmt.Errorf("SearchRestaurantsForChatbot: %w", err)
+		return nil, err
 	}
 	defer rows.Close()
 
-	var restaurants []models.Restaurant
-	var ids []int
-
+	result := make(map[int][]models.RestaurantImage)
 	for rows.Next() {
-		var r models.Restaurant
+		var img models.RestaurantImage
+		var restaurantID int
 		if err := rows.Scan(
-			&r.ID, &r.Name, &r.Address, &r.Lat, &r.Lng,
-			&r.Rating, &r.PriceRange, &r.OpenTime, &r.CloseTime, &r.Type,
+			&img.ID, &restaurantID, &img.ImageURL,
+			&img.Caption, &img.IsThumbnail, &img.CreatedAt,
 		); err != nil {
 			continue
 		}
-		restaurants = append(restaurants, r)
-		ids = append(ids, r.ID)
+		result[restaurantID] = append(result[restaurantID], img)
 	}
-
-	if len(ids) == 0 {
-		return restaurants, nil
-	}
-
-	menuMap, err := getMenusByRestaurantIDs(ctx, ids)
-	if err == nil {
-		for i := range restaurants {
-			restaurants[i].Menu = menuMap[restaurants[i].ID]
-		}
-	}
-
-	return restaurants, nil
+	return result, nil
 }
 
 func CreateReview(ctx context.Context, rv models.UserRating) (*models.UserRating, error) {
@@ -573,76 +496,76 @@ func LocalLogin(ctx context.Context, username, password string) (*models.User, e
 
 // Tạo reset token, lưu DB, trả về token để gửi mail
 func CreatePasswordResetToken(ctx context.Context, username string) (string, string, error) {
-	// Lấy user_id VÀ email từ DB
-	var userID int
-	var email string
-	row := db.QueryRowContext(ctx, `
+    // Lấy user_id VÀ email từ DB
+    var userID int
+    var email string
+    row := db.QueryRowContext(ctx, `
         SELECT ua.user_id, u.email 
         FROM UserAuth ua
         INNER JOIN Users u ON ua.user_id = u.id
         WHERE ua.provider = 'local' AND ua.provider_id = @username
     `, sql.Named("username", username))
 
-	if err := row.Scan(&userID, &email); err == sql.ErrNoRows {
-		return "", "", fmt.Errorf("không tìm thấy tài khoản")
-	} else if err != nil {
-		return "", "", err
-	}
+    if err := row.Scan(&userID, &email); err == sql.ErrNoRows {
+        return "", "", fmt.Errorf("không tìm thấy tài khoản")
+    } else if err != nil {
+        return "", "", err
+    }
 
-	// Tạo token như cũ
-	b := make([]byte, 32)
-	rand.Read(b)
-	token := hex.EncodeToString(b)
-	exp := time.Now().Add(15 * time.Minute)
+    // Tạo token như cũ
+    b := make([]byte, 32)
+    rand.Read(b)
+    token := hex.EncodeToString(b)
+    exp := time.Now().Add(15 * time.Minute)
 
-	db.ExecContext(ctx, `
+    db.ExecContext(ctx, `
         UPDATE UserAuth SET reset_token = @token, reset_token_exp = @exp
         WHERE provider = 'local' AND provider_id = @username
     `,
-		sql.Named("token", token),
-		sql.Named("exp", exp),
-		sql.Named("username", username),
-	)
+        sql.Named("token", token),
+        sql.Named("exp", exp),
+        sql.Named("username", username),
+    )
 
-	return token, email, nil // trả về cả email
+    return token, email, nil // trả về cả email
 }
 
 // Đổi mật khẩu mới sau khi xác thực token
 func ResetPassword(ctx context.Context, token, newPassword string) error {
-	var userID int
-	var expTime time.Time
+    var userID int
+    var expTime time.Time
 
-	row := db.QueryRowContext(ctx, `
+    row := db.QueryRowContext(ctx, `
         SELECT user_id, reset_token_exp FROM UserAuth
         WHERE reset_token = @token AND provider = 'local'
     `, sql.Named("token", token))
 
-	if err := row.Scan(&userID, &expTime); err == sql.ErrNoRows {
-		return fmt.Errorf("token không hợp lệ hoặc đã hết hạn")
-	} else if err != nil {
-		return err
-	}
+    if err := row.Scan(&userID, &expTime); err == sql.ErrNoRows {
+        return fmt.Errorf("token không hợp lệ hoặc đã hết hạn")
+    } else if err != nil {
+        return err
+    }
 
-	if time.Now().After(expTime) {
-		return fmt.Errorf("token đã hết hạn")
-	}
+    if time.Now().After(expTime) {
+        return fmt.Errorf("token đã hết hạn")
+    }
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
-	if err != nil {
-		return fmt.Errorf("lỗi hash password")
-	}
+    hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+    if err != nil {
+        return fmt.Errorf("lỗi hash password")
+    }
 
-	_, err = db.ExecContext(ctx, `
+    _, err = db.ExecContext(ctx, `
         UPDATE UserAuth
         SET password_hash   = @hash,
             reset_token     = NULL,
             reset_token_exp = NULL
         WHERE user_id = @userID AND provider = 'local'
     `,
-		sql.Named("hash", string(hash)),
-		sql.Named("userID", userID),
-	)
-	return err
+        sql.Named("hash", string(hash)),
+        sql.Named("userID", userID),
+    )
+    return err
 }
 
 // [Nhut]
@@ -745,7 +668,13 @@ func GetRestaurantDetail(ctx context.Context, id int) (*models.RestaurantDetail,
     }
 
     // 4. Mock thêm mảng ảnh (nếu SQL chưa có bảng ảnh riêng)
-    rd.Images = []string{"banner.jpg", "view_quan.jpg"}
+    // rd.Images = []string{"banner.jpg", "view_quan.jpg"}
+    // Do đổi cấu trúc ảnh models
+    rd.Images = []models.RestaurantImage{
+	{ImageURL: "https://storage.yummap.vn/restaurants/" + fmt.Sprintf("%d", id) + "/banner.jpg", IsThumbnail: true},
+	{ImageURL: "https://storage.yummap.vn/restaurants/" + fmt.Sprintf("%d", id) + "/view1.jpg"},
+	{ImageURL: "https://storage.yummap.vn/restaurants/" + fmt.Sprintf("%d", id) + "/view2.jpg"},
+    }
 
     return &rd, nil
 }
@@ -843,4 +772,114 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 	}
 
 	return trendingList, nil
+}
+
+//[Minh]
+// SearchRestaurantsForChatbot truy vấn quán ăn dựa trên các thực thể intent từ người dùng (Chatbot)
+func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interface{}) ([]models.Restaurant, error) {
+	query := `
+		SELECT r.id, r.name, r.address, r.lat, r.lng, r.rating, r.price_range, r.open_time, r.close_time, r.type
+		FROM Restaurants r
+		WHERE 1=1
+	`
+	var namedArgs []interface{}
+
+	// Lọc theo món ăn (nằm trong tên quán hoặc menu)
+	if dish, ok := entities["dish"].(string); ok && dish != "" {
+		query += ` AND (r.name LIKE @dish OR r.id IN (SELECT restaurant_id FROM MenuItems WHERE name LIKE @dish))`
+		namedArgs = append(namedArgs, sql.Named("dish", "%"+dish+"%"))
+	}
+
+	// Lọc theo vị trí (gần đúng qua address)
+	if location, ok := entities["location"].(string); ok && location != "" {
+		query += ` AND r.address LIKE @loc`
+		namedArgs = append(namedArgs, sql.Named("loc", "%"+location+"%"))
+	}
+
+	query += ` ORDER BY r.rating DESC OFFSET 0 ROWS FETCH NEXT 5 ROWS ONLY`
+
+	rows, err := db.QueryContext(ctx, query, namedArgs...)
+	if err != nil {
+		return nil, fmt.Errorf("SearchRestaurantsForChatbot: %w", err)
+	}
+	defer rows.Close()
+
+	var restaurants []models.Restaurant
+	var ids []int
+
+	for rows.Next() {
+		var r models.Restaurant
+		if err := rows.Scan(
+			&r.ID, &r.Name, &r.Address, &r.Lat, &r.Lng,
+			&r.Rating, &r.PriceRange, &r.OpenTime, &r.CloseTime, &r.Type,
+		); err != nil {
+			continue
+		}
+		restaurants = append(restaurants, r)
+		ids = append(ids, r.ID)
+	}
+
+	if len(ids) == 0 {
+		return restaurants, nil
+	}
+
+	menuMap, err := getMenusByRestaurantIDs(ctx, ids)
+	if err == nil {
+		for i := range restaurants {
+			restaurants[i].Menu = menuMap[restaurants[i].ID]
+		}
+	}
+
+	return restaurants, nil
+}
+
+
+// ============================================================
+// CHAT HISTORY
+// ============================================================
+
+type ChatHistoryEntry struct {
+	ID          int       `json:"id"`
+	UserID      int       `json:"user_id"`
+	UserMessage string    `json:"user_message"`
+	BotReply    string    `json:"bot_reply"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
+// SaveChatHistory lưu tin nhắn của user và bot vào DB
+func SaveChatHistory(ctx context.Context, userID int, userMessage string, botReply string) error {
+	_, err := db.ExecContext(ctx, `
+		INSERT INTO ChatHistory (user_id, user_message, bot_reply, created_at)
+		VALUES (@uid, @userMsg, @botReply, GETDATE())
+	`,
+		sql.Named("uid", userID),
+		sql.Named("userMsg", userMessage),
+		sql.Named("botReply", botReply),
+	)
+	if err != nil {
+		log.Printf("[DB] Lỗi lưu lịch sử chat: %v", err)
+	}
+	return err
+}
+
+func GetChatHistoryByUserID(ctx context.Context, userID int) ([]ChatHistoryEntry, error) {
+	rows, err := db.QueryContext(ctx, `
+		SELECT id, user_id, user_message, bot_reply, created_at
+		FROM ChatHistory
+		WHERE user_id = @uid
+		ORDER BY created_at ASC
+	`, sql.Named("uid", userID))
+	if err != nil {
+		return nil, fmt.Errorf("GetChatHistoryByUserID: %w", err)
+	}
+	defer rows.Close()
+
+	var history []ChatHistoryEntry
+	for rows.Next() {
+		var h ChatHistoryEntry
+		if err := rows.Scan(&h.ID, &h.UserID, &h.UserMessage, &h.BotReply, &h.CreatedAt); err == nil {
+			history = append(history, h)
+		}
+	}
+	return history, nil
 }

@@ -24,7 +24,6 @@ import (
 	"backend/core/internal/models"
 
 	"backend/core/internal/dto"
-	"log"
 )
 
 // pythonBaseResponse: Cấu trúc tương ứng với BaseResponse bên Python Pydantic
@@ -257,3 +256,4 @@ func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]inter
 		return []map[string]interface{}{}
 	}
 	return results
+}

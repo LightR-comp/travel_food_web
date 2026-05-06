@@ -25,6 +25,7 @@ type Restaurant struct {
 	IsOpen     bool    `json:"is_open"`
 
 	Menu       []MenuItem `json:"menu"`
+	Images     []RestaurantImage `json:"images"`
 
 	CreatedAt  time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt  time.Time `db:"updated_at" json:"updated_at"`
@@ -32,9 +33,6 @@ type Restaurant struct {
 // RestaurantDetail mở rộng thông tin của Restaurant, có thể bao gồm các trường chi tiết hơn như hình ảnh, đánh giá của người dùng, v.v.
 type RestaurantDetail struct {
 	Restaurant
-
-	// Thông tin chi tiết hơn có thể được thêm vào đây, ví dụ: hình ảnh, đánh giá của người dùng, v.v.
-	Images      []string `json:"images"`
 	UserRatings []UserRating `json:"user_ratings"`
 }
 
@@ -58,4 +56,13 @@ type RestaurantFilter struct {
 	FoodTypes []string `json:"food_types"`
 
 	IsOpen bool `json:"is_open"`
+}
+
+type RestaurantImage struct {
+	ID           int       `json:"id"`
+	RestaurantID int       `json:"restaurant_id"`
+	ImageURL     string    `json:"image_url"`
+	Caption      string    `json:"caption"`
+	IsThumbnail  bool      `json:"is_thumbnail"`
+	CreatedAt    time.Time `json:"created_at"`
 }

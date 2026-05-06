@@ -122,8 +122,15 @@ func LocalLogin(c *gin.Context) {
 		return
 	}
 
+	token, err := services.GenerateJWT(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo token"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Đăng nhập thành công",
+		"token":   token,
 		"user":    user,
 	})
 }

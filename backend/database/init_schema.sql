@@ -127,8 +127,8 @@ CREATE TABLE Comments (
 )
 GO
 
--- Bảng CommentLikes: Like bài viết
-CREATE TABLE CommentLikes (
+-- Bảng PostLikes: Like bài viết
+CREATE TABLE PostLikes (
     id         BIGINT IDENTITY(1,1) PRIMARY KEY,
     post_id    BIGINT NOT NULL FOREIGN KEY REFERENCES Posts(id) ON DELETE CASCADE,
     user_id    INT NOT NULL FOREIGN KEY REFERENCES Users(id),
@@ -153,5 +153,15 @@ CREATE TABLE Polls (
     question    NVARCHAR(500) NOT NULL,
     options     NVARCHAR(MAX) NOT NULL,
     total_votes INT DEFAULT 0
+)
+GO
+
+CREATE TABLE RestaurantImages (
+    id            INT IDENTITY(1,1) PRIMARY KEY,
+    restaurant_id INT NOT NULL FOREIGN KEY REFERENCES Restaurants(id) ON DELETE CASCADE,
+    image_url     NVARCHAR(500) NOT NULL,
+    caption       NVARCHAR(255) NULL,
+    is_thumbnail  BIT DEFAULT 0,
+    created_at    DATETIME DEFAULT GETDATE()
 )
 GO

@@ -1,13 +1,18 @@
 // forum.go chứa các mô hình dữ liệu liên quan đến diễn đàn (forum) của quán ăn
 package models
 
-type User struct {
+import (
+    "encoding/json"
+    "time"
+)
+
+/*type User struct {
     ID          uint64 `json:"id"`
     Username    string `json:"username"`
     DisplayName string `json:"display_name"`
     AvatarURL   string `json:"avatar_url"`
     CreatedAt   time.Time `json:"created_at"`
-}
+}*/
 
 type Post struct {
     ID            uint64    `json:"id"`
@@ -23,6 +28,8 @@ type Post struct {
     IsLocked      bool      `json:"is_locked"`
     CreatedAt     time.Time `json:"created_at"`
     UpdatedAt     time.Time `json:"updated_at"`
+
+	Comments []Comment `json:"comments,omitempty"`
 }
 
 type Comment struct {

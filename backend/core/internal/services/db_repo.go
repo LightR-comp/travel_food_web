@@ -194,10 +194,19 @@ func GetRestaurantsNearby(ctx context.Context, q NearbyQuery) ([]models.Restaura
 		return restaurants, nil
 	}
 
+	// Lấy menu
 	menuMap, err := getMenusByRestaurantIDs(ctx, ids)
 	if err == nil {
 		for i := range restaurants {
 			restaurants[i].Menu = menuMap[restaurants[i].ID]
+		}
+	}
+
+	// Lấy ảnh
+	imageMap, err := getImagesByRestaurantIDs(ctx, ids)
+	if err == nil {
+		for i := range restaurants {
+			restaurants[i].Images = imageMap[restaurants[i].ID]
 		}
 	}
 
@@ -228,6 +237,37 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 			continue
 		}
 		result[restaurantID] = append(result[restaurantID], item)
+	}
+	return result, nil
+}
+
+
+// Image handling
+func getImagesByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.RestaurantImage, error) {
+	query := fmt.Sprintf(`
+		SELECT id, restaurant_id, image_url, caption, is_thumbnail, created_at
+		FROM RestaurantImages
+		WHERE restaurant_id IN (%s)
+		ORDER BY is_thumbnail DESC
+	`, intSliceToSQL(ids))
+
+	rows, err := db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make(map[int][]models.RestaurantImage)
+	for rows.Next() {
+		var img models.RestaurantImage
+		var restaurantID int
+		if err := rows.Scan(
+			&img.ID, &restaurantID, &img.ImageURL,
+			&img.Caption, &img.IsThumbnail, &img.CreatedAt,
+		); err != nil {
+			continue
+		}
+		result[restaurantID] = append(result[restaurantID], img)
 	}
 	return result, nil
 }
@@ -314,63 +354,6 @@ func updateAvgRating(restaurantID int) {
 		WHERE id = @rid
 	`, sql.Named("rid", restaurantID))
 }
-
-// ============================================================
-// FORUM
-// ============================================================
-
-/*func CreateTopic(ctx context.Context, topic models.ForumTopic) (*models.ForumTopic, error) {
-	row := db.QueryRowContext(ctx, `
-		INSERT INTO ForumTopics (user_uid, title, content, created_at)
-		OUTPUT INSERTED.id, INSERTED.created_at
-		VALUES (@uid, @title, @content, GETDATE())
-	`,
-		sql.Named("uid", topic.UserUID),
-		sql.Named("title", topic.Title),
-		sql.Named("content", topic.Content),
-	)
-	if err := row.Scan(&topic.ID, &topic.CreatedAt); err != nil {
-		return nil, fmt.Errorf("CreateTopic: %w", err)
-	}
-	return &topic, nil
-}
-
-func GetTopics(ctx context.Context) ([]models.ForumTopic, error) {
-	rows, err := db.QueryContext(ctx, `
-		SELECT t.id, t.user_uid, u.name, t.title, t.content, t.created_at
-		FROM ForumTopics t
-		LEFT JOIN Users u ON t.user_uid = u.uid
-		ORDER BY t.created_at DESC
-	`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var topics []models.ForumTopic
-	for rows.Next() {
-		var t models.ForumTopic
-		rows.Scan(&t.ID, &t.UserUID, &t.UserName, &t.Title, &t.Content, &t.CreatedAt)
-		topics = append(topics, t)
-	}
-	return topics, nil
-}
-
-func CreateComment(ctx context.Context, comment models.ForumComment) (*models.ForumComment, error) {
-	row := db.QueryRowContext(ctx, `
-		INSERT INTO ForumComments (topic_id, user_uid, content, created_at)
-		OUTPUT INSERTED.id, INSERTED.created_at
-		VALUES (@topicID, @uid, @content, GETDATE())
-	`,
-		sql.Named("topicID", comment.TopicID),
-		sql.Named("uid", comment.UserUID),
-		sql.Named("content", comment.Content),
-	)
-	if err := row.Scan(&comment.ID, &comment.CreatedAt); err != nil {
-		return nil, fmt.Errorf("CreateComment: %w", err)
-	}
-	return &comment, nil
-}*/
 
 // ============================================================
 // HELPER UTILS

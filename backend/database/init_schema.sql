@@ -93,6 +93,8 @@ CREATE TABLE UserRatings (
 )
 GO
 
+
+
 ALTER TABLE UserAuth 
 ADD reset_token     NVARCHAR(255) NULL,
     reset_token_exp DATETIME      NULL;

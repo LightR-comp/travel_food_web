@@ -102,19 +102,27 @@ def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
         ai_reply = "Dạ, em đang gặp chút sự cố ạ."
 
     # --- Bước 4: Build response — lỗi ở đây không ảnh hưởng ai_reply ---
+    suggested_places = []
     try:
-        warning_set = {r for r, _ in warning_restaurants}
-        safe_set = {r for r, _ in safe_restaurants}
-
-        suggested_places = [
-            PlaceInfo(
-                restaurant=res,
-                ai_reason=reason,
-                allergy_friendly=res not in warning_set,  # Bỏ list comprehension lồng nhau
-                tags=["An toàn"] if res in safe_set else ["Cần lưu ý"]
-            )
-            for res, reason in safe_restaurants + warning_restaurants
-        ]
+        for is_safe, items in [(True, safe_restaurants), (False, warning_restaurants)]:
+            for res, reason in items:
+                place = PlaceInfo(
+                    restaurant={
+                        "id": res.get("id", 0),
+                        "res_name": res.get("res_name", "Không tên"),
+                        "rating": res.get("rating", 0.0),
+                        "price": res.get("price", 0.0),
+                        "image_url": res.get("image_url", ""),
+                        "distance_km": 0.0,
+                        "type": "restaurant",
+                        # Dùng `or []` để xử lý cả trường hợp key không tồn tại hoặc giá trị là None
+                        "featured_dishes": res.get("featured_dishes") or []
+                    },
+                    ai_reason=reason,
+                    allergy_friendly=is_safe,
+                    tags=["An toàn"] if is_safe else ["Cần lưu ý"]
+                )
+                suggested_places.append(place)
     except Exception as e:
         logger.error(f"Lỗi khi build suggested_places: {e}", exc_info=True)
         suggested_places = []  # Fallback — vẫn trả về ai_reply

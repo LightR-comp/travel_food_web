@@ -13,6 +13,13 @@ func SetupRouter(r *gin.Engine) {
 		// --- NHÓM CHATBOT AI ---
 		chat := v1.Group("/chat")
 		{
+			chat.POST("/message", handlers.ChatbotProcess)        // Xử lý tin nhắn (Intent -> DB -> Gen text)
+			chat.GET("/history/:userId", handlers.GetChatHistory) // Lấy lịch sử chat
+		}
+
+		// --- NHÓM GỢI Ý QUÁN ĂN ---
+		v1.POST("/recommend", handlers.GetRecommendations)
+
 			chat.POST("/message", handlers.ChatbotProcess)             // Xử lý tin nhắn (Intent -> DB -> Gen text)
 		//	chat.GET("/history/:userId", handlers.GetChatHistory)      // Lấy lịch sử chat
 		}
@@ -25,11 +32,11 @@ func SetupRouter(r *gin.Engine) {
 		// --- NHÓM XÁC THỰC & NGƯỜI DÙNG ---
 		auth := v1.Group("/auth")
 		{
-			auth.POST("/oauth",           handlers.Login)
-			auth.POST("/register",        handlers.Register)
-			auth.POST("/login",           handlers.LocalLogin)
+			auth.POST("/oauth", handlers.Login)
+			auth.POST("/register", handlers.Register)
+			auth.POST("/login", handlers.LocalLogin)
 			auth.POST("/forgot-password", handlers.ForgotPassword)
-			auth.POST("/reset-password",  handlers.ResetPassword)
+			auth.POST("/reset-password", handlers.ResetPassword)
 		}
 
 		protected := v1.Group("", middlewares.FirebaseAuthMiddleware())
@@ -39,6 +46,32 @@ func SetupRouter(r *gin.Engine) {
 		}
 
 		// --- NHÓM NHÀ HÀNG & MÓN ĂN ---
+		// restaurants := v1.Group("/restaurants")
+		// {
+		// 	restaurants.GET("/popular", handlers.GetPopularRestaurants) // Good spots for food
+		// 	restaurants.GET("/search", handlers.SearchRestaurants)      // Bộ lọc & Tìm kiếm (q, price, sort...)
+		// 	restaurants.GET("/:id", handlers.GetRestaurantDetail)       // Chi tiết nhà hàng.
+		// }
+
+		// v1.GET("/dishes/trending", handlers.GetTrendingDishes)
+
+		// --- NHÓM BÀI VIẾT (POSTS) ---
+		// posts := v1.Group("/posts")
+		// {
+		// 	// Public routes (Xem không cần đăng nhập)
+		// 	posts.GET("/popular", handlers.GetPopularPosts) // Bài review hot
+		// 	posts.GET("", handlers.GetListPosts)            // Danh sách bài viết (Phân trang/Topic)
+		// 	posts.GET("/:id", handlers.GetPostDetail)       // Chi tiết bài viết + Comments
+
+		// 	// Private routes (Cần Middleware Auth)
+		// 	authorized := posts.Group("/")
+		// 	authorized.Use(middleware.FirebaseAuthMiddleware())
+		// 	{
+		// 		authorized.POST("", handlers.CreatePost)                // Đăng bài mới
+		// 		authorized.POST("/:id/comments", handlers.AddComment)    // Bình luận bài viết, :id là ID bài viết
+		// 		authorized.POST("/:id/likes", handlers.LikePost)        // Thả tim, :id là ID bài viết
+		// 	}
+		// }
 		restaurants := v1.Group("/restaurants")
 		{
 			restaurants.GET("/popular", handlers.GetPopularRestaurants) // Good spots for food
@@ -72,5 +105,7 @@ func SetupRouter(r *gin.Engine) {
 		// 	utils.GET("/weather", handlers.GetWeather)
 		// 	utils.GET("/currency", handlers.GetExchangeRate)
 		// }
+	}
+}
 	}
 	}

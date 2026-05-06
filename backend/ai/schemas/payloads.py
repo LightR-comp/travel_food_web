@@ -58,21 +58,12 @@ class AIResultItem(BaseModel):
 class RecommendResponse(BaseModel):
     recommended_restaurants: List[AIResultItem]
 
-class ChatIntentRequest(BaseModel):
-    message: str = Field(min_length=1, max_length=500)
-
-    @field_validator("message")
-    @classmethod
-    def message_not_blank(cls, v):
-        if not v.strip():
-            raise ValueError("Tin nhắn không được để trống")
-        return v.strip()
-
 ### CHATBOT_FLOW:
 
 
 # Lần gọi 1: Phân tích ý định
 class ChatIntentRequest(BaseModel):
+    user_id: Optional[int] = None
     message: str = Field(min_length=1, max_length=500)
 
     @field_validator("message")
@@ -88,10 +79,21 @@ class IntentData(BaseModel):   # python trả về
     confidence: float
 
 # Lần gọi 2: Tạo câu trả lời tự nhiên
+# 2 class mới này sẽ thay thế cho RecommendRequest và RecommendResponse đã dùng ở giai đoạn 1
+# Vì chúng ta cần thêm ngữ cảnh người dùng vào luồng chatbot.
+class ChatUserPreferences(BaseModel):
+    dietary: Optional[List[str]] = []
+    budget: Optional[int] = None
+
+class ChatUserContext(BaseModel):
+    user_id: int
+    preferences: ChatUserPreferences = ChatUserPreferences()
+
 class ChatGenerationRequest(BaseModel):
     user_message: str = Field(min_length=1, max_length=500)
+    intent: str
     found_restaurants: list = Field(max_length=20)  # Tránh list khổng lồ
-    user_context: Optional[UserContext] = None
+    user_context: Optional[ChatUserContext] = None # Thay cho class UserContext đã dùng ở RecommendRequest
 
 class PlaceInfo(BaseModel):
     restaurant: RestaurantInput

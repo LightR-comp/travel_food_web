@@ -66,7 +66,7 @@ const SignupPage = () => {
         to="/"
         className="fixed top-5 left-6 z-50 flex items-center gap-1.5 px-4 py-2 bg-white/20 backdrop-blur border border-white/35 rounded-full text-white text-xs font-semibold hover:bg-white/35 hover:-translate-x-1 transition-all"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3.5 h-3.5">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-5 h-5">
           <polyline points="15,18 9,12 15,6" />
         </svg>
         Về trang chủ
@@ -80,23 +80,11 @@ const SignupPage = () => {
       </div>
 
       {/* Card */}
-      <div className="bg-white rounded-[28px] shadow-[0_24px_64px_rgba(60,20,10,0.22)] w-full max-w-[780px] overflow-hidden flex animate-fade-up pt-7">
-
-        {/* Left: decorative white side */}
-        <div className="hidden md:flex w-[220px] flex-shrink-0 bg-white items-center justify-center p-6">
-          <div className="w-[180px] rounded-2xl overflow-hidden shadow-[0_8px_24px_rgba(60,20,10,0.14)]">
-            <img
-              src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80"
-              alt="Ẩm thực Việt"
-              className="w-full h-[320px] object-cover hover:scale-105 transition-transform duration-700"
-              id="deco-food-img"
-            />
-          </div>
-        </div>
+      <div className="bg-white rounded-[28px] shadow-[0_24px_64px_rgba(60,20,10,0.22)] w-full max-w-[480px] overflow-hidden flex animate-fade-up pt-7">
 
         {/* Right: peach form panel */}
         <div
-          className="flex-1 flex flex-col items-center px-9 py-7 m-4 mr-5 ml-2 rounded-[20px]"
+          className="flex-1 flex flex-col items-center px-9 py-7 m-4  rounded-[20px]"
           style={{ background: '#FDECD8' }}
         >
           <h1 className="font-[Baloo_2,sans-serif] text-[1.6rem] font-extrabold text-[#5C2A1A] tracking-[2px] mb-5">

@@ -87,7 +87,7 @@ DECLARE @IdNNQuan INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Nhi Nhi
 
 DECLARE @IdBanhCanhBaTam INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Bánh Canh Bà Tám Chợ Cầu');
 DECLARE @IdComChayTN INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Cơm chay Thiện Nhẫn');
-DECLARE @IdBanhCanhCaLoc INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Bánh canh cá lóc Cường Đô La');
+
 DECLARE @IdKDLBenXua INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Khu du lịch Bến Xưa');
 DECLARE @IdBunDauMetQuan INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Bún đậu mắm tôm Mẹt Quán');
 DECLARE @IdMiQuangHQ INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'MÌ QUẢNG HƯƠNG QUÊ');
@@ -146,7 +146,7 @@ INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingre
 (@IdBunHaiDang, N'Tô Thịt + Nem', N'Bún thịt nướng ăn kèm nem nướng đậm đà', 50000, 'vietnamese', 'pork,sausage,noodle'),
 (@IdBunHaiDang, N'Tô Chả Giò + Nem', N'Lựa chọn không thịt nướng với chả giò và nem nướng', 50000, 'vietnamese', 'spring roll,sausage,noodle'),
 (@IdBunHaiDang, N'Tô Thịt Không', N'Bún thịt nướng thuần túy', 50000, 'vietnamese', 'pork,noodle'),
-(@IdBunHaiDang, N'Tô Chả Giò Không', N'Bún ăn kèm chả giò chiên giòn', 50000, 'vietnamese', 'spring roll,noodle')
+(@IdBunHaiDang, N'Tô Chả Giò Không', N'Bún ăn kèm chả giò chiên giòn', 50000, 'vietnamese', 'spring roll,noodle'),
 
 -- Papaxốt --
 (@IdPapaxot, N'Cơm Xèo Bò Đặc Biệt', N'Cơm nóng trên chảo xèo xèo cùng thịt bò, trứng ốp la và ngô hạt', 97000, 'vietnamese', 'beef,egg,corn,rice'),
@@ -160,7 +160,7 @@ INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingre
 (@IdPapaxot, N'Cơm Xèo Gà Phi Lê', N'Phần ức gà phi lê mềm, ít béo dành cho người ăn kiêng', 69000, 'vietnamese', 'chicken,rice'),
 (@IdPapaxot, N'Cơm Xèo Gà Xúc Xắc (Sốt Teriyaki)', N'Gà cắt viên xúc xắc thấm sốt Teriyaki Nhật Bản', 59000, 'vietnamese', 'chicken,sausage,teriyaki sauce,rice'),
 (@IdPapaxot, N'Cơm Xèo Gà Áp Chảo', N'Gà áp chảo giòn da, thịt bên trong vẫn giữ được độ ẩm', 59000, 'vietnamese', 'chicken,rice'),
-(@IdPapaxot, N'Cơm Xèo Gà Hải Sản', N'Sự kết hợp độc đáo giữa gà và hải sản trên chảo xèo xèo', 85000, 'vietnamese', 'chicken,seafood,rice')
+(@IdPapaxot, N'Cơm Xèo Gà Hải Sản', N'Sự kết hợp độc đáo giữa gà và hải sản trên chảo xèo xèo', 85000, 'vietnamese', 'chicken,seafood,rice'),
 
 -- Bún đậu Homemade --
 (@IdBunHomemade, N'Bún Đậu No Nê (1-2 người)', N'Phiên bản nâng cấp gồm: bún lá, đậu mơ, chả cốm, thịt chân giò, ba rọi riềng mẻ, dồi sụn', 189000, 'vietnamese', 'noodle,tofu,pork,spring roll,shrimp paste'),
@@ -195,22 +195,22 @@ INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingre
 (@IdILOVEKEM, N'Kem tự chọn (100gram)', N'Khách hàng tự chọn các vị kem yêu thích: Sầu riêng, Trà xanh, Dưa lưới, Dâu, Bạc hà...', 29000, 'dessert', 'ice cream,topping,fruit'),
 
 -- Lẩu dê Lâm ký --
-(@IdDeLamLy, N'Lẩu Dê (Nhỏ)', N'Lẩu dê tươi nấu kiểu truyền thống, nước dùng thanh ngọt', 320000, 'goat', 'goat meat,herb,tofu,vegetable'),
-(@IdDeLamLy, N'Thịt Dê Nướng', N'Thịt dê tươi tẩm ướp gia vị đậm đà nướng than hồng', 175000, 'goat', 'goat meat,garlic,chili'),
-(@IdDeLamLy, N'Lòng Dê', N'Lòng dê tươi chế biến sạch, dai giòn sần sật', 160000, 'goat', 'goat intestine'),
-(@IdDeLamLy, N'Cháo Dê', N'Cháo gạo thơm nấu cùng thịt dê bằm bổ dưỡng', 45000, 'goat', 'goat meat,rice,ginger'),
-(@IdDeLamLy, N'Tiết Canh Dê', N'Món tiết canh dê tươi đặc sản', 40000, 'goat', 'goat blood,peanut,herb'),
-(@IdDeLamLy, N'Dê Tiềm Thuốc Bắc (Đặt trước)', N'Dê hầm các vị thuốc bắc quý hiếm, bồi bổ sức khỏe (Thố lớn)', 1000000, 'goat', 'goat meat,chinese medicine,herb'),
-(@IdDeLamLy, N'Mì Thêm', N'Mì trứng ăn kèm lẩu', 17000, 'side_dish', 'egg noodle'),
-(@IdDeLamLy, N'Bánh Phở Thêm', N'Bánh phở tươi ăn kèm lẩu', 17000, 'side_dish', 'rice noodle'),
-(@IdDeLamLy, N'Bún Thêm', N'Bún tươi ăn kèm lẩu', 14000, 'side_dish', 'noodle'),
-(@IdDeLamLy, N'Đậu Hũ Chiên', N'Đậu hũ chiên vàng giòn', 17000, 'side_dish', 'tofu'),
-(@IdDeLamLy, N'Rau Thêm', N'Các loại rau ăn kèm lẩu dê', 14000, 'side_dish', 'vegetable'),
-(@IdDeLamLy, N'Bia Heineken (Lon)', N'Bia Heineken lon ướp lạnh', 25000, 'drink', 'beer'),
-(@IdDeLamLy, N'Bia Tiger (Lon)', N'Bia Tiger lon ướp lạnh', 22000, 'drink', 'beer'),
-(@IdDeLamLy, N'Soda Chanh', N'Nước soda chanh đường giải nhiệt', 15000, 'drink', 'soda,lemon'),
-(@IdDeLamLy, N'Nước Suối', N'Nước suối đóng chai', 10000, 'drink', 'water'),
-(@IdDeLamLy, N'Trà Đá', N'Ly trà đá mát lạnh', 2000, 'drink', 'tea'),
+(@IdDeLamKy, N'Lẩu Dê (Nhỏ)', N'Lẩu dê tươi nấu kiểu truyền thống, nước dùng thanh ngọt', 320000, 'goat', 'goat meat,herb,tofu,vegetable'),
+(@IdDeLamKy, N'Thịt Dê Nướng', N'Thịt dê tươi tẩm ướp gia vị đậm đà nướng than hồng', 175000, 'goat', 'goat meat,garlic,chili'),
+(@IdDeLamKy, N'Lòng Dê', N'Lòng dê tươi chế biến sạch, dai giòn sần sật', 160000, 'goat', 'goat intestine'),
+(@IdDeLamKy, N'Cháo Dê', N'Cháo gạo thơm nấu cùng thịt dê bằm bổ dưỡng', 45000, 'goat', 'goat meat,rice,ginger'),
+(@IdDeLamKy, N'Tiết Canh Dê', N'Món tiết canh dê tươi đặc sản', 40000, 'goat', 'goat blood,peanut,herb'),
+(@IdDeLamKy, N'Dê Tiềm Thuốc Bắc (Đặt trước)', N'Dê hầm các vị thuốc bắc quý hiếm, bồi bổ sức khỏe (Thố lớn)', 1000000, 'goat', 'goat meat,chinese medicine,herb'),
+(@IdDeLamKy, N'Mì Thêm', N'Mì trứng ăn kèm lẩu', 17000, 'side_dish', 'egg noodle'),
+(@IdDeLamKy, N'Bánh Phở Thêm', N'Bánh phở tươi ăn kèm lẩu', 17000, 'side_dish', 'rice noodle'),
+(@IdDeLamKy, N'Bún Thêm', N'Bún tươi ăn kèm lẩu', 14000, 'side_dish', 'noodle'),
+(@IdDeLamKy, N'Đậu Hũ Chiên', N'Đậu hũ chiên vàng giòn', 17000, 'side_dish', 'tofu'),
+(@IdDeLamKy, N'Rau Thêm', N'Các loại rau ăn kèm lẩu dê', 14000, 'side_dish', 'vegetable'),
+(@IdDeLamKy, N'Bia Heineken (Lon)', N'Bia Heineken lon ướp lạnh', 25000, 'drink', 'beer'),
+(@IdDeLamKy, N'Bia Tiger (Lon)', N'Bia Tiger lon ướp lạnh', 22000, 'drink', 'beer'),
+(@IdDeLamKy, N'Soda Chanh', N'Nước soda chanh đường giải nhiệt', 15000, 'drink', 'soda,lemon'),
+(@IdDeLamKy, N'Nước Suối', N'Nước suối đóng chai', 10000, 'drink', 'water'),
+(@IdDeLamKy, N'Trà Đá', N'Ly trà đá mát lạnh', 2000, 'drink', 'tea'),
 
 -- Quán nướng Yaki --
 (@IdNuongYaki, N'Sashimi Cá Hồi', N'Cá hồi tươi thái lát, vị béo ngậy tự nhiên', 175000, 'japanese', 'salmon'),

@@ -16,6 +16,7 @@ import (
 	"context"
 	"io"
 	"log"
+	"sort"
 	"strings"
 	"time"
 
@@ -130,8 +131,16 @@ func CallAIChatGenerate(req dto.AIChatGenerateRequest) (*dto.AIChatGenerateRespo
 	return &result, nil
 }
 
+// rankedRestaurant là một helper struct để giữ một nhà hàng và điểm số đã tính toán của nó để sắp xếp.
+type rankedRestaurant struct {
+	// Giữ con trỏ để tránh copy struct lớn
+	restaurant models.Restaurant
+	finalScore float64
+}
+
 // FetchRestaurantsFromEntities nhận Entities để chọc vào Database lấy data quán ăn (GIAI ĐOẠN 2)
-func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]interface{}) []map[string]interface{} {
+// Nó cũng sẽ tính toán lại điểm và sắp xếp dựa trên lịch sử tương tác của người dùng.
+func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]interface{}, userID int) []map[string]interface{} {
 	if entities == nil {
 		entities = make(map[string]interface{})
 	}
@@ -142,12 +151,77 @@ func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]inter
 		return []map[string]interface{}{}
 	}
 
+	var rankedList []rankedRestaurant
+
+	// GIAI ĐOẠN 2.1: Re-ranking dựa trên lịch sử trò chuyện (implicit relevance)
+	if userID > 0 && len(restaurants) > 0 {
+		// Thay vì đếm lượt click/like (tương tác tường minh), chúng ta sẽ tính điểm liên quan
+		// bằng cách phân tích từ khóa trong toàn bộ lịch sử chat của người dùng
+		// và so sánh với thông tin (tags) của nhà hàng. Đây là một dạng cá nhân hóa ngầm.
+		// Hàm GetUserInteractionCounts cũ vẫn được giữ lại để phục vụ cho endpoint /recommend.
+		relevanceScores, err := CalculateChatRelevanceScores(ctx, userID, restaurants)
+		if err != nil {
+			log.Printf("[Chatbot] Lỗi tính điểm liên quan từ lịch sử chat: %v", err)
+			// Không làm gián đoạn, chỉ log lỗi và tiếp tục với danh sách ban đầu
+		} else {
+			// --- Logic tính điểm và sắp xếp lại ---
+			const (
+				// Trọng số này có thể cần tinh chỉnh. 0.2 điểm cho mỗi từ khóa khớp.
+				relevanceWeight = 0.2
+				maxBonusScore   = 2.5 // Điểm thưởng tối đa để không làm sai lệch điểm rating gốc
+			)
+
+			for _, r := range restaurants {
+				// Lấy điểm khớp từ map, mặc định là 0
+				matchCount := relevanceScores[r.ID]
+
+				// Tính điểm thưởng
+				bonusScore := float64(matchCount) * relevanceWeight
+				if bonusScore > maxBonusScore {
+					bonusScore = maxBonusScore // Áp dụng mức trần (max cap)
+				}
+
+				// final_score = old_score + bonus_score. old_score ở đây là r.Rating
+				finalScore := r.Rating + bonusScore
+
+				rankedList = append(rankedList, rankedRestaurant{
+					restaurant: r,
+					finalScore: finalScore,
+				})
+			}
+
+			// Sắp xếp danh sách theo finalScore giảm dần
+			sort.Slice(rankedList, func(i, j int) bool {
+				return rankedList[i].finalScore > rankedList[j].finalScore
+			})
+		}
+	} else {
+		// Nếu không có re-ranking, chuyển đổi `restaurants` thành `rankedList` với điểm số mặc định
+		for _, r := range restaurants {
+			rankedList = append(rankedList, rankedRestaurant{
+				restaurant: r,
+				finalScore: r.Rating, // Điểm ban đầu là rating gốc
+			})
+		}
+	}
+
+	// --- Phần còn lại của hàm giữ nguyên, xử lý danh sách `restaurants` đã được re-rank và giới hạn top 3 ---
 	dishQuery, hasDishQuery := entities["dish"].(string)
+
+	// Chỉ lấy Top 3 để xử lý và gửi cho AI
+	limit := 3
+	if len(rankedList) < limit {
+		limit = len(rankedList)
+	}
+	topRankedList := rankedList[:limit]
 
 	var results []map[string]interface{}
 	seenNames := make(map[string]bool) // Map để theo dõi các tên nhà hàng đã được xử lý
 
-	for _, r := range restaurants {
+	for _, rankedItem := range topRankedList {
+		r := rankedItem.restaurant
+		finalScore := rankedItem.finalScore
+
 		// Bỏ qua nếu tên nhà hàng này đã được thêm vào kết quả
 		if _, seen := seenNames[r.Name]; seen {
 			continue
@@ -225,6 +299,7 @@ func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]inter
 			"distance_km":     1.5, // Giả định khi không có tọa độ người dùng
 			"type":            r.Type,
 			"featured_dishes": featuredDishes,
+			"final_score":     finalScore, // Thêm điểm số đã tính vào đây
 		})
 	}
 

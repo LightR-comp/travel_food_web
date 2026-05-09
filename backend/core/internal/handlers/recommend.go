@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -57,13 +58,23 @@ func GetRecommendations(c *gin.Context) {
 	// Ưu tiên 2: Xử lý giá trị mặc định
 	if req.Preferences.Budget == 0 { req.Preferences.Budget = 100000 }
 	if req.Preferences.People == 0 { req.Preferences.People = 1 }
-
+	// Đảm bảo Dietary và FoodTypes không bị null khi lên JSON
+	if req.Preferences.Dietary == nil {
+    		req.Preferences.Dietary = []string{}
+	}
+	if req.Preferences.FoodTypes == nil {
+    		req.Preferences.FoodTypes = []string{}
+	}
 	// Truy vấn quán ăn quanh vị trí
 	restaurants, err := services.GetRestaurantsNearby(ctx, services.NearbyQuery{
 		Latitude:  req.Location.Lat,
 		Longitude: req.Location.Lng,
 		RadiusKm:  req.Location.RadiusKm,
 	})
+	// log.Printf("[DEBUG] Số lượng quán lấy từ DB: %d", len(restaurants))
+	// for _, r := range restaurants {
+	// 	log.Printf("[DEBUG] Restaurant ID trong DB: %d - Tên: %s", r.ID, r.Name)
+	// }
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.RecommendResponse{Success: false, Message: "Lỗi DB"})
 		return
@@ -84,7 +95,8 @@ func GetRecommendations(c *gin.Context) {
 		UserIntent:  utils.ToUserContext(req),
 		Restaurants: aiInput,
 	}
-
+	// // Thêm log này:
+	//log.Printf("[DEBUG] Payload gửi sang AI: %+v", aiReq)
 	// Gọi Python Service chấm điểm
 	aiResp, err := services.CallPythonEngine(aiReq)
 	if err != nil {
@@ -100,6 +112,7 @@ func GetRecommendations(c *gin.Context) {
 	}
 
 	for _, aiRes := range aiResp.RecommendedRestaurants {
+		log.Printf("[DEBUG] AI trả về ID: %d", aiRes.ID)
 		if original, exists := resMap[aiRes.ID]; exists {
 			summary := dto.RestaurantSummary{
 				ID: original.ID,
@@ -119,7 +132,7 @@ func GetRecommendations(c *gin.Context) {
 					Score: aiRes.Score,
 					Reason: aiRes.Reason,
 				},
-			}
+			} 
 			if len(original.Menu) > 0 {
 				summary.SignatureDish = dto.SignatureDishDTO{
 					DishName: original.Menu[0].Name,

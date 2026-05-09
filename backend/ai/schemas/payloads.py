@@ -41,7 +41,7 @@ class RestaurantInput(BaseModel):
     res_name: str
     rating: float
     price: float
-    image_url: str
+    image_url: str = "" 
     distance_km: float
     type: str
     featured_dishes: List[SummaryDishInput] = []

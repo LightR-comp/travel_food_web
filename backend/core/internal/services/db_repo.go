@@ -320,13 +320,25 @@ func GetRestaurantsNearby(ctx context.Context, q NearbyQuery) ([]models.Restaura
 }
 
 func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.MenuItem, error) {
+	if len(ids) == 0 {
+		return make(map[int][]models.MenuItem), nil
+	}
+
+	// Sử dụng placeholders để tránh SQL Injection (mặc dù ID là int nhưng đây là best practice)
+	placeholders := make([]string, len(ids))
+	args := make([]interface{}, len(ids))
+	for i, id := range ids {
+		placeholders[i] = fmt.Sprintf("@p%d", i)
+		args[i] = sql.Named(fmt.Sprintf("p%d", i), id)
+	}
+
 	query := fmt.Sprintf(`
 		SELECT restaurant_id, id, name, description, price, food_type, ingredients
 		FROM MenuItems
 		WHERE restaurant_id IN (%s)
-	`, intSliceToSQL(ids))
+	`, strings.Join(placeholders, ","))
 
-	rows, err := db.QueryContext(ctx, query)
+	rows, err := db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -549,11 +561,14 @@ func DeleteReview(ctx context.Context, reviewID int, userID int) error {
 }
 
 func updateAvgRating(restaurantID int) {
-	db.Exec(`
+	_, err := db.Exec(`
 		UPDATE Restaurants
-		SET avg_rating = (SELECT AVG(CAST(rating AS FLOAT)) FROM Reviews WHERE restaurant_id = @rid)
+		SET rating = (SELECT AVG(CAST(rating AS FLOAT)) FROM UserRatings WHERE restaurant_id = @rid)
 		WHERE id = @rid
 	`, sql.Named("rid", restaurantID))
+	if err != nil {
+		log.Printf("[DB] Lỗi cập nhật rating trung bình: %v", err)
+	}
 }
 
 // ============================================================
@@ -773,14 +788,14 @@ func ResetPassword(ctx context.Context, token, newPassword string) error {
 // CalculateDistance: Tính khoảng cách giữa 2 điểm (Lat, Lng) theo đơn vị Km
 func CalculateDistance(lat1, lng1, lat2, lng2 float64) float64 {
 	const EarthRadius = 6371.0 // Bán kính Trái Đất tính theo Km
-	
+
 	dLat := (lat2 - lat1) * (math.Pi / 180)
 	dLng := (lng2 - lng1) * (math.Pi / 180)
-	
+
 	a := math.Sin(dLat/2)*math.Sin(dLat/2) +
 		math.Cos(lat1*(math.Pi/180))*math.Cos(lat2*(math.Pi/180))*
 			math.Sin(dLng/2)*math.Sin(dLng/2)
-	
+
 	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
 	return EarthRadius * c
 }
@@ -822,11 +837,11 @@ func SearchRestaurants(ctx context.Context, q string, minPrice, maxPrice float64
 		if err := rows.Scan(&r.ID, &r.Name, &r.Address, &r.Lat, &r.Lng, &r.Rating, &r.PriceRange, &r.Type); err != nil {
 			continue
 		}
-		
+
 		if userLat != 0 && userLng != 0 {
 			r.DistanceKm = CalculateDistance(userLat, userLng, r.Lat, r.Lng)
 		}
-		
+
 		r.Menu = []models.MenuItem{}
 		results = append(results, r)
 	}
@@ -837,40 +852,40 @@ func SearchRestaurants(ctx context.Context, q string, minPrice, maxPrice float64
 // GetRestaurantDetail: Lấy chi tiết nhà hàng, bao gồm menu và reviews
 // Chưa hoàn thiện vì còn thiếu bảng ảnh, nhưng sẽ trả về được menu và reviews để handler có thể hiển thị chi tiết.
 func GetRestaurantDetail(ctx context.Context, id int) (*models.RestaurantDetail, error) {
-    // 1. Lấy thông tin gốc của quán
-    query := `
+	// 1. Lấy thông tin gốc của quán
+	query := `
         SELECT id, name, address, lat, lng, rating, price_range, 
                open_time, close_time, type, created_at
         FROM Restaurants WHERE id = @id
     `
-    var rd models.RestaurantDetail
-    err := db.QueryRowContext(ctx, query, sql.Named("id", id)).Scan(
-        &rd.ID, &rd.Name, &rd.Address, &rd.Lat, &rd.Lng, &rd.Rating, 
-        &rd.PriceRange, &rd.OpenTime, &rd.CloseTime, &rd.Type, &rd.CreatedAt,
-    )
-    if err == sql.ErrNoRows {
-        return nil, fmt.Errorf("không tìm thấy nhà hàng")
-    }
-    if err != nil {
-        return nil, err
-    }
+	var rd models.RestaurantDetail
+	err := db.QueryRowContext(ctx, query, sql.Named("id", id)).Scan(
+		&rd.ID, &rd.Name, &rd.Address, &rd.Lat, &rd.Lng, &rd.Rating,
+		&rd.PriceRange, &rd.OpenTime, &rd.CloseTime, &rd.Type, &rd.CreatedAt,
+	)
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("không tìm thấy nhà hàng")
+	}
+	if err != nil {
+		return nil, err
+	}
 
-    // 2. Lấy Menu (Dùng hàm có sẵn để lấy menu theo restaurant ID)
-    menuMap, err := getMenusByRestaurantIDs(ctx, []int{id})
-    if err == nil {
-        rd.Menu = menuMap[id]
-    }
+	// 2. Lấy Menu (Dùng hàm có sẵn để lấy menu theo restaurant ID)
+	menuMap, err := getMenusByRestaurantIDs(ctx, []int{id})
+	if err == nil {
+		rd.Menu = menuMap[id]
+	}
 
-    // 3. Lấy Reviews để làm phần đánh giá khách hàng
-    reviews, err := GetReviewsByRestaurant(ctx, id)
-    if err == nil {
-        rd.UserRatings = reviews
-    }
+	// 3. Lấy Reviews để làm phần đánh giá khách hàng
+	reviews, err := GetReviewsByRestaurant(ctx, id)
+	if err == nil {
+		rd.UserRatings = reviews
+	}
 
-    // 4. Mock thêm mảng ảnh (nếu SQL chưa có bảng ảnh riêng)
-    rd.Images = []string{"banner.jpg", "view_quan.jpg"}
+	// 4. Mock thêm mảng ảnh (nếu SQL chưa có bảng ảnh riêng)
+	rd.Images = []string{"banner.jpg", "view_quan.jpg"}
 
-    return &rd, nil
+	return &rd, nil
 }
 
 // GetPopularRestaurants: Lấy danh sách quán ăn uy tín cho trang chủ
@@ -894,13 +909,13 @@ func GetPopularRestaurants(ctx context.Context, limit int) ([]models.Restaurant,
 	for rows.Next() {
 		var r models.Restaurant
 		err := rows.Scan(
-			&r.ID, &r.Name, &r.Address, &r.Lat, &r.Lng, 
+			&r.ID, &r.Name, &r.Address, &r.Lat, &r.Lng,
 			&r.Rating, &r.PriceRange, &r.OpenTime, &r.CloseTime, &r.Type,
 		)
 		if err != nil {
 			continue
 		}
-		
+
 		// Gán mảng rỗng cho Menu để tránh bị null khi trả về JSON
 		r.Menu = []models.MenuItem{}
 		restaurants = append(restaurants, r)

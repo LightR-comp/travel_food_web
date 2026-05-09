@@ -1,16 +1,11 @@
 import json
 import re
-import os
 from typing import Dict, Any
 from functools import lru_cache
-import google.generativeai as genai
-from dotenv import load_dotenv, find_dotenv
+from core.ai_config import shared_model
 
-# Tự động tìm file .env ở bất kỳ đâu trong dự án
-load_dotenv(find_dotenv())
-
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-shared_model = genai.GenerativeModel('gemini-2.5-flash')
+# The API key and model are now configured centrally in core/ai_config.py
+# The shared_model is imported directly.
 
 INTENT_PROMPT_TEMPLATE = """Bạn là AI phân tích ý định người dùng cho ứng dụng ẩm thực YumMap.
 ## Các intent hợp lệ:

@@ -1,25 +1,12 @@
-import os
-import google.generativeai as genai
-from dotenv import load_dotenv, find_dotenv
 from schemas.payloads import ChatGenerationRequest, ChatFinalData, PlaceInfo
 import logging
-from google.api_core.exceptions import (
-    ResourceExhausted,      # Hết quota API
-    ServiceUnavailable,     # Gemini server down
-    InvalidArgument,        # Prompt sai format
-    DeadlineExceeded,       # Timeout
-)
+from core.ai_config import shared_model
 
 logger = logging.getLogger(__name__)
 
-# Tự động tìm file .env ở bất kỳ đâu trong dự án
-load_dotenv(find_dotenv())
-
-api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-if api_key:
-    genai.configure(api_key=api_key)
-
-shared_model = genai.GenerativeModel('gemini-3.1-pro-preview')
+# The API key and model are now configured centrally in core/ai_config.py
+# We no longer need to load .env or configure genai here.
+# The shared_model is imported directly.
 
 
 # --- Custom Exceptions ---
@@ -38,23 +25,26 @@ def _filter_restaurants(request: ChatGenerationRequest, user_allergies: set):
 
     for res in request.found_restaurants:
         try:
-            # Lấy tất cả ingredients từ các món ăn trong 'featured_dishes'
-            all_ingredients = []
+            # Lấy tất cả ingredients từ các món ăn và chuyển thành một set để kiểm tra hiệu quả
+            restaurant_ingredients = set()
             featured_dishes = res.get('featured_dishes', [])
             for dish in featured_dishes:
-                all_ingredients.extend(dish.get('ingredients', []))
-
-            ingredients_str = ", ".join(all_ingredients).lower()
+                # Chuyển thành chữ thường để so sánh không phân biệt hoa/thường
+                ingredients_in_dish = [ing.lower().strip() for ing in dish.get('ingredients', [])]
+                restaurant_ingredients.update(ingredients_in_dish)
             
-            has_allergen = any(allergen in ingredients_str for allergen in user_allergies)
-
-            if has_allergen:
-                warning_restaurants.append((res, "Có thể chứa nguyên liệu bạn dị ứng"))
+            # Kiểm tra xem có bất kỳ dị ứng nào của người dùng nằm trong danh sách nguyên liệu của nhà hàng không
+            # Dùng set intersection (&) để kiểm tra nhanh và chính xác, tránh lỗi so khớp chuỗi con (substring matching)
+            found_allergens_set = user_allergies & restaurant_ingredients
+            if found_allergens_set:
+                # Tìm ra các chất gây dị ứng cụ thể để cung cấp lý do rõ ràng hơn
+                found_allergens_str = ", ".join(found_allergens_set)
+                warning_restaurants.append((res, f"Có thể chứa nguyên liệu bạn dị ứng: {found_allergens_str}"))
             else:
                 safe_restaurants.append((res, "Phù hợp với yêu cầu của bạn"))
 
         except Exception as e:
-            logger.warning(f"Dữ liệu nhà hàng không hợp lệ: {e}")
+            logger.warning(f"Lỗi khi xử lý nhà hàng ID {res.get('id')}: {e}")
             continue  # Bỏ qua nhà hàng lỗi, xử lý tiếp
 
     return safe_restaurants, warning_restaurants
@@ -71,24 +61,40 @@ def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
     # --- Bước 2: Phân loại nhà hàng ---
     safe_restaurants, warning_restaurants = _filter_restaurants(request, user_allergies)
 
-    safe_list = "\n".join(f"- {r.get('res_name', '')} ({r.get('price', 0)}đ): {', '.join(r.get('ingredients', []))}" for r, _ in safe_restaurants)
+    # Hàm hỗ trợ để lấy tất cả ingredients từ một nhà hàng cho việc tạo prompt
+    def _get_all_ingredients_for_prompt(restaurant_dict):
+        all_ings = set() # Dùng set để tránh lặp lại nguyên liệu
+        for dish in restaurant_dict.get("featured_dishes", []):
+            for ingredient in dish.get("ingredients", []):
+                all_ings.add(ingredient.lower())
+        return list(all_ings)
+
+    safe_list = "\n".join(f"- {r.get('res_name', '')} ({r.get('price', 0)}đ): có các món chứa {', '.join(_get_all_ingredients_for_prompt(r))}" for r, _ in safe_restaurants)
     warning_list = "\n".join(f"- {r.get('res_name', '')}: {reason}" for r, reason in warning_restaurants)
 
-    prompt = f"""Bạn là trợ lý ẩm thực YumMap, thân thiện và am hiểu.
-    Câu hỏi: "{request.user_message}"
-    Dị ứng người dùng: {', '.join(user_allergies) if user_allergies else 'Không có'}
-    Nhà hàng phù hợp:
-    {safe_list if safe_list else "Chưa tìm thấy"}
-    Nhà hàng cần lưu ý:
+    prompt = f"""Bạn là trợ lý ẩm thực YumMap, vai trò của bạn là một người bạn đồng hành thân thiện và am hiểu.
+    Dựa vào thông tin dưới đây, hãy đưa ra một câu trả lời tư vấn tự nhiên, ngắn gọn và hữu ích cho người dùng.
+
+    ## Bối cảnh cuộc trò chuyện:
+    - Câu hỏi của người dùng: "{request.user_message}"
+    - Dị ứng người dùng cần tránh: {', '.join(user_allergies) if user_allergies else 'Không có'}
+
+    ## Dữ liệu tôi đã tìm thấy:
+    - Các nhà hàng phù hợp và an toàn:
+    {safe_list if safe_list else "Rất tiếc, tôi chưa tìm thấy quán nào hoàn toàn phù hợp."}
+    - Các nhà hàng cần cân nhắc (có thể chứa chất dị ứng):
     {warning_list if warning_list else "Không có"}
-    Hãy tư vấn ngắn gọn, ưu tiên nhà hàng an toàn."""
+
+    ## Yêu cầu cho bạn:
+    1. Viết một câu trả lời duy nhất, không cần lặp lại danh sách trên.
+    2. Ưu tiên giới thiệu các nhà hàng trong danh sách "phù hợp và an toàn".
+    3. Nếu có nhà hàng cần cân nhắc, hãy cảnh báo nhẹ nhàng.
+    4. Giọng văn phải thật tự nhiên, như đang nói chuyện với một người bạn.
+    """
 
     # --- Bước 3: Gọi AI ---
     try:
-        if not api_key:
-            raise ValueError("Không tìm thấy file .env hoặc thiếu GEMINI_API_KEY. Vui lòng kiểm tra lại!")
-            
-        # Tắt toàn bộ bộ lọc an toàn để AI không bao giờ từ chối trả lời
+        # The API key check is now handled centrally at startup.
         response = shared_model.generate_content(
             prompt,
             safety_settings={
@@ -100,7 +106,7 @@ def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
         )
         ai_reply = response.text
     except ValueError as ve:
-        logger.error(f"Lỗi truy xuất dữ liệu Gemini: {ve}")
+        logger.error(f"Lỗi giá trị đầu vào cho Gemini: {ve}")
         ai_reply = f"Dạ, câu hỏi này làm AI bối rối một chút. (Lỗi chi tiết: {str(ve)})"
     except Exception as e:
         # Lỗi không xác định — log đầy đủ để debug
@@ -112,6 +118,16 @@ def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
     try:
         for is_safe, items in [(True, safe_restaurants), (False, warning_restaurants)]:
             for res, reason in items:
+                # LƯU Ý: Schema `PlaceInfo` trong `payloads.py` cần được bổ sung trường `score: Optional[float] = None`
+                # để có thể chứa điểm số đã được re-rank từ Go.
+
+                # Lấy điểm số đã được Go tính toán, nếu không có thì dùng rating gốc.
+                # Giá trị này sẽ được lưu vào DB ở Go, và bị xóa đi trước khi gửi cho Frontend.
+                score_to_save = res.get("final_score")
+                if score_to_save is None:
+                    score_to_save = res.get("rating", 0.0)
+                    logger.warning(f"Không tìm thấy 'final_score' cho nhà hàng ID {res.get('id')}. Dùng 'rating' gốc làm fallback.")
+
                 place = PlaceInfo(
                     restaurant={
                         "id": res.get("id", 0),
@@ -119,12 +135,13 @@ def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
                         "rating": res.get("rating", 0.0),
                         "price": res.get("price", 0.0),
                         "image_url": res.get("image_url", ""),
-                        "distance_km": 0.0,
-                        "type": "restaurant",
+                        "distance_km": res.get("distance_km", 0.0), # SỬA: Lấy distance_km từ Go
+                        "type": res.get("type", "restaurant"), # SỬA: Lấy type từ Go
                         # Dùng `or []` để xử lý cả trường hợp key không tồn tại hoặc giá trị là None
                         "featured_dishes": res.get("featured_dishes") or []
                     },
                     ai_reason=reason,
+                    score=score_to_save,
                     allergy_friendly=is_safe,
                     tags=["An toàn"] if is_safe else ["Cần lưu ý"]
                 )

@@ -81,6 +81,7 @@ class IntentData(BaseModel):   # python trả về
 # Lần gọi 2: Tạo câu trả lời tự nhiên
 # 2 class mới này sẽ thay thế cho RecommendRequest và RecommendResponse đã dùng ở giai đoạn 1
 # Vì chúng ta cần thêm ngữ cảnh người dùng vào luồng chatbot.
+# Các class này thay thế cho các class ở trên vì chưa test được với tọa độ người dùng
 class ChatUserPreferences(BaseModel):
     dietary: Optional[List[str]] = []
     budget: Optional[int] = None
@@ -98,6 +99,7 @@ class ChatGenerationRequest(BaseModel):
 class PlaceInfo(BaseModel):
     restaurant: RestaurantInput
     ai_reason: Optional[str] = None
+    score: Optional[float] = None 
     allergy_friendly: bool = False
     tags: List[str] = []
 

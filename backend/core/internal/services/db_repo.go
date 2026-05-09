@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	_ "github.com/denisenkom/go-mssqldb"
@@ -140,28 +141,82 @@ func UpdateUserPreferences(ctx context.Context, userID int, prefs models.UserPre
 // CHAT HISTORY
 // ============================================================
 
+// ChatHistoryEntry represents a single entry in the ChatHistory table.
 type ChatHistoryEntry struct {
 	ID          int       `json:"id"`
 	UserID      int       `json:"user_id"`
 	UserMessage string    `json:"user_message"`
 	BotReply    string    `json:"bot_reply"`
 	CreatedAt   time.Time `json:"created_at"`
+	// Các trường suggested_context và top_score đã được chuyển sang bảng ChatSuggestionLog
 }
 
-// SaveChatHistory lưu tin nhắn của user và bot vào DB
-func SaveChatHistory(ctx context.Context, userID int, userMessage string, botReply string) error {
-	_, err := db.ExecContext(ctx, `
+// ChatSuggestionLogEntry represents a single suggested restaurant in a chat message.
+type ChatSuggestionLogEntry struct {
+	ChatHistoryID  int64
+	RestaurantID   int
+	RestaurantName string
+	Score          float64
+}
+
+// SaveChatHistory saves the main chat message and returns the new history ID.
+func SaveChatHistory(ctx context.Context, userID int, userMessage, botReply string) (int64, error) {
+	var newID int64
+	query := `
 		INSERT INTO ChatHistory (user_id, user_message, bot_reply, created_at)
+		OUTPUT INSERTED.id
 		VALUES (@uid, @userMsg, @botReply, GETDATE())
-	`,
+	`
+	row := db.QueryRowContext(ctx, query,
 		sql.Named("uid", userID),
 		sql.Named("userMsg", userMessage),
 		sql.Named("botReply", botReply),
 	)
+	err := row.Scan(&newID)
 	if err != nil {
 		log.Printf("[DB] Lỗi lưu lịch sử chat: %v", err)
+		return 0, err
 	}
-	return err
+	return newID, nil
+}
+
+// SaveChatSuggestions lưu top 3 nhà hàng được đề xuất.
+func SaveChatSuggestions(ctx context.Context, chatHistoryID int64, suggestions []ChatSuggestionLogEntry) error {
+	if len(suggestions) == 0 {
+		return nil
+	}
+
+	// Sử dụng transaction để đảm bảo tất cả các gợi ý được lưu hoặc không lưu gì cả.
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("lỗi bắt đầu transaction: %w", err)
+	}
+	defer tx.Rollback() // Rollback nếu có lỗi xảy ra
+
+	stmt, err := tx.PrepareContext(ctx, `
+		INSERT INTO ChatSuggestionLog (chat_history_id, restaurant_id, restaurant_name, score, created_at)
+		VALUES (@chatId, @resId, @resName, @score, GETDATE())
+	`,
+	)
+	if err != nil {
+		return fmt.Errorf("lỗi chuẩn bị statement: %w", err)
+	}
+	defer stmt.Close()
+
+	for _, s := range suggestions {
+		_, err := stmt.ExecContext(ctx,
+			sql.Named("chatId", chatHistoryID),
+			sql.Named("resId", s.RestaurantID),
+			sql.Named("resName", s.RestaurantName),
+			sql.Named("score", s.Score),
+		)
+		if err != nil {
+			// Nếu một insert lỗi, toàn bộ transaction sẽ được rollback.
+			return fmt.Errorf("lỗi thực thi insert cho suggestion (resId: %d): %w", s.RestaurantID, err)
+		}
+	}
+
+	return tx.Commit() // Hoàn tất transaction nếu không có lỗi
 }
 
 func GetChatHistoryByUserID(ctx context.Context, userID int) ([]ChatHistoryEntry, error) {
@@ -338,6 +393,74 @@ func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interf
 	}
 
 	return restaurants, nil
+}
+
+// tokenize là hàm nội bộ, giúp tách một chuỗi văn bản thành các từ (tokens) duy nhất.
+// Hàm này thực hiện các bước: chuyển thành chữ thường, thay thế dấu câu, và loại bỏ các từ quá ngắn.
+func tokenize(text string) map[string]bool {
+	// Thay thế các dấu câu phổ biến bằng khoảng trắng để tách từ tốt hơn
+	replacer := strings.NewReplacer(",", " ", ".", " ", ";", " ", ":", " ", "!", " ", "?", " ", "(", " ", ")", " ")
+	text = replacer.Replace(text)
+
+	words := strings.Fields(strings.ToLower(text))
+	tokenSet := make(map[string]bool)
+	for _, word := range words {
+		// Bỏ qua các từ rất ngắn, thường là stop-words hoặc ký tự nhiễu
+		if len(word) > 2 {
+			tokenSet[word] = true
+		}
+	}
+	return tokenSet
+}
+
+// CalculateChatRelevanceScores tính điểm liên quan cho các nhà hàng dựa trên lịch sử chat của người dùng.
+// Thuật toán này đếm số lần các từ khóa trong toàn bộ cuộc trò chuyện của người dùng khớp với "tags" của nhà hàng.
+// "Tags" của nhà hàng được tổng hợp từ: tên, loại hình, tên món, mô tả món, và nguyên liệu.
+func CalculateChatRelevanceScores(ctx context.Context, userID int, restaurants []models.Restaurant) (map[int]int, error) {
+	// Bước 1: Lấy toàn bộ lịch sử chat của người dùng
+	history, err := GetChatHistoryByUserID(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("lỗi lấy lịch sử chat để tính điểm: %w", err)
+	}
+	if len(history) == 0 {
+		return make(map[int]int), nil // Không có lịch sử, không có điểm thưởng
+	}
+
+	// Bước 2: Tổng hợp và "tokenize" tất cả các tin nhắn của người dùng thành một tập hợp từ khóa
+	var allUserMessages strings.Builder
+	for _, entry := range history {
+		allUserMessages.WriteString(entry.UserMessage)
+		allUserMessages.WriteString(" ")
+	}
+	userKeywords := tokenize(allUserMessages.String())
+
+	if len(userKeywords) == 0 {
+		return make(map[int]int), nil
+	}
+
+	relevanceScores := make(map[int]int)
+
+	// Bước 3: Lặp qua từng nhà hàng để tính điểm
+	for _, r := range restaurants {
+		// Bước 3.1: Tạo "tags" cho nhà hàng từ nhiều nguồn thông tin
+		var restaurantContent strings.Builder
+		restaurantContent.WriteString(r.Name + " " + r.Type + " ")
+		for _, menuItem := range r.Menu {
+			restaurantContent.WriteString(menuItem.Name + " " + menuItem.Description + " " + menuItem.Ingredients + " ")
+		}
+		restaurantTags := tokenize(restaurantContent.String())
+
+		// Bước 3.2: Đếm số từ khóa của người dùng khớp với tags của nhà hàng
+		matchCount := 0
+		for keyword := range userKeywords {
+			if _, found := restaurantTags[keyword]; found {
+				matchCount++
+			}
+		}
+		relevanceScores[r.ID] = matchCount
+	}
+
+	return relevanceScores, nil
 }
 
 func CreateReview(ctx context.Context, rv models.UserRating) (*models.UserRating, error) {

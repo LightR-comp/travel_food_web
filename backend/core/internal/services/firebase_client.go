@@ -53,3 +53,4 @@ func VerifyIDToken(ctx context.Context, token string) (*auth.Token, error) {
 	}
 	return firebaseAuth.VerifyIDToken(ctx, token)
 }
+

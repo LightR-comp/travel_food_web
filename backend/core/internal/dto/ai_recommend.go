@@ -18,8 +18,10 @@ type AIRecommendRequest struct {
 // AIRestaurantInput: Định nghĩa cấu trúc dữ liệu của một quán ăn được gửi sang Python AI Service để đánh giá và gợi ý
 type AIRestaurantInput struct {
 	ID         int     `json:"id"`
+	Name       string  `json:"res_name"` //
 	Rating     float64 `json:"rating"`
 	Price      float64 `json:"price"`
+	ImageURL   string  `json:"image_url"`//
 	DistanceKm float64 `json:"distance_km"`
 	//Kiểu quán ăn
 	Type       string   `json:"type"`

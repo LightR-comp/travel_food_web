@@ -1,7 +1,10 @@
-# core/ai_config.py
 import google.generativeai as genai
 import os
+from dotenv import load_dotenv, find_dotenv
 
-genai.configure(api_key=os.getenv("GEMINI_KEY"))
-# Khởi tạo 1 lần dùng cho cả hội
-shared_model = genai.GenerativeModel('gemini-1.5-pro')
+load_dotenv(find_dotenv())
+
+api_key = os.getenv('GEMINI_KEY')
+
+genai.configure(api_key=api_key)
+shared_model = genai.GenerativeModel('gemini-2.0-flash-lite')

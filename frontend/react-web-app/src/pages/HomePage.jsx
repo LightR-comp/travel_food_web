@@ -13,14 +13,19 @@ const HomePage = () => {
   const [loading,  setLoading]      = useState(true);
 
   useEffect(() => {
-    Promise.all([getTrendingApi(), getGoodSpotsApi(), getPopularPostsApi()])
-      .then(([t, s, p]) => {
-        setTrending(t.data.restaurants);
-        setSpots(s.data.restaurants);
-        setPosts(p.data.posts);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  Promise.all([getTrendingApi(), getGoodSpotsApi(), getPopularPostsApi()])
+    .then(([t, s, p]) => {
+      setTrending(t?.data?.restaurants || []);
+      setSpots(s?.data?.restaurants   || []);
+      setPosts(p?.data?.posts         || []);
+    })
+    .catch(() => {
+      setTrending([]);
+      setSpots([]);
+      setPosts([]);
+    })
+    .finally(() => setLoading(false));
+}, []);
 
   return (
     <div className="min-h-screen bg-[#FAFAF7]">

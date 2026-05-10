@@ -3,7 +3,7 @@ import axiosInstance from './axiosInstance';
 // ============================================================
 // Restaurant / Food API – maps to Go backend /api/v1/restaurants/*
 // Base URL: http://localhost:8080/api  (set in axiosInstance)
-// NOTE: axiosInstance.baseURL = /api  →  ta dùng /v1/... dưới đây
+// NOTE: axiosInstance.baseURL = /api/v1  →  ta chỉ cần gọi endpoint
 // ============================================================
 
 /**
@@ -12,7 +12,7 @@ import axiosInstance from './axiosInstance';
  * @param {number} limit - Số lượng kết quả (mặc định 6)
  */
 export const getTrendingApi = async (limit = 6) => {
-  const { data } = await axiosInstance.get('/v1/dishes/trending', {
+  const { data } = await axiosInstance.get('/dishes/trending', {
     params: { limit },
   });
   return data; // { success, message, data: { dishes }, error }
@@ -24,7 +24,7 @@ export const getTrendingApi = async (limit = 6) => {
  * @param {number} limit - Số lượng kết quả (mặc định 6)
  */
 export const getGoodSpotsApi = async (limit = 6) => {
-  const { data } = await axiosInstance.get('/v1/restaurants/popular', {
+  const { data } = await axiosInstance.get('/restaurants/popular', {
     params: { limit },
   });
   return data; // { success, message, data: { restaurants }, error }
@@ -35,7 +35,7 @@ export const getGoodSpotsApi = async (limit = 6) => {
  * Trả về danh sách bài review hot.
  */
 export const getPopularPostsApi = async () => {
-  const { data } = await axiosInstance.get('/v1/posts/popular');
+  const { data } = await axiosInstance.get('/posts/popular');
   return data; // { data: posts } hoặc { success, data: { posts }, error }
 };
 
@@ -52,7 +52,7 @@ export const getPopularPostsApi = async () => {
  * }} params
  */
 export const searchRestaurantsApi = async (params = {}) => {
-  const { data } = await axiosInstance.get('/v1/restaurants/search', {
+  const { data } = await axiosInstance.get('/restaurants/search', {
     params,
   });
   return data; // { success, message, data: { total, restaurants }, error }
@@ -64,6 +64,6 @@ export const searchRestaurantsApi = async (params = {}) => {
  * @param {number|string} id
  */
 export const getRestaurantByIdApi = async (id) => {
-  const { data } = await axiosInstance.get(`/v1/restaurants/${id}`);
+  const { data } = await axiosInstance.get(`/restaurants/${id}`);
   return data; // { success, message, data: { ...restaurant }, error }
 };

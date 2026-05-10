@@ -4,7 +4,7 @@ import axios from 'axios';
 // Axios Instance – swap BASE_URL to your Go backend
 // ============================================================
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 });

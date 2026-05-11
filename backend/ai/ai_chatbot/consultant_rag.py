@@ -1,6 +1,5 @@
-import os
-import google.generativeai as genai
 from dotenv import load_dotenv, find_dotenv
+from core.ai_config import shared_model
 from schemas.payloads import ChatGenerationRequest, ChatFinalData, PlaceInfo
 import logging
 from google.api_core.exceptions import (
@@ -14,12 +13,6 @@ logger = logging.getLogger(__name__)
 
 # Tự động tìm file .env ở bất kỳ đâu trong dự án
 load_dotenv(find_dotenv())
-
-api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-if api_key:
-    genai.configure(api_key=api_key)
-
-shared_model = genai.GenerativeModel('gemini-3.1-pro-preview')
 
 
 # --- Custom Exceptions ---

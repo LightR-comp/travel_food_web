@@ -14,7 +14,7 @@ INSERT INTO Restaurants (name, address, lat, lng, rating, price_range, open_time
 (N'I LOVE KEM', N'355 Đ.Lê Văn Sỹ, Phường 1, Quận Tân Bình', 10.79643347945519, 106.66513820391683, 4.3, 100000, '10:00', '23:00', 'vietnamese'),
 (N'Lẩu Dê Lâm Ký', N'47 Đ.Nguyễn Thị Nhỏ, Phường 9, Quận Tân Bình', 10.7700343924685, 106.65241699064585, 3.9, 220000, '15:00', '22:00', 'vietnamese'),
 
--- Tán Phú --
+-- Tân Phú --
 (N'Quán Nướng Yaki', N'375 Đ.Tân Sơn Nhì, Phường Tân Thành, Quận Tân Phú', 10.794101390074331, 106.62891908836144, 3.9, 500000, '9:00', '23:30', 'japanese,bbq'),
 (N'The Pizza Company', N'Tầng trệt, Aeon Mall Tân Phú Celadon, 30 Đ.Bờ Bao Tân Thắng, Phường Sơn Kỳ, Quận Tân Phú', 10.801544031808016, 106.61854110789773, 4.0, 1000000, '10:00', '22:00', 'italian'),
 (N'Nhà hàng Vườn Treo MansonPark', N'2 Đ.Đô Đốc Long, Phường Tân Quý, Quận Tân Phú', 10.791732577331674, 106.63012289762649, 4.8, 500000, '17:00', '23:00', 'vietnamese'),
@@ -61,7 +61,7 @@ DECLARE @IdPapaxot INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Papax�
 DECLARE @IdBunHomemade INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Đậu Homemade - Bún đậu mắm tôm');
 DECLARE @IdNemNuongBeThao INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Nem Nướng Nha Trang BÉ THẢO');
 DECLARE @IdILOVEKEM INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'I LOVE KEM');
-DECLARE @IdDeLamKy INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Lẩu Dê Lâm Ký');
+DECLARE @IdDeLamLy INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Lẩu Dê Lâm Ký');
 
 DECLARE @IdNuongYaki INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Quán Nướng Yaki');
 DECLARE @IdPizzaCompany INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'The Pizza Company');
@@ -146,7 +146,7 @@ INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingre
 (@IdBunHaiDang, N'Tô Thịt + Nem', N'Bún thịt nướng ăn kèm nem nướng đậm đà', 50000, 'vietnamese', 'pork,sausage,noodle'),
 (@IdBunHaiDang, N'Tô Chả Giò + Nem', N'Lựa chọn không thịt nướng với chả giò và nem nướng', 50000, 'vietnamese', 'spring roll,sausage,noodle'),
 (@IdBunHaiDang, N'Tô Thịt Không', N'Bún thịt nướng thuần túy', 50000, 'vietnamese', 'pork,noodle'),
-(@IdBunHaiDang, N'Tô Chả Giò Không', N'Bún ăn kèm chả giò chiên giòn', 50000, 'vietnamese', 'spring roll,noodle')
+(@IdBunHaiDang, N'Tô Chả Giò Không', N'Bún ăn kèm chả giò chiên giòn', 50000, 'vietnamese', 'spring roll,noodle'),
 
 -- Papaxốt --
 (@IdPapaxot, N'Cơm Xèo Bò Đặc Biệt', N'Cơm nóng trên chảo xèo xèo cùng thịt bò, trứng ốp la và ngô hạt', 97000, 'vietnamese', 'beef,egg,corn,rice'),
@@ -160,7 +160,7 @@ INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingre
 (@IdPapaxot, N'Cơm Xèo Gà Phi Lê', N'Phần ức gà phi lê mềm, ít béo dành cho người ăn kiêng', 69000, 'vietnamese', 'chicken,rice'),
 (@IdPapaxot, N'Cơm Xèo Gà Xúc Xắc (Sốt Teriyaki)', N'Gà cắt viên xúc xắc thấm sốt Teriyaki Nhật Bản', 59000, 'vietnamese', 'chicken,sausage,teriyaki sauce,rice'),
 (@IdPapaxot, N'Cơm Xèo Gà Áp Chảo', N'Gà áp chảo giòn da, thịt bên trong vẫn giữ được độ ẩm', 59000, 'vietnamese', 'chicken,rice'),
-(@IdPapaxot, N'Cơm Xèo Gà Hải Sản', N'Sự kết hợp độc đáo giữa gà và hải sản trên chảo xèo xèo', 85000, 'vietnamese', 'chicken,seafood,rice')
+(@IdPapaxot, N'Cơm Xèo Gà Hải Sản', N'Sự kết hợp độc đáo giữa gà và hải sản trên chảo xèo xèo', 85000, 'vietnamese', 'chicken,seafood,rice'),
 
 -- Bún đậu Homemade --
 (@IdBunHomemade, N'Bún Đậu No Nê (1-2 người)', N'Phiên bản nâng cấp gồm: bún lá, đậu mơ, chả cốm, thịt chân giò, ba rọi riềng mẻ, dồi sụn', 189000, 'vietnamese', 'noodle,tofu,pork,spring roll,shrimp paste'),

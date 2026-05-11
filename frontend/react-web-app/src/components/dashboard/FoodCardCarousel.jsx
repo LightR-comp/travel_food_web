@@ -2,6 +2,8 @@ import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, StarRating, Distance, PriceTag, Tag } from '../ui/index.jsx';
 
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80';
+
 // ---- Scroll Arrow Button ----
 const ScrollBtn = ({ direction, onClick }) => (
   <button
@@ -20,10 +22,23 @@ const ScrollBtn = ({ direction, onClick }) => (
 // ---- Single Food Card ----
 export const FoodCard = ({ restaurant, featured = false }) => {
   const navigate = useNavigate();
-  const { id, restaurant_info, meta, tags, image_url, badge } = restaurant;
+
+  // API trả về flat structure
+  const {
+    id,
+    name,
+    rating,
+    price_range,
+    type,
+    distance_km,
+    images,
+    is_open,
+  } = restaurant;
+
+  const tags = type ? type.split(',').map(t => t.trim()) : [];
+  const image_url = images?.[0] || DEFAULT_IMAGE;
 
   if (featured) {
-    // Dark featured card (Phúc Lộc Thọ style)
     return (
       <div
         className="bg-white rounded-2xl overflow-hidden shadow-sm hover:-translate-y-1.5 hover:shadow-md transition-all cursor-pointer flex-shrink-0 w-[200px]"
@@ -32,7 +47,7 @@ export const FoodCard = ({ restaurant, featured = false }) => {
         <div className="relative h-[145px] bg-gradient-to-br from-[#3D1A0A] to-[#6B2D15] flex items-center justify-center">
           <div className="text-center px-3">
             <p className="text-[0.65rem] text-white/70 font-semibold tracking-widest uppercase mb-1">
-              {restaurant_info.name.split(' ').slice(0, 2).join(' ')}
+              {name?.split(' ').slice(0, 2).join(' ')}
             </p>
             <span className="inline-block bg-[#F5A623] text-white text-[0.55rem] font-extrabold px-2 py-0.5 rounded tracking-widest uppercase mb-1">
               GOOD FOOD
@@ -44,15 +59,15 @@ export const FoodCard = ({ restaurant, featured = false }) => {
           </div>
         </div>
         <div className="p-3">
-          <h3 className="font-bold text-[0.88rem] text-[#2C1810] truncate mb-1">{restaurant_info.name}</h3>
+          <h3 className="font-bold text-[0.88rem] text-[#2C1810] truncate mb-1">{name}</h3>
           <div className="flex flex-wrap gap-1 mb-1.5">
             {tags.map((t) => <Tag key={t} label={`• ${t}`} />)}
           </div>
           <div className="flex gap-2 flex-wrap mb-1.5">
-            <StarRating rating={meta.rating} count={meta.review_count} />
-            <Distance km={meta.distance_km} />
+            <StarRating rating={rating} count={null} />
+            <Distance km={distance_km} />
           </div>
-          <PriceTag priceRange={meta.price_range} />
+          <PriceTag priceRange={price_range} />
         </div>
       </div>
     );
@@ -69,25 +84,25 @@ export const FoodCard = ({ restaurant, featured = false }) => {
         <div className="w-full h-full rounded-[14px] overflow-hidden relative shadow-sm">
           <img
             src={image_url}
-            alt={restaurant_info.name}
+            alt={name}
             loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover transition-transform duration-500"
           />
-          {badge && <Badge label={badge} />}
+          {!is_open && <Badge label="Đóng cửa" />}
         </div>
       </div>
 
       {/* Body */}
       <div className="p-3">
-        <h3 className="font-bold text-[0.88rem] text-[#2C1810] truncate mb-1">{restaurant_info.name}</h3>
+        <h3 className="font-bold text-[0.88rem] text-[#2C1810] truncate mb-1">{name}</h3>
         <div className="flex flex-wrap gap-1 mb-1.5">
           {tags.slice(0, 2).map((t) => <Tag key={t} label={`• ${t}`} />)}
         </div>
         <div className="flex gap-2 flex-wrap mb-1.5">
-          <StarRating rating={meta.rating} count={meta.review_count} />
-          <Distance km={meta.distance_km} />
+          <StarRating rating={rating} count={null} />
+          <Distance km={distance_km} />
         </div>
-        <PriceTag priceRange={meta.price_range} />
+        <PriceTag priceRange={price_range} />
       </div>
     </div>
   );
@@ -105,7 +120,6 @@ const FoodCardCarousel = ({ restaurants = [], title, emoji, sectionId }) => {
   return (
     <section className="py-12" id={sectionId}>
       <div className="max-w-[1200px] mx-auto px-6">
-        {/* Section header */}
         <div className="mb-6">
           <h2 className="font-iciel text-2xl font-extrabold text-[#2C1810] tracking-wide inline-flex items-center gap-2">
             {title}
@@ -113,7 +127,6 @@ const FoodCardCarousel = ({ restaurants = [], title, emoji, sectionId }) => {
           </h2>
         </div>
 
-        {/* Scroll wrapper */}
         <div className="flex items-center gap-3">
           <ScrollBtn direction="left" onClick={() => scroll(-1)} />
           <div ref={scrollRef} className="cards-scroll">

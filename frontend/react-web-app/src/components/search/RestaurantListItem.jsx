@@ -6,7 +6,15 @@ import { StarRating, Distance, PriceTag, Tag, Badge } from '../ui/index.jsx';
  */
 const RestaurantListItem = ({ restaurant }) => {
   const navigate = useNavigate();
-  const { id, restaurant_info, meta, tags, image_url, badge, ai_analysis } = restaurant;
+  const { id, name, address, rating, price_range, type, distance_km, ai_analysis, badge } = restaurant;
+  
+  // Xử lý giá tiền (price_range đang là số, VD: 150000 -> 150.000 đ)
+  const formattedPrice = price_range ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price_range) : 'Đang cập nhật';
+  
+  // Dùng ảnh ngẫu nhiên hoặc ảnh theo id tạm thời nếu backend chưa trả về
+  const imageUrl = restaurant.image_url || `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80`;
+
+  const tags = type ? [type] : [];
 
   return (
     <div
@@ -18,8 +26,8 @@ const RestaurantListItem = ({ restaurant }) => {
       <div className="relative w-[180px] h-[160px] flex-shrink-0 p-2.5 pr-0">
         <div className="w-full h-full rounded-[14px] overflow-hidden relative shadow-sm">
           <img
-            src={image_url}
-            alt={restaurant_info.name}
+            src={imageUrl}
+            alt={name}
             loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
@@ -31,19 +39,19 @@ const RestaurantListItem = ({ restaurant }) => {
       <div className="flex-1 py-4 pr-4 flex flex-col justify-between">
         <div>
           <h3 className="font-[Baloo_2,sans-serif] text-xl font-bold text-[#2C1810] mb-1.5">
-            {restaurant_info.name}
+            {name}
           </h3>
 
           {/* Rating */}
-          <StarRating rating={meta.rating} count={meta.review_count} size="md" />
+          <StarRating rating={rating} count={"+"} size="md" />
 
           {/* Address */}
           <p className="flex items-start gap-1.5 mt-2 text-sm text-[#4A3728]">
             <span className="flex-shrink-0 mt-0.5">📍</span>
             <span>
-              {restaurant_info.contact.address}
-              {meta.distance_km && (
-                <span className="text-[#7B7068]"> • {meta.distance_km} km</span>
+              {address}
+              {distance_km > 0 && (
+                <span className="text-[#7B7068]"> • {distance_km.toFixed(1)} km</span>
               )}
             </span>
           </p>
@@ -51,7 +59,7 @@ const RestaurantListItem = ({ restaurant }) => {
           {/* Price */}
           <p className="flex items-center gap-1.5 mt-2 text-sm text-[#4A3728]">
             <span>🏷️</span>
-            <span className="font-medium">{meta.price_range}</span>
+            <span className="font-medium">{formattedPrice}</span>
           </p>
 
           {/* AI reason badge */}
@@ -67,7 +75,7 @@ const RestaurantListItem = ({ restaurant }) => {
           {tags.map((t) => (
             <span
               key={t}
-              className="px-3 py-1 rounded-full bg-[#FFF8EE] border border-[#F5EDD8] text-xs text-[#4A3728] font-medium"
+              className="px-3 py-1 rounded-full bg-[#FFF8EE] border border-[#F5EDD8] text-xs text-[#4A3728] font-medium uppercase"
             >
               {t}
             </span>

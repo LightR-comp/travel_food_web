@@ -1,10 +1,10 @@
 import google.generativeai as genai
-import os
-from dotenv import load_dotenv, find_dotenv
+from core.config import settings
 
-load_dotenv(find_dotenv())
+if not settings.GEMINI_API_KEY:
+    raise ValueError("Không tìm thấy GEMINI_API_KEY hoặc GOOGLE_API_KEY trong file .env. Vui lòng kiểm tra lại!")
 
-api_key = os.getenv('GEMINI_KEY')
+genai.configure(api_key=settings.GEMINI_API_KEY)
 
-genai.configure(api_key=api_key)
-shared_model = genai.GenerativeModel('gemini-2.0-flash-lite')
+# Khởi tạo 1 lần dùng cho cả hội
+shared_model = genai.GenerativeModel(settings.GEMINI_MODEL_NAME)

@@ -3,11 +3,6 @@ import re
 from typing import Dict, Any
 from functools import lru_cache
 from core.ai_config import shared_model
-from dotenv import load_dotenv, find_dotenv
-
-# Tự động tìm file .env ở bất kỳ đâu trong dự án
-load_dotenv(find_dotenv())
- 
 
 INTENT_PROMPT_TEMPLATE = """Bạn là AI phân tích ý định người dùng cho ứng dụng ẩm thực YumMap.
 ## Các intent hợp lệ:

@@ -2,10 +2,7 @@
 # Đây là nơi chúng ta sẽ xây dựng các endpoint để xử lý yêu cầu gợi ý
 # từ Go Core Backend, bao gồm việc nhận dữ liệu về người dùng và danh sách quán ăn, sau đó sử dụng các hàm trong thư mục 'recommendation_engine' để tính toán điểm số và xây dựng lý do cho từng quán ăn, cuối cùng trả về kết quả cho Go Core Backend.
 
-import os
 import json
-import google.generativeai as genai
-from dotenv import load_dotenv, find_dotenv
 from fastapi import APIRouter, HTTPException
 from schemas.payloads import RecommendRequest, RecommendResponse, AIResultItem, BaseResponse
 from recommendation_engine.scoring import process_scoring
@@ -13,15 +10,10 @@ from recommendation_engine.scoring import process_scoring
 from schemas.payloads import ChatIntentRequest, ChatGenerationRequest
 from ai_chatbot.nlp_parser import detect_intent_with_ai
 from ai_chatbot.consultant_rag import generate_final_response
+from core.ai_config import shared_model
 
-# Tự động tìm file .env ở bất kỳ đâu trong dự án
-load_dotenv(find_dotenv())
 router = APIRouter()
 
-# Cấu hình Gemini
-api_key = os.getenv("GEMINI_API_KEY")
-genai.configure(api_key=api_key)
-model = genai.GenerativeModel('gemini-2.5-flash')
 
 @router.post("/recommend", response_model=BaseResponse)
 async def recommend_endpoint(request: RecommendRequest):
@@ -60,7 +52,7 @@ async def recommend_endpoint(request: RecommendRequest):
         """
 
         try:
-            response = model.generate_content(prompt)
+            response = shared_model.generate_content(prompt)
             # Làm sạch chuỗi JSON từ AI
             raw_text = response.text.strip().replace("```json", "").replace("```", "")
             ai_reasons = json.loads(raw_text).get("reasons", {})

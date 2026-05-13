@@ -1,4 +1,3 @@
-from dotenv import load_dotenv, find_dotenv
 from core.ai_config import shared_model
 from schemas.payloads import ChatGenerationRequest, ChatFinalData, PlaceInfo
 import logging
@@ -10,9 +9,6 @@ from google.api_core.exceptions import (
 )
 
 logger = logging.getLogger(__name__)
-
-# Tự động tìm file .env ở bất kỳ đâu trong dự án
-load_dotenv(find_dotenv())
 
 
 # --- Custom Exceptions ---
@@ -77,28 +73,20 @@ def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
     Hãy tư vấn ngắn gọn, ưu tiên nhà hàng an toàn."""
 
     # --- Bước 3: Gọi AI ---
-    try:
-        if not api_key:
-            raise ValueError("Không tìm thấy file .env hoặc thiếu GEMINI_API_KEY. Vui lòng kiểm tra lại!")
+
             
-        # Tắt toàn bộ bộ lọc an toàn để AI không bao giờ từ chối trả lời
-        response = shared_model.generate_content(
-            prompt,
-            safety_settings={
+    # Tắt toàn bộ bộ lọc an toàn để AI không bao giờ từ chối trả lời
+    response = shared_model.generate_content(
+    prompt,
+    safety_settings={
                 'HARM_CATEGORY_HARASSMENT': 'BLOCK_NONE',
                 'HARM_CATEGORY_HATE_SPEECH': 'BLOCK_NONE',
                 'HARM_CATEGORY_SEXUALLY_EXPLICIT': 'BLOCK_NONE',
                 'HARM_CATEGORY_DANGEROUS_CONTENT': 'BLOCK_NONE'
-            }
-        )
-        ai_reply = response.text
-    except ValueError as ve:
-        logger.error(f"Lỗi truy xuất dữ liệu Gemini: {ve}")
-        ai_reply = f"Dạ, câu hỏi này làm AI bối rối một chút. (Lỗi chi tiết: {str(ve)})"
-    except Exception as e:
-        # Lỗi không xác định — log đầy đủ để debug
-        logger.exception(f"Lỗi không xác định khi gọi Gemini: {e}")
-        ai_reply = f"Dạ, em đang gặp chút sự cố ạ. (Lỗi AI: {str(e)})"
+        }
+    )
+    ai_reply = response.text
+
 
     # --- Bước 4: Build response — lỗi ở đây không ảnh hưởng ai_reply ---
     suggested_places = []

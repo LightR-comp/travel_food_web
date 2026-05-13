@@ -7,4 +7,4 @@ load_dotenv(find_dotenv())
 api_key = os.getenv('GEMINI_KEY')
 
 genai.configure(api_key=api_key)
-shared_model = genai.GenerativeModel('gemini-2.0-flash-lite')
+shared_model = genai.GenerativeModel('gemini-2.5-flash')

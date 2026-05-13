@@ -500,76 +500,76 @@ func LocalLogin(ctx context.Context, username, password string) (*models.User, e
 
 // Tạo reset token, lưu DB, trả về token để gửi mail
 func CreatePasswordResetToken(ctx context.Context, username string) (string, string, error) {
-	// Lấy user_id VÀ email từ DB
-	var userID int
-	var email string
-	row := db.QueryRowContext(ctx, `
+    // Lấy user_id VÀ email từ DB
+    var userID int
+    var email string
+    row := db.QueryRowContext(ctx, `
         SELECT ua.user_id, u.email 
         FROM UserAuth ua
         INNER JOIN Users u ON ua.user_id = u.id
         WHERE ua.provider = 'local' AND ua.provider_id = @username
     `, sql.Named("username", username))
 
-	if err := row.Scan(&userID, &email); err == sql.ErrNoRows {
-		return "", "", fmt.Errorf("không tìm thấy tài khoản")
-	} else if err != nil {
-		return "", "", err
-	}
+    if err := row.Scan(&userID, &email); err == sql.ErrNoRows {
+        return "", "", fmt.Errorf("không tìm thấy tài khoản")
+    } else if err != nil {
+        return "", "", err
+    }
 
-	// Tạo token như cũ
-	b := make([]byte, 32)
-	rand.Read(b)
-	token := hex.EncodeToString(b)
-	exp := time.Now().Add(15 * time.Minute)
+    // Tạo token như cũ
+    b := make([]byte, 32)
+    rand.Read(b)
+    token := hex.EncodeToString(b)
+    exp := time.Now().Add(15 * time.Minute)
 
-	db.ExecContext(ctx, `
+    db.ExecContext(ctx, `
         UPDATE UserAuth SET reset_token = @token, reset_token_exp = @exp
         WHERE provider = 'local' AND provider_id = @username
     `,
-		sql.Named("token", token),
-		sql.Named("exp", exp),
-		sql.Named("username", username),
-	)
+        sql.Named("token", token),
+        sql.Named("exp", exp),
+        sql.Named("username", username),
+    )
 
-	return token, email, nil // trả về cả email
+    return token, email, nil // trả về cả email
 }
 
 // Đổi mật khẩu mới sau khi xác thực token
 func ResetPassword(ctx context.Context, token, newPassword string) error {
-	var userID int
-	var expTime time.Time
+    var userID int
+    var expTime time.Time
 
-	row := db.QueryRowContext(ctx, `
+    row := db.QueryRowContext(ctx, `
         SELECT user_id, reset_token_exp FROM UserAuth
         WHERE reset_token = @token AND provider = 'local'
     `, sql.Named("token", token))
 
-	if err := row.Scan(&userID, &expTime); err == sql.ErrNoRows {
-		return fmt.Errorf("token không hợp lệ hoặc đã hết hạn")
-	} else if err != nil {
-		return err
-	}
+    if err := row.Scan(&userID, &expTime); err == sql.ErrNoRows {
+        return fmt.Errorf("token không hợp lệ hoặc đã hết hạn")
+    } else if err != nil {
+        return err
+    }
 
-	if time.Now().After(expTime) {
-		return fmt.Errorf("token đã hết hạn")
-	}
+    if time.Now().After(expTime) {
+        return fmt.Errorf("token đã hết hạn")
+    }
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
-	if err != nil {
-		return fmt.Errorf("lỗi hash password")
-	}
+    hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+    if err != nil {
+        return fmt.Errorf("lỗi hash password")
+    }
 
-	_, err = db.ExecContext(ctx, `
+    _, err = db.ExecContext(ctx, `
         UPDATE UserAuth
         SET password_hash   = @hash,
             reset_token     = NULL,
             reset_token_exp = NULL
         WHERE user_id = @userID AND provider = 'local'
     `,
-		sql.Named("hash", string(hash)),
-		sql.Named("userID", userID),
-	)
-	return err
+        sql.Named("hash", string(hash)),
+        sql.Named("userID", userID),
+    )
+    return err
 }
 
 // [Nhut]
@@ -647,40 +647,40 @@ func GetRestaurantDetail(ctx context.Context, id int) (*models.RestaurantDetail,
                open_time, close_time, type, created_at
         FROM Restaurants WHERE id = @id
     `
-	var rd models.RestaurantDetail
-	err := db.QueryRowContext(ctx, query, sql.Named("id", id)).Scan(
-		&rd.ID, &rd.Name, &rd.Address, &rd.Lat, &rd.Lng, &rd.Rating,
-		&rd.PriceRange, &rd.OpenTime, &rd.CloseTime, &rd.Type, &rd.CreatedAt,
-	)
-	if err == sql.ErrNoRows {
-		return nil, fmt.Errorf("không tìm thấy nhà hàng")
-	}
-	if err != nil {
-		return nil, err
-	}
+    var rd models.RestaurantDetail
+    err := db.QueryRowContext(ctx, query, sql.Named("id", id)).Scan(
+        &rd.ID, &rd.Name, &rd.Address, &rd.Lat, &rd.Lng, &rd.Rating, 
+        &rd.PriceRange, &rd.OpenTime, &rd.CloseTime, &rd.Type, &rd.CreatedAt,
+    )
+    if err == sql.ErrNoRows {
+        return nil, fmt.Errorf("không tìm thấy nhà hàng")
+    }
+    if err != nil {
+        return nil, err
+    }
 
-	// 2. Lấy Menu (Dùng hàm có sẵn để lấy menu theo restaurant ID)
-	menuMap, err := getMenusByRestaurantIDs(ctx, []int{id})
-	if err == nil {
-		rd.Menu = menuMap[id]
-	}
+    // 2. Lấy Menu (Dùng hàm có sẵn để lấy menu theo restaurant ID)
+    menuMap, err := getMenusByRestaurantIDs(ctx, []int{id})
+    if err == nil {
+        rd.Menu = menuMap[id]
+    }
 
-	// 3. Lấy Reviews để làm phần đánh giá khách hàng
-	reviews, err := GetReviewsByRestaurant(ctx, id)
-	if err == nil {
-		rd.UserRatings = reviews
-	}
+    // 3. Lấy Reviews để làm phần đánh giá khách hàng
+    reviews, err := GetReviewsByRestaurant(ctx, id)
+    if err == nil {
+        rd.UserRatings = reviews
+    }
 
-	// 4. Mock thêm mảng ảnh (nếu SQL chưa có bảng ảnh riêng)
-	// rd.Images = []string{"banner.jpg", "view_quan.jpg"}
-	// Do đổi cấu trúc ảnh models
-	rd.Images = []models.RestaurantImage{
-		{ImageURL: "https://storage.yummap.vn/restaurants/" + fmt.Sprintf("%d", id) + "/banner.jpg", IsThumbnail: true},
-		{ImageURL: "https://storage.yummap.vn/restaurants/" + fmt.Sprintf("%d", id) + "/view1.jpg"},
-		{ImageURL: "https://storage.yummap.vn/restaurants/" + fmt.Sprintf("%d", id) + "/view2.jpg"},
-	}
+    // 4. Mock thêm mảng ảnh (nếu SQL chưa có bảng ảnh riêng)
+    // rd.Images = []string{"banner.jpg", "view_quan.jpg"}
+    // Do đổi cấu trúc ảnh models
+    rd.Images = []models.RestaurantImage{
+	{ImageURL: "https://storage.yummap.vn/restaurants/" + fmt.Sprintf("%d", id) + "/banner.jpg", IsThumbnail: true},
+	{ImageURL: "https://storage.yummap.vn/restaurants/" + fmt.Sprintf("%d", id) + "/view1.jpg"},
+	{ImageURL: "https://storage.yummap.vn/restaurants/" + fmt.Sprintf("%d", id) + "/view2.jpg"},
+    }
 
-	return &rd, nil
+    return &rd, nil
 }
 
 // GetPopularRestaurants: Lấy danh sách quán ăn uy tín cho trang chủ

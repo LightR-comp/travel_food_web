@@ -1,12 +1,15 @@
+from dotenv import load_dotenv, find_dotenv
+from core.ai_config import shared_model
 from schemas.payloads import ChatGenerationRequest, ChatFinalData, PlaceInfo
 import logging
-from core.ai_config import shared_model
 
 logger = logging.getLogger(__name__)
 
 # The API key and model are now configured centrally in core/ai_config.py
 # We no longer need to load .env or configure genai here.
 # The shared_model is imported directly.
+# Tự động tìm file .env ở bất kỳ đâu trong dự án
+load_dotenv(find_dotenv())
 
 
 # --- Custom Exceptions ---

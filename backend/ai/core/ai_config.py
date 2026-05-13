@@ -1,4 +1,3 @@
-# core/ai_config.py
 import google.generativeai as genai
 from core.config import settings
 

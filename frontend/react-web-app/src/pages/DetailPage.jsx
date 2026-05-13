@@ -4,52 +4,145 @@ import PhotoGallery from '../components/detail/PhotoGallery';
 import MenuSection from '../components/detail/MenuSection';
 import ReviewSection from '../components/detail/ReviewSection';
 
-import { StarRating, OpenStatus, Spinner } from '../components/ui/index.jsx';
+import { Spinner } from '../components/ui/index.jsx';
 import { getRestaurantByIdApi } from '../api/restaurantApi';
 
-// Mock gallery images for detail (would come from API in production)
-const GALLERY_IMAGES = [
-  'https://scontent.fsgn17-1.fna.fbcdn.net/v/t39.30808-6/680447409_2496624150752646_5733658399108806712_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=13d280&_nc_ohc=nNAVbXGc54QQ7kNvwFXhzR5&_nc_oc=AdopDkYwTgLGRJfGpfP4zUR3oycxPPtX3B8lelmaHDnROLUij-VpKCA4wRPbhfGjO6iKuqEw-pQ09Tcnx6SDIJiz&_nc_zt=23&_nc_ht=scontent.fsgn17-1.fna&_nc_gid=Chvx6-wWcVxuEr9ZMa9N-g&_nc_ss=7b2a8&oh=00_Af2I5KLOZk9CWHHcMcuoM4aw1aQpexTBgd8K0ZoswFXVVA&oe=69F2A006',
-  'https://scontent.fsgn17-1.fna.fbcdn.net/v/t39.30808-6/680718077_2496623994085995_3004369118705862204_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=13d280&_nc_ohc=Je55gEk5biQQ7kNvwFvq8Hc&_nc_oc=AdoCgF4sUMNZSNa21ZXDOZ0RyNgJyGNN0Rx1J_2AFUk87VfO7v0Kxrn7gPnQdB2KQbh0WYN-dNF8bCqbuKZczjz3&_nc_zt=23&_nc_ht=scontent.fsgn17-1.fna&_nc_gid=txV1jhk7-F1B2xj7U0i0RA&_nc_ss=7b2a8&oh=00_Af0g1K3jprLohFWf1ym_9c4brAd9G8ye72BQdscnEbuYew&oe=69F2C457',
-  'https://scontent.fsgn17-1.fna.fbcdn.net/v/t39.30808-6/682198551_2496623974085997_339940597237661833_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=111&ccb=1-7&_nc_sid=13d280&_nc_ohc=txtYryWusn0Q7kNvwEzjWQe&_nc_oc=AdozUB5wEFKA1m4IA_C3jSzbnUkwpJJ1PSAIEP_RUW_dZxB7sFp-U2zVsQM8Rdny0qgwuPykYGWH-hwopvhgX7lG&_nc_zt=23&_nc_ht=scontent.fsgn17-1.fna&_nc_gid=uOSwYEO2gQ_6DiiS9IK6SA&_nc_ss=7b2a8&oh=00_Af0vwzPRuQ4rZvAg4QSeDILy7Z_qrzBO4JdfiQeWcrmF7Q&oe=69F2AE06',
-  'https://scontent.fsgn17-1.fna.fbcdn.net/v/t39.30808-6/678788383_2496623954085999_9041755802111341267_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=13d280&_nc_ohc=TlUJKzOxHjEQ7kNvwFrO-Xr&_nc_oc=AdoporqfIbY29bhY4tgYqLZZA3Fkf8d_4SbLGt7OMjzrthf_9zw8q-3NJi9_D49TJLYfZRh6zgaVM3__2TaJvTAu&_nc_zt=23&_nc_ht=scontent.fsgn17-1.fna&_nc_gid=_9jrwn7KoA4V5nHYx1mX5g&_nc_ss=7b2a8&oh=00_Af20_58zgrOwuUE-DIgH9VUUFAR21gV4H3a_3md-yVWqHA&oe=69F2A572',
-  'https://scontent.fsgn17-1.fna.fbcdn.net/v/t39.30808-6/682131563_2496624090752652_6299885406740940689_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=13d280&_nc_ohc=Pd3k2fmSETIQ7kNvwH691V9&_nc_oc=Adq2dml50_MF2hvJfGkv8BRg_sM4ibViXOjJy_E6g7BI_PipUfq-mShL7Jh9426l1sVYvIx4xJryW6psGW1q3twQ&_nc_zt=23&_nc_ht=scontent.fsgn17-1.fna&_nc_gid=2xklPQZbeklznVOQzkDORw&_nc_ss=7b2a8&oh=00_Af1k89IbOsCIRVUb0T9Qrr-EFOocCe0J7bC49DW3x25SBg&oe=69F2AF1E',
-  'https://scontent.fsgn17-1.fna.fbcdn.net/v/t39.30808-6/680377267_2496624094085985_805073932068142165_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=13d280&_nc_ohc=DEAqQ_hwWSsQ7kNvwFRAJie&_nc_oc=Adpj8n0HVCRQHVjRvKpoZw47c9uoZsIOr_c_FzfION48zvHZHqkdhX8hAtTLvqgoxP9xht98BBFYBg0h47A019DI&_nc_zt=23&_nc_ht=scontent.fsgn17-1.fna&_nc_gid=RCUHWKhU1Ahg0LY3dbRLAQ&_nc_ss=7b2a8&oh=00_Af052xa1G90jKfww0NCK2_KDbC99j6KkxVeM8JbBn8eZVQ&oe=69F2C914',
-  'https://scontent.fsgn17-1.fna.fbcdn.net/v/t39.30808-6/679096346_2496624077419320_554599415698098513_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=111&ccb=1-7&_nc_sid=13d280&_nc_ohc=sPEAW88GaEsQ7kNvwFqZlBm&_nc_oc=AdrlhPB41NofdZ4sF6QxpIgf5dY8IsIpqrOJvamTJud9G9dqvwJHuEEl0O8p9-Ai--eMlKrSiAOiNewVlA-Mk25m&_nc_zt=23&_nc_ht=scontent.fsgn17-1.fna&_nc_gid=6odYk3e3-QHYLeCVVy5oeQ&_nc_ss=7b2a8&oh=00_Af0Brd7N4rcxzLW4GWYL3z8bUD5EkoWfGFLRPgx09y6VMQ&oe=69F2B772',
-];
+// ============================================================
+// Helper: map flat RestaurantDetail (từ backend) → các section
+// Backend trả về:
+//   res.data = { id, name, address, lat, lng, rating, price_range,
+//                open_time, close_time, type, menu, user_ratings, images }
+// ============================================================
+function mapApiToSections(raw) {
+  if (!raw) return null;
+
+  // Tính is_open_now dựa trên open_time / close_time (HH:MM)
+  const isOpenNow = (() => {
+    try {
+      const now = new Date();
+      const [oh, om] = (raw.open_time || '').split(':').map(Number);
+      const [ch, cm] = (raw.close_time || '').split(':').map(Number);
+      const cur = now.getHours() * 60 + now.getMinutes();
+      const open = oh * 60 + om;
+      const close = ch * 60 + cm;
+      if (close > open) return cur >= open && cur <= close;
+      // Trường hợp qua nửa đêm
+      return cur >= open || cur <= close;
+    } catch {
+      return false;
+    }
+  })();
+
+  const schedule =
+    raw.open_time && raw.close_time
+      ? `${raw.open_time} – ${raw.close_time}`
+      : 'Chưa có thông tin';
+
+  // Galleries: ưu tiên ảnh từ API, fallback rỗng
+  const galleries = Array.isArray(raw.images)
+    ? raw.images.map((img) => (typeof img === 'string' ? img : img?.image_url)).filter(Boolean)
+    : [];
+
+  // Menu: raw.menu là []MenuItem { id, name, description, price, food_type }
+  const menu = Array.isArray(raw.menu) ? raw.menu : [];
+
+  // restaurant_info: gom các trường cơ bản
+  const restaurant_info = {
+    name: raw.name || 'Không có tên',
+    type: raw.type || '',
+    contact: {
+      address: raw.address || 'Chưa có địa chỉ',
+      phone: raw.phone || null,
+      facebook: raw.facebook_url || null,
+    },
+    operating_hours: {
+      schedule,
+      is_open_now: isOpenNow,
+    },
+  };
+
+  // meta: rating + review_count + price_range
+  const meta = {
+    rating: raw.rating ?? 0,
+    review_count: Array.isArray(raw.user_ratings) ? raw.user_ratings.length : 0,
+    price_range:
+      raw.price_range != null
+        ? Number(raw.price_range).toLocaleString('vi-VN') + ' đ'
+        : 'Chưa có thông tin',
+  };
+
+  // ai_analysis: backend chưa trả, để null an toàn
+  const ai_analysis = raw.ai_analysis ?? null;
+
+  // signature_dish: backend chưa trả, lấy món đầu tiên nếu có
+  const signature_dish = raw.signature_dish ?? (menu.length > 0 ? menu[0] : null);
+
+  // tags: từ type hoặc mảng tags nếu có
+  const tags = Array.isArray(raw.tags)
+    ? raw.tags
+    : raw.type
+    ? [raw.type]
+    : [];
+
+  // user_ratings để ReviewSection dùng sau này
+  const user_ratings = Array.isArray(raw.user_ratings) ? raw.user_ratings : [];
+
+  return { restaurant_info, meta, ai_analysis, signature_dish, galleries, menu, tags, user_ratings };
+}
 
 const DetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [restaurant, setRestaurant] = useState(null);
+  const [data, setData] = useState(null);   // mapped sections
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!id) return;
     setLoading(true);
+    setError(null);
+    setData(null);
+
     getRestaurantByIdApi(id)
-      .then((res) => setRestaurant(res.data.restaurant))
-      .catch(() => setError('Không tìm thấy nhà hàng này'))
+      .then((res) => {
+        // Backend: { success, data: RestaurantDetail, ... }
+        const raw = res?.data ?? null;
+        if (!raw) throw new Error('Không có dữ liệu');
+        const mapped = mapApiToSections(raw);
+        setData(mapped);
+      })
+      .catch((err) => {
+        const msg =
+          err?.response?.data?.message ||
+          err?.message ||
+          'Không tìm thấy nhà hàng này';
+        setError(msg);
+      })
       .finally(() => setLoading(false));
   }, [id]);
 
+  // ── Loading ──
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen bg-[#FAFAF7]">
       <Spinner size="lg" />
     </div>
   );
 
-  if (error || !restaurant) return (
+  // ── Error / Not found ──
+  if (error || !data) return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#FAFAF7] gap-4">
       <div className="text-6xl">😕</div>
-      <h2 className="text-xl font-bold text-[#2C1810]">{error || 'Không tìm thấy'}</h2>
-      <button onClick={() => navigate(-1)} className="px-6 py-2 bg-[#E8623A] text-white rounded-full font-semibold hover:opacity-90 transition-opacity">
+      <h2 className="text-xl font-bold text-[#2C1810]">{error || 'Không tìm thấy nhà hàng'}</h2>
+      <button
+        onClick={() => navigate(-1)}
+        className="px-6 py-2 bg-[#E8623A] text-white rounded-full font-semibold hover:opacity-90 transition-opacity"
+      >
         ← Quay lại
       </button>
     </div>
   );
 
-  const { restaurant_info, signature_dish, meta, ai_analysis, tags } = restaurant;
+  const { restaurant_info, meta, ai_analysis, galleries, tags } = data;
   const { name, contact, operating_hours } = restaurant_info;
 
   return (
@@ -67,8 +160,10 @@ const DetailPage = () => {
           Quay lại
         </button>
 
-        {/* Photo gallery */}
-        <PhotoGallery images={GALLERY_IMAGES} restaurantName={name} />
+        {/* Photo gallery – dùng ảnh từ API, ẩn nếu không có ảnh */}
+        {galleries.length > 0 && (
+          <PhotoGallery images={galleries} restaurantName={name} />
+        )}
 
         {/* Main info + map split */}
         <div className="flex flex-col lg:flex-row gap-6 mt-8">
@@ -90,7 +185,7 @@ const DetailPage = () => {
             {/* ── Tags row + rating ── */}
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
               <div className="flex items-center gap-2 flex-wrap">
-                {tags?.map((t) => (
+                {tags.map((t) => (
                   <span key={t} className="px-3 py-1 rounded-full border border-[#E0D3C8] text-sm text-[#4A3728] font-medium">
                     {t}
                   </span>
@@ -138,10 +233,12 @@ const DetailPage = () => {
                     </a>
                   </div>
                 )}
-                <div className="flex items-center gap-2">
-                  <span className="text-lg flex-shrink-0">📘</span>
-                  <a href="https://www.facebook.com/SaBiChuongbyBrothers/photos" className="text-sm text-[#1877F2] hover:underline font-medium">{name}</a>
-                </div>
+                {contact.facebook && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg flex-shrink-0">📘</span>
+                    <a href={contact.facebook} target="_blank" rel="noreferrer" className="text-sm text-[#1877F2] hover:underline font-medium">{name}</a>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -174,13 +271,12 @@ const DetailPage = () => {
               </button>
             </div>
 
-            {/* Menu section – same width as left info */}
+            {/* Menu section */}
             <div className="bg-white rounded-2xl border border-[#F5EDD8] p-6 mt-6">
               <MenuSection />
             </div>
 
             <ReviewSection />
-
 
           </div>
 
@@ -189,13 +285,9 @@ const DetailPage = () => {
 
             {/* ── Location card ── */}
             <div className="bg-[#E8F4FD] rounded-2xl border border-[#D0E8F8] p-5 text-center">
-              {/* Pin icon */}
               <div className="flex justify-center mb-3">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
-                    fill="#3B82F6"
-                  />
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#3B82F6"/>
                   <circle cx="12" cy="9" r="2.5" fill="white" />
                 </svg>
               </div>
@@ -208,7 +300,6 @@ const DetailPage = () => {
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-2 border-2 border-[#F5A623] text-[#E8960A] font-semibold text-sm rounded-full hover:bg-[#FFF8EE] transition-colors"
               >
-                {/* Navigation arrow icon */}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M3.4 20.4l17.45-7.48a1 1 0 000-1.84L3.4 3.6a.993.993 0 00-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.51c0 .71.73 1.2 1.39.91z" />
                 </svg>
@@ -227,7 +318,7 @@ const DetailPage = () => {
                 <div>
                   <p className="text-xs text-[#7B7068] mb-0.5">Đánh giá</p>
                   <p className="text-sm font-semibold text-[#2C1810]">
-                    {'★'.repeat(Math.round(meta.rating))}{'☆'.repeat(5 - Math.round(meta.rating))}{' '}
+                    {'★'.repeat(Math.min(5, Math.round(meta.rating)))}{'☆'.repeat(Math.max(0, 5 - Math.round(meta.rating)))}{' '}
                     <span className="text-[#F5A623]">{meta.rating} / 5</span>
                   </p>
                 </div>
@@ -253,8 +344,8 @@ const DetailPage = () => {
                 </div>
               </div>
 
-              {/* Suitable for (from tags) */}
-              {tags?.length > 0 && (
+              {/* Tags */}
+              {tags.length > 0 && (
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-2xl flex-shrink-0">👥</span>
                   <div>
@@ -278,7 +369,6 @@ const DetailPage = () => {
 
           </div>
         </div>
-
 
       </div>
     </div>

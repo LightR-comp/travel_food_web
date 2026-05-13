@@ -273,10 +273,10 @@ const DetailPage = () => {
 
             {/* Menu section */}
             <div className="bg-white rounded-2xl border border-[#F5EDD8] p-6 mt-6">
-              <MenuSection />
+              <MenuSection menu={data.menu} />
             </div>
 
-            <ReviewSection />
+            <ReviewSection reviews={data.user_ratings} rating={meta.rating} />
 
           </div>
 

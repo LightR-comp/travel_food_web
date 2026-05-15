@@ -1,11 +1,12 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from schemas.payloads import *
 from ai_chatbot.nlp_parser import detect_intent_with_ai
 from ai_chatbot.consultant_rag import generate_final_response
+from ai_chatbot.identify_logic import identify_dish_from_image
 import asyncio
 
 router = APIRouter()
-
+# Các endpoint cho chatbot phân tích ý định và tạo phản hồi
 @router.post("/intent_parse", response_model=BaseResponse)
 async def intent_parse_endpoint(request: ChatIntentRequest):
     try:
@@ -28,3 +29,18 @@ async def generate_response_endpoint(request: ChatGenerationRequest):
         return BaseResponse(success=True, message="Tạo phản hồi thành công", data=final_data)
     except Exception as e:
         return BaseResponse(success=False, error=str(e))
+
+# Endpoint mới cho nhận diện món ăn từ ảnh (Multimodal)
+@router.post("/identify_dish", response_model=BaseResponse)
+async def identify_dish_endpoint(request: dict):
+    """Endpoint nhận diện món ăn từ Base64 image (Multimodal)"""
+    try:
+        img_b64 = request.get("image_base64")
+        if not img_b64:
+            raise HTTPException(status_code=400, detail="Thiếu dữ liệu hình ảnh (base64)")
+            
+        # Chạy logic nhận diện (chứa prompt Gemini) trong thread riêng
+        result = await asyncio.to_thread(identify_dish_from_image, img_b64)
+        return BaseResponse(success=True, message="Nhận diện thành công", data=result)
+    except Exception as e:
+        return BaseResponse(success=False, message="Lỗi nhận diện món ăn", error=str(e))

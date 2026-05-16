@@ -281,6 +281,39 @@ func getImagesByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.
 	return result, nil
 }
 
+func getImagesByMenuItemIDs(ctx context.Context, ids []int) (map[int][]models.DishImage, error) {
+	if len(ids) == 0 {
+		return make(map[int][]models.DishImage), nil
+	}
+
+	idStrings := make([]string, len(ids))
+	for i, id := range ids {
+		idStrings[i] = fmt.Sprintf("%d", id)
+	}
+	query := fmt.Sprintf(`
+		SELECT id, menu_item_id, image_url, caption, is_thumbnail, created_at
+		FROM DishImages
+		WHERE menu_item_id IN (%s)
+		ORDER BY is_thumbnail DESC
+	`, strings.Join(idStrings, ","))
+
+	rows, err := db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make(map[int][]models.DishImage)
+	for rows.Next() {
+		var img models.DishImage
+		if err := rows.Scan(&img.ID, &img.MenuItemID, &img.ImageURL, &img.Caption, &img.IsThumbnail, &img.CreatedAt); err != nil {
+			continue
+		}
+		result[img.MenuItemID] = append(result[img.MenuItemID], img)
+	}
+	return result, nil
+}
+
 func CreateReview(ctx context.Context, rv models.UserRating) (*models.UserRating, error) {
 	row := db.QueryRowContext(ctx, `
 		INSERT INTO UserRatings (restaurant_id, user_id, rating, comment, created_at)
@@ -768,14 +801,29 @@ func GetPopularRestaurants(ctx context.Context, limit int) ([]models.Restaurant,
 
 // GetTrendingDishes: Lấy quán ăn dựa trên các món ăn đang nổi tiếng
 func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}, error) {
-	// Query lấy món ăn trending kèm thông tin quán sở hữu món đó
 	query := `
+		WITH RankedDishes AS (
+			SELECT 
+				m.id AS dish_id, 
+				m.name AS dish_name, 
+				m.price, 
+				m.description, 
+				m.ingredients,
+				r.id AS restaurant_id, 
+				r.name AS restaurant_name, 
+				r.address, 
+				r.rating, 
+				r.type,
+				ROW_NUMBER() OVER (PARTITION BY r.id ORDER BY m.price DESC) AS rn
+			FROM MenuItems m
+			JOIN Restaurants r ON m.restaurant_id = r.id
+		)
 		SELECT TOP (@limit) 
-			m.id AS dish_id, m.name AS dish_name, m.price, m.description, m.ingredients,
-			r.id AS restaurant_id, r.name AS restaurant_name, r.address, r.rating, r.type
-		FROM MenuItems m
-		JOIN Restaurants r ON m.restaurant_id = r.id
-		ORDER BY r.rating DESC, m.price DESC -- Ưu tiên quán xịn và món đặc sắc
+			dish_id, dish_name, price, description, ingredients,
+			restaurant_id, restaurant_name, address, rating, type
+		FROM RankedDishes
+		WHERE rn = 1
+		ORDER BY rating DESC, price DESC
 	`
 
 	rows, err := db.QueryContext(ctx, query, sql.Named("limit", limit))
@@ -784,32 +832,31 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 	}
 	defer rows.Close()
 
-	var trendingList []map[string]interface{}
+	var dishIDs []int
+	var tempItems []map[string]interface{}
+
 	for rows.Next() {
 		var dID, rID int
 		var dName, dDesc, dIngre, rName, rAddr, rType string
 		var price, rating float64
 
-		err := rows.Scan(&dID, &dName, &price, &dDesc, &dIngre, &rID, &rName, &rAddr, &rating, &rType)
-		if err != nil {
+		if err := rows.Scan(&dID, &dName, &price, &dDesc, &dIngre, &rID, &rName, &rAddr, &rating, &rType); err != nil {
 			continue
 		}
 
-		// Logic tạo huy hiệu (Badge) tự động
 		badge := "Popular"
 		if rating >= 4.5 {
 			badge = "Must try"
 		}
 
-		// Tạo cấu trúc dữ liệu xoay quanh món ăn nổi tiếng
 		item := map[string]interface{}{
 			"dish_info": map[string]interface{}{
 				"id":          dID,
 				"name":        dName,
 				"price":       price,
 				"description": dDesc,
-				"image_url":   fmt.Sprintf("https://storage.yummap.vn/dishes/%d.jpg", dID), // URL ảnh món ăn
 				"badge":       badge,
+				"image_url":   "", 
 			},
 			"restaurant_info": map[string]interface{}{
 				"id":      rID,
@@ -819,10 +866,42 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 				"type":    rType,
 			},
 		}
-		trendingList = append(trendingList, item)
+		
+		tempItems = append(tempItems, item)
+		dishIDs = append(dishIDs, dID)
 	}
 
-	return trendingList, nil
+	if len(dishIDs) > 0 {
+		imageMap, err := getImagesByMenuItemIDs(ctx, dishIDs)
+		if err == nil {
+			for _, item := range tempItems {
+				dishInfo := item["dish_info"].(map[string]interface{})
+				dID := dishInfo["id"].(int)
+				
+				images := imageMap[dID]
+				var finalImg string
+				
+				for _, img := range images {
+					if img.IsThumbnail {
+						finalImg = img.ImageURL
+						break
+					}
+				}
+				
+				if finalImg == "" && len(images) > 0 {
+					finalImg = images[0].ImageURL
+				}
+				
+				dishInfo["image_url"] = finalImg
+			}
+		}
+	}
+
+	if tempItems == nil {
+		return []map[string]interface{}{}, nil
+	}
+
+	return tempItems, nil
 }
 
 // [Minh]

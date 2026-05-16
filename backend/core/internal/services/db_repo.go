@@ -216,11 +216,19 @@ func GetRestaurantsNearby(ctx context.Context, q NearbyQuery) ([]models.Restaura
 }
 
 func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.MenuItem, error) {
+	if len(ids) == 0 {
+		return make(map[int][]models.MenuItem), nil
+	}
+
+	idStrings := make([]string, len(ids))
+	for i, id := range ids {
+		idStrings[i] = fmt.Sprintf("%d", id)
+	}
 	query := fmt.Sprintf(`
-		SELECT restaurant_id, id, name, description, price, food_type, ingredients
-		FROM MenuItems
+		SELECT restaurant_id, id, name, description, price, food_type, ingredients 
+		FROM MenuItems 
 		WHERE restaurant_id IN (%s)
-	`, intSliceToSQL(ids))
+	`, strings.Join(idStrings, ","))
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
@@ -231,15 +239,15 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 	result := make(map[int][]models.MenuItem)
 	for rows.Next() {
 		var item models.MenuItem
-		var restaurantID int
 		if err := rows.Scan(
-			&restaurantID, &item.ID, &item.Name, &item.Description,
+			&item.RestaurantID, &item.ID, &item.Name, &item.Description,
 			&item.Price, &item.FoodType, &item.Ingredients,
 		); err != nil {
 			continue
 		}
-		result[restaurantID] = append(result[restaurantID], item)
+		result[item.RestaurantID] = append(result[item.RestaurantID], item)
 	}
+
 	return result, nil
 }
 
@@ -305,9 +313,16 @@ func GetReviewsByRestaurant(ctx context.Context, restaurantID int) ([]models.Use
 	var reviews []models.UserRating
 	for rows.Next() {
 		var rv models.UserRating
-		rows.Scan(&rv.ID, &rv.UserID, &rv.RestaurantID, &rv.Rating, &rv.Comment, &rv.CreatedAt)
+		if err := rows.Scan(&rv.ID, &rv.UserID, &rv.RestaurantID, &rv.Rating, &rv.Comment, &rv.CreatedAt); err != nil {
+			continue
+		}
 		reviews = append(reviews, rv)
 	}
+
+	if reviews == nil {
+		return []models.UserRating{}, nil
+	}
+
 	return reviews, nil
 }
 
@@ -358,6 +373,36 @@ func updateAvgRating(restaurantID int) {
 	if err != nil {
 		log.Printf("[DB] Lỗi cập nhật rating trung bình: %v", err)
 	}
+}
+
+func GetForumPostsByRestaurantID(ctx context.Context, restaurantID int) ([]models.Post, error) {
+	query := `
+		SELECT TOP 5 id, author_id, prefix, title, summary, thumbnail_url, 
+		             type, view_count, reply_count, is_locked, created_at, updated_at
+		FROM Posts
+		WHERE restaurant_id = @rid
+		ORDER BY created_at DESC
+	`
+	rows, err := db.QueryContext(ctx, query, sql.Named("rid", restaurantID))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []models.Post
+	for rows.Next() {
+		var p models.Post
+		err := rows.Scan(
+			&p.ID, &p.AuthorID, &p.Prefix, &p.Title, &p.Summary, &p.ThumbnailURL,
+			&p.Type, &p.ViewCount, &p.ReplyCount, &p.IsLocked, &p.CreatedAt, &p.UpdatedAt,
+		)
+		if err != nil {
+			continue
+		}
+		p.Comments = []models.Comment{}
+		posts = append(posts, p)
+	}
+	return posts, nil
 }
 
 // ============================================================
@@ -641,46 +686,48 @@ func SearchRestaurants(ctx context.Context, q string, minPrice, maxPrice float64
 // GetRestaurantDetail: Lấy chi tiết nhà hàng, bao gồm menu và reviews
 // Chưa hoàn thiện vì còn thiếu bảng ảnh, nhưng sẽ trả về được menu và reviews để handler có thể hiển thị chi tiết.
 func GetRestaurantDetail(ctx context.Context, id int) (*models.RestaurantDetail, error) {
-	// 1. Lấy thông tin gốc của quán
 	query := `
-        SELECT id, name, address, lat, lng, rating, price_range, 
-               open_time, close_time, type, created_at
-        FROM Restaurants WHERE id = @id
-    `
-    var rd models.RestaurantDetail
-    err := db.QueryRowContext(ctx, query, sql.Named("id", id)).Scan(
-        &rd.ID, &rd.Name, &rd.Address, &rd.Lat, &rd.Lng, &rd.Rating, 
-        &rd.PriceRange, &rd.OpenTime, &rd.CloseTime, &rd.Type, &rd.CreatedAt,
-    )
-    if err == sql.ErrNoRows {
-        return nil, fmt.Errorf("không tìm thấy nhà hàng")
-    }
-    if err != nil {
-        return nil, err
-    }
+		SELECT id, name, address, lat, lng, rating, price_range, 
+		       open_time, close_time, type, created_at
+		FROM Restaurants WHERE id = @id
+	`
+	var rd models.RestaurantDetail
+	err := db.QueryRowContext(ctx, query, sql.Named("id", id)).Scan(
+		&rd.ID, &rd.Name, &rd.Address, &rd.Lat, &rd.Lng, &rd.Rating, 
+		&rd.PriceRange, &rd.OpenTime, &rd.CloseTime, &rd.Type, &rd.CreatedAt,
+	)
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("không tìm thấy nhà hàng")
+	}
+	if err != nil {
+		return nil, err
+	}
 
-    // 2. Lấy Menu (Dùng hàm có sẵn để lấy menu theo restaurant ID)
-    menuMap, err := getMenusByRestaurantIDs(ctx, []int{id})
-    if err == nil {
-        rd.Menu = menuMap[id]
-    }
+	menuMap, err := getMenusByRestaurantIDs(ctx, []int{id})
+	if err == nil {
+		rd.Menu = menuMap[id]
+	}
 
-    // 3. Lấy Reviews để làm phần đánh giá khách hàng
-    reviews, err := GetReviewsByRestaurant(ctx, id)
-    if err == nil {
-        rd.UserRatings = reviews
-    }
+	reviews, err := GetReviewsByRestaurant(ctx, id)
+	if err == nil {
+		rd.UserRatings = reviews
+	}
 
-    // 4. Mock thêm mảng ảnh (nếu SQL chưa có bảng ảnh riêng)
-    // rd.Images = []string{"banner.jpg", "view_quan.jpg"}
-    // Do đổi cấu trúc ảnh models
-    rd.Images = []models.RestaurantImage{
-	{ImageURL: "https://storage.yummap.vn/restaurants/" + fmt.Sprintf("%d", id) + "/banner.jpg", IsThumbnail: true},
-	{ImageURL: "https://storage.yummap.vn/restaurants/" + fmt.Sprintf("%d", id) + "/view1.jpg"},
-	{ImageURL: "https://storage.yummap.vn/restaurants/" + fmt.Sprintf("%d", id) + "/view2.jpg"},
-    }
+	imageMap, err := getImagesByRestaurantIDs(ctx, []int{id})
+	if err == nil && len(imageMap[id]) > 0 {
+		rd.Images = imageMap[id]
+	} else {
+		rd.Images = []models.RestaurantImage{}
+	}
 
-    return &rd, nil
+	forumPosts, err := GetForumPostsByRestaurantID(ctx, rd.ID)
+	if err == nil {
+		rd.ForumPosts = forumPosts
+	} else {
+		rd.ForumPosts = []models.Post{}
+	}
+
+	return &rd, nil
 }
 
 // GetPopularRestaurants: Lấy danh sách quán ăn uy tín cho trang chủ

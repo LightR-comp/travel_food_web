@@ -22,6 +22,9 @@ type Config struct {
 	GoongMapsAPIKey string
 	GeminiAPIKey string
 	FirebaseCredentialPath string
+	CloudinaryCloudName string
+	CloudinaryAPIKey    string
+	CloudinaryAPISecret string
 }
 
 // biến global để DB Repo, AI Client gọi
@@ -46,6 +49,9 @@ func LoadConfig() {
 		GoongMapsAPIKey: getEnv("GOOng_MAPS_API_KEY", ""),
 		GeminiAPIKey:     getEnv("GEMINI_API_KEY", ""),
 		FirebaseCredentialPath: getEnv("FIREBASE_CREDENTIAL_PATH", "../../config/serviceAccountKey.json"),
+		CloudinaryCloudName: getEnv("CLOUDINARY_CLOUD_NAME", "dmp7l3ore"),
+		CloudinaryAPIKey:    getEnv("CLOUDINARY_API_KEY", "225293476625234"),
+		CloudinaryAPISecret: getEnv("CLOUDINARY_API_SECRET", "tj82Ei-qT_KVysyxRLnVHdwlSI0"),
 	}
 }	
 

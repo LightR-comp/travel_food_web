@@ -41,3 +41,13 @@ export const getMeApi = async () => {
   const { data } = await axiosInstance.get('/me');
   return data;
 };
+
+/**
+ * PUT /api/v1/me
+ * Body: { full_name, avatar_url } (các field cần cập nhật)
+ * Response: { success, message, data: { id, username, full_name, email, avatar_url }, error }
+ */
+export const updateProfileApi = async (payload) => {
+  const { data } = await axiosInstance.put('/me', payload);
+  return data;
+};

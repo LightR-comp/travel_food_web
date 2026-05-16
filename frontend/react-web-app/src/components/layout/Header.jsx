@@ -157,6 +157,17 @@ const Header = () => {
                   <p className="text-sm font-bold text-[#2C1810] truncate">{user.full_name}</p>
                   <p className="text-xs text-[#7B7068] truncate">{user.email}</p>
                 </div>
+
+                {/* Profile page */}
+                <Link
+                  to="/profile"
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[#2C1810] hover:bg-[#FFF8EE] transition-colors"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  👤 Trang cá nhân
+                </Link>
+
+
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors"

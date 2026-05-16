@@ -1,18 +1,16 @@
+from dotenv import load_dotenv, find_dotenv
 from core.ai_config import shared_model
 from schemas.payloads import ChatGenerationRequest, ChatFinalData, PlaceInfo
 import logging
 
 logger = logging.getLogger(__name__)
 
-<<<<<<< HEAD
-=======
 # The API key and model are now configured centrally in core/ai_config.py
 # We no longer need to load .env or configure genai here.
 # The shared_model is imported directly.
 # Tự động tìm file .env ở bất kỳ đâu trong dự án
 load_dotenv(find_dotenv())
 
->>>>>>> 430236052329140f0b5555c8aa6bab08a9be3389
 
 # --- Custom Exceptions ---
 class AllergyProcessingError(Exception):
@@ -98,30 +96,15 @@ def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
     """
 
     # --- Bước 3: Gọi AI ---
-<<<<<<< HEAD
-
-            
-    # Tắt toàn bộ bộ lọc an toàn để AI không bao giờ từ chối trả lời
-    response = shared_model.generate_content(
-    prompt,
-    safety_settings={
-=======
     try:
         # The API key check is now handled centrally at startup.
         response = shared_model.generate_content(
             prompt,
             safety_settings={
->>>>>>> 430236052329140f0b5555c8aa6bab08a9be3389
                 'HARM_CATEGORY_HARASSMENT': 'BLOCK_NONE',
                 'HARM_CATEGORY_HATE_SPEECH': 'BLOCK_NONE',
                 'HARM_CATEGORY_SEXUALLY_EXPLICIT': 'BLOCK_NONE',
                 'HARM_CATEGORY_DANGEROUS_CONTENT': 'BLOCK_NONE'
-<<<<<<< HEAD
-        }
-    )
-    ai_reply = response.text
-
-=======
             }
         )
         ai_reply = response.text
@@ -132,7 +115,6 @@ def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
         # Lỗi không xác định — log đầy đủ để debug
         logger.exception(f"Lỗi không xác định khi gọi Gemini: {e}")
         ai_reply = f"Dạ, em đang gặp chút sự cố ạ. (Lỗi AI: {str(e)})"
->>>>>>> 430236052329140f0b5555c8aa6bab08a9be3389
 
     # --- Bước 4: Build response — lỗi ở đây không ảnh hưởng ai_reply ---
     suggested_places = []

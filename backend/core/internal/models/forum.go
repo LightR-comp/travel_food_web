@@ -30,6 +30,7 @@ type Post struct {
     UpdatedAt     time.Time `json:"updated_at"`
 
 	Comments []Comment `json:"comments,omitempty"`
+    Images []PostImage `json:"images,omitempty"`
 }
 
 type Comment struct {
@@ -39,6 +40,7 @@ type Comment struct {
     Content   string    `json:"content"`
     LikeCount int       `json:"like_count"`
     CreatedAt time.Time `json:"created_at"`
+    ImageURL  string    `json:"image_url,omitempty"`
 }
 
 type Attachment struct {
@@ -54,4 +56,12 @@ type Poll struct {
     Question   string   `json:"question"`
     Options    []string `json:"options"`
     TotalVotes int      `json:"total_votes"`
+}
+
+type PostImage struct {
+    ID         int       `json:"id"`
+    PostID     int       `json:"post_id"`
+    ImageURL   string    `json:"image_url"`
+    OrderIndex int       `json:"order_index"`
+    CreatedAt  time.Time `json:"created_at"`
 }

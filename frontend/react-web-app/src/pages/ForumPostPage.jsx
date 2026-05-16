@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { forumApi } from '../api/forumApi'; // Thêm dòng này để kết nối API tập trung
 
 /* ─── Intersection Observer hook ─── */
 const useInView = (threshold = 0.15) => {
@@ -97,12 +98,27 @@ const ForumPostPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isValid) return;
-    setSubmitting(true);
-    await new Promise(r => setTimeout(r, 2000));
-    setSubmitting(false);
-    setShowSuccess(true);
-    setTimeout(() => navigate('/forum'), 2500);
+    if (!isValid || submitting) return;
+    
+    try {
+      setSubmitting(true);
+      
+      // Gọi API createPost
+      await forumApi.createPost({
+        title: form.title,
+        content: form.content,
+        category: form.category
+      });
+
+      // Hiển thị popup thông báo thành công của UI và chuyển trang
+      setShowSuccess(true);
+      setTimeout(() => navigate('/forum'), 2500);
+    } catch (error) {
+      console.error("Lỗi khi đăng bài viết:", error);
+      alert(error.message || "Đăng bài viết thất bại. Bạn cần đăng nhập để thực hiện.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const inputClass = `

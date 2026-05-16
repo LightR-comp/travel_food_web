@@ -56,8 +56,10 @@ func SetupRouter(r *gin.Engine) {
 			posts.GET("", handlers.GetListPosts)            // Danh sách bài viết (Phân trang/Topic)
 			posts.GET("/:id", handlers.GetPostDetail)       // Chi tiết bài viết + Comments
 
+
 			// Private routes (Cần Middleware Auth)
 			authorized := posts.Group("/")
+			
 			authorized.Use(middlewares.FirebaseAuthMiddleware())
 			{
 				authorized.POST("", handlers.CreatePost)                // Đăng bài mới

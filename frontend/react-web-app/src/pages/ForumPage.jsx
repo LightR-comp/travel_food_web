@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { forumApi } from '../api/forumApi';
 
-/* ─── mock data ─── */
+
+const TRENDING_TAGS = ['#bunbo', '#phobeo', '#reviewquanandian', '#comtam', '#giamgia'];
+
 const CATEGORIES = [
   { id: 'all', label: 'Tất cả', icon: '🍽️' },
   { id: 'review', label: 'Đánh giá', icon: '⭐' },
@@ -9,87 +12,6 @@ const CATEGORIES = [
   { id: 'tips', label: 'Mẹo vặt', icon: '💡' },
   { id: 'events', label: 'Sự kiện', icon: '🎉' },
   { id: 'question', label: 'Hỏi đáp', icon: '❓' },
-];
-
-const TRENDING_TAGS = [
-  '#BúnBòHuế', '#PhởHàNội', '#BánhMì', '#CơmTấm',
-  '#ĂnVặtSàiGòn', '#QuánCaFe', '#FoodTour', '#ẨmThựcĐường phố',
-];
-
-const MOCK_POSTS = [
-  {
-    id: 1,
-    author: 'Minh Anh',
-    avatar: '🧑‍🍳',
-    category: 'review',
-    title: 'Top 5 quán phở ngon nhất Quận 1 – Review chân thực!',
-    excerpt: 'Sau nhiều ngày lang thang khắp Quận 1, mình đã tìm ra 5 quán phở ngon nhất với hương vị đậm đà, nước dùng trong...',
-    likes: 234,
-    comments: 45,
-    time: '2 giờ trước',
-    tags: ['#PhởHàNội', '#Quận1'],
-    pinned: true,
-  },
-  {
-    id: 2,
-    author: 'Hồng Ngọc',
-    avatar: '👩‍🍳',
-    category: 'recipe',
-    title: 'Cách nấu bún bò Huế chuẩn vị miền Trung tại nhà',
-    excerpt: 'Chia sẻ công thức bún bò Huế gia truyền từ bà ngoại, đảm bảo ai ăn cũng phải khen ngon. Bí quyết nằm ở...',
-    likes: 189,
-    comments: 32,
-    time: '5 giờ trước',
-    tags: ['#BúnBòHuế', '#CôngThức'],
-  },
-  {
-    id: 3,
-    author: 'Đức Thành',
-    avatar: '🧔',
-    category: 'tips',
-    title: 'Bí kíp ăn vặt Sài Gòn với budget 50k',
-    excerpt: 'Bạn chỉ có 50k mà muốn ăn no? Không vấn đề! Đây là list những món ăn vặt Sài Gòn siêu ngon mà siêu rẻ...',
-    likes: 312,
-    comments: 67,
-    time: '1 ngày trước',
-    tags: ['#ĂnVặtSàiGòn', '#TiếtKiệm'],
-  },
-  {
-    id: 4,
-    author: 'Thu Hương',
-    avatar: '👩',
-    category: 'events',
-    title: 'Lễ hội ẩm thực đường phố 2026 – Đừng bỏ lỡ!',
-    excerpt: 'Lễ hội ẩm thực đường phố lớn nhất năm sắp diễn ra tại Công viên 23/9. Hàng trăm gian hàng ẩm thực từ khắp cả nước...',
-    likes: 156,
-    comments: 28,
-    time: '2 ngày trước',
-    tags: ['#FoodTour', '#SựKiện'],
-  },
-  {
-    id: 5,
-    author: 'Quốc Bảo',
-    avatar: '🧑',
-    category: 'question',
-    title: 'Quán bánh mì nào ngon nhất TP.HCM? Cần gợi ý!',
-    excerpt: 'Mình mới chuyển vào Sài Gòn, đang tìm quán bánh mì ngon. Mọi người gợi ý giúp mình với, mình thích bánh mì thịt...',
-    likes: 87,
-    comments: 54,
-    time: '3 ngày trước',
-    tags: ['#BánhMì', '#TPHCM'],
-  },
-  {
-    id: 6,
-    author: 'Lan Chi',
-    avatar: '👧',
-    category: 'review',
-    title: 'Review quán cơm tấm Bụi – Hương vị Sài Gòn xưa',
-    excerpt: 'Quán cơm tấm nhỏ nằm trong hẻm đường Nguyễn Thị Minh Khai, không bảng hiệu, nhưng hương vị thì không lẫn vào đâu...',
-    likes: 198,
-    comments: 41,
-    time: '3 ngày trước',
-    tags: ['#CơmTấm', '#SàiGòn'],
-  },
 ];
 
 /* ─── Intersection Observer hook ─── */
@@ -196,21 +118,62 @@ const PostCard = ({ post, index }) => {
 
 /* ─── Main ForumPage ─── */
 const ForumPage = () => {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('all');
   const [heroRef, heroVisible] = useInView(0.2);
 
+  // Gọi API lấy danh sách bài viết thực tế khi component được load
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const response = await forumApi.getPosts(1, 10);
+        
+        // Map dữ liệu từ Backend phục vụ cấu trúc UI của Frontend
+        const realPosts = (response.data || []).map(p => ({
+          ...p,
+          category: p.category || 'review', 
+          excerpt: p.summary || 'Không có mô tả ngắn.',
+          author: p.author_name || 'Thành viên YumMap', 
+          avatar: p.avatar_url || '🧑‍🍳',
+          comments: p.reply_count || 0,
+          likes: p.view_count || 0,
+          tags: p.tags || ['#YumMap', '#FoodReview']
+        }));
+        
+        setPosts(realPosts);
+      } catch (error) {
+        console.error("Lỗi khi tải bài viết:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
+  // Lọc bài viết theo danh mục (category) đã chọn
   const filteredPosts = activeCategory === 'all'
-    ? MOCK_POSTS
-    : MOCK_POSTS.filter(p => p.category === activeCategory);
+    ? posts
+    : posts.filter(p => p.category === activeCategory);
+
+  // Hiển thị trạng thái Loading khi đợi API
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#FAFAF7] flex items-center justify-center">
+        <p className="text-[#7B7068] font-medium animate-pulse">Đang tải danh sách bài viết từ hệ thống...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FAFAF7]">
-      {/* Hero */}
+      {/* Hero Section */}
       <section
         ref={heroRef}
         className={`relative overflow-hidden bg-gradient-to-br from-[#2C1810] via-[#4A3728] to-[#2C1810] text-white py-16 sm:py-20 transition-all duration-1000 ${heroVisible ? 'opacity-100' : 'opacity-0'}`}
       >
-        {/* Decorative blobs */}
         <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#E8623A]/20 rounded-full blur-[100px] animate-pulse" />
         <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-[#F5A623]/15 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '1s' }} />
 
@@ -227,7 +190,7 @@ const ForumPage = () => {
           <div className="flex items-center justify-center gap-6 mt-8">
             {[
               { number: '12.5K', label: 'Thành viên' },
-              { number: '3.2K', label: 'Bài viết' },
+              { number: posts.length || '3.2K', label: 'Bài viết' },
               { number: '18K', label: 'Bình luận' },
             ].map(stat => (
               <div key={stat.label} className="text-center">
@@ -239,11 +202,11 @@ const ForumPage = () => {
         </div>
       </section>
 
-      {/* Content */}
+      {/* Main Content Container */}
       <div className="max-w-[1200px] mx-auto px-6 py-10">
         <div className="flex flex-col lg:flex-row gap-8">
 
-          {/* Main content */}
+          {/* Left: Content column */}
           <div className="flex-1 min-w-0">
             {/* Category pills */}
             <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-4 mb-6">
@@ -265,7 +228,7 @@ const ForumPage = () => {
               ))}
             </div>
 
-            {/* New post */}
+            {/* Create new post widget */}
             <div className="bg-white rounded-2xl border border-[#F5EDD8] p-4 mb-6 flex items-center gap-3 hover:border-[#E8623A]/20 transition-colors cursor-pointer group">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#E8623A] to-[#C04D2B] flex items-center justify-center text-white text-lg">
                 ✍️
@@ -278,13 +241,14 @@ const ForumPage = () => {
               </Link>
             </div>
 
-            {/* Posts grid */}
+            {/* Posts Grid Layout */}
             <div className="grid gap-5">
               {filteredPosts.map((post, i) => (
                 <PostCard key={post.id} post={post} index={i} />
               ))}
             </div>
 
+            {/* Empty state view */}
             {filteredPosts.length === 0 && (
               <div className="text-center py-16">
                 <span className="text-5xl block mb-3">🍃</span>
@@ -293,11 +257,11 @@ const ForumPage = () => {
             )}
           </div>
 
-          {/* Sidebar */}
+          {/* Right: Sidebar column */}
           <aside className="w-full lg:w-80 flex-shrink-0 space-y-6">
-            {/* Trending tags */}
+            {/* Trending tags card */}
             <div className="bg-white rounded-2xl border border-[#F5EDD8] p-5">
-              <h3 className="font-[Baloo_2,sans-serif] font-bold text-[#2C1810] mb-4 flex items-center gap-2">
+              <h3 className="font-bold text-[#2C1810] mb-4 flex items-center gap-2">
                 🔥 Xu hướng
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -309,9 +273,9 @@ const ForumPage = () => {
               </div>
             </div>
 
-            {/* Top contributors */}
+            {/* Top contributors card */}
             <div className="bg-white rounded-2xl border border-[#F5EDD8] p-5">
-              <h3 className="font-[Baloo_2,sans-serif] font-bold text-[#2C1810] mb-4 flex items-center gap-2">
+              <h3 className="font-bold text-[#2C1810] mb-4 flex items-center gap-2">
                 👑 Top đóng góp
               </h3>
               <ul className="space-y-3">
@@ -336,9 +300,9 @@ const ForumPage = () => {
               </ul>
             </div>
 
-            {/* Community rules */}
+            {/* Rules card */}
             <div className="bg-gradient-to-br from-[#FFF8EE] to-[#FDECD8] rounded-2xl border border-[#F5EDD8] p-5">
-              <h3 className="font-[Baloo_2,sans-serif] font-bold text-[#2C1810] mb-3 flex items-center gap-2">
+              <h3 className="font-bold text-[#2C1810] mb-3 flex items-center gap-2">
                 📋 Nội quy
               </h3>
               <ul className="space-y-2 text-xs text-[#4A3728]">
@@ -349,6 +313,7 @@ const ForumPage = () => {
               </ul>
             </div>
           </aside>
+
         </div>
       </div>
     </div>

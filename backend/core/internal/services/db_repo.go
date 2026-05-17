@@ -10,6 +10,7 @@ import (
 	"log"
 	"math"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -668,52 +669,250 @@ func CalculateDistance(lat1, lng1, lat2, lng2 float64) float64 {
 }
 
 // SearchRestaurants: Não bộ tìm kiếm trả về data thô và tổng số lượng
-func SearchRestaurants(ctx context.Context, q string, minPrice, maxPrice float64, userLat, userLng float64) ([]models.Restaurant, int, error) {
-	query := `
-		SELECT DISTINCT TOP 7 r.id, r.name, r.address, r.lat, r.lng, 
-		       r.rating, r.price_range, r.type
-		FROM Restaurants r
-		LEFT JOIN MenuItems m ON r.id = m.restaurant_id
-		WHERE 1=1
-	`
+func SearchRestaurants(
+	ctx context.Context,
+	q string,
+	minPrice *float64, // dùng pointer: nil = không filter, 0 = filter từ 0đ
+	maxPrice *float64,
+	filters []string,
+	sortBy string,
+	userLat, userLng float64,
+	limit int,
+) ([]models.Restaurant, int, error) {
+
+	var conditions []string
 	var args []interface{}
 	argCount := 1
 
+	// =========================
+	// SEARCH QUERY
+	// =========================
 	if q != "" {
 		searchTerm := "%" + q + "%"
-		query += fmt.Sprintf(" AND (r.name LIKE @p%d OR r.type LIKE @p%d OR m.name LIKE @p%d)", argCount, argCount, argCount)
+
+		conditions = append(conditions, fmt.Sprintf(`
+			(
+				r.name LIKE @p%d OR
+				r.type LIKE @p%d OR
+				EXISTS (
+					SELECT 1
+					FROM MenuItems m
+					WHERE m.restaurant_id = r.id
+					AND m.name LIKE @p%d
+				)
+			)
+		`, argCount, argCount, argCount))
+
 		args = append(args, searchTerm)
 		argCount++
 	}
 
-	if minPrice > 0 {
-		query += fmt.Sprintf(" AND (m.price >= @p%d OR r.price_range >= @p%d)", argCount, argCount+1)
-		args = append(args, minPrice, minPrice)
-		argCount += 2
+	// =========================
+	// PRICE FILTER
+	// dùng pointer để phân biệt "không truyền" vs "truyền 0"
+	// =========================
+	if minPrice != nil {
+		conditions = append(conditions, fmt.Sprintf("r.price_range >= @p%d", argCount))
+		args = append(args, *minPrice)
+		argCount++
 	}
+
+	if maxPrice != nil {
+		conditions = append(conditions, fmt.Sprintf("r.price_range <= @p%d", argCount))
+		args = append(args, *maxPrice)
+		argCount++
+	}
+
+	// =========================
+	// EXTRA FILTERS
+	// =========================
+	for _, filter := range filters {
+		switch filter {
+		case "highly_rated":
+			conditions = append(conditions, "r.rating >= 4.5")
+		case "budget":
+			conditions = append(conditions, "r.price_range <= 50000")
+		}
+	}
+
+	// =========================
+	// BUILD QUERY
+	// TOP đặt sau ORDER BY hoặc dùng OFFSET/FETCH để đảm bảo limit đúng
+	// =========================
+	whereClause := ""
+	if len(conditions) > 0 {
+		whereClause = "WHERE " + strings.Join(conditions, " AND ")
+	}
+
+	query := fmt.Sprintf(`
+		SELECT DISTINCT
+			r.id,
+			r.name,
+			r.address,
+			r.lat,
+			r.lng,
+			r.rating,
+			r.price_range,
+			r.open_time,
+			r.close_time,
+			r.type
+		FROM Restaurants r
+		%s
+		ORDER BY r.id
+		OFFSET 0 ROWS FETCH NEXT %d ROWS ONLY
+	`, whereClause, limit)
 
 	rows, err := db.QueryContext(ctx, query, args...)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("query restaurants: %w", err)
 	}
 	defer rows.Close()
 
-	var results []models.Restaurant
+	var restaurants []models.Restaurant
+	var ids []int
+
 	for rows.Next() {
 		var r models.Restaurant
-		if err := rows.Scan(&r.ID, &r.Name, &r.Address, &r.Lat, &r.Lng, &r.Rating, &r.PriceRange, &r.Type); err != nil {
+
+		err := rows.Scan(
+			&r.ID,
+			&r.Name,
+			&r.Address,
+			&r.Lat,
+			&r.Lng,
+			&r.Rating,
+			&r.PriceRange,
+			&r.OpenTime,
+			&r.CloseTime,
+			&r.Type,
+		)
+		if err != nil {
 			continue
 		}
 
+		r.Images = []models.RestaurantImage{}
+		r.Menu = []models.MenuItem{}
+
+		// =========================
+		// DISTANCE
+		// =========================
 		if userLat != 0 && userLng != 0 {
 			r.DistanceKm = CalculateDistance(userLat, userLng, r.Lat, r.Lng)
 		}
 
-		r.Menu = []models.MenuItem{}
-		results = append(results, r)
+		// =========================
+		// OPEN STATUS
+		// =========================
+		now := time.Now().Format("15:04")
+		if r.OpenTime <= r.CloseTime {
+			r.IsOpen = now >= r.OpenTime && now <= r.CloseTime
+		} else {
+			// qua đêm (ví dụ: 22:00 - 02:00)
+			r.IsOpen = now >= r.OpenTime || now <= r.CloseTime
+		}
+
+		restaurants = append(restaurants, r)
+		ids = append(ids, r.ID)
 	}
 
-	return results, len(results), nil
+	if err := rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("scan restaurants: %w", err)
+	}
+
+	if len(ids) == 0 {
+		return []models.Restaurant{}, 0, nil
+	}
+
+	// =========================
+	// LOAD IMAGES
+	// =========================
+	imageMap, err := getImagesByRestaurantIDs(ctx, ids)
+	if err == nil {
+		for i := range restaurants {
+			if imgs, found := imageMap[restaurants[i].ID]; found {
+				restaurants[i].Images = imgs
+			}
+		}
+	}
+
+	// =========================
+	// LOAD MENU
+	// dùng parameterized placeholders thay vì string join để tránh SQL injection
+	// =========================
+	menuPlaceholders := make([]string, len(ids))
+	menuArgs := make([]interface{}, len(ids))
+	for i, id := range ids {
+		menuPlaceholders[i] = fmt.Sprintf("@mid%d", i)
+		menuArgs[i] = sql.Named(fmt.Sprintf("mid%d", i), id)
+	}
+
+	menuQuery := fmt.Sprintf(`
+		SELECT
+			id,
+			restaurant_id,
+			name,
+			description,
+			price,
+			food_type,
+			ingredients,
+			story
+		FROM MenuItems
+		WHERE restaurant_id IN (%s)
+	`, strings.Join(menuPlaceholders, ","))
+
+	if q != "" {
+		menuQuery += fmt.Sprintf(" AND name LIKE @mq%d", len(ids))
+		menuArgs = append(menuArgs, sql.Named(fmt.Sprintf("mq%d", len(ids)), "%"+q+"%"))
+	}
+
+	menuRows, err := db.QueryContext(ctx, menuQuery, menuArgs...)
+	if err == nil {
+		defer menuRows.Close()
+
+		menuMap := make(map[int][]models.MenuItem)
+
+		for menuRows.Next() {
+			var mi models.MenuItem
+
+			err := menuRows.Scan(
+				&mi.ID,
+				&mi.RestaurantID,
+				&mi.Name,
+				&mi.Description,
+				&mi.Price,
+				&mi.FoodType,
+				&mi.Ingredients,
+				&mi.Story,
+			)
+			if err == nil {
+				menuMap[mi.RestaurantID] = append(menuMap[mi.RestaurantID], mi)
+			}
+		}
+
+		for i := range restaurants {
+			if items, found := menuMap[restaurants[i].ID]; found {
+				restaurants[i].Menu = items
+			}
+		}
+	}
+
+	// =========================
+	// SORT
+	// =========================
+	switch sortBy {
+	case "rating":
+		sort.Slice(restaurants, func(i, j int) bool {
+			return restaurants[i].Rating > restaurants[j].Rating
+		})
+	case "distance":
+		if userLat != 0 && userLng != 0 {
+			sort.Slice(restaurants, func(i, j int) bool {
+				return restaurants[i].DistanceKm < restaurants[j].DistanceKm
+			})
+		}
+	}
+
+	return restaurants, len(restaurants), nil
 }
 
 // GetRestaurantDetail: Lấy chi tiết nhà hàng, bao gồm menu và reviews
@@ -765,7 +964,6 @@ func GetRestaurantDetail(ctx context.Context, id int) (*models.RestaurantDetail,
 
 // GetPopularRestaurants: Lấy danh sách quán ăn uy tín cho trang chủ
 func GetPopularRestaurants(ctx context.Context, limit int) ([]models.Restaurant, error) {
-	// Lấy những quán có Rating cao nhất, giới hạn số lượng (ví dụ: top 6 quán)
 	query := `
 		SELECT TOP (@limit) 
 			id, name, address, lat, lng, rating, price_range, 
@@ -781,6 +979,8 @@ func GetPopularRestaurants(ctx context.Context, limit int) ([]models.Restaurant,
 	defer rows.Close()
 
 	var restaurants []models.Restaurant
+	var ids []int
+
 	for rows.Next() {
 		var r models.Restaurant
 		err := rows.Scan(
@@ -791,9 +991,32 @@ func GetPopularRestaurants(ctx context.Context, limit int) ([]models.Restaurant,
 			continue
 		}
 
-		// Gán mảng rỗng cho Menu để tránh bị null khi trả về JSON
+		// Khởi tạo mảng rỗng thay vì để null nhằm tránh lỗi phía Frontend
 		r.Menu = []models.MenuItem{}
+		r.Images = []models.RestaurantImage{}
+		
+		// Logic tính toán trạng thái đóng/mở cửa dựa trên thời gian thực hệ thống
+		now := time.Now().Format("15:00")
+		if r.OpenTime <= r.CloseTime {
+			r.IsOpen = now >= r.OpenTime && now <= r.CloseTime
+		} else {
+			r.IsOpen = now >= r.OpenTime || now <= r.CloseTime
+		}
+
 		restaurants = append(restaurants, r)
+		ids = append(ids, r.ID)
+	}
+
+	// Đổ dữ liệu ảnh Thumbnail thực tế từ DB vào danh sách
+	if len(ids) > 0 {
+		imageMap, err := getImagesByRestaurantIDs(ctx, ids)
+		if err == nil {
+			for i := range restaurants {
+				if imgs, found := imageMap[restaurants[i].ID]; found {
+					restaurants[i].Images = imgs
+				}
+			}
+		}
 	}
 
 	return restaurants, nil

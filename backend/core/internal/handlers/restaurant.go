@@ -2,6 +2,7 @@ package handlers
 
 // restaurant.go chứa các handler liên quan đến quán ăn (restaurant)
 import (
+	"backend/core/internal/models"
 	"backend/core/internal/services"
 	"net/http"
 	"strconv"
@@ -22,11 +23,40 @@ func SearchRestaurants(c *gin.Context) {
 	q := c.Query("q")
 	userLat, _ := strconv.ParseFloat(c.Query("lat"), 64)
 	userLng, _ := strconv.ParseFloat(c.Query("lng"), 64)
-	minP, _ := strconv.ParseFloat(c.DefaultQuery("min_price", "0"), 64)
-	maxP, _ := strconv.ParseFloat(c.DefaultQuery("max_price", "0"), 64)
+	sortBy := c.DefaultQuery("sort_by", "rating")
+	filters := c.QueryArray("filters")
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "4"))
+
+	// =========================
+	// PRICE FILTER
+	// Chỉ truyền pointer khi query param thực sự được gửi lên
+	// =========================
+	var minPrice, maxPrice *float64
+
+	if minStr, exists := c.GetQuery("min_price"); exists && minStr != "" {
+		if val, err := strconv.ParseFloat(minStr, 64); err == nil {
+			minPrice = &val
+		}
+	}
+
+	if maxStr, exists := c.GetQuery("max_price"); exists && maxStr != "" {
+		if val, err := strconv.ParseFloat(maxStr, 64); err == nil {
+			maxPrice = &val
+		}
+	}
 
 	ctx := c.Request.Context()
-	results, total, err := services.SearchRestaurants(ctx, q, minP, maxP, userLat, userLng)
+	results, total, err := services.SearchRestaurants(
+		ctx,
+		q,
+		minPrice,
+		maxPrice,
+		filters,
+		sortBy,
+		userLat,
+		userLng,
+		limit,
+	)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -38,12 +68,23 @@ func SearchRestaurants(c *gin.Context) {
 		return
 	}
 
+	type CleanRestaurant struct {
+		models.Restaurant
+		CreatedAt interface{} `json:"created_at,omitempty"`
+		UpdatedAt interface{} `json:"updated_at,omitempty"`
+	}
+
+	cleanResults := make([]CleanRestaurant, len(results))
+	for i, r := range results {
+		cleanResults[i] = CleanRestaurant{Restaurant: r}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Success",
 		"data": gin.H{
 			"total":       total,
-			"restaurants": results,
+			"restaurants": cleanResults,
 		},
 		"error": nil,
 	})

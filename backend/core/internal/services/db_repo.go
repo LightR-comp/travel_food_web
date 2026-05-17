@@ -668,7 +668,7 @@ func GetRestaurantDetail(ctx context.Context, id int) (*models.RestaurantDetail,
     }
 
     // 4. Mock thêm mảng ảnh (nếu SQL chưa có bảng ảnh riêng)
-    rd.Images = []string{"banner.jpg", "view_quan.jpg"}
+    //rd.Images = []string{"banner.jpg", "view_quan.jpg"}
 
     return &rd, nil
 }

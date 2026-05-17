@@ -23,13 +23,14 @@ const GoogleIcon = () => (
 );
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({ username: '', password: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const showToast = (msg, type = 'error') => {
     setToast({ msg, type });
@@ -43,6 +44,19 @@ const LoginPage = () => {
     else if (form.password.length < 6) e.password = 'Mật khẩu tối thiểu 6 ký tự';
     setErrors(e);
     return Object.keys(e).length === 0;
+  };
+
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    const result = await loginWithGoogle();
+    
+    if (result.success) {
+      showToast('✅ Đăng nhập bằng Google thành công!', 'success');
+      setTimeout(() => navigate('/'), 800);
+    } else {
+      showToast(result.error || '❌ Đăng nhập Google thất bại');
+    }
+    setGoogleLoading(false);
   };
 
   const handleChange = (field) => (e) => {
@@ -150,7 +164,11 @@ const LoginPage = () => {
               <AuthButton variant="facebook" className="flex-1 py-2.5" id="login-facebook-btn">
                 <FacebookIcon /> Facebook
               </AuthButton>
-              <AuthButton variant="google" className="flex-1 py-2.5" id="login-google-btn">
+              <AuthButton variant="google" className="flex-1 py-2.5" id="login-google-btn" 
+              onClick={handleGoogleLogin}  
+              loading={googleLoading}       
+              disabled={googleLoading} 
+              >
                 <GoogleIcon /> Google
               </AuthButton>
             </div>

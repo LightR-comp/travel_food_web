@@ -1,24 +1,25 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { loginApi, registerApi, logoutApi, getMeApi } from '../api/AuthAPI';
-import { auth, googleProvider, facebookProvider, signInWithPopup } from '../config/firebase';
+import { auth, googleProvider, facebookProvider } from '../config/firebase';
+import { signInWithPopup } from 'firebase/auth';
 
 const AuthContext = createContext(null);
+
+const API_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Restore session on mount
   useEffect(() => {
     const token = localStorage.getItem('yummap_token');
     if (token) {
       getMeApi()
         .then((res) => {
-          if (res.success) {
-            setUser(res.data);
-          } else {
-            localStorage.removeItem('yummap_token');
-          }
+          if (res.success) setUser(res.data);
+          else localStorage.removeItem('yummap_token');
         })
         .catch(() => localStorage.removeItem('yummap_token'))
         .finally(() => setLoading(false));
@@ -27,6 +28,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  // ---- Local login ----
   const login = useCallback(async (credentials) => {
     setError(null);
     const res = await loginApi(credentials);
@@ -37,105 +39,104 @@ export const AuthProvider = ({ children }) => {
     return res;
   }, []);
 
+  // ---- Register ----
   const register = useCallback(async (payload) => {
     setError(null);
     return await registerApi(payload);
   }, []);
 
+  // ---- Logout ----
   const logout = useCallback(async () => {
-    try {
-      await logoutApi();
-    } catch (error) {
-      console.error('Logout API error:', error);
-    } finally {
-      localStorage.removeItem('yummap_token');
-      setUser(null);
-    }
+    try { await logoutApi(); } catch (e) { console.error('Logout error:', e); }
+    localStorage.removeItem('yummap_token');
+    setUser(null);
   }, []);
 
+  // ---- Update user state ----
   const updateUser = useCallback((updatedData) => {
     setUser(prev => ({ ...prev, ...updatedData }));
   }, []);
 
+  // ---- Helper: send idToken to Go backend ----
+  const sendOAuthToken = async (idToken, provider) => {
+    const response = await fetch(`${API_URL}/auth/oauth`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ 
+        id_token: idToken,  
+        provider: provider  
+      }),
+    });
+
+    if (!response.ok) {
+      let errorBody = '';
+      try {
+        errorBody = await response.text();
+      } catch (e) {
+        errorBody = 'Unable to read error body';
+      }
+      console.error(`OAuth backend error (${response.status}):`, errorBody);
+      throw new Error(`HTTP ${response.status} - ${errorBody}`);
+    }
+
+    return response.json();
+  };
+
+  // ---- Google login ----
   const loginWithGoogle = useCallback(async () => {
     setError(null);
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      const { email, displayName, uid, photoURL } = result.user;
-      
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/social-login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          fullName: displayName,
-          socialId: uid,
-          avatar: photoURL,
-          provider: 'google'
-        })
-      });
-      
-      const data = await response.json();
-      
+      // Force refresh token
+      const idToken = await result.user.getIdToken(true);
+      const data = await sendOAuthToken(idToken, 'google');
+
       if (data.success) {
         localStorage.setItem('yummap_token', data.data.token);
         setUser(data.data.user);
         return { success: true, user: data.data.user };
-      } else {
-        return { success: false, error: data.message };
       }
-    } catch (error) {
-      console.error('Google login error:', error);
+      return { success: false, error: data.message };
+    } catch (err) {
+      console.error('Google login error:', err);
       return { success: false, error: 'Đăng nhập Google thất bại' };
     }
   }, []);
 
+  // ---- Facebook login ----
   const loginWithFacebook = useCallback(async () => {
     setError(null);
     try {
       const result = await signInWithPopup(auth, facebookProvider);
-      const { email, displayName, uid, photoURL } = result.user;
-      
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/social-login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          fullName: displayName,
-          socialId: uid,
-          avatar: photoURL,
-          provider: 'facebook'
-        })
-      });
-      
-      const data = await response.json();
-      
+      const idToken = await result.user.getIdToken(true);
+      const data = await sendOAuthToken(idToken, 'facebook');
+
       if (data.success) {
         localStorage.setItem('yummap_token', data.data.token);
         setUser(data.data.user);
         return { success: true, user: data.data.user };
-      } else {
-        return { success: false, error: data.message };
       }
-    } catch (error) {
-      console.error('Facebook login error:', error);
+      return { success: false, error: data.message };
+    } catch (err) {
+      console.error('Facebook login error:', err);
       return { success: false, error: 'Đăng nhập Facebook thất bại' };
     }
   }, []);
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
+    <AuthContext.Provider value={{
+      user,
       setUser,
       updateUser,
-      loading, 
-      error, 
-      login, 
-      register, 
+      loading,
+      error,
+      login,
+      register,
       logout,
       loginWithGoogle,
       loginWithFacebook,
-      isAuth: !!user 
+      isAuth: !!user,
     }}>
       {children}
     </AuthContext.Provider>

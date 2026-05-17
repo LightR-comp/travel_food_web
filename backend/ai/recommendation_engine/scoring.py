@@ -19,19 +19,82 @@ def _get_virtual_tags(r_type: str, dishes: list) -> list:
         tags.update([ing.lower() for ing in ingredients])
     return list(tags)
 
-def calculate_budget_fit(user_budget, people, restaurant_price, virtual_tags):
-    """Tính điểm ngân sách dùng hàm mũ."""
+import math
+
+def calculate_budget_fit(
+    user_budget,
+    people,
+    restaurant_price,
+    virtual_tags
+):
     budget_per_person = user_budget / max(1, people)
-    if restaurant_price <= budget_per_person:
-        return 1.0
-    
-    penalty_ratio = (restaurant_price - budget_per_person) / budget_per_person
-    score = math.exp(-4 * penalty_ratio)
-    
-    group_indicators = {"bbq", "buffet", "lẩu", "family"}
-    if people >= 4 and any(ind in virtual_tags for ind in group_indicators):
-        score = min(1.0, score + 0.1)
-    return round(score, 3)
+
+    # Normalize price ratio
+    x = restaurant_price / max(1, budget_per_person)
+
+    tags = set(tag.lower() for tag in virtual_tags)
+
+    # =========================
+    # Base preference profile
+    # =========================
+
+    mu = 0.9
+    sigma = 0.22
+
+    # =========================
+    # Tag-driven adaptation
+    # =========================
+
+    premium_tags = {
+        "steak", "sushi", "fine dining",
+        "omakase", "wine", "romantic"
+    }
+
+    group_tags = {
+        "bbq", "buffet", "lẩu",
+        "hotpot", "family"
+    }
+
+    cheap_tags = {
+        "street food", "student",
+        "fast food", "snack"
+    }
+
+    # Premium restaurant
+    if tags & premium_tags:
+        mu += 0.18
+        sigma += 0.05
+
+    # Group dining
+    if people >= 4 and tags & group_tags:
+        mu += 0.12
+        sigma += 0.08
+
+    # Cheap casual food
+    if tags & cheap_tags:
+        mu -= 0.15
+
+    # =========================
+    # Gaussian utility score
+    # =========================
+
+    score = math.exp(
+        -((x - mu) ** 2) / (2 * sigma ** 2)
+    )
+
+    # =========================
+    # Saturation handling
+    # =========================
+
+    # Quá mắc → phạt thêm
+    if x > 1.6:
+        score *= 0.6
+
+    # Quá rẻ → giảm nhẹ vì mismatch expectation
+    if x < 0.4:
+        score *= 0.85
+
+    return round(max(0.0, min(score, 1.0)), 3)
 
 def determine_dynamic_weights(prefs):
     """Điều chỉnh trọng số thông minh."""
@@ -45,6 +108,26 @@ def determine_dynamic_weights(prefs):
     if any(m in mood for m in ["chill", "romantic", "stress"]):
         return {"taste": 0.3, "emotion": 0.5, "budget": 0.2}
     return {"taste": 0.4, "emotion": 0.3, "budget": 0.3}
+
+import math
+
+def calculate_total_score(
+    s_taste,
+    s_emotion,
+    s_budget,
+    weights
+):
+    epsilon = 1e-6
+
+    score = (
+        (s_taste + epsilon) ** weights["taste"]
+        *
+        (s_emotion + epsilon) ** weights["emotion"]
+        *
+        (s_budget + epsilon) ** weights["budget"]
+    )
+
+    return round(score, 4)
 
 # ==========================================
 # 3. HÀM XỬ LÝ CHÍNH GIAO TIẾP VỚI GO BACKEND
@@ -85,9 +168,7 @@ def process_scoring(ai_input_data):
         )
 
         # 3. Tổng hợp điểm theo trọng số
-        total_score = (s_taste * weights["taste"]) + \
-                      (s_emotion * weights["emotion"]) + \
-                      (s_budget * weights["budget"])
+        total_score = max(0.1,calculate_total_score(s_taste, s_emotion, s_budget, weights))
         
         # 4. Phạt khoảng cách
         dist = r.get("distance_km", 0)

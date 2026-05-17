@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { loginApi, registerApi, logoutApi, getMeApi } from '../api/AuthAPI';
-import { auth, googleProvider, facebookProvider } from '../config/firebase';
+import { auth, googleProvider } from '../config/firebase';
 import { signInWithPopup } from 'firebase/auth';
 
 const AuthContext = createContext(null);

@@ -6,7 +6,10 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/base64"
 	"fmt" // Thêm import fmt để sử dụng fmt.Sprintf
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -21,6 +24,18 @@ import (
 // ChatbotProcess is the main handler for the /chat endpoint.
 // It orchestrates the entire chatbot workflow as defined in the API contract.
 func ChatbotProcess(c *gin.Context) {
+	// RẼ NHÁNH LOGIC: Kiểm tra nếu request có chứa file ảnh (multipart form)
+	contentType := c.ContentType()
+	if strings.Contains(contentType, "multipart/form-data") {
+		handleImageIdentification(c)
+		return
+	}
+
+	// LOGIC CHAT VĂN BẢN (Giữ nguyên logic cũ bên dưới)
+	processTextChat(c)
+}
+
+func processTextChat(c *gin.Context) {
 	// Lấy data từ Request
 	var req dto.ChatbotMessageRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -249,6 +264,81 @@ func ChatbotProcess(c *gin.Context) {
 		"message": "Thành công",
 		"data":    frontendData,
 		"error":   nil,
+	})
+}
+
+// handleImageIdentification xử lý logic nhận diện món ăn khi endpoint /chat nhận được file
+func handleImageIdentification(c *gin.Context) {
+	file, err := c.FormFile("image") // Tên field này phải khớp với Key trong Postman/Frontend
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Vui lòng cung cấp hình ảnh", "error": err.Error()})
+		return
+	}
+
+	userID, _ := strconv.Atoi(c.PostForm("user_id"))
+	if userID == 0 {
+		userID = c.GetInt("user_id")
+	}
+
+	// Fallback cho testing tương tự luồng chat văn bản
+	if userID == 0 {
+		userID = 1
+	}
+
+	f, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Không thể mở file", "error": err.Error()})
+		return
+	}
+	defer f.Close()
+
+	imgBytes, err := io.ReadAll(f)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Lỗi đọc dữ liệu ảnh", "error": err.Error()})
+		return
+	}
+	imgBase64 := base64.StdEncoding.EncodeToString(imgBytes)
+
+	// 2.5 Upload ảnh lên Cloudinary để lấy link lưu vào Database
+	imageURL, errUpload := services.UploadToCloudinary(c.Request.Context(), bytes.NewReader(imgBytes), "yummap_chats")
+	if errUpload != nil {
+		log.Printf("[Identify] Lỗi upload Cloudinary: %v", errUpload)
+		// Fallback nếu upload lỗi để không làm gián đoạn tiến trình của AI
+		imageURL = "[Hình ảnh món ăn]"
+	}
+
+	aiReq := dto.AIIdentifyDishRequest{
+		UserID:   userID,
+		ImageB64: imgBase64,
+	}
+
+	aiRes, err := services.CallAIIdentifyDish(aiReq)
+	if err != nil {
+		log.Printf("[Identify] AI Error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "AI không thể nhận diện món ăn lúc này",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if userID > 0 {
+		botReply := fmt.Sprintf("Tôi nhận ra đây là món **%s**.\n\n**Nguyên liệu chính:** %s\n\n**Công thức:**\n%s",
+			aiRes.DishName,
+			strings.Join(aiRes.Ingredients, ", "),
+			aiRes.Recipe,
+		)
+		_, errDB := services.SaveChatHistory(c.Request.Context(), userID, imageURL, botReply)
+		if errDB != nil {
+			log.Printf("[Identify] Lỗi lưu lịch sử DB cho UserID %d: %v", userID, errDB)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Nhận diện thành công",
+		"data":    aiRes,
 	})
 }
 

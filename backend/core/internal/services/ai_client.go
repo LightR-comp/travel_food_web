@@ -154,6 +154,43 @@ func CallAIChatGenerate(req dto.AIChatGenerateRequest) (*dto.AIChatGenerateRespo
 	return &result, nil
 }
 
+// CallAIIdentifyDish gọi API Python để nhận diện món ăn qua hình ảnh
+func CallAIIdentifyDish(req dto.AIIdentifyDishRequest) (*dto.AIIdentifyDishResponse, error) {
+	jsonData, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	// Image processing có thể mất thời gian, đặt timeout 60s
+	client := &http.Client{Timeout: 60 * time.Second}
+	baseURL := strings.TrimRight(config.AppConfig.AIServiceURL, "/")
+	url := baseURL + "/api/v1/bot/identify_dish"
+
+	resp, err := client.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, fmt.Errorf("không thể kết nối tới AI Service: %v", err)
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("AI Service báo lỗi HTTP %d: %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	var result struct {
+		Success bool                       `json:"success"`
+		Data    dto.AIIdentifyDishResponse `json:"data"`
+	}
+	if err := json.Unmarshal(bodyBytes, &result); err != nil {
+		return nil, err
+	}
+	return &result.Data, nil
+}
+
 // rankedRestaurant là một helper struct để giữ một nhà hàng và điểm số đã tính toán của nó để sắp xếp.
 type rankedRestaurant struct {
 	// Giữ con trỏ để tránh copy struct lớn

@@ -307,10 +307,20 @@ func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]inter
 			if ingredients == nil {
 				ingredients = []string{}
 			}
+
+			var dishImg string
+			if len(m.Images) > 0 {
+				// Đây chính là link lấy từ bảng DishImages trường ImageURL
+				dishImg = m.Images[0].ImageURL
+			} else {
+				dishImg = "https://placehold.co/200x200?text=No+Dish+Image"
+			}
+
 			return map[string]interface{}{
 				"name":        m.Name,
 				"price":       m.Price,
 				"ingredients": ingredients,
+				"image_url":   dishImg,
 			}
 		}
 
@@ -340,22 +350,33 @@ func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]inter
 			}
 		}
 
-		// Tính giá trung bình từ menu để thay cho giá hardcode
-		var avgPrice float64
+		// Ưu tiên lấy giá từ cột price_range của nhà hàng
+		displayPrice := float64(r.PriceRange)
+
+		// Nếu có menu, tính giá trung bình để có con số cập nhật nhất
 		if len(r.Menu) > 0 {
 			var totalPrice float64
 			for _, item := range r.Menu {
 				totalPrice += item.Price
 			}
-			avgPrice = totalPrice / float64(len(r.Menu))
+			displayPrice = totalPrice / float64(len(r.Menu))
+		}
+
+		resImage := ""
+		if len(r.Images) > 0 {
+			// Lấy ảnh đầu tiên của quán
+			resImage = r.Images[0].ImageURL
+		}
+		if resImage == "" {
+			resImage = "https://placehold.co/400x300?text=" + r.Name
 		}
 
 		results = append(results, map[string]interface{}{
 			"id":              r.ID,
 			"res_name":        r.Name,
 			"rating":          r.Rating,
-			"price":           avgPrice, // Sử dụng giá trung bình tính được
-			"image_url":       "https://placehold.co/400x300?text=" + r.Name,
+			"price":           displayPrice, // Trả về price_range hoặc giá trung bình menu
+			"image_url":       resImage,
 			"distance_km":     1.5, // Giả định khi không có tọa độ người dùng
 			"type":            r.Type,
 			"featured_dishes": featuredDishes,

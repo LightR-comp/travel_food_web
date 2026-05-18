@@ -35,6 +35,7 @@ class SummaryDishInput(BaseModel):
     name: str
     price: float
     ingredients: List[str] = []
+    image_url: Optional[str] = ""
 
 class RestaurantInput(BaseModel):
     id: int

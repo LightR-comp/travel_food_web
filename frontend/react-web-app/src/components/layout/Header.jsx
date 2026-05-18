@@ -152,11 +152,22 @@ const Header = () => {
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-xl border border-[#F5EDD8] py-2 z-50">
+                <div className="absolute right-0 top-full mt-2 min-w-[200px] max-w-[280px] bg-white rounded-2xl shadow-xl border border-[#F5EDD8] py-2 z-50">
                   <div className="px-4 py-2 border-b border-[#F5EDD8]">
-                    <p className="text-sm font-bold text-[#2C1810]">{user.full_name}</p>
-                    <p className="text-xs text-[#7B7068]">{user.email}</p>
-                  </div>
+                  <p className="text-sm font-bold text-[#2C1810] truncate">{user.full_name}</p>
+                  <p className="text-xs text-[#7B7068] truncate">{user.email}</p>
+                </div>
+
+                {/* Profile page */}
+                <Link
+                  to="/profile"
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[#2C1810] hover:bg-[#FFF8EE] transition-colors"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  👤 Trang cá nhân
+                </Link>
+
+
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors"

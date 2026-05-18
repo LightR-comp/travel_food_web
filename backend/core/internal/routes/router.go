@@ -14,7 +14,7 @@ func SetupRouter(r *gin.Engine) {
 		chat := v1.Group("/chat")
 		{
 			chat.POST("/message", handlers.ChatbotProcess)             // Xử lý tin nhắn (Intent -> DB -> Gen text)
-		//	chat.GET("/history/:userId", handlers.GetChatHistory)      // Lấy lịch sử chat
+			chat.GET("/history/:userId", handlers.GetChatHistory)      // Lấy lịch sử chat
 		}
 
 
@@ -56,8 +56,10 @@ func SetupRouter(r *gin.Engine) {
 			posts.GET("", handlers.GetListPosts)            // Danh sách bài viết (Phân trang/Topic)
 			posts.GET("/:id", handlers.GetPostDetail)       // Chi tiết bài viết + Comments
 
+
 			// Private routes (Cần Middleware Auth)
 			authorized := posts.Group("/")
+			
 			authorized.Use(middlewares.FirebaseAuthMiddleware())
 			{
 				authorized.POST("", handlers.CreatePost)                // Đăng bài mới

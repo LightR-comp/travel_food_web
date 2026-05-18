@@ -23,9 +23,9 @@ class Settings:
     WEATHER_BASE_URL = "http://api.openweathermap.org/data/2.5/weather"
     
     # --- AI Model Config ---
-    AI_API_KEY = os.getenv("AI_API_KEY")
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     DEFAULT_CITY = "Ho Chi Minh City"
-    AI_MODEL_NAME = "gemini-1.5-flash" # Hoặc gemini-pro
+    GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash") # Model dùng chung cho toàn bộ AI service
 
     # --- Database (Nếu Python cần kết nối trực tiếp MSSQL giống Go) ---
     # DB_URL = os.getenv("DATABASE_URL")

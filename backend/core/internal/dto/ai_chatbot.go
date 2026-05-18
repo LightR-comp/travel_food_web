@@ -1,30 +1,46 @@
 // Request and Response DTOs for AI Chatbot
 // Tuân theo flow chatbot ở API-CONTRACT.md
-
+// Ghi chú: File này được tạo mới để chứa các struct phục vụ ĐÚNG luồng giao tiếp AI theo api-contract.md
 package dto
 
-import (
-	"backend/core/internal/models"
-)
-
-// ChatRequest là DTO cho yêu cầu chat từ client
-type ChatRequest struct {
+// ChatbotMessageRequest: Nhận Request tin nhắn từ UI Frontend
+type ChatbotMessageRequest struct {
+	UserID  int    `json:"user_id"`
 	Message string `json:"message" binding:"required"`
 }
 
-// ChatResponse là DTO cho phản hồi chat từ server
-type ChatResponse struct {
-	Reply string `json:"reply"`
-	Suggestions []models.Restaurant `json:"suggestions,omitempty"`
+// AIIntentParseRequest đại diện cho dữ liệu Go gửi đi ở GIAI ĐOẠN 1
+type AIIntentParseRequest struct {
+	UserID  int    `json:"user_id"`
+	Message string `json:"message"`
 }
 
-// Các intent từ python sau khi được phân tích sẽ được gửi về đây
-type IntentRequest struct {
-	Intent []string `json:"intent" binding:"required"`
+// AIIntentParseResponse đại diện cho dữ liệu Python trả về ở GIAI ĐOẠN 1
+type AIIntentParseResponse struct {
+	Success bool `json:"success"`
+	Data    struct {
+		Intent     string                 `json:"intent"`
+		Entities   map[string]interface{} `json:"entities"`
+		Confidence float64                `json:"confidence"`
+	} `json:"data"`
+	Error interface{} `json:"error"`
 }
 
-// data từ database khi query từ các intent để gửi cho python
-type IntentData struct {
-	Intent string `json:"intent"`
-	Data   string `json:"data"`
+// AIChatGenerateRequest đại diện cho dữ liệu Go gửi đi ở GIAI ĐOẠN 3
+type AIChatGenerateRequest struct {
+	UserMessage      string                   `json:"user_message"`
+	Intent           string                   `json:"intent"`
+	UserContext      map[string]interface{}   `json:"user_context"`
+	FoundRestaurants []map[string]interface{} `json:"found_restaurants"`
+}
+
+// AIChatGenerateResponse đại diện cho kết quả Python trả về ở GIAI ĐOẠN 4
+type AIChatGenerateResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Data    struct {
+		Reply           string                   `json:"reply"`
+		SuggestedPlaces []map[string]interface{} `json:"suggested_places"`
+	} `json:"data"`
+	Error interface{} `json:"error"`
 }

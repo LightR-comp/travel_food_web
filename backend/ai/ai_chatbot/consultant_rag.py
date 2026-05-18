@@ -1,14 +1,15 @@
-from core.ai_config import shared_model # Import từ core
+from dotenv import load_dotenv, find_dotenv
+from core.ai_config import shared_model
 from schemas.payloads import ChatGenerationRequest, ChatFinalData, PlaceInfo
 import logging
-from google.api_core.exceptions import (
-    ResourceExhausted,      # Hết quota API
-    ServiceUnavailable,     # Gemini server down
-    InvalidArgument,        # Prompt sai format
-    DeadlineExceeded,       # Timeout
-)
 
 logger = logging.getLogger(__name__)
+
+# The API key and model are now configured centrally in core/ai_config.py
+# We no longer need to load .env or configure genai here.
+# The shared_model is imported directly.
+# Tự động tìm file .env ở bất kỳ đâu trong dự án
+load_dotenv(find_dotenv())
 
 
 # --- Custom Exceptions ---
@@ -22,23 +23,31 @@ class RestaurantFilterError(Exception):
 
 
 def _filter_restaurants(request: ChatGenerationRequest, user_allergies: set):
-    """Tách logic lọc ra riêng — dễ test và catch lỗi độc lập"""
     safe_restaurants = []
     warning_restaurants = []
 
     for res in request.found_restaurants:
         try:
-            ingredients = res.featured_dishes.lower() if res.featured_dishes else ""
-            has_allergen = any(allergen in ingredients for allergen in user_allergies)
-
-            if has_allergen:
-                warning_restaurants.append((res, "Có thể chứa nguyên liệu bạn dị ứng"))
+            # Lấy tất cả ingredients từ các món ăn và chuyển thành một set để kiểm tra hiệu quả
+            restaurant_ingredients = set()
+            featured_dishes = res.get('featured_dishes', [])
+            for dish in featured_dishes:
+                # Chuyển thành chữ thường để so sánh không phân biệt hoa/thường
+                ingredients_in_dish = [ing.lower().strip() for ing in dish.get('ingredients', [])]
+                restaurant_ingredients.update(ingredients_in_dish)
+            
+            # Kiểm tra xem có bất kỳ dị ứng nào của người dùng nằm trong danh sách nguyên liệu của nhà hàng không
+            # Dùng set intersection (&) để kiểm tra nhanh và chính xác, tránh lỗi so khớp chuỗi con (substring matching)
+            found_allergens_set = user_allergies & restaurant_ingredients
+            if found_allergens_set:
+                # Tìm ra các chất gây dị ứng cụ thể để cung cấp lý do rõ ràng hơn
+                found_allergens_str = ", ".join(found_allergens_set)
+                warning_restaurants.append((res, f"Có thể chứa nguyên liệu bạn dị ứng: {found_allergens_str}"))
             else:
                 safe_restaurants.append((res, "Phù hợp với yêu cầu của bạn"))
 
-        except AttributeError as e:
-            # Dữ liệu nhà hàng bị thiếu field
-            logger.warning(f"Dữ liệu nhà hàng không hợp lệ (id={getattr(res, 'id', 'unknown')}): {e}")
+        except Exception as e:
+            logger.warning(f"Lỗi khi xử lý nhà hàng ID {res.get('id')}: {e}")
             continue  # Bỏ qua nhà hàng lỗi, xử lý tiếp
 
     return safe_restaurants, warning_restaurants
@@ -47,76 +56,100 @@ def _filter_restaurants(request: ChatGenerationRequest, user_allergies: set):
 def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
 
     # --- Bước 1: Xử lý dị ứng ---
-    try:
-        user_allergies = set(a.lower() for a in (request.user_context.preferences.dietary or []))
-    except AttributeError as e:
-        logger.error(f"Không đọc được preferences từ user_context: {e}", exc_info=True)
-        raise AllergyProcessingError("Dữ liệu người dùng không hợp lệ") from e
+    user_allergies = set()
+    if request.user_context and request.user_context.preferences:
+        dietary = request.user_context.preferences.dietary or []
+        user_allergies = set(a.lower() for a in dietary)
 
     # --- Bước 2: Phân loại nhà hàng ---
-    try:
-        safe_restaurants, warning_restaurants = _filter_restaurants(request, user_allergies)
-    except Exception as e:
-        logger.error(f"Lỗi khi phân loại nhà hàng: {e}", exc_info=True)
-        raise RestaurantFilterError("Không thể phân loại nhà hàng") from e
+    safe_restaurants, warning_restaurants = _filter_restaurants(request, user_allergies)
 
-    safe_list = "\n".join(f"- {r.res_name} ({r.price}): {r.featured_dishes}" for r, _ in safe_restaurants)
-    warning_list = "\n".join(f"- {r.res_name}: {reason}" for r, reason in warning_restaurants)
+    # Hàm hỗ trợ để lấy tất cả ingredients từ một nhà hàng cho việc tạo prompt
+    def _get_all_ingredients_for_prompt(restaurant_dict):
+        all_ings = set() # Dùng set để tránh lặp lại nguyên liệu
+        for dish in restaurant_dict.get("featured_dishes", []):
+            for ingredient in dish.get("ingredients", []):
+                all_ings.add(ingredient.lower())
+        return list(all_ings)
 
-    prompt = f"""Bạn là trợ lý ẩm thực YumMap, thân thiện và am hiểu.
-    Câu hỏi: "{request.user_message}"
-    Dị ứng người dùng: {', '.join(user_allergies) if user_allergies else 'Không có'}
-    Nhà hàng phù hợp:
-    {safe_list if safe_list else "Chưa tìm thấy"}
-    Nhà hàng cần lưu ý:
+    safe_list = "\n".join(f"- {r.get('res_name', '')} ({r.get('price', 0)}đ): có các món chứa {', '.join(_get_all_ingredients_for_prompt(r))}" for r, _ in safe_restaurants)
+    warning_list = "\n".join(f"- {r.get('res_name', '')}: {reason}" for r, reason in warning_restaurants)
+
+    prompt = f"""Bạn là trợ lý ẩm thực YumMap, vai trò của bạn là một người bạn đồng hành thân thiện và am hiểu.
+    Dựa vào thông tin dưới đây, hãy đưa ra một câu trả lời tư vấn tự nhiên, ngắn gọn và hữu ích cho người dùng.
+
+    ## Bối cảnh cuộc trò chuyện:
+    - Câu hỏi của người dùng: "{request.user_message}"
+    - Dị ứng người dùng cần tránh: {', '.join(user_allergies) if user_allergies else 'Không có'}
+
+    ## Dữ liệu tôi đã tìm thấy:
+    - Các nhà hàng phù hợp và an toàn:
+    {safe_list if safe_list else "Rất tiếc, tôi chưa tìm thấy quán nào hoàn toàn phù hợp."}
+    - Các nhà hàng cần cân nhắc (có thể chứa chất dị ứng):
     {warning_list if warning_list else "Không có"}
-    Hãy tư vấn ngắn gọn, ưu tiên nhà hàng an toàn."""
+
+    ## Yêu cầu cho bạn:
+    1. Viết một câu trả lời duy nhất, không cần lặp lại danh sách trên.
+    2. Ưu tiên giới thiệu các nhà hàng trong danh sách "phù hợp và an toàn".
+    3. Nếu có nhà hàng cần cân nhắc, hãy cảnh báo nhẹ nhàng.
+    4. Giọng văn phải thật tự nhiên, như đang nói chuyện với một người bạn.
+    """
 
     # --- Bước 3: Gọi AI ---
     try:
-        ai_reply = shared_model.generate_content(prompt).text
-
-    except ResourceExhausted as e:
-        # Hết quota → không retry, báo ngay
-        logger.error(f"Gemini API hết quota: {e}")
-        ai_reply = "Dạ, hệ thống AI đang quá tải, em chưa thể tư vấn ngay được ạ. Bạn thử lại sau ít phút nhé!"
-
-    except DeadlineExceeded as e:
-        # Timeout → có thể retry
-        logger.warning(f"Gemini API timeout: {e}")
-        ai_reply = "Dạ, kết nối AI hơi chậm lúc này ạ. Bạn thử gửi lại câu hỏi nhé!"
-
-    except ServiceUnavailable as e:
-        # Server Gemini down
-        logger.critical(f"Gemini service unavailable: {e}", exc_info=True)
-        ai_reply = "Dạ, dịch vụ AI đang bảo trì ạ. Em vẫn hiển thị danh sách nhà hàng cho bạn!"
-
-    except InvalidArgument as e:
-        # Prompt bị lỗi format — lỗi code, cần fix
-        logger.error(f"Prompt không hợp lệ — kiểm tra lại template: {e}", exc_info=True)
-        ai_reply = "Dạ, em gặp lỗi xử lý câu hỏi ạ."
-
+        # The API key check is now handled centrally at startup.
+        response = shared_model.generate_content(
+            prompt,
+            safety_settings={
+                'HARM_CATEGORY_HARASSMENT': 'BLOCK_NONE',
+                'HARM_CATEGORY_HATE_SPEECH': 'BLOCK_NONE',
+                'HARM_CATEGORY_SEXUALLY_EXPLICIT': 'BLOCK_NONE',
+                'HARM_CATEGORY_DANGEROUS_CONTENT': 'BLOCK_NONE'
+            }
+        )
+        ai_reply = response.text
+    except ValueError as ve:
+        logger.error(f"Lỗi giá trị đầu vào cho Gemini: {ve}")
+        ai_reply = f"Dạ, câu hỏi này làm AI bối rối một chút. (Lỗi chi tiết: {str(ve)})"
     except Exception as e:
         # Lỗi không xác định — log đầy đủ để debug
         logger.exception(f"Lỗi không xác định khi gọi Gemini: {e}")
-        ai_reply = "Dạ, em đang gặp chút sự cố ạ."
+        ai_reply = f"Dạ, em đang gặp chút sự cố ạ. (Lỗi AI: {str(e)})"
 
     # --- Bước 4: Build response — lỗi ở đây không ảnh hưởng ai_reply ---
+    suggested_places = []
     try:
-        warning_set = {r for r, _ in warning_restaurants}
-        safe_set = {r for r, _ in safe_restaurants}
+        for is_safe, items in [(True, safe_restaurants), (False, warning_restaurants)]:
+            for res, reason in items:
+                # LƯU Ý: Schema `PlaceInfo` trong `payloads.py` cần được bổ sung trường `score: Optional[float] = None`
+                # để có thể chứa điểm số đã được re-rank từ Go.
 
-        suggested_places = [
-            PlaceInfo(
-                restaurant=res,
-                ai_reason=reason,
-                allergy_friendly=res not in warning_set,  # Bỏ list comprehension lồng nhau
-                tags=["An toàn"] if res in safe_set else ["Cần lưu ý"]
-            )
-            for res, reason in safe_restaurants + warning_restaurants
-        ]
+                # Lấy điểm số đã được Go tính toán, nếu không có thì dùng rating gốc.
+                # Giá trị này sẽ được lưu vào DB ở Go, và bị xóa đi trước khi gửi cho Frontend.
+                score_to_save = res.get("final_score")
+                if score_to_save is None:
+                    score_to_save = res.get("rating", 0.0)
+                    logger.warning(f"Không tìm thấy 'final_score' cho nhà hàng ID {res.get('id')}. Dùng 'rating' gốc làm fallback.")
+
+                place = PlaceInfo(
+                    restaurant={
+                        "id": res.get("id", 0),
+                        "res_name": res.get("res_name", "Không tên"),
+                        "rating": res.get("rating", 0.0),
+                        "price": res.get("price", 0.0),
+                        "image_url": res.get("image_url", ""),
+                        "distance_km": res.get("distance_km", 0.0), # SỬA: Lấy distance_km từ Go
+                        "type": res.get("type", "restaurant"), # SỬA: Lấy type từ Go
+                        # Dùng `or []` để xử lý cả trường hợp key không tồn tại hoặc giá trị là None
+                        "featured_dishes": res.get("featured_dishes") or []
+                    },
+                    ai_reason=reason,
+                    score=score_to_save,
+                    allergy_friendly=is_safe,
+                    tags=["An toàn"] if is_safe else ["Cần lưu ý"]
+                )
+                suggested_places.append(place)
     except Exception as e:
         logger.error(f"Lỗi khi build suggested_places: {e}", exc_info=True)
-        suggested_places = []  # Fallback — vẫn trả về ai_reply
 
     return ChatFinalData(reply=ai_reply, suggested_places=suggested_places)

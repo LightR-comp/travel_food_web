@@ -19,6 +19,7 @@ import ContactPage from './pages/ContactPage';
 import PolicyPage from './pages/PolicyPage';
 import SupportPage from './pages/SupportPage';
 import TermsPage  from './pages/TermsPage';
+import ProfilePage from './pages/ProfilePage';
 
 // Pages that should NOT show the main layout (header/footer/chatbot)
 const AUTH_ROUTES = ['/login', '/signup'];
@@ -46,6 +47,7 @@ const AppLayout = () => {
           <Route path="/"          element={<HomePage />} />
           <Route path="/search"    element={<SearchPage />} />
           <Route path="/detail/:id" element={<DetailPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/forum"     element={<ForumPage />} />
           <Route path="/forum/new-post" element={<ForumPostPage />} />
           <Route path="/forum/:id" element={<ForumDetailPage />} />

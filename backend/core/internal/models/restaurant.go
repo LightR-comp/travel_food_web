@@ -33,6 +33,7 @@ type Restaurant struct {
 // RestaurantDetail mở rộng thông tin của Restaurant, có thể bao gồm các trường chi tiết hơn như hình ảnh, đánh giá của người dùng, v.v.
 type RestaurantDetail struct {
 	Restaurant
+	ForumPosts []Post `json:"forum_posts"`
 	UserRatings []UserRating `json:"user_ratings"`
 }
 

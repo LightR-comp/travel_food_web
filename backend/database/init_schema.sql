@@ -188,3 +188,22 @@ CREATE TABLE RestaurantImages (
     created_at    DATETIME DEFAULT GETDATE()
 )
 GO
+
+CREATE TABLE DishImages (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    menu_item_id INT NOT NULL,
+    image_url NVARCHAR(MAX) NOT NULL,
+    caption NVARCHAR(500) NULL,
+    is_thumbnail BIT NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    
+    -- Liên kết khóa ngoại tới bảng MenuItems để đảm bảo toàn vẹn dữ liệu
+    CONSTRAINT FK_DishImages_MenuItems FOREIGN KEY (menu_item_id) 
+        REFERENCES MenuItems(id) ON DELETE CASCADE
+);
+GO
+
+-- Tạo Index để tối ưu tốc độ truy vấn khi hàm getImagesByMenuItemIDs tìm kiếm bằng IN (...)
+CREATE INDEX IX_DishImages_MenuItemID ON DishImages(menu_item_id);
+GO
+

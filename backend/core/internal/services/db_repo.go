@@ -10,6 +10,8 @@ import (
 	"log"
 	"math"
 	"os"
+	"sort"
+	"strings"
 	"time"
 
 	_ "github.com/denisenkom/go-mssqldb"
@@ -215,11 +217,19 @@ func GetRestaurantsNearby(ctx context.Context, q NearbyQuery) ([]models.Restaura
 }
 
 func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.MenuItem, error) {
+	if len(ids) == 0 {
+		return make(map[int][]models.MenuItem), nil
+	}
+
+	idStrings := make([]string, len(ids))
+	for i, id := range ids {
+		idStrings[i] = fmt.Sprintf("%d", id)
+	}
 	query := fmt.Sprintf(`
-		SELECT restaurant_id, id, name, description, price, food_type, ingredients
-		FROM MenuItems
+		SELECT restaurant_id, id, name, description, price, food_type, ingredients 
+		FROM MenuItems 
 		WHERE restaurant_id IN (%s)
-	`, intSliceToSQL(ids))
+	`, strings.Join(idStrings, ","))
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
@@ -230,18 +240,17 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 	result := make(map[int][]models.MenuItem)
 	for rows.Next() {
 		var item models.MenuItem
-		var restaurantID int
 		if err := rows.Scan(
-			&restaurantID, &item.ID, &item.Name, &item.Description,
+			&item.RestaurantID, &item.ID, &item.Name, &item.Description,
 			&item.Price, &item.FoodType, &item.Ingredients,
 		); err != nil {
 			continue
 		}
-		result[restaurantID] = append(result[restaurantID], item)
+		result[item.RestaurantID] = append(result[item.RestaurantID], item)
 	}
+
 	return result, nil
 }
-
 
 // Image handling
 func getImagesByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.RestaurantImage, error) {
@@ -269,6 +278,39 @@ func getImagesByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.
 			continue
 		}
 		result[restaurantID] = append(result[restaurantID], img)
+	}
+	return result, nil
+}
+
+func getImagesByMenuItemIDs(ctx context.Context, ids []int) (map[int][]models.DishImage, error) {
+	if len(ids) == 0 {
+		return make(map[int][]models.DishImage), nil
+	}
+
+	idStrings := make([]string, len(ids))
+	for i, id := range ids {
+		idStrings[i] = fmt.Sprintf("%d", id)
+	}
+	query := fmt.Sprintf(`
+		SELECT id, menu_item_id, image_url, caption, is_thumbnail, created_at
+		FROM DishImages
+		WHERE menu_item_id IN (%s)
+		ORDER BY is_thumbnail DESC
+	`, strings.Join(idStrings, ","))
+
+	rows, err := db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make(map[int][]models.DishImage)
+	for rows.Next() {
+		var img models.DishImage
+		if err := rows.Scan(&img.ID, &img.MenuItemID, &img.ImageURL, &img.Caption, &img.IsThumbnail, &img.CreatedAt); err != nil {
+			continue
+		}
+		result[img.MenuItemID] = append(result[img.MenuItemID], img)
 	}
 	return result, nil
 }
@@ -305,9 +347,16 @@ func GetReviewsByRestaurant(ctx context.Context, restaurantID int) ([]models.Use
 	var reviews []models.UserRating
 	for rows.Next() {
 		var rv models.UserRating
-		rows.Scan(&rv.ID, &rv.UserID, &rv.RestaurantID, &rv.Rating, &rv.Comment, &rv.CreatedAt)
+		if err := rows.Scan(&rv.ID, &rv.UserID, &rv.RestaurantID, &rv.Rating, &rv.Comment, &rv.CreatedAt); err != nil {
+			continue
+		}
 		reviews = append(reviews, rv)
 	}
+
+	if reviews == nil {
+		return []models.UserRating{}, nil
+	}
+
 	return reviews, nil
 }
 
@@ -349,11 +398,45 @@ func DeleteReview(ctx context.Context, reviewID int, userID int) error {
 }
 
 func updateAvgRating(restaurantID int) {
-	db.Exec(`
+	_, err := db.Exec(`
 		UPDATE Restaurants
-		SET avg_rating = (SELECT AVG(CAST(rating AS FLOAT)) FROM Reviews WHERE restaurant_id = @rid)
+		SET rating = (SELECT AVG(CAST(rating AS FLOAT)) FROM UserRatings WHERE restaurant_id = @rid)
 		WHERE id = @rid
 	`, sql.Named("rid", restaurantID))
+
+	if err != nil {
+		log.Printf("[DB] Lỗi cập nhật rating trung bình: %v", err)
+	}
+}
+
+func GetForumPostsByRestaurantID(ctx context.Context, restaurantID int) ([]models.Post, error) {
+	query := `
+		SELECT TOP 5 id, author_id, prefix, title, summary, thumbnail_url, 
+		             type, view_count, reply_count, is_locked, created_at, updated_at
+		FROM Posts
+		WHERE restaurant_id = @rid
+		ORDER BY created_at DESC
+	`
+	rows, err := db.QueryContext(ctx, query, sql.Named("rid", restaurantID))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []models.Post
+	for rows.Next() {
+		var p models.Post
+		err := rows.Scan(
+			&p.ID, &p.AuthorID, &p.Prefix, &p.Title, &p.Summary, &p.ThumbnailURL,
+			&p.Type, &p.ViewCount, &p.ReplyCount, &p.IsLocked, &p.CreatedAt, &p.UpdatedAt,
+		)
+		if err != nil {
+			continue
+		}
+		p.Comments = []models.Comment{}
+		posts = append(posts, p)
+	}
+	return posts, nil
 }
 
 // ============================================================
@@ -573,109 +656,314 @@ func ResetPassword(ctx context.Context, token, newPassword string) error {
 // CalculateDistance: Tính khoảng cách giữa 2 điểm (Lat, Lng) theo đơn vị Km
 func CalculateDistance(lat1, lng1, lat2, lng2 float64) float64 {
 	const EarthRadius = 6371.0 // Bán kính Trái Đất tính theo Km
-	
+
 	dLat := (lat2 - lat1) * (math.Pi / 180)
 	dLng := (lng2 - lng1) * (math.Pi / 180)
-	
+
 	a := math.Sin(dLat/2)*math.Sin(dLat/2) +
 		math.Cos(lat1*(math.Pi/180))*math.Cos(lat2*(math.Pi/180))*
 			math.Sin(dLng/2)*math.Sin(dLng/2)
-	
+
 	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
 	return EarthRadius * c
 }
 
 // SearchRestaurants: Não bộ tìm kiếm trả về data thô và tổng số lượng
-func SearchRestaurants(ctx context.Context, q string, minPrice, maxPrice float64, userLat, userLng float64) ([]models.Restaurant, int, error) {
-	query := `
-		SELECT DISTINCT TOP 7 r.id, r.name, r.address, r.lat, r.lng, 
-		       r.rating, r.price_range, r.type
-		FROM Restaurants r
-		LEFT JOIN MenuItems m ON r.id = m.restaurant_id
-		WHERE 1=1
-	`
+func SearchRestaurants(
+	ctx context.Context,
+	q string,
+	minPrice *float64, // dùng pointer: nil = không filter, 0 = filter từ 0đ
+	maxPrice *float64,
+	filters []string,
+	sortBy string,
+	userLat, userLng float64,
+	limit int,
+) ([]models.Restaurant, int, error) {
+
+	var conditions []string
 	var args []interface{}
 	argCount := 1
 
+	// =========================
+	// SEARCH QUERY
+	// =========================
 	if q != "" {
 		searchTerm := "%" + q + "%"
-		query += fmt.Sprintf(" AND (r.name LIKE @p%d OR r.type LIKE @p%d OR m.name LIKE @p%d)", argCount, argCount, argCount)
+
+		conditions = append(conditions, fmt.Sprintf(`
+			(
+				r.name LIKE @p%d OR
+				r.type LIKE @p%d OR
+				EXISTS (
+					SELECT 1
+					FROM MenuItems m
+					WHERE m.restaurant_id = r.id
+					AND m.name LIKE @p%d
+				)
+			)
+		`, argCount, argCount, argCount))
+
 		args = append(args, searchTerm)
 		argCount++
 	}
 
-	if minPrice > 0 {
-		query += fmt.Sprintf(" AND (m.price >= @p%d OR r.price_range >= @p%d)", argCount, argCount+1)
-		args = append(args, minPrice, minPrice)
-		argCount += 2
+	// =========================
+	// PRICE FILTER
+	// dùng pointer để phân biệt "không truyền" vs "truyền 0"
+	// =========================
+	if minPrice != nil {
+		conditions = append(conditions, fmt.Sprintf("r.price_range >= @p%d", argCount))
+		args = append(args, *minPrice)
+		argCount++
 	}
+
+	if maxPrice != nil {
+		conditions = append(conditions, fmt.Sprintf("r.price_range <= @p%d", argCount))
+		args = append(args, *maxPrice)
+		argCount++
+	}
+
+	// =========================
+	// EXTRA FILTERS
+	// =========================
+	for _, filter := range filters {
+		switch filter {
+		case "highly_rated":
+			conditions = append(conditions, "r.rating >= 4.5")
+		case "budget":
+			conditions = append(conditions, "r.price_range <= 50000")
+		}
+	}
+
+	// =========================
+	// BUILD QUERY
+	// TOP đặt sau ORDER BY hoặc dùng OFFSET/FETCH để đảm bảo limit đúng
+	// =========================
+	whereClause := ""
+	if len(conditions) > 0 {
+		whereClause = "WHERE " + strings.Join(conditions, " AND ")
+	}
+
+	query := fmt.Sprintf(`
+		SELECT DISTINCT
+			r.id,
+			r.name,
+			r.address,
+			r.lat,
+			r.lng,
+			r.rating,
+			r.price_range,
+			r.open_time,
+			r.close_time,
+			r.type
+		FROM Restaurants r
+		%s
+		ORDER BY r.id
+		OFFSET 0 ROWS FETCH NEXT %d ROWS ONLY
+	`, whereClause, limit)
 
 	rows, err := db.QueryContext(ctx, query, args...)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("query restaurants: %w", err)
 	}
 	defer rows.Close()
 
-	var results []models.Restaurant
+	var restaurants []models.Restaurant
+	var ids []int
+
 	for rows.Next() {
 		var r models.Restaurant
-		if err := rows.Scan(&r.ID, &r.Name, &r.Address, &r.Lat, &r.Lng, &r.Rating, &r.PriceRange, &r.Type); err != nil {
+
+		err := rows.Scan(
+			&r.ID,
+			&r.Name,
+			&r.Address,
+			&r.Lat,
+			&r.Lng,
+			&r.Rating,
+			&r.PriceRange,
+			&r.OpenTime,
+			&r.CloseTime,
+			&r.Type,
+		)
+		if err != nil {
 			continue
 		}
-		
+
+		r.Images = []models.RestaurantImage{}
+		r.Menu = []models.MenuItem{}
+
+		// =========================
+		// DISTANCE
+		// =========================
 		if userLat != 0 && userLng != 0 {
 			r.DistanceKm = CalculateDistance(userLat, userLng, r.Lat, r.Lng)
 		}
-		
-		r.Menu = []models.MenuItem{}
-		results = append(results, r)
+
+		// =========================
+		// OPEN STATUS
+		// =========================
+		now := time.Now().Format("15:04")
+		if r.OpenTime <= r.CloseTime {
+			r.IsOpen = now >= r.OpenTime && now <= r.CloseTime
+		} else {
+			// qua đêm (ví dụ: 22:00 - 02:00)
+			r.IsOpen = now >= r.OpenTime || now <= r.CloseTime
+		}
+
+		restaurants = append(restaurants, r)
+		ids = append(ids, r.ID)
 	}
 
-	return results, len(results), nil
+	if err := rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("scan restaurants: %w", err)
+	}
+
+	if len(ids) == 0 {
+		return []models.Restaurant{}, 0, nil
+	}
+
+	// =========================
+	// LOAD IMAGES
+	// =========================
+	imageMap, err := getImagesByRestaurantIDs(ctx, ids)
+	if err == nil {
+		for i := range restaurants {
+			if imgs, found := imageMap[restaurants[i].ID]; found {
+				restaurants[i].Images = imgs
+			}
+		}
+	}
+
+	// =========================
+	// LOAD MENU
+	// dùng parameterized placeholders thay vì string join để tránh SQL injection
+	// =========================
+	menuPlaceholders := make([]string, len(ids))
+	menuArgs := make([]interface{}, len(ids))
+	for i, id := range ids {
+		menuPlaceholders[i] = fmt.Sprintf("@mid%d", i)
+		menuArgs[i] = sql.Named(fmt.Sprintf("mid%d", i), id)
+	}
+
+	menuQuery := fmt.Sprintf(`
+		SELECT
+			id,
+			restaurant_id,
+			name,
+			description,
+			price,
+			food_type,
+			ingredients,
+			story
+		FROM MenuItems
+		WHERE restaurant_id IN (%s)
+	`, strings.Join(menuPlaceholders, ","))
+
+	if q != "" {
+		menuQuery += fmt.Sprintf(" AND name LIKE @mq%d", len(ids))
+		menuArgs = append(menuArgs, sql.Named(fmt.Sprintf("mq%d", len(ids)), "%"+q+"%"))
+	}
+
+	menuRows, err := db.QueryContext(ctx, menuQuery, menuArgs...)
+	if err == nil {
+		defer menuRows.Close()
+
+		menuMap := make(map[int][]models.MenuItem)
+
+		for menuRows.Next() {
+			var mi models.MenuItem
+
+			err := menuRows.Scan(
+				&mi.ID,
+				&mi.RestaurantID,
+				&mi.Name,
+				&mi.Description,
+				&mi.Price,
+				&mi.FoodType,
+				&mi.Ingredients,
+				&mi.Story,
+			)
+			if err == nil {
+				menuMap[mi.RestaurantID] = append(menuMap[mi.RestaurantID], mi)
+			}
+		}
+
+		for i := range restaurants {
+			if items, found := menuMap[restaurants[i].ID]; found {
+				restaurants[i].Menu = items
+			}
+		}
+	}
+
+	// =========================
+	// SORT
+	// =========================
+	switch sortBy {
+	case "rating":
+		sort.Slice(restaurants, func(i, j int) bool {
+			return restaurants[i].Rating > restaurants[j].Rating
+		})
+	case "distance":
+		if userLat != 0 && userLng != 0 {
+			sort.Slice(restaurants, func(i, j int) bool {
+				return restaurants[i].DistanceKm < restaurants[j].DistanceKm
+			})
+		}
+	}
+
+	return restaurants, len(restaurants), nil
 }
 
 // GetRestaurantDetail: Lấy chi tiết nhà hàng, bao gồm menu và reviews
 // Chưa hoàn thiện vì còn thiếu bảng ảnh, nhưng sẽ trả về được menu và reviews để handler có thể hiển thị chi tiết.
 func GetRestaurantDetail(ctx context.Context, id int) (*models.RestaurantDetail, error) {
-    // 1. Lấy thông tin gốc của quán
-    query := `
-        SELECT id, name, address, lat, lng, rating, price_range, 
-               open_time, close_time, type, created_at
-        FROM Restaurants WHERE id = @id
-    `
-    var rd models.RestaurantDetail
-    err := db.QueryRowContext(ctx, query, sql.Named("id", id)).Scan(
-        &rd.ID, &rd.Name, &rd.Address, &rd.Lat, &rd.Lng, &rd.Rating, 
-        &rd.PriceRange, &rd.OpenTime, &rd.CloseTime, &rd.Type, &rd.CreatedAt,
-    )
-    if err == sql.ErrNoRows {
-        return nil, fmt.Errorf("không tìm thấy nhà hàng")
-    }
-    if err != nil {
-        return nil, err
-    }
+	query := `
+		SELECT id, name, address, lat, lng, rating, price_range, 
+		       open_time, close_time, type, created_at
+		FROM Restaurants WHERE id = @id
+	`
+	var rd models.RestaurantDetail
+	err := db.QueryRowContext(ctx, query, sql.Named("id", id)).Scan(
+		&rd.ID, &rd.Name, &rd.Address, &rd.Lat, &rd.Lng, &rd.Rating, 
+		&rd.PriceRange, &rd.OpenTime, &rd.CloseTime, &rd.Type, &rd.CreatedAt,
+	)
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("không tìm thấy nhà hàng")
+	}
+	if err != nil {
+		return nil, err
+	}
 
-    // 2. Lấy Menu (Dùng hàm có sẵn để lấy menu theo restaurant ID)
-    menuMap, err := getMenusByRestaurantIDs(ctx, []int{id})
-    if err == nil {
-        rd.Menu = menuMap[id]
-    }
+	menuMap, err := getMenusByRestaurantIDs(ctx, []int{id})
+	if err == nil {
+		rd.Menu = menuMap[id]
+	}
 
-    // 3. Lấy Reviews để làm phần đánh giá khách hàng
-    reviews, err := GetReviewsByRestaurant(ctx, id)
-    if err == nil {
-        rd.UserRatings = reviews
-    }
+	reviews, err := GetReviewsByRestaurant(ctx, id)
+	if err == nil {
+		rd.UserRatings = reviews
+	}
 
-    // 4. Mock thêm mảng ảnh (nếu SQL chưa có bảng ảnh riêng)
-    //rd.Images = []string{"banner.jpg", "view_quan.jpg"}
+	imageMap, err := getImagesByRestaurantIDs(ctx, []int{id})
+	if err == nil && len(imageMap[id]) > 0 {
+		rd.Images = imageMap[id]
+	} else {
+		rd.Images = []models.RestaurantImage{}
+	}
 
-    return &rd, nil
+	forumPosts, err := GetForumPostsByRestaurantID(ctx, rd.ID)
+	if err == nil {
+		rd.ForumPosts = forumPosts
+	} else {
+		rd.ForumPosts = []models.Post{}
+	}
+
+	return &rd, nil
 }
 
 // GetPopularRestaurants: Lấy danh sách quán ăn uy tín cho trang chủ
 func GetPopularRestaurants(ctx context.Context, limit int) ([]models.Restaurant, error) {
-	// Lấy những quán có Rating cao nhất, giới hạn số lượng (ví dụ: top 6 quán)
 	query := `
 		SELECT TOP (@limit) 
 			id, name, address, lat, lng, rating, price_range, 
@@ -691,19 +979,44 @@ func GetPopularRestaurants(ctx context.Context, limit int) ([]models.Restaurant,
 	defer rows.Close()
 
 	var restaurants []models.Restaurant
+	var ids []int
+
 	for rows.Next() {
 		var r models.Restaurant
 		err := rows.Scan(
-			&r.ID, &r.Name, &r.Address, &r.Lat, &r.Lng, 
+			&r.ID, &r.Name, &r.Address, &r.Lat, &r.Lng,
 			&r.Rating, &r.PriceRange, &r.OpenTime, &r.CloseTime, &r.Type,
 		)
 		if err != nil {
 			continue
 		}
-		
-		// Gán mảng rỗng cho Menu để tránh bị null khi trả về JSON
+
+		// Khởi tạo mảng rỗng thay vì để null nhằm tránh lỗi phía Frontend
 		r.Menu = []models.MenuItem{}
+		r.Images = []models.RestaurantImage{}
+		
+		// Logic tính toán trạng thái đóng/mở cửa dựa trên thời gian thực hệ thống
+		now := time.Now().Format("15:00")
+		if r.OpenTime <= r.CloseTime {
+			r.IsOpen = now >= r.OpenTime && now <= r.CloseTime
+		} else {
+			r.IsOpen = now >= r.OpenTime || now <= r.CloseTime
+		}
+
 		restaurants = append(restaurants, r)
+		ids = append(ids, r.ID)
+	}
+
+	// Đổ dữ liệu ảnh Thumbnail thực tế từ DB vào danh sách
+	if len(ids) > 0 {
+		imageMap, err := getImagesByRestaurantIDs(ctx, ids)
+		if err == nil {
+			for i := range restaurants {
+				if imgs, found := imageMap[restaurants[i].ID]; found {
+					restaurants[i].Images = imgs
+				}
+			}
+		}
 	}
 
 	return restaurants, nil
@@ -711,14 +1024,29 @@ func GetPopularRestaurants(ctx context.Context, limit int) ([]models.Restaurant,
 
 // GetTrendingDishes: Lấy quán ăn dựa trên các món ăn đang nổi tiếng
 func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}, error) {
-	// Query lấy món ăn trending kèm thông tin quán sở hữu món đó
 	query := `
+		WITH RankedDishes AS (
+			SELECT 
+				m.id AS dish_id, 
+				m.name AS dish_name, 
+				m.price, 
+				m.description, 
+				m.ingredients,
+				r.id AS restaurant_id, 
+				r.name AS restaurant_name, 
+				r.address, 
+				r.rating, 
+				r.type,
+				ROW_NUMBER() OVER (PARTITION BY r.id ORDER BY m.price DESC) AS rn
+			FROM MenuItems m
+			JOIN Restaurants r ON m.restaurant_id = r.id
+		)
 		SELECT TOP (@limit) 
-			m.id AS dish_id, m.name AS dish_name, m.price, m.description, m.ingredients,
-			r.id AS restaurant_id, r.name AS restaurant_name, r.address, r.rating, r.type
-		FROM MenuItems m
-		JOIN Restaurants r ON m.restaurant_id = r.id
-		ORDER BY r.rating DESC, m.price DESC -- Ưu tiên quán xịn và món đặc sắc
+			dish_id, dish_name, price, description, ingredients,
+			restaurant_id, restaurant_name, address, rating, type
+		FROM RankedDishes
+		WHERE rn = 1
+		ORDER BY rating DESC, price DESC
 	`
 
 	rows, err := db.QueryContext(ctx, query, sql.Named("limit", limit))
@@ -727,32 +1055,31 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 	}
 	defer rows.Close()
 
-	var trendingList []map[string]interface{}
+	var dishIDs []int
+	var tempItems []map[string]interface{}
+
 	for rows.Next() {
 		var dID, rID int
 		var dName, dDesc, dIngre, rName, rAddr, rType string
 		var price, rating float64
 
-		err := rows.Scan(&dID, &dName, &price, &dDesc, &dIngre, &rID, &rName, &rAddr, &rating, &rType)
-		if err != nil {
+		if err := rows.Scan(&dID, &dName, &price, &dDesc, &dIngre, &rID, &rName, &rAddr, &rating, &rType); err != nil {
 			continue
 		}
 
-		// Logic tạo huy hiệu (Badge) tự động
 		badge := "Popular"
 		if rating >= 4.5 {
 			badge = "Must try"
 		}
 
-		// Tạo cấu trúc dữ liệu xoay quanh món ăn nổi tiếng
 		item := map[string]interface{}{
 			"dish_info": map[string]interface{}{
 				"id":          dID,
 				"name":        dName,
 				"price":       price,
 				"description": dDesc,
-				"image_url":   fmt.Sprintf("https://storage.yummap.vn/dishes/%d.jpg", dID), // URL ảnh món ăn
 				"badge":       badge,
+				"image_url":   "", 
 			},
 			"restaurant_info": map[string]interface{}{
 				"id":      rID,
@@ -762,8 +1089,277 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 				"type":    rType,
 			},
 		}
-		trendingList = append(trendingList, item)
+		
+		tempItems = append(tempItems, item)
+		dishIDs = append(dishIDs, dID)
 	}
 
-	return trendingList, nil
+	if len(dishIDs) > 0 {
+		imageMap, err := getImagesByMenuItemIDs(ctx, dishIDs)
+		if err == nil {
+			for _, item := range tempItems {
+				dishInfo := item["dish_info"].(map[string]interface{})
+				dID := dishInfo["id"].(int)
+				
+				images := imageMap[dID]
+				var finalImg string
+				
+				for _, img := range images {
+					if img.IsThumbnail {
+						finalImg = img.ImageURL
+						break
+					}
+				}
+				
+				if finalImg == "" && len(images) > 0 {
+					finalImg = images[0].ImageURL
+				}
+				
+				dishInfo["image_url"] = finalImg
+			}
+		}
+	}
+
+	if tempItems == nil {
+		return []map[string]interface{}{}, nil
+	}
+
+	return tempItems, nil
+}
+
+// [Minh]
+// SearchRestaurantsForChatbot truy vấn quán ăn dựa trên các thực thể intent từ người dùng (Chatbot)
+func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interface{}) ([]models.Restaurant, error) {
+	query := `
+		SELECT r.id, r.name, r.address, r.lat, r.lng, r.rating, r.price_range, r.open_time, r.close_time, r.type
+		FROM Restaurants r
+		WHERE 1=1
+	`
+	var namedArgs []interface{}
+
+	// Lọc theo món ăn (nằm trong tên quán hoặc menu)
+	if dish, ok := entities["dish"].(string); ok && dish != "" {
+		query += ` AND (r.name LIKE @dish OR r.id IN (SELECT restaurant_id FROM MenuItems WHERE name LIKE @dish))`
+		namedArgs = append(namedArgs, sql.Named("dish", "%"+dish+"%"))
+	}
+
+	// Lọc theo vị trí (gần đúng qua address)
+	if location, ok := entities["location"].(string); ok && location != "" {
+		query += ` AND r.address LIKE @loc`
+		namedArgs = append(namedArgs, sql.Named("loc", "%"+location+"%"))
+	}
+
+	query += ` ORDER BY r.rating DESC OFFSET 0 ROWS FETCH NEXT 5 ROWS ONLY`
+
+	rows, err := db.QueryContext(ctx, query, namedArgs...)
+	if err != nil {
+		return nil, fmt.Errorf("SearchRestaurantsForChatbot: %w", err)
+	}
+	defer rows.Close()
+
+	var restaurants []models.Restaurant
+	var ids []int
+
+	for rows.Next() {
+		var r models.Restaurant
+		if err := rows.Scan(
+			&r.ID, &r.Name, &r.Address, &r.Lat, &r.Lng,
+			&r.Rating, &r.PriceRange, &r.OpenTime, &r.CloseTime, &r.Type,
+		); err != nil {
+			continue
+		}
+		restaurants = append(restaurants, r)
+		ids = append(ids, r.ID)
+	}
+
+	if len(ids) == 0 {
+		return restaurants, nil
+	}
+
+	menuMap, err := getMenusByRestaurantIDs(ctx, ids)
+	if err == nil {
+		for i := range restaurants {
+			restaurants[i].Menu = menuMap[restaurants[i].ID]
+		}
+	}
+
+	return restaurants, nil
+}
+
+// tokenize là hàm nội bộ, giúp tách một chuỗi văn bản thành các từ (tokens) duy nhất.
+// Hàm này thực hiện các bước: chuyển thành chữ thường, thay thế dấu câu, và loại bỏ các từ quá ngắn.
+func tokenize(text string) map[string]bool {
+	// Thay thế các dấu câu phổ biến bằng khoảng trắng để tách từ tốt hơn
+	replacer := strings.NewReplacer(",", " ", ".", " ", ";", " ", ":", " ", "!", " ", "?", " ", "(", " ", ")", " ")
+	text = replacer.Replace(text)
+
+	words := strings.Fields(strings.ToLower(text))
+	tokenSet := make(map[string]bool)
+	for _, word := range words {
+		// Bỏ qua các từ rất ngắn, thường là stop-words hoặc ký tự nhiễu
+		if len(word) > 2 {
+			tokenSet[word] = true
+		}
+	}
+	return tokenSet
+}
+
+// CalculateChatRelevanceScores tính điểm liên quan cho các nhà hàng dựa trên lịch sử chat của người dùng.
+// Thuật toán này đếm số lần các từ khóa trong toàn bộ cuộc trò chuyện của người dùng khớp với "tags" của nhà hàng.
+// "Tags" của nhà hàng được tổng hợp từ: tên, loại hình, tên món, mô tả món, và nguyên liệu.
+func CalculateChatRelevanceScores(ctx context.Context, userID int, restaurants []models.Restaurant) (map[int]int, error) {
+	// Bước 1: Lấy lịch sử chat của người dùng trong 7 ngày gần nhất để tính điểm liên quan.
+	// Việc giới hạn thời gian giúp hệ thống tự động "reset" điểm và cập nhật theo sở thích mới nhất của người dùng.
+	since := time.Now().AddDate(0, 0, -7)
+	rows, err := db.QueryContext(ctx, `
+		SELECT user_message FROM ChatHistory 
+		WHERE user_id = @uid AND created_at >= @since
+	`, sql.Named("uid", userID), sql.Named("since", since))
+	if err != nil {
+		return nil, fmt.Errorf("lỗi lấy lịch sử chat gần đây: %w", err)
+	}
+	defer rows.Close()
+
+	// Bước 2: Tổng hợp và "tokenize" tất cả các tin nhắn của người dùng thành một tập hợp từ khóa
+	var allUserMessages strings.Builder
+	for rows.Next() {
+		var msg string
+		if err := rows.Scan(&msg); err == nil {
+			allUserMessages.WriteString(msg)
+			allUserMessages.WriteString(" ")
+		}
+	}
+	userKeywords := tokenize(allUserMessages.String())
+
+	if len(userKeywords) == 0 {
+		return make(map[int]int), nil
+	}
+
+	relevanceScores := make(map[int]int)
+
+	// Bước 3: Lặp qua từng nhà hàng để tính điểm
+	for _, r := range restaurants {
+		// Bước 3.1: Tạo "tags" cho nhà hàng từ nhiều nguồn thông tin
+		var restaurantContent strings.Builder
+		restaurantContent.WriteString(r.Name + " " + r.Type + " ")
+		for _, menuItem := range r.Menu {
+			restaurantContent.WriteString(menuItem.Name + " " + menuItem.Description + " " + menuItem.Ingredients + " ")
+		}
+		restaurantTags := tokenize(restaurantContent.String())
+
+		// Bước 3.2: Đếm số từ khóa của người dùng khớp với tags của nhà hàng
+		matchCount := 0
+		for keyword := range userKeywords {
+			if _, found := restaurantTags[keyword]; found {
+				matchCount++
+			}
+		}
+		relevanceScores[r.ID] = matchCount
+	}
+
+	return relevanceScores, nil
+}
+
+// ============================================================
+// CHAT HISTORY
+// ============================================================
+
+// ChatHistoryEntry represents a single entry in the ChatHistory table.
+type ChatHistoryEntry struct {
+	ID          int       `json:"id"`
+	UserID      int       `json:"user_id"`
+	UserMessage string    `json:"user_message"`
+	BotReply    string    `json:"bot_reply"`
+	CreatedAt   time.Time `json:"created_at"`
+	// Các trường suggested_context và top_score đã được chuyển sang bảng ChatSuggestionLog
+}
+
+// ChatSuggestionLogEntry represents a single suggested restaurant in a chat message.
+type ChatSuggestionLogEntry struct {
+	ChatHistoryID  int64
+	RestaurantID   int
+	RestaurantName string
+	Score          float64
+}
+
+// SaveChatHistory saves the main chat message and returns the new history ID.
+func SaveChatHistory(ctx context.Context, userID int, userMessage, botReply string) (int64, error) {
+	var newID int64
+	query := `
+		INSERT INTO ChatHistory (user_id, user_message, bot_reply, created_at)
+		OUTPUT INSERTED.id
+		VALUES (@uid, @userMsg, @botReply, GETDATE())
+	`
+	row := db.QueryRowContext(ctx, query,
+		sql.Named("uid", userID),
+		sql.Named("userMsg", userMessage),
+		sql.Named("botReply", botReply),
+	)
+	err := row.Scan(&newID)
+	if err != nil {
+		log.Printf("[DB] Lỗi lưu lịch sử chat: %v", err)
+		return 0, err
+	}
+	return newID, nil
+}
+
+// SaveChatSuggestions lưu top 3 nhà hàng được đề xuất.
+func SaveChatSuggestions(ctx context.Context, chatHistoryID int64, suggestions []ChatSuggestionLogEntry) error {
+	if len(suggestions) == 0 {
+		return nil
+	}
+
+	// Sử dụng transaction để đảm bảo tất cả các gợi ý được lưu hoặc không lưu gì cả.
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("lỗi bắt đầu transaction: %w", err)
+	}
+	defer tx.Rollback() // Rollback nếu có lỗi xảy ra
+
+	stmt, err := tx.PrepareContext(ctx, `
+		INSERT INTO ChatSuggestionLog (chat_history_id, restaurant_id, restaurant_name, score, created_at)
+		VALUES (@chatId, @resId, @resName, @score, GETDATE())
+	`,
+	)
+	if err != nil {
+		return fmt.Errorf("lỗi chuẩn bị statement: %w", err)
+	}
+	defer stmt.Close()
+
+	for _, s := range suggestions {
+		_, err := stmt.ExecContext(ctx,
+			sql.Named("chatId", chatHistoryID),
+			sql.Named("resId", s.RestaurantID),
+			sql.Named("resName", s.RestaurantName),
+			sql.Named("score", s.Score),
+		)
+		if err != nil {
+			// Nếu một insert lỗi, toàn bộ transaction sẽ được rollback.
+			return fmt.Errorf("lỗi thực thi insert cho suggestion (resId: %d): %w", s.RestaurantID, err)
+		}
+	}
+
+	return tx.Commit() // Hoàn tất transaction nếu không có lỗi
+}
+
+func GetChatHistoryByUserID(ctx context.Context, userID int) ([]ChatHistoryEntry, error) {
+	rows, err := db.QueryContext(ctx, `
+		SELECT id, user_id, user_message, bot_reply, created_at
+		FROM ChatHistory
+		WHERE user_id = @uid
+		ORDER BY created_at ASC
+	`, sql.Named("uid", userID))
+	if err != nil {
+		return nil, fmt.Errorf("GetChatHistoryByUserID: %w", err)
+	}
+	defer rows.Close()
+
+	var history []ChatHistoryEntry
+	for rows.Next() {
+		var h ChatHistoryEntry
+		if err := rows.Scan(&h.ID, &h.UserID, &h.UserMessage, &h.BotReply, &h.CreatedAt); err == nil {
+			history = append(history, h)
+		}
+	}
+	return history, nil
 }

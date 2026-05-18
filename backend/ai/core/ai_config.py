@@ -1,7 +1,10 @@
-# core/ai_config.py
 import google.generativeai as genai
-import os
+from core.config import settings
 
-genai.configure(api_key=os.getenv("GEMINI_KEY"))
+if not settings.GEMINI_API_KEY:
+    raise ValueError("Không tìm thấy GEMINI_API_KEY hoặc GOOGLE_API_KEY trong file .env. Vui lòng kiểm tra lại!")
+
+genai.configure(api_key=settings.GEMINI_API_KEY)
+
 # Khởi tạo 1 lần dùng cho cả hội
-shared_model = genai.GenerativeModel('gemini-1.5-flash')
+shared_model = genai.GenerativeModel(settings.GEMINI_MODEL_NAME)

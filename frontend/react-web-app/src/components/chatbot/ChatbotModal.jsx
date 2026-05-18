@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { sendChatMessageApi } from '../../api/chatbotApi';
 import { useAuth } from '../../context/AuthContext';
+import botAvatar from '../../assets/avatar_chatbot.jpg';
 
 // ---- Chat Bubble ----
 const ChatBubble = ({ role, text, timestamp, suggestedPlaces = [] }) => {
@@ -9,9 +10,11 @@ const ChatBubble = ({ role, text, timestamp, suggestedPlaces = [] }) => {
     <div className={`flex items-end gap-2 ${isBot ? 'flex-row' : 'flex-row-reverse'}`}>
       {/* Avatar */}
       {isBot && (
-        <div className="w-8 h-8 rounded-full bg-[#F9A899] flex items-center justify-center flex-shrink-0 text-sm">
-          🤖
-        </div>
+        <img
+          src={botAvatar}
+          alt="bot"
+          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+/>
       )}
 
       <div className={`max-w-[80%] flex flex-col gap-1 ${isBot ? 'items-start' : 'items-end'}`}>
@@ -68,7 +71,11 @@ const ChatBubble = ({ role, text, timestamp, suggestedPlaces = [] }) => {
 // ---- Typing indicator ----
 const TypingIndicator = () => (
   <div className="flex items-end gap-2">
-    <div className="w-8 h-8 rounded-full bg-[#F9A899] flex items-center justify-center text-sm">🤖</div>
+    <img
+          src={botAvatar}
+          alt="bot"
+          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+/>
     <div className="bg-[#FDECD8] px-4 py-3 rounded-2xl rounded-bl-sm">
       <div className="flex gap-1 items-center">
         {[0, 1, 2].map((i) => (
@@ -141,7 +148,11 @@ const ChatbotModal = ({ onClose }) => {
     >
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3.5 bg-gradient-to-r from-[#F4836A] to-[#E85D42] text-white flex-shrink-0">
-        <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-xl">🤖</div>
+        <img
+          src={botAvatar}
+          alt="bot"
+          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+/>
         <div className="flex-1">
           <p className="font-bold text-sm">Trợ lý ẩm thực</p>
           <p className="text-xs opacity-80">YumMap AI • Đang hoạt động</p>
@@ -212,12 +223,12 @@ export const ChatbotButton = ({ onClick, isOpen }) => (
       bg-gradient-to-r from-[#E8623A] to-[#C04D2B] text-white
       px-5 py-3 rounded-full text-sm font-bold
       shadow-[0_8px_28px_rgba(232,98,58,0.4)]
-      hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-[0_14px_36px_rgba(232,98,58,0.5)]
+      hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-[0_14px_36px_rgba(232,98,58,0.5)]sss
       transition-all duration-200
       ${!isOpen ? 'animate-pulse-glow' : ''}
     `}
   >
-    <span className="text-xl">{isOpen ? '💬' : '🤖'}</span>
+    <span className="text-xl">{isOpen ? '💬'  : <img src={botAvatar} alt="bot" className="w-10 h-10 rounded-full object-cover" />}</span>
     <span>AI Gợi ý</span>
   </button>
 );

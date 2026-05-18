@@ -14,7 +14,7 @@ INSERT INTO Restaurants (name, address, lat, lng, rating, price_range, open_time
 (N'I LOVE KEM', N'355 Đ.Lê Văn Sỹ, Phường 1, Quận Tân Bình', 10.79643347945519, 106.66513820391683, 4.3, 100000, '10:00', '23:00', 'vietnamese'),
 (N'Lẩu Dê Lâm Ký', N'47 Đ.Nguyễn Thị Nhỏ, Phường 9, Quận Tân Bình', 10.7700343924685, 106.65241699064585, 3.9, 220000, '15:00', '22:00', 'vietnamese'),
 
--- Tán Phú --
+-- Tân Phú --
 (N'Quán Nướng Yaki', N'375 Đ.Tân Sơn Nhì, Phường Tân Thành, Quận Tân Phú', 10.794101390074331, 106.62891908836144, 3.9, 500000, '9:00', '23:30', 'japanese,bbq'),
 (N'The Pizza Company', N'Tầng trệt, Aeon Mall Tân Phú Celadon, 30 Đ.Bờ Bao Tân Thắng, Phường Sơn Kỳ, Quận Tân Phú', 10.801544031808016, 106.61854110789773, 4.0, 1000000, '10:00', '22:00', 'italian'),
 (N'Nhà hàng Vườn Treo MansonPark', N'2 Đ.Đô Đốc Long, Phường Tân Quý, Quận Tân Phú', 10.791732577331674, 106.63012289762649, 4.8, 500000, '17:00', '23:00', 'vietnamese'),
@@ -61,7 +61,7 @@ DECLARE @IdPapaxot INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Papax�
 DECLARE @IdBunHomemade INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Đậu Homemade - Bún đậu mắm tôm');
 DECLARE @IdNemNuongBeThao INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Nem Nướng Nha Trang BÉ THẢO');
 DECLARE @IdILOVEKEM INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'I LOVE KEM');
-DECLARE @IdDeLamKy INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Lẩu Dê Lâm Ký');
+DECLARE @IdDeLamLy INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Lẩu Dê Lâm Ký');
 
 DECLARE @IdNuongYaki INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Quán Nướng Yaki');
 DECLARE @IdPizzaCompany INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'The Pizza Company');
@@ -77,7 +77,7 @@ DECLARE @IdGaTaQN INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Gà Ta 
 DECLARE @IdBanhMiChao INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Bánh Mì Chảo Cô 3 Hậu');
 DECLARE @IdNhaHangNNB INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Nhà hàng Những Người Bạn');
 DECLARE @IdMiGa INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Mì Gà Da Giòn');
-DECLARE @IdBanhCanhCaLoc INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Bánh canh cá lóc Cường Đô La');
+DECLARE @IdBanhCanhCaLoc_1 INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Bánh canh cá lóc Cường Đô La');
 DECLARE @IdBanhMiCoBich INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Bánh mì cóc Cô Bích');
 DECLARE @IdQuanNuiNgu INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Quán Ăn Núi Ngự');
 DECLARE @IdBBQGarden INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'BBQ GARDEN | LẨU - NƯỚNG KHÔNG KHÓI GÒ VẤP');
@@ -87,7 +87,7 @@ DECLARE @IdNNQuan INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Nhi Nhi
 
 DECLARE @IdBanhCanhBaTam INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Bánh Canh Bà Tám Chợ Cầu');
 DECLARE @IdComChayTN INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Cơm chay Thiện Nhẫn');
-DECLARE @IdBanhCanhCaLoc INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Bánh canh cá lóc Cường Đô La');
+DECLARE @IdBanhCanhCaLoc_2 INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Bánh canh cá lóc Cường Đô La');
 DECLARE @IdKDLBenXua INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Khu du lịch Bến Xưa');
 DECLARE @IdBunDauMetQuan INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Bún đậu mắm tôm Mẹt Quán');
 DECLARE @IdMiQuangHQ INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'MÌ QUẢNG HƯƠNG QUÊ');
@@ -146,7 +146,7 @@ INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingre
 (@IdBunHaiDang, N'Tô Thịt + Nem', N'Bún thịt nướng ăn kèm nem nướng đậm đà', 50000, 'vietnamese', 'pork,sausage,noodle'),
 (@IdBunHaiDang, N'Tô Chả Giò + Nem', N'Lựa chọn không thịt nướng với chả giò và nem nướng', 50000, 'vietnamese', 'spring roll,sausage,noodle'),
 (@IdBunHaiDang, N'Tô Thịt Không', N'Bún thịt nướng thuần túy', 50000, 'vietnamese', 'pork,noodle'),
-(@IdBunHaiDang, N'Tô Chả Giò Không', N'Bún ăn kèm chả giò chiên giòn', 50000, 'vietnamese', 'spring roll,noodle')
+(@IdBunHaiDang, N'Tô Chả Giò Không', N'Bún ăn kèm chả giò chiên giòn', 50000, 'vietnamese', 'spring roll,noodle'),
 
 -- Papaxốt --
 (@IdPapaxot, N'Cơm Xèo Bò Đặc Biệt', N'Cơm nóng trên chảo xèo xèo cùng thịt bò, trứng ốp la và ngô hạt', 97000, 'vietnamese', 'beef,egg,corn,rice'),
@@ -160,7 +160,7 @@ INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingre
 (@IdPapaxot, N'Cơm Xèo Gà Phi Lê', N'Phần ức gà phi lê mềm, ít béo dành cho người ăn kiêng', 69000, 'vietnamese', 'chicken,rice'),
 (@IdPapaxot, N'Cơm Xèo Gà Xúc Xắc (Sốt Teriyaki)', N'Gà cắt viên xúc xắc thấm sốt Teriyaki Nhật Bản', 59000, 'vietnamese', 'chicken,sausage,teriyaki sauce,rice'),
 (@IdPapaxot, N'Cơm Xèo Gà Áp Chảo', N'Gà áp chảo giòn da, thịt bên trong vẫn giữ được độ ẩm', 59000, 'vietnamese', 'chicken,rice'),
-(@IdPapaxot, N'Cơm Xèo Gà Hải Sản', N'Sự kết hợp độc đáo giữa gà và hải sản trên chảo xèo xèo', 85000, 'vietnamese', 'chicken,seafood,rice')
+(@IdPapaxot, N'Cơm Xèo Gà Hải Sản', N'Sự kết hợp độc đáo giữa gà và hải sản trên chảo xèo xèo', 85000, 'vietnamese', 'chicken,seafood,rice'),
 
 -- Bún đậu Homemade --
 (@IdBunHomemade, N'Bún Đậu No Nê (1-2 người)', N'Phiên bản nâng cấp gồm: bún lá, đậu mơ, chả cốm, thịt chân giò, ba rọi riềng mẻ, dồi sụn', 189000, 'vietnamese', 'noodle,tofu,pork,spring roll,shrimp paste'),
@@ -195,22 +195,22 @@ INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingre
 (@IdILOVEKEM, N'Kem tự chọn (100gram)', N'Khách hàng tự chọn các vị kem yêu thích: Sầu riêng, Trà xanh, Dưa lưới, Dâu, Bạc hà...', 29000, 'dessert', 'ice cream,topping,fruit'),
 
 -- Lẩu dê Lâm ký --
-(@IdDeLamLy, N'Lẩu Dê (Nhỏ)', N'Lẩu dê tươi nấu kiểu truyền thống, nước dùng thanh ngọt', 320000, 'goat', 'goat meat,herb,tofu,vegetable'),
-(@IdDeLamLy, N'Thịt Dê Nướng', N'Thịt dê tươi tẩm ướp gia vị đậm đà nướng than hồng', 175000, 'goat', 'goat meat,garlic,chili'),
-(@IdDeLamLy, N'Lòng Dê', N'Lòng dê tươi chế biến sạch, dai giòn sần sật', 160000, 'goat', 'goat intestine'),
-(@IdDeLamLy, N'Cháo Dê', N'Cháo gạo thơm nấu cùng thịt dê bằm bổ dưỡng', 45000, 'goat', 'goat meat,rice,ginger'),
-(@IdDeLamLy, N'Tiết Canh Dê', N'Món tiết canh dê tươi đặc sản', 40000, 'goat', 'goat blood,peanut,herb'),
-(@IdDeLamLy, N'Dê Tiềm Thuốc Bắc (Đặt trước)', N'Dê hầm các vị thuốc bắc quý hiếm, bồi bổ sức khỏe (Thố lớn)', 1000000, 'goat', 'goat meat,chinese medicine,herb'),
-(@IdDeLamLy, N'Mì Thêm', N'Mì trứng ăn kèm lẩu', 17000, 'side_dish', 'egg noodle'),
-(@IdDeLamLy, N'Bánh Phở Thêm', N'Bánh phở tươi ăn kèm lẩu', 17000, 'side_dish', 'rice noodle'),
-(@IdDeLamLy, N'Bún Thêm', N'Bún tươi ăn kèm lẩu', 14000, 'side_dish', 'noodle'),
-(@IdDeLamLy, N'Đậu Hũ Chiên', N'Đậu hũ chiên vàng giòn', 17000, 'side_dish', 'tofu'),
-(@IdDeLamLy, N'Rau Thêm', N'Các loại rau ăn kèm lẩu dê', 14000, 'side_dish', 'vegetable'),
-(@IdDeLamLy, N'Bia Heineken (Lon)', N'Bia Heineken lon ướp lạnh', 25000, 'drink', 'beer'),
-(@IdDeLamLy, N'Bia Tiger (Lon)', N'Bia Tiger lon ướp lạnh', 22000, 'drink', 'beer'),
-(@IdDeLamLy, N'Soda Chanh', N'Nước soda chanh đường giải nhiệt', 15000, 'drink', 'soda,lemon'),
-(@IdDeLamLy, N'Nước Suối', N'Nước suối đóng chai', 10000, 'drink', 'water'),
-(@IdDeLamLy, N'Trà Đá', N'Ly trà đá mát lạnh', 2000, 'drink', 'tea'),
+(@IdDeLamKy, N'Lẩu Dê (Nhỏ)', N'Lẩu dê tươi nấu kiểu truyền thống, nước dùng thanh ngọt', 320000, 'goat', 'goat meat,herb,tofu,vegetable'),
+(@IdDeLamKy, N'Thịt Dê Nướng', N'Thịt dê tươi tẩm ướp gia vị đậm đà nướng than hồng', 175000, 'goat', 'goat meat,garlic,chili'),
+(@IdDeLamKy, N'Lòng Dê', N'Lòng dê tươi chế biến sạch, dai giòn sần sật', 160000, 'goat', 'goat intestine'),
+(@IdDeLamKy, N'Cháo Dê', N'Cháo gạo thơm nấu cùng thịt dê bằm bổ dưỡng', 45000, 'goat', 'goat meat,rice,ginger'),
+(@IdDeLamKy, N'Tiết Canh Dê', N'Món tiết canh dê tươi đặc sản', 40000, 'goat', 'goat blood,peanut,herb'),
+(@IdDeLamKy, N'Dê Tiềm Thuốc Bắc (Đặt trước)', N'Dê hầm các vị thuốc bắc quý hiếm, bồi bổ sức khỏe (Thố lớn)', 1000000, 'goat', 'goat meat,chinese medicine,herb'),
+(@IdDeLamKy, N'Mì Thêm', N'Mì trứng ăn kèm lẩu', 17000, 'side_dish', 'egg noodle'),
+(@IdDeLamKy, N'Bánh Phở Thêm', N'Bánh phở tươi ăn kèm lẩu', 17000, 'side_dish', 'rice noodle'),
+(@IdDeLamKy, N'Bún Thêm', N'Bún tươi ăn kèm lẩu', 14000, 'side_dish', 'noodle'),
+(@IdDeLamKy, N'Đậu Hũ Chiên', N'Đậu hũ chiên vàng giòn', 17000, 'side_dish', 'tofu'),
+(@IdDeLamKy, N'Rau Thêm', N'Các loại rau ăn kèm lẩu dê', 14000, 'side_dish', 'vegetable'),
+(@IdDeLamKy, N'Bia Heineken (Lon)', N'Bia Heineken lon ướp lạnh', 25000, 'drink', 'beer'),
+(@IdDeLamKy, N'Bia Tiger (Lon)', N'Bia Tiger lon ướp lạnh', 22000, 'drink', 'beer'),
+(@IdDeLamKy, N'Soda Chanh', N'Nước soda chanh đường giải nhiệt', 15000, 'drink', 'soda,lemon'),
+(@IdDeLamKy, N'Nước Suối', N'Nước suối đóng chai', 10000, 'drink', 'water'),
+(@IdDeLamKy, N'Trà Đá', N'Ly trà đá mát lạnh', 2000, 'drink', 'tea'),
 
 -- Quán nướng Yaki --
 (@IdNuongYaki, N'Sashimi Cá Hồi', N'Cá hồi tươi thái lát, vị béo ngậy tự nhiên', 175000, 'japanese', 'salmon'),
@@ -377,16 +377,16 @@ INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingre
 (@IdMiGa, N'Phở Đặc Biệt (Bò + Lòng)', N'Tô phở đặc biệt kết hợp thịt bò tươi và lòng bò bổ dưỡng', 55000, 'noodle', 'beef,offal,noodle'),
 
 -- Bánh canh cá lóc --
-(@IdBanhCanhCaLoc, N'Bánh Canh Cá Lóc Chiên (Thường)', N'Bánh canh ăn kèm thịt cá lóc chiên giòn, nước dùng đậm đà', 38000, 'vietnamese', 'snakehead fish,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Cá Lóc Chiên (Đặc biệt)', N'Phần đặc biệt với lượng cá lóc chiên nhiều hơn', 45000, 'vietnamese', 'snakehead fish,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Cá Lóc Hấp (Thường)', N'Bánh canh với thịt cá lóc hấp thanh ngọt, giữ trọn vị tự nhiên', 38000, 'vietnamese', 'snakehead fish,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Cá Lóc Hấp (Đặc biệt)', N'Phần đặc biệt với cá lóc hấp đầy đặn', 45000, 'vietnamese', 'snakehead fish,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Đầu Cá Lóc (Thường)', N'Bánh canh ăn kèm đầu cá lóc béo ngậy, ngọt thịt', 50000, 'vietnamese', 'snakehead fish,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Đầu Cá Lóc (Đặc biệt)', N'Phần đặc biệt với đầu cá lớn và nhiều topping hơn', 55000, 'vietnamese', 'snakehead fish,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Ruột Cá Lóc (Thường)', N'Bánh canh với ruột cá lóc giòn sần sật, vị béo bùi đặc trưng', 50000, 'vietnamese', 'snakehead fish offal,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Ruột Cá Lóc (Đặc biệt)', N'Phần ruột cá lóc đặc biệt dành cho người sành ăn', 55000, 'vietnamese', 'snakehead fish offal,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Cá Ngừ (Thường)', N'Bánh canh cá ngừ tươi ngon, hương vị đậm đà miền Trung', 38000, 'vietnamese', 'tuna,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Cá Ngừ (Đặc biệt)', N'Phần đặc biệt với nhiều lát cá ngừ tươi và nước dùng đặc sắc', 45000, 'vietnamese', 'tuna,noodle'),
+(@IdBanhCanhCaLoc_1, N'Bánh Canh Cá Lóc Chiên (Thường)', N'Bánh canh ăn kèm thịt cá lóc chiên giòn, nước dùng đậm đà', 38000, 'vietnamese', 'snakehead fish,noodle'),
+(@IdBanhCanhCaLoc_1, N'Bánh Canh Cá Lóc Chiên (Đặc biệt)', N'Phần đặc biệt với lượng cá lóc chiên nhiều hơn', 45000, 'vietnamese', 'snakehead fish,noodle'),
+(@IdBanhCanhCaLoc_1, N'Bánh Canh Cá Lóc Hấp (Thường)', N'Bánh canh với thịt cá lóc hấp thanh ngọt, giữ trọn vị tự nhiên', 38000, 'vietnamese', 'snakehead fish,noodle'),
+(@IdBanhCanhCaLoc_1, N'Bánh Canh Cá Lóc Hấp (Đặc biệt)', N'Phần đặc biệt với cá lóc hấp đầy đặn', 45000, 'vietnamese', 'snakehead fish,noodle'),
+(@IdBanhCanhCaLoc_1, N'Bánh Canh Đầu Cá Lóc (Thường)', N'Bánh canh ăn kèm đầu cá lóc béo ngậy, ngọt thịt', 50000, 'vietnamese', 'snakehead fish,noodle'),
+(@IdBanhCanhCaLoc_1, N'Bánh Canh Đầu Cá Lóc (Đặc biệt)', N'Phần đặc biệt với đầu cá lớn và nhiều topping hơn', 55000, 'vietnamese', 'snakehead fish,noodle'),
+(@IdBanhCanhCaLoc_1, N'Bánh Canh Ruột Cá Lóc (Thường)', N'Bánh canh với ruột cá lóc giòn sần sật, vị béo bùi đặc trưng', 50000, 'vietnamese', 'snakehead fish offal,noodle'),
+(@IdBanhCanhCaLoc_1, N'Bánh Canh Ruột Cá Lóc (Đặc biệt)', N'Phần ruột cá lóc đặc biệt dành cho người sành ăn', 55000, 'vietnamese', 'snakehead fish offal,noodle'),
+(@IdBanhCanhCaLoc_1, N'Bánh Canh Cá Ngừ (Thường)', N'Bánh canh cá ngừ tươi ngon, hương vị đậm đà miền Trung', 38000, 'vietnamese', 'tuna,noodle'),
+(@IdBanhCanhCaLoc_1, N'Bánh Canh Cá Ngừ (Đặc biệt)', N'Phần đặc biệt với nhiều lát cá ngừ tươi và nước dùng đặc sắc', 45000, 'vietnamese', 'tuna,noodle'),
 
 -- Banh mi Co Bich --
 (@IdBanhMiCoBich, N'Bánh tráng mắm ruốc', N'Bánh tráng giòn tan kết hợp vị mắm ruốc đậm đà đặc trưng', 25000, 'snack', 'rice paper,shrimp paste'),
@@ -488,16 +488,16 @@ INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingre
 (@IdComChayTN, N'Lẩu chay (Nhỏ)', N'Lẩu chay thập cẩm với các loại nấm, đậu hũ và rau xanh', 80000, 'hotpot', 'tofu,mushroom,vegetable,noodle'),
 
 -- Bánh canh cá lóc --
-(@IdBanhCanhCaLoc, N'Bánh Canh Cá Lóc Chiên (Thường)', N'Bánh canh ăn kèm thịt cá lóc chiên giòn, nước dùng đậm đà', 38000, 'vietnamese', 'snakehead fish,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Cá Lóc Chiên (Đặc biệt)', N'Phần đặc biệt với lượng cá lóc chiên nhiều hơn', 45000, 'vietnamese', 'snakehead fish,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Cá Lóc Hấp (Thường)', N'Bánh canh với thịt cá lóc hấp thanh ngọt, giữ trọn vị tự nhiên', 38000, 'vietnamese', 'snakehead fish,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Cá Lóc Hấp (Đặc biệt)', N'Phần đặc biệt với cá lóc hấp đầy đặn', 45000, 'vietnamese', 'snakehead fish,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Đầu Cá Lóc (Thường)', N'Bánh canh ăn kèm đầu cá lóc béo ngậy, ngọt thịt', 50000, 'vietnamese', 'snakehead fish,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Đầu Cá Lóc (Đặc biệt)', N'Phần đặc biệt với đầu cá lớn và nhiều topping hơn', 55000, 'vietnamese', 'snakehead fish,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Ruột Cá Lóc (Thường)', N'Bánh canh với ruột cá lóc giòn sần sật, vị béo bùi đặc trưng', 50000, 'vietnamese', 'snakehead fish offal,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Ruột Cá Lóc (Đặc biệt)', N'Phần ruột cá lóc đặc biệt dành cho người sành ăn', 55000, 'vietnamese', 'snakehead fish offal,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Cá Ngừ (Thường)', N'Bánh canh cá ngừ tươi ngon, hương vị đậm đà miền Trung', 38000, 'vietnamese', 'tuna,noodle'),
-(@IdBanhCanhCaLoc, N'Bánh Canh Cá Ngừ (Đặc biệt)', N'Phần đặc biệt với nhiều lát cá ngừ tươi và nước dùng đặc sắc', 45000, 'vietnamese', 'tuna,noodle'),
+(@IdBanhCanhCaLoc_2, N'Bánh Canh Cá Lóc Chiên (Thường)', N'Bánh canh ăn kèm thịt cá lóc chiên giòn, nước dùng đậm đà', 38000, 'vietnamese', 'snakehead fish,noodle'),
+(@IdBanhCanhCaLoc_2, N'Bánh Canh Cá Lóc Chiên (Đặc biệt)', N'Phần đặc biệt với lượng cá lóc chiên nhiều hơn', 45000, 'vietnamese', 'snakehead fish,noodle'),
+(@IdBanhCanhCaLoc_2, N'Bánh Canh Cá Lóc Hấp (Thường)', N'Bánh canh với thịt cá lóc hấp thanh ngọt, giữ trọn vị tự nhiên', 38000, 'vietnamese', 'snakehead fish,noodle'),
+(@IdBanhCanhCaLoc_2, N'Bánh Canh Cá Lóc Hấp (Đặc biệt)', N'Phần đặc biệt với cá lóc hấp đầy đặn', 45000, 'vietnamese', 'snakehead fish,noodle'),
+(@IdBanhCanhCaLoc_2, N'Bánh Canh Đầu Cá Lóc (Thường)', N'Bánh canh ăn kèm đầu cá lóc béo ngậy, ngọt thịt', 50000, 'vietnamese', 'snakehead fish,noodle'),
+(@IdBanhCanhCaLoc_2, N'Bánh Canh Đầu Cá Lóc (Đặc biệt)', N'Phần đặc biệt với đầu cá lớn và nhiều topping hơn', 55000, 'vietnamese', 'snakehead fish,noodle'),
+(@IdBanhCanhCaLoc_2, N'Bánh Canh Ruột Cá Lóc (Thường)', N'Bánh canh với ruột cá lóc giòn sần sật, vị béo bùi đặc trưng', 50000, 'vietnamese', 'snakehead fish offal,noodle'),
+(@IdBanhCanhCaLoc_2, N'Bánh Canh Ruột Cá Lóc (Đặc biệt)', N'Phần ruột cá lóc đặc biệt dành cho người sành ăn', 55000, 'vietnamese', 'snakehead fish offal,noodle'),
+(@IdBanhCanhCaLoc_2, N'Bánh Canh Cá Ngừ (Thường)', N'Bánh canh cá ngừ tươi ngon, hương vị đậm đà miền Trung', 38000, 'vietnamese', 'tuna,noodle'),
+(@IdBanhCanhCaLoc_2, N'Bánh Canh Cá Ngừ (Đặc biệt)', N'Phần đặc biệt với nhiều lát cá ngừ tươi và nước dùng đặc sắc', 45000, 'vietnamese', 'tuna,noodle'),
 
 -- KDL Bến Xưa --
 (@IdKDLBenXua, N'Giò Heo Nướng', N'Giò heo nướng giòn rụm, lớp da thơm lừng đậm đà đặc sản Bến Xưa', 178000, 'vietnamese', 'pork trotter'),

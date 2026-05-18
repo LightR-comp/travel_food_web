@@ -93,6 +93,29 @@ CREATE TABLE UserRatings (
 )
 GO
 
+-- Bảng ChatHistory: Lưu lịch sử chat
+CREATE TABLE ChatHistory (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NOT NULL FOREIGN KEY REFERENCES Users(id) ON DELETE CASCADE,
+    user_message NVARCHAR(MAX),
+    bot_reply NVARCHAR(MAX),
+    created_at DATETIME DEFAULT GETDATE()
+);
+GO
+
+-- Bảng ChatSuggestionLog: Lưu chi tiết các nhà hàng được gợi ý trong một tin nhắn chat
+-- Thiết kế này giúp truy vấn và phân tích dữ liệu gợi ý dễ dàng hơn nhiều so với việc lưu JSON.
+CREATE TABLE ChatSuggestionLog (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    chat_history_id INT NOT NULL FOREIGN KEY REFERENCES ChatHistory(id) ON DELETE CASCADE,
+    restaurant_id INT NOT NULL,
+    restaurant_name NVARCHAR(255), -- Denormalized for easier analysis
+    score FLOAT NOT NULL,
+    created_at DATETIME DEFAULT GETDATE()
+);
+GO
+
+
 ALTER TABLE UserAuth 
 ADD reset_token     NVARCHAR(255) NULL,
     reset_token_exp DATETIME      NULL;
@@ -184,3 +207,21 @@ CREATE TABLE CommentLikes (
 
 ALTER TABLE Comments
     ADD image_url NVARCHAR(500) NULL;
+CREATE TABLE DishImages (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    menu_item_id INT NOT NULL,
+    image_url NVARCHAR(MAX) NOT NULL,
+    caption NVARCHAR(500) NULL,
+    is_thumbnail BIT NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    
+    -- Liên kết khóa ngoại tới bảng MenuItems để đảm bảo toàn vẹn dữ liệu
+    CONSTRAINT FK_DishImages_MenuItems FOREIGN KEY (menu_item_id) 
+        REFERENCES MenuItems(id) ON DELETE CASCADE
+);
+GO
+
+-- Tạo Index để tối ưu tốc độ truy vấn khi hàm getImagesByMenuItemIDs tìm kiếm bằng IN (...)
+CREATE INDEX IX_DishImages_MenuItemID ON DishImages(menu_item_id);
+GO
+

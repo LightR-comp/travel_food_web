@@ -56,13 +56,17 @@ func SetupRouter(r *gin.Engine) {
 			posts.GET("", handlers.GetListPosts)            // Danh sách bài viết (Phân trang/Topic)
 			posts.GET("/:id", handlers.GetPostDetail)       // Chi tiết bài viết + Comments
 
+
 			// Private routes (Cần Middleware Auth)
 			authorized := posts.Group("/")
+			
 			authorized.Use(middlewares.FirebaseAuthMiddleware())
 			{
 				authorized.POST("", handlers.CreatePost)                // Đăng bài mới
 				authorized.POST("/:id/comments", handlers.AddComment)    // Bình luận bài viết, :id là ID bài viết
-				authorized.POST("/:id/likes", handlers.LikePost)        // Thả tim, :id là ID bài viết
+				authorized.POST("/:id/likes", handlers.LikePost)   // Like bài viết, :id là ID bài viết
+				authorized.POST("/comments/:id/likes", handlers.LikeComment) // Like comment, :id là ID comment
+				authorized.POST("/upload", handlers.UploadImage)
 			}
 		}
 

@@ -28,6 +28,8 @@ func main() {
 		panic(err)
 	}
 
+	// Init Cloudinary
+	services.InitCloudinary()
 	// Tạo server
 	r := gin.Default()
 

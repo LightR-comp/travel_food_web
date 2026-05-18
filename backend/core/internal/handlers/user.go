@@ -62,59 +62,16 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	successResponse(c, "Đăng nhập thành công", gin.H{"user": user})
-}
-
-// Register tài khoản local
-func Register(c *gin.Context) {
-	var req struct {
-		Username string `json:"username"  binding:"required"`
-		Password string `json:"password"  binding:"required"`
-		Name     string `json:"full_name" binding:"required"`
-		Email    string `json:"email"     binding:"required"`
-	}
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		errorResponse(c, http.StatusBadRequest, "Thiếu thông tin đăng ký", err.Error())
-		return
-	}
-
-	user, err := services.RegisterLocal(c.Request.Context(), req.Username, req.Password, req.Name, req.Email)
+	jwtToken, err := services.GenerateJWT(user.ID)
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, err.Error(), err.Error())
-		return
+    	c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo token"})
+    	return
 	}
-
-	successResponse(c, "Đăng ký thành công", gin.H{"user_id": user.ID})
-}
-
-// LocalLogin đăng nhập bằng username/password
-func LocalLogin(c *gin.Context) {
-	var req struct {
-		Username string `json:"username" binding:"required"`
-		Password string `json:"password" binding:"required"`
-	}
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		errorResponse(c, http.StatusBadRequest, "Thiếu username hoặc password", err.Error())
-		return
-	}
-
-	user, err := services.LocalLogin(c.Request.Context(), req.Username, req.Password)
-	if err != nil {
-		errorResponse(c, http.StatusUnauthorized, "Tên đăng nhập hoặc mật khẩu không đúng", err.Error())
-		return
-	}
-
-	token, err := services.GenerateJWT(user.ID)
-	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "Lỗi tạo token", err.Error())
-		return
-	}
-
-	successResponse(c, "Đăng nhập thành công", gin.H{
-		"token": token,
-		"user":  user,
+	
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Đăng nhập thành công",
+		"token":   jwtToken,
+		"user":    user,
 	})
 }
 

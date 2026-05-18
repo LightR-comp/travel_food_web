@@ -189,6 +189,24 @@ CREATE TABLE RestaurantImages (
 )
 GO
 
+CREATE TABLE PostImages (
+    id          BIGINT IDENTITY(1,1) PRIMARY KEY,
+    post_id     BIGINT NOT NULL REFERENCES Posts(id) ON DELETE CASCADE,
+    image_url   NVARCHAR(500) NOT NULL,
+    order_index INT DEFAULT 0,
+    created_at  DATETIME DEFAULT GETDATE()
+);
+
+CREATE TABLE CommentLikes (
+    id         BIGINT IDENTITY(1,1) PRIMARY KEY,
+    comment_id BIGINT NOT NULL REFERENCES Comments(id) ON DELETE CASCADE,
+    user_id    INT NOT NULL REFERENCES Users(id),
+    created_at DATETIME DEFAULT GETDATE(),
+    CONSTRAINT UQ_CommentLike UNIQUE (comment_id, user_id)
+);
+
+ALTER TABLE Comments
+    ADD image_url NVARCHAR(500) NULL;
 CREATE TABLE DishImages (
     id INT IDENTITY(1,1) PRIMARY KEY,
     menu_item_id INT NOT NULL,

@@ -6,7 +6,8 @@ import (
 	"backend/core/internal/services"
 	"net/http"
 	"strconv"
-
+	"time"
+	"context"
 	"github.com/gin-gonic/gin"
 )
 
@@ -174,5 +175,65 @@ func GetTrendingDishes(c *gin.Context) {
 			"dishes": trendingList,
 		},
 		"error": nil,
+	})
+}
+
+
+type ReviewInput struct {
+	Rating  float64 `json:"rating" binding:"required,min=1,max=5"`
+	Comment string  `json:"comment" binding:"required"`
+}
+
+func CreateComment(c *gin.Context) {
+	// 1. Lấy restaurant_id từ URL đường dẫn (Param)
+	restaurantIDStr := c.Param("id")
+	restaurantID, err := strconv.Atoi(restaurantIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "ID quán ăn không hợp lệ"})
+		return
+	}
+
+	// 2. Lấy userID của người dùng đang đăng nhập (Thường bốc từ Middleware Auth ra)
+	// Giả sử Nhựt lưu userID trong context sau khi check JWT là "userID"
+	userIDVal, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Chưa đăng nhập"})
+		return
+	}
+	userID := userIDVal.(int)
+
+	// 3. Bind dữ liệu JSON từ Frontend gửi lên
+	var input ReviewInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Dữ liệu đánh giá không hợp lệ"})
+		return
+	}
+
+	// 4. Đóng gói dữ liệu vào struct UserRating của models
+	reviewData := models.UserRating{
+		RestaurantID: restaurantID,
+		UserID:       userID,
+		Rating:       input.Rating,
+		Comment:      input.Comment,
+	}
+
+	// 5. Gọi xuống tầng service/repository để lưu vào DB
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	insertedReview, err := services.CreateReview(ctx, reviewData) // Gọi hàm trong db_repo.go của Nhựt
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Không thể lưu đánh giá"})
+		return
+	}
+
+	// 6. Cập nhật lại điểm Rating trung bình của quán ăn (Hàm này Nhựt cũng viết sẵn rồi!)
+	go services.UpdateAvgRating(restaurantID) // Chạy ngầm (goroutine) để không làm chậm request của user
+
+	// 7. Trả kết quả thành công về cho Frontend
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Đánh giá quán ăn thành công!",
+		"data":    insertedReview,
 	})
 }

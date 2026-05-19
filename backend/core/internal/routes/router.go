@@ -44,6 +44,7 @@ func SetupRouter(r *gin.Engine) {
 			restaurants.GET("/popular", handlers.GetPopularRestaurants) // Good spots for food
 		 	restaurants.GET("/search", handlers.SearchRestaurants)      // Bộ lọc & Tìm kiếm (q, price, sort...)
 			restaurants.GET("/:id", handlers.GetRestaurantDetail)       // Chi tiết nhà hàng.
+			restaurants.POST("/:id/rating", handlers.CreateComment)    // Xem menu của nhà hàng
 		}
 
 		v1.GET("/dishes/trending", handlers.GetTrendingDishes)
@@ -64,15 +65,17 @@ func SetupRouter(r *gin.Engine) {
 			{
 				authorized.POST("", handlers.CreatePost)                // Đăng bài mới
 				authorized.POST("/:id/comments", handlers.AddComment)    // Bình luận bài viết, :id là ID bài viết
-				authorized.POST("/:id/likes", handlers.LikePost)        // Thả tim, :id là ID bài viết
+				authorized.POST("/:id/likes", handlers.LikePost)   // Like bài viết, :id là ID bài viết
+				authorized.POST("/comments/:id/likes", handlers.LikeComment) // Like comment, :id là ID comment
+				authorized.POST("/upload", handlers.UploadImage)
 			}
 		}
 
 		// // --- NHÓM TIỆN ÍCH (Vị trí, Thời tiết, Tiền tệ) ---
-		// utils := v1.Group("/utils")
-		// {
-		// 	utils.GET("/weather", handlers.GetWeather)
+		utils := v1.Group("/utils")
+		{
+		 	utils.GET("/weather", handlers.GetWeather)
 		// 	utils.GET("/currency", handlers.GetExchangeRate)
-		// }
+		}
 	}
 	}

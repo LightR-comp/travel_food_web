@@ -37,3 +37,4 @@ func PreparePlaceResponse(id string, service *services.GMapsClient) map[string]i
 		"error": nil,
 	}
 }
+

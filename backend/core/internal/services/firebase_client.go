@@ -40,7 +40,6 @@ func InitFirebase(ctx context.Context) error {
 			errInit = err
 			return
 		}
-
 		firebaseAuth = client
 	})
 
@@ -53,4 +52,3 @@ func VerifyIDToken(ctx context.Context, token string) (*auth.Token, error) {
 	}
 	return firebaseAuth.VerifyIDToken(ctx, token)
 }
-

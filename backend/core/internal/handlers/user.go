@@ -1,3 +1,7 @@
+// user.go chứa các hàm xử lý liên quan đến người dùng, bao gồm đăng nhập, lấy thông tin profile và cập nhật profile.
+// Đây là nơi chúng ta sẽ xây dựng logic để xác thực người dùng thông qua token
+// lưu trữ thông tin người dùng vào cơ sở dữ liệu và cung cấp API để frontend có thể lấy và cập nhật thông tin người dùng một cách dễ dàng.
+
 package handlers
 
 import (
@@ -12,39 +16,19 @@ import (
 	"backend/core/internal/services"
 )
 
-// ---- Helper trả về format chuẩn ----
-func successResponse(c *gin.Context, message string, data any) {
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": message,
-		"data":    data,
-		"error":   nil,
-	})
-}
-
-func errorResponse(c *gin.Context, status int, message string, err string) {
-	c.JSON(status, gin.H{
-		"success": false,
-		"message": message,
-		"data":    nil,
-		"error":   err,
-	})
-}
-
-// Login OAuth (Google/Facebook)
 func Login(c *gin.Context) {
 	var req struct {
 		IDToken  string `json:"id_token" binding:"required"`
-		Provider string `json:"provider" binding:"required"`
+		Provider string `json:"provider" binding:"required"` // "google" hoặc "facebook"
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errorResponse(c, http.StatusBadRequest, "Thiếu id_token hoặc provider", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Thiếu id_token hoặc provider"})
 		return
 	}
 
 	token, err := services.VerifyIDToken(c.Request.Context(), req.IDToken)
 	if err != nil {
-		errorResponse(c, http.StatusUnauthorized, "Token không hợp lệ", err.Error())
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token không hợp lệ"})
 		return
 	}
 
@@ -54,11 +38,12 @@ func Login(c *gin.Context) {
 
 	user, err := services.UpsertUser(
 		c.Request.Context(),
-		token.UID, email, name, avatar,
+		token.UID,
+		email, name, avatar,
 		models.AuthProvider(req.Provider),
 	)
 	if err != nil {
-		errorResponse(c, http.StatusInternalServerError, "Lỗi lưu thông tin user", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi lưu thông tin user"})
 		return
 	}
 
@@ -75,87 +60,140 @@ func Login(c *gin.Context) {
 	})
 }
 
-// GetProfile lấy thông tin user hiện tại
 func GetProfile(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
 	user, err := services.GetUserByID(c.Request.Context(), userID)
 	if err != nil {
-		errorResponse(c, http.StatusNotFound, "Không tìm thấy user", err.Error())
+		c.JSON(http.StatusNotFound, gin.H{"error": "Không tìm thấy user"})
 		return
 	}
 
-	successResponse(c, "Lấy thông tin thành công", user)
+	c.JSON(http.StatusOK, user)
 }
 
-// UpdateProfile cập nhật preferences
 func UpdateProfile(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
 	var prefs models.UserPreferences
 	if err := c.ShouldBindJSON(&prefs); err != nil {
-		errorResponse(c, http.StatusBadRequest, "Dữ liệu không hợp lệ", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Dữ liệu không hợp lệ"})
 		return
 	}
 
 	if err := services.UpdateUserPreferences(c.Request.Context(), userID, prefs); err != nil {
-		errorResponse(c, http.StatusInternalServerError, "Lỗi cập nhật profile", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi cập nhật profile"})
 		return
 	}
 
-	successResponse(c, "Cập nhật thành công", nil)
+	c.JSON(http.StatusOK, gin.H{"message": "Cập nhật thành công"})
 }
 
-// ForgotPassword gửi reset link qua email
-func ForgotPassword(c *gin.Context) {
+// Đăng ký tài khoản Local
+func Register(c *gin.Context) {
+    var req struct {
+        Username string `json:"username" binding:"required"`
+        Password string `json:"password" binding:"required"`
+        Name     string `json:"name"     binding:"required"`
+        Email    string `json:"email"    binding:"required"` // thêm
+    }
+
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Thiếu thông tin đăng ký"})
+        return
+    }
+
+    user, err := services.RegisterLocal(c.Request.Context(), req.Username, req.Password, req.Name, req.Email)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "Đăng ký thành công", "user": user})
+}
+
+func LocalLogin(c *gin.Context) {
 	var req struct {
 		Username string `json:"username" binding:"required"`
+		Password string `json:"password" binding:"required"`
 	}
+
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errorResponse(c, http.StatusBadRequest, "Thiếu username", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Thiếu username hoặc password"})
 		return
 	}
 
-	token, email, err := services.CreatePasswordResetToken(c.Request.Context(), req.Username)
+	user, err := services.LocalLogin(c.Request.Context(), req.Username, req.Password)
 	if err != nil {
-		successResponse(c, "Nếu tài khoản tồn tại, hướng dẫn đặt lại mật khẩu đã được gửi", nil)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Tên đăng nhập hoặc mật khẩu không đúng"})
 		return
 	}
 
-	resetLink := fmt.Sprintf("%s/reset-password?token=%s", os.Getenv("FRONTEND_URL"), token)
-
-	// Dev mode
-	if os.Getenv("SMTP_HOST") == "" {
-		successResponse(c, "Dev mode: token đặt lại mật khẩu", gin.H{
-			"token":      token,
-			"reset_link": resetLink,
-			"email":      email,
-		})
+	token, err := services.GenerateJWT(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo token"})
 		return
 	}
 
-	if err := services.SendResetEmail(email, resetLink); err != nil {
-		log.Printf("[ForgotPassword] Lỗi gửi email: %v", err)
-	}
-
-	successResponse(c, "Nếu tài khoản tồn tại, hướng dẫn đặt lại mật khẩu đã được gửi", nil)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Đăng nhập thành công",
+		"token":   token,
+		"user":    user,
+	})
 }
 
-// ResetPassword đổi mật khẩu mới
+// ForgotPassword nhận username, gửi reset link qua email
+func ForgotPassword(c *gin.Context) {
+    var req struct {
+        Username string `json:"username" binding:"required"`
+    }
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Thiếu username"})
+        return
+    }
+
+    token, email, err := services.CreatePasswordResetToken(c.Request.Context(), req.Username)
+    if err != nil {
+        c.JSON(http.StatusOK, gin.H{"message": "Nếu tài khoản tồn tại, hướng dẫn đặt lại mật khẩu đã được gửi"})
+        return
+    }
+
+    resetLink := fmt.Sprintf("%s/reset-password?token=%s", os.Getenv("FRONTEND_URL"), token)
+
+    // Dev mode — trả token ra Postman
+    if os.Getenv("SMTP_HOST") == "" {
+        c.JSON(http.StatusOK, gin.H{
+            "message":    "Dev mode: token đặt lại mật khẩu",
+            "token":      token,
+            "reset_link": resetLink,
+            "email":      email, // thấy rõ gửi về đâu
+        })
+        return
+    }
+
+    // Production — gửi về email thật
+    if err := services.SendResetEmail(email, resetLink); err != nil {
+        log.Printf("[ForgotPassword] Lỗi gửi email: %v", err)
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "Nếu tài khoản tồn tại, hướng dẫn đặt lại mật khẩu đã được gửi"})
+}
+
+// ResetPassword xác thực token và đổi mật khẩu mới
 func ResetPassword(c *gin.Context) {
 	var req struct {
 		Token       string `json:"token"        binding:"required"`
 		NewPassword string `json:"new_password" binding:"required,min=6"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errorResponse(c, http.StatusBadRequest, "Thiếu token hoặc mật khẩu mới (tối thiểu 6 ký tự)", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Thiếu token hoặc mật khẩu mới (tối thiểu 6 ký tự)"})
 		return
 	}
 
 	if err := services.ResetPassword(c.Request.Context(), req.Token, req.NewPassword); err != nil {
-		errorResponse(c, http.StatusBadRequest, err.Error(), err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	successResponse(c, "Đặt lại mật khẩu thành công", nil)
+	c.JSON(http.StatusOK, gin.H{"message": "Đặt lại mật khẩu thành công"})
 }

@@ -23,9 +23,9 @@ const GoogleIcon = () => (
 );
 
 const LoginPage = () => {
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, loginWithFacebook } = useAuth();
   const navigate = useNavigate();
-
+  const [facebookLoading, setFacebookLoading] = useState(false);
   const [form, setForm] = useState({ username: '', password: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -44,6 +44,18 @@ const LoginPage = () => {
     else if (form.password.length < 6) e.password = 'Mật khẩu tối thiểu 6 ký tự';
     setErrors(e);
     return Object.keys(e).length === 0;
+  };
+
+  const handleFacebookLogin = async () => {
+    setFacebookLoading(true);
+    const result = await loginWithFacebook();
+    if (result?.success) {
+      showToast('✅ Đăng nhập bằng Facebook thành công!', 'success');
+      setTimeout(() => navigate('/'), 800);
+    } else {
+      showToast(result?.error || '❌ Đăng nhập Facebook thất bại');
+    }
+    setFacebookLoading(false);
   };
 
   const handleGoogleLogin = async () => {
@@ -161,9 +173,17 @@ const LoginPage = () => {
 
             {/* Social login */}
             <div className="flex gap-3 mb-4" id="social-login-btns">
-              <AuthButton variant="facebook" className="flex-1 py-2.5" id="login-facebook-btn">
+              <AuthButton 
+                variant="facebook" 
+                className="flex-1 py-2.5" 
+                id="login-facebook-btn"
+                onClick={handleFacebookLogin}
+                loading={facebookLoading}
+                disabled={facebookLoading}
+              >
                 <FacebookIcon /> Facebook
               </AuthButton>
+              
               <AuthButton variant="google" className="flex-1 py-2.5" id="login-google-btn" 
               onClick={handleGoogleLogin}  
               loading={googleLoading}       

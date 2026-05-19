@@ -44,3 +44,16 @@ type AIChatGenerateResponse struct {
 	} `json:"data"`
 	Error interface{} `json:"error"`
 }
+
+// AIIdentifyDishRequest: Request gửi ảnh món ăn sang Python AI (Dùng cho tính năng nhận diện ảnh)
+type AIIdentifyDishRequest struct {
+	UserID   int    `json:"user_id"`
+	ImageB64 string `json:"image_base64"` // Dữ liệu ảnh dạng chuỗi Base64
+}
+
+// AIIdentifyDishResponse: Kết quả nhận diện món ăn từ AI
+type AIIdentifyDishResponse struct {
+	DishName    string   `json:"dish_name"`
+	Ingredients []string `json:"ingredients"`
+	Recipe      string   `json:"recipe"`
+}

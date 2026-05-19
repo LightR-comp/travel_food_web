@@ -1131,6 +1131,17 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 	return tempItems, nil
 }
 
+func UpdateAvgRating(restaurantID int) {
+	_, err := db.Exec(`
+		UPDATE Restaurants
+		SET rating = (SELECT AVG(CAST(rating AS FLOAT)) FROM UserRatings WHERE restaurant_id = @rid)
+		WHERE id = @rid
+	`, sql.Named("rid", restaurantID))
+	if err != nil {
+		log.Printf("[DB] Lỗi cập nhật rating trung bình: %v", err)
+	}
+}
+
 // [Minh]
 // SearchRestaurantsForChatbot truy vấn quán ăn dựa trên các thực thể intent từ người dùng (Chatbot)
 func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interface{}) ([]models.Restaurant, error) {
@@ -1367,3 +1378,5 @@ func GetChatHistoryByUserID(ctx context.Context, userID int) ([]ChatHistoryEntry
 	}
 	return history, nil
 }
+
+

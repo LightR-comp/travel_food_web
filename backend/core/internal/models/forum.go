@@ -17,6 +17,7 @@ import (
 type Post struct {
     ID            uint64    `json:"id"`
     AuthorID      uint64    `json:"author_id"`
+    AuthorName    string    `json:"author_name"`
     Prefix        string    `json:"prefix"`          // Ví dụ: (No prefix)
     Title         string    `json:"title"`           // "Review bánh mì Huỳnh Hoa..."
   	Content       json.RawMessage `json:"content"`

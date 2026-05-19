@@ -59,7 +59,7 @@ func SetupRouter(r *gin.Engine) {
 
 
 			// Private routes (Cần Middleware Auth)
-			authorized := posts.Group("/")
+			authorized := posts.Group("")
 			
 			authorized.Use(middlewares.FirebaseAuthMiddleware())
 			{

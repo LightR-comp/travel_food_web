@@ -35,6 +35,7 @@ type RestaurantDetail struct {
 	Restaurant
 	ForumPosts []Post `json:"forum_posts"`
 	UserRatings []UserRating `json:"user_ratings"`
+	Story      string `json:"story"`
 }
 
 type UserRating struct {

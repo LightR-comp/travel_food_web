@@ -221,29 +221,60 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 		return make(map[int][]models.MenuItem), nil
 	}
 
+	// Sử dụng parameterized query để tránh SQL injection và cải thiện hiệu suất
+	placeholders := make([]string, len(ids))
+	args := make([]interface{}, len(ids))
+	for i, id := range ids {
+		paramName := fmt.Sprintf("id%d", i)
+		placeholders[i] = "@" + paramName
+		args[i] = sql.Named(paramName, id)
+	}
+
 	query := fmt.Sprintf(`
 		SELECT restaurant_id, id, name, description, price, food_type, ingredients, story
 		FROM MenuItems 
 		WHERE restaurant_id IN (%s)
-	`, intSliceToSQL(ids))
+	`, strings.Join(placeholders, ","))
 
-	rows, err := db.QueryContext(ctx, query)
+	log.Printf("[DEBUG_DB] Executing Query: %s", query)
+	rows, err := db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	result := make(map[int][]models.MenuItem)
+	totalItemsFetched := 0
 	for rows.Next() {
 		var item models.MenuItem
+		// Sử dụng sql.NullString cho các cột có thể là NULL trong DB để tránh lỗi scan
+		var description, ingredients, story sql.NullString
+
 		if err := rows.Scan(
-			&item.RestaurantID, &item.ID, &item.Name, &item.Description,
-			&item.Price, &item.FoodType, &item.Ingredients, &item.Story,
+			&item.RestaurantID, &item.ID, &item.Name, &description,
+			&item.Price, &item.FoodType, &ingredients, &story,
 		); err != nil {
-			continue
+			log.Printf("[DB_SCAN_ERROR] Lỗi khi đọc dòng MenuItem: %v", err)
+			continue // Bỏ qua dòng lỗi và tiếp tục
 		}
+
+		// Gán giá trị nếu nó không phải là NULL, nếu là NULL thì trường trong struct sẽ là chuỗi rỗng ""
+		if description.Valid {
+			item.Description = description.String
+		}
+		if ingredients.Valid {
+			item.Ingredients = ingredients.String
+		}
+		if story.Valid {
+			item.Story = story.String
+		}
+
 		result[item.RestaurantID] = append(result[item.RestaurantID], item)
+		totalItemsFetched++
 	}
+
+	log.Printf("[DEBUG_DB] Querying MenuItems for restaurant IDs: %v", ids)
+	log.Printf("[DEBUG_DB] getMenusByRestaurantIDs: Fetched %d total menu items for %d restaurants.", totalItemsFetched, len(ids))
 
 	// Lấy ảnh cho từng món ăn vừa tìm thấy
 	// Bước 2: Gom tất cả ID món ăn để lấy ảnh (Batch query)
@@ -277,14 +308,23 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 
 // Image handling
 func getImagesByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.RestaurantImage, error) {
+	// Sử dụng parameterized query để tránh SQL injection
+	placeholders := make([]string, len(ids))
+	args := make([]interface{}, len(ids))
+	for i, id := range ids {
+		paramName := fmt.Sprintf("id%d", i)
+		placeholders[i] = "@" + paramName
+		args[i] = sql.Named(paramName, id)
+	}
+
 	query := fmt.Sprintf(`
 		SELECT id, restaurant_id, image_url, caption, is_thumbnail, created_at
 		FROM RestaurantImages
 		WHERE restaurant_id IN (%s)
 		ORDER BY is_thumbnail DESC
-	`, intSliceToSQL(ids))
+	`, strings.Join(placeholders, ","))
 
-	rows, err := db.QueryContext(ctx, query)
+	rows, err := db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -314,14 +354,23 @@ func getDishImagesByMenuItemIDs(ctx context.Context, ids []int) (map[int][]model
 		return make(map[int][]models.DishImage), nil
 	}
 
+	// Sử dụng parameterized query để tránh SQL injection
+	placeholders := make([]string, len(ids))
+	args := make([]interface{}, len(ids))
+	for i, id := range ids {
+		paramName := fmt.Sprintf("id%d", i)
+		placeholders[i] = "@" + paramName
+		args[i] = sql.Named(paramName, id)
+	}
+
 	query := fmt.Sprintf(`
 		SELECT id, menu_item_id, image_url, caption, is_thumbnail, created_at
 		FROM DishImages
 		WHERE menu_item_id IN (%s)
 		ORDER BY is_thumbnail DESC
-	`, intSliceToSQL(ids))
+	`, strings.Join(placeholders, ","))
 
-	rows, err := db.QueryContext(ctx, query)
+	rows, err := db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -469,17 +518,6 @@ func GetForumPostsByRestaurantID(ctx context.Context, restaurantID int) ([]model
 // ============================================================
 // HELPER UTILS
 // ============================================================
-
-func intSliceToSQL(ids []int) string {
-	s := ""
-	for i, id := range ids {
-		if i > 0 {
-			s += ","
-		}
-		s += fmt.Sprintf("%d", id)
-	}
-	return s
-}
 
 func toJSONArray(arr []string) string {
 	if len(arr) == 0 {
@@ -1209,6 +1247,10 @@ func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interf
 		); err != nil {
 			continue
 		}
+		// Khởi tạo mảng rỗng để đảm bảo JSON output là `[]` thay vì `null`
+		r.Images = []models.RestaurantImage{}
+		r.Menu = []models.MenuItem{}
+
 		restaurants = append(restaurants, r)
 		ids = append(ids, r.ID)
 	}

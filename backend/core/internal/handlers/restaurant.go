@@ -25,7 +25,7 @@ func SearchRestaurants(c *gin.Context) {
 	userLng, _ := strconv.ParseFloat(c.Query("lng"), 64)
 	sortBy := c.DefaultQuery("sort_by", "rating")
 	filters := c.QueryArray("filters")
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "4"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
 
 	// =========================
 	// PRICE FILTER

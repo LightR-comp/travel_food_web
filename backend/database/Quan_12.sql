@@ -1,4 +1,4 @@
-	USE travel_food_db
+USE travel_food_db
 GO
 
 -- ==========================================
@@ -6,24 +6,28 @@ GO
 -- ==========================================
 
 INSERT INTO Restaurants (name, address, lat, lng, rating, price_range, open_time, close_time, type) VALUES 
-(N'Súp Cua Cô 8', N'76/49 Đ.369 - TTH.21 Khu Phố 1, P. Tân Thới Hiệp, Quận 12, TP. HCM', 10.860969, 106.646513, 4.7, 60000, '10:00', '21:00', 'vietnamese'),
-(N'Tiệm Mùa Hạ - Trà & Bánh - Thạnh Xuân Quận 12', N'20/53 Thạnh Xuân 24, Khu Phố 7, P. Thạnh Xuân, Quận 12, TP. HCM', 10.873976, 106.673103, 4.3, 50000, '09:00', '22:00', 'snack'),
-(N'Mì Cay Nam Hàn - Mì Cay & Tokbokki - Đông Hưng Thuận 2', N'191/30 Đông Hưng Thuận 2, P. Tân Hưng Thuận, Quận 12, TP. HCM', 10.839079, 106.627498, 4.8, 65000, '09:00', '22:30', 'korean'),
-(N'NT Food - Mì Trộn Indo - Gà Rán & Ăn Vặt', N'292 Huỳnh Thị Hai, P. Tân Chánh Hiệp, Quận 12, TP. HCM', 10.867033, 106.625224, 4.1, 55000, '08:00', '22:00', 'asian'),
-(N'Mì Ý Happy Meal - Nui & Nước - 481/9/21 HT17', N'481/9/21 HT17, P. Hiệp Thành, Quận 12, TP. HCM', 10.883152, 106.642093, 4.6, 45000, '09:00', '21:30', 'italian'),
-(N'Trà Sữa Te Amo - 109 Dương Thị Mười', N'109 Dương Thị Mười, Khu Phố 6, P. Hiệp Thành, Quận 12, TP. HCM', 10.875230, 106.640012, 4.9, 30000, '08:00', '22:30', 'beverage'),
-(N'Cô Lan - Bún Thịt Nướng & Bột Chiên - Nguyễn Văn Quá', N'715/23/1 Nguyễn Văn Quá, P. Đông Hưng Thuận, Quận 12, TP. HCM', 10.847112, 106.633436, 4.3, 40000, '06:00', '22:00', 'vietnamese'),
-(N'Quán Cơm Gà Mắm Tỏi 1208 - Nguyễn Văn Quá', N'1208 Nguyễn Văn Quá, P. Tân Thới Hiệp, Quận 12, TP. HCM', 10.855831, 106.639251, 4.6, 65000, '09:00', '22:00', 'vietnamese'),
-(N'Cá Viên Chiên TyBy - Trần Thị Hè', N'621/39/2/4 Trần Thị Hè, P. Hiệp Thành, Quận 12, TP. HCM', 10.880628, 106.627846, 4.2, 60000, '15:00', '23:30', 'snack'),
-(N'3 Râu - Gà Rán Pizza & Trà Sữa – 1208 Nguyễn Văn Quá', N'1208 Nguyễn Văn Quá, Tổ 5, Khu Phố 2A, P. Tân Thới Hiệp, Quận 12, TP. HCM', 10.855826, 106.639274, 4.4, 65000, '09:00', '22:00', 'fastfood'),
-(N'Trà Sữa HongKong Baley - Phan Văn Hớn', N'93 Phan Văn Hớn, P. Tân Thới Nhất, Quận 12, TP. HCM', 10.828145, 106.620263, 4.7, 35000, '08:00', '22:00', 'beverage'),
-(N'Cháo Sò Huyết 1999 - Hiệp Thành 13', N'585 Hiệp Thành 13, Quận 12, TP. HCM', 10.885557, 106.631548, 4.8, 60000, '15:00', '23:00', 'seafood'),
-(N'TUTIMI - Milo Dầm - Trà Sữa & Cà Phê - 71A Nguyễn Văn Quá', N'71A Nguyễn Văn Quá, P. Tân Hưng Thuận, Quận 12, TP. HCM', 10.828357, 106.626737, 4.2, 40000, '08:00', '22:30', 'cafe'),
-(N'Quán Ăn 7 Thức - Bún Riêu & Hủ Tiếu', N'121 Lê Văn Khương, P. Hiệp Thành, Quận 12, TP. HCM', 10.877546, 106.648881, 4.6, 50000, '06:00', '21:00', 'vietnamese'),
-(N'Gà Nướng Cơm Lam - Trần Tính', N'42 Tân Chánh Hiệp 18, P. Tân Chánh Hiệp, Quận 12, TP. HCM', 10.864723, 106.617366, 4.3, 150000, '09:00', '22:00', 'vietnamese'),
-(N'PHONG VŨ - BÁNH MÌ HÀ NỘI, XÔI MẶN & BÁNH BAO - TÔ KÝ', N'169 Tô Ký, P. Đông Hưng Thuận, Quận 12, TP. HCM', 10.849130, 106.632675, 4.8, 35000, '06:00', '22:00', 'vietnamese');
-GO
+(N'Phở Nguyên Quận 12 - Vườn Lài', N'51A Vườn Lài, P. An Phú Đông, Quận 12, TP. HCM', 10.863468, 106.690417, 4.2, 50000, '06:00', '22:00', N'vietnamese, bình dân'),
+(N'Súp Cua Cô 8', N'76/49 Đ.369 - TTH.21 Khu Phố 1, P. Tân Thới Hiệp, Quận 12, TP. HCM', 10.860969, 106.646513, 4.7, 60000, '10:00', '21:00', N'vietnamese, bình dân'),
+(N'Tiệm Mùa Hạ - Trà & Bánh - Thạnh Xuân Quận 12', N'20/53 Thạnh Xuân 24, Khu Phố 7, P. Thạnh Xuân, Quận 12, TP. HCM', 10.873976, 106.673103, 4.3, 50000, '09:00', '22:00', N'cafe, bình dân'),
+(N'Mì Cay Nam Hàn - Mì Cay & Tokbokki - Đông Hưng Thuận 2', N'191/30 Đông Hưng Thuận 2, P. Tân Hưng Thuận, Quận 12, TP. HCM', 10.839079, 106.627498, 4.8, 65000, '09:00', '22:30', N'korean, bình dân'),
+(N'NT Food - Mì Trộn Indo - Gà Rán & Ăn Vặt', N'292 Huỳnh Thị Hai, P. Tân Chánh Hiệp, Quận 12, TP. HCM', 10.867033, 106.625224, 4.1, 55000, '08:00', '22:00', N'asian, bình dân'),
+(N'Mì Ý Happy Meal - Nui & Nước - 481/9/21 HT17', N'481/9/21 HT17, P. Hiệp Thành, Quận 12, TP. HCM', 10.883152, 106.642093, 4.6, 45000, '09:00', '21:30', N'italian, bình dân'),
+(N'Trà Sữa Te Amo - 109 Dương Thị Mười', N'109 Dương Thị Mười, Khu Phố 6, P. Hiệp Thành, Quận 12, TP. HCM', 10.875230, 106.640012, 4.9, 30000, '08:00', '22:30', N'cafe, bình dân'),
+(N'Cô Lan - Bún Thịt Nướng & Bột Chiên - Nguyễn Văn Quá', N'715/23/1 Nguyễn Văn Quá, P. Đông Hưng Thuận, Quận 12, TP. HCM', 10.847112, 106.633436, 4.3, 40000, '06:00', '22:00', N'vietnamese, bình dân'),
+(N'Quán Cơm Gà Mắm Tỏi 1208 - Nguyễn Văn Quá', N'1208 Nguyễn Văn Quá, P. Tân Thới Hiệp, Quận 12, TP. HCM', 10.855831, 106.639251, 4.6, 65000, '09:00', '22:00', N'vietnamese, bình dân'),
+(N'Cá Viên Chiên TyBy - Trần Thị Hè', N'621/39/2/4 Trần Thị Hè, P. Hiệp Thành, Quận 12, TP. HCM', 10.880628, 106.627846, 4.2, 60000, '15:00', '23:30', N'asian, bình dân'),
+(N'3 Râu - Gà Rán Pizza & Trà Sữa – 1208 Nguyễn Văn Quá', N'1208 Nguyễn Văn Quá, Tổ 5, Khu Phố 2A, P. Tân Thới Hiệp, Quận 12, TP. HCM', 10.855826, 106.639274, 4.4, 65000, '09:00', '22:00', N'fastfood, bình dân'),
+(N'Trà Sữa HongKong Baley - Phan Văn Hớn', N'93 Phan Văn Hớn, P. Tân Thới Nhất, Quận 12, TP. HCM', 10.828145, 106.620263, 4.7, 35000, '08:00', '22:00', N'cafe, bình dân'),
+(N'Cháo Sò Huyết 1999 - Hiệp Thành 13', N'585 Hiệp Thành 13, Quận 12, TP. HCM', 10.885557, 106.631548, 4.8, 60000, '15:00', '23:00', N'seafood, bình dân'),
+(N'TUTIMI - Milo Dầm - Trà Sữa & Cà Phê - 71A Nguyễn Văn Quá', N'71A Nguyễn Văn Quá, P. Tân Hưng Thuận, Quận 12, TP. HCM', 10.828357, 106.626737, 4.2, 40000, '08:00', '22:30', N'cafe, bình dân'),
+(N'Phở Nguyễn - Tô Ký', N'250 Tô Ký, P. Tân Chánh Hiệp, Quận 12, TP. HCM', 10.857072, 106.620231, 4.1, 60000, '06:00', '22:00', N'vietnamese, bình dân'),
+(N'Quán Ăn 7 Thức - Bún Riêu & Hủ Tiếu', N'121 Lê Văn Khương, P. Hiệp Thành, Quận 12, TP. HCM', 10.877546, 106.648881, 4.6, 50000, '06:00', '21:00', N'vietnamese, bình dân'),
+(N'Gà Nướng Cơm Lam - Trần Tính', N'42 Tân Chánh Hiệp 18, P. Tân Chánh Hiệp, Quận 12, TP. HCM', 10.864723, 106.617366, 4.3, 150000, '09:00', '22:00', N'vietnamese, gia gia đình'),
+(N'PHONG VŨ - BÁNH MÌ HÀ NỘI, XÔI MẶN & BÁNH BAO - TÔ KÝ', N'169 Tô Ký, P. Đông Hưng Thuận, Quận 12, TP. HCM', 10.849130, 106.632675, 4.8, 35000, '06:00', '22:00', N'vietnamese, bình dân');
 
+-- Đã gộp Batch (Không dùng chữ GO ở đây) để giữ phạm vi hoạt động cho các biến DECLARE
+
+DECLARE @IdPhoNguyen INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Phở Nguyên Quận 12 - Vườn Lài');
 DECLARE @IdSupCuaCo8 INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Súp Cua Cô 8');
 DECLARE @IdTiemMuaHa INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Tiệm Mùa Hạ - Trà & Bánh - Thạnh Xuân Quận 12');
 DECLARE @IdMiCayNamHan INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Mì Cay Nam Hàn - Mì Cay & Tokbokki - Đông Hưng Thuận 2');
@@ -37,6 +41,7 @@ DECLARE @Id3Rau INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'3 Râu - 
 DECLARE @IdBaley INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Trà Sữa HongKong Baley - Phan Văn Hớn');
 DECLARE @IdChaoSoHuyet INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Cháo Sò Huyết 1999 - Hiệp Thành 13');
 DECLARE @IdTutimi INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'TUTIMI - Milo Dầm - Trà Sữa & Cà Phê - 71A Nguyễn Văn Quá');
+DECLARE @IdPhoNguyenToKy INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Phở Nguyễn - Tô Ký');
 DECLARE @IdQuan7Thuc INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Quán Ăn 7 Thức - Bún Riêu & Hủ Tiếu');
 DECLARE @IdGaNuongCL INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Gà Nướng Cơm Lam - Trần Tính');
 DECLARE @IdPhongVu INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'PHONG VŨ - BÁNH MÌ HÀ NỘI, XÔI MẶN & BÁNH BAO - TÔ KÝ');
@@ -45,7 +50,10 @@ DECLARE @IdPhongVu INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'PHONG 
 -- CHÈN MENU
 -- ==========================================
 INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingredients) VALUES 
-
+(@IdPhoNguyen, N'Phở tái', N'', 40000, 'vietnamese', 'pho noodles, rare beef'),
+(@IdPhoNguyen, N'Phở tái nạm', N'', 47000, 'vietnamese', 'pho noodles, rare beef, beef flank'),
+(@IdPhoNguyen, N'Phở gà', N'', 40000, 'vietnamese', 'pho noodles, chicken'),
+(@IdPhoNguyen, N'Bún thập cẩm', N'', 47000, 'vietnamese', 'rice noodles, mixed meat, broth'),
 
 (@IdSupCuaCo8, N'Súp cua truyền thống', N'CUA, SỤN GÀ, TRỨNG CÚT', 43000, 'vietnamese', 'crab soup, quail egg, cartilage'),
 (@IdSupCuaCo8, N'Súp cua bắc thảo', N'CUA, SỤN GÀ, TRỨNG CÚT, TRỨNG BẮC THẢO', 60000, 'vietnamese', 'crab soup, century egg'),
@@ -112,7 +120,6 @@ INSERT INTO MenuItems (restaurant_id, name, description, price, food_type, ingre
 (@IdTutimi, N'Trà Sữa Olong Trân Châu Trắng', N'', 19000, 'beverage', 'oolong milk tea, white boba'),
 (@IdTutimi, N'Mây Đào size 530ml', N'Olong thơm dịu, đào thanh mát', 19000, 'beverage', 'peach tea'),
 
-
 (@IdQuan7Thuc, N'Bún riêu thập cẩm', N'', 55000, 'vietnamese', 'rice noodles, crab paste, mixed toppings'),
 (@IdQuan7Thuc, N'Canh bún', N'', 45000, 'vietnamese', 'thick rice noodles, crab paste'),
 (@IdQuan7Thuc, N'Hủ tiếu thập cẩm', N'', 55000, 'vietnamese', 'hu tieu noodles, mixed toppings'),
@@ -155,6 +162,11 @@ INSERT INTO RestaurantImages (restaurant_id, image_url, is_thumbnail) VALUES
 -- CHÈN ẢNH TỪNG MÓN ĂN
 -- ==========================================
 INSERT INTO DishImages (menu_item_id, image_url)
+-- Phở Nguyên Quận 12
+SELECT id, 'https://down-zl-vn.img.susercontent.com/vn-11134517-820l4-mdvpwatisrgmaa' FROM MenuItems WHERE restaurant_id = @IdPhoNguyen AND name = N'Phở tái' UNION ALL
+SELECT id, 'https://down-zl-vn.img.susercontent.com/vn-11134517-820l4-mdvpwatisrgmaa' FROM MenuItems WHERE restaurant_id = @IdPhoNguyen AND name = N'Phở tái nạm' UNION ALL
+SELECT id, 'https://down-zl-vn.img.susercontent.com/vn-11134517-820l4-mdvpwatisrgmaa' FROM MenuItems WHERE restaurant_id = @IdPhoNguyen AND name = N'Phở gà' UNION ALL
+SELECT id, 'https://down-zl-vn.img.susercontent.com/vn-11134517-820l4-mdvpridfpu6a20' FROM MenuItems WHERE restaurant_id = @IdPhoNguyen AND name = N'Bún thập cẩm' UNION ALL
 
 -- Súp Cua Cô 8
 SELECT id, 'https://down-zl-vn.img.susercontent.com/vn-11134517-7r98o-lr36hi8uvsm167' FROM MenuItems WHERE restaurant_id = @IdSupCuaCo8 AND name = N'Súp cua truyền thống' UNION ALL
@@ -234,6 +246,11 @@ SELECT id, 'https://down-zl-vn.img.susercontent.com/vn-11134517-820l4-miy1ndcc7b
 SELECT id, 'https://down-zl-vn.img.susercontent.com/vn-11134517-820l4-mjpphm1mtedj72' FROM MenuItems WHERE restaurant_id = @IdTutimi AND name = N'Trà Sữa Olong Trân Châu Trắng' UNION ALL
 SELECT id, 'https://down-zl-vn.img.susercontent.com/vn-11134517-820l4-mjpqub8a0k5da0' FROM MenuItems WHERE restaurant_id = @IdTutimi AND name = N'Mây Đào size 530ml' UNION ALL
 
+-- Phở Nguyễn Tô Ký
+SELECT id, 'https://down-zl-vn.img.susercontent.com/vn-11134517-7ras8-m1rzb3oonbgfd7' FROM MenuItems WHERE restaurant_id = @IdPhoNguyenToKy AND name = N'Phở bò tái nạm' UNION ALL
+SELECT id, 'https://down-zl-vn.img.susercontent.com/vn-11134517-7ras8-m1rzep5t6bf77c' FROM MenuItems WHERE restaurant_id = @IdPhoNguyenToKy AND name = N'Phở bò thập cẩm' UNION ALL
+SELECT id, 'https://down-zl-vn.img.susercontent.com/vn-11134517-7ras8-m1rzzyln1p3neb' FROM MenuItems WHERE restaurant_id = @IdPhoNguyenToKy AND name = N'Phở Gà' UNION ALL
+SELECT id, 'https://down-zl-vn.img.susercontent.com/vn-11134517-7ras8-m1rze2whqy4zca' FROM MenuItems WHERE restaurant_id = @IdPhoNguyenToKy AND name = N'Phở bắp bò' UNION ALL
 
 -- Quán Ăn 7 Thức
 SELECT id, 'https://down-zl-vn.img.susercontent.com/vn-11134517-7r98o-lr5ux0a0iqx07a' FROM MenuItems WHERE restaurant_id = @IdQuan7Thuc AND name = N'Bún riêu thập cẩm' UNION ALL

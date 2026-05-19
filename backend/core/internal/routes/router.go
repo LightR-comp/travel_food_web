@@ -71,10 +71,10 @@ func SetupRouter(r *gin.Engine) {
 		}
 
 		// // --- NHÓM TIỆN ÍCH (Vị trí, Thời tiết, Tiền tệ) ---
-		// utils := v1.Group("/utils")
-		// {
-		// 	utils.GET("/weather", handlers.GetWeather)
+		utils := v1.Group("/utils")
+		{
+		 	utils.GET("/weather", handlers.GetWeather)
 		// 	utils.GET("/currency", handlers.GetExchangeRate)
-		// }
+		}
 	}
 	}

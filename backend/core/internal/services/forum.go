@@ -90,6 +90,7 @@ func GetPostDetail(ctx context.Context, postID int) (*models.Post, error) {
 		return nil, fmt.Errorf("GetPostDetail: %w", err)
 	}
 	p.Content = json.RawMessage(contentStr)
+	p.AuthorName = authorName
 
 	// Lấy comments
 	p.Comments, err = GetCommentsByPost(ctx, int(p.ID))
@@ -232,6 +233,7 @@ func scanPosts(rows *sql.Rows) ([]models.Post, error) {
 			continue
 		}
 		p.Content = json.RawMessage(contentStr)
+		p.AuthorName = authorName
 		posts = append(posts, p)
 	}
 	return posts, nil

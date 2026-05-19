@@ -29,9 +29,11 @@ func GetRecommendations(c *gin.Context) {
 	if authUserID > 0 {
 		req.UserID = authUserID
 	}
-	// Hardcode tọa độ demo tại Vincom Thủ Đức
-	req.Location.Lat = 10.85027
-	req.Location.Lng = 106.76504
+	// Dùng toạ độ từ frontend gửi lên (nếu có), nếu không có thì mặc định trung tâm TP.HCM
+	if req.Location.Lat == 0 && req.Location.Lng == 0 {
+		req.Location.Lat = 10.7769
+		req.Location.Lng = 106.7009
+	}
 	if req.Location.RadiusKm == 0 {
 		req.Location.RadiusKm = 5.0
 	}
@@ -100,7 +102,7 @@ func GetRecommendations(c *gin.Context) {
 	// Gọi Python Service chấm điểm
 	aiResp, err := services.CallPythonEngine(aiReq)
 	if err != nil {
-		c.JSON(http.StatusServiceUnavailable, dto.RecommendResponse{Success: false, Message: "AI Service lỗi"})
+		c.JSON(http.StatusServiceUnavailable, dto.RecommendResponse{Success: false, Message: "AI Service lỗi", Error: err.Error()})
 		return
 	}
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const HeroBanner = () => {
+const HeroBanner = ({ onOpenRecommend }) => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
 
@@ -11,7 +11,7 @@ const HeroBanner = () => {
   };
 
   return (
-    <section className="relative h-[380px] overflow-hidden" id="hero-section">
+    <section className="relative h-[420px] overflow-hidden" id="hero-section">
       {/* Background image */}
       <div className="absolute inset-0">
         <img
@@ -20,7 +20,7 @@ const HeroBanner = () => {
           className="w-full h-full object-cover object-[center_30%] hover:scale-[1.04] transition-transform duration-[8s]"
         />
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/15 to-[rgba(44,24,16,0.55)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/15 to-[rgba(44,24,16,0.60)]" />
       </div>
 
       {/* Content */}
@@ -57,6 +57,24 @@ const HeroBanner = () => {
             </svg>
           </button>
         </form>
+
+        {/* AI Recommend Button */}
+        <button
+          id="ai-recommend-btn"
+          onClick={onOpenRecommend}
+          className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-full
+            bg-white/10 backdrop-blur-sm border border-white/30 text-white
+            hover:bg-white/20 hover:border-white/50 hover:scale-[1.04]
+            active:scale-100 transition-all duration-200 animate-fade-up
+            text-[0.88rem] font-semibold shadow-lg"
+          style={{ animationDelay: '0.45s' }}
+        >
+          <span className="text-base">✨</span>
+          Để AI gợi ý cho tôi
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 opacity-70">
+            <polyline points="9,18 15,12 9,6" />
+          </svg>
+        </button>
       </div>
     </section>
   );

@@ -282,6 +282,8 @@ func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]inter
 		r := rankedItem.restaurant
 		finalScore := rankedItem.finalScore
 
+		log.Printf("[DEBUG_AI_CLIENT] Processing restaurant '%s' (ID: %d). Menu items from DB: %d", r.Name, r.ID, len(r.Menu))
+
 		// Bỏ qua nếu tên nhà hàng này đã được thêm vào kết quả
 		if _, seen := seenNames[r.Name]; seen {
 			continue
@@ -324,16 +326,35 @@ func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]inter
 			}
 		}
 
+		// 1. Nếu người dùng tìm món cụ thể, thực hiện lọc trong menu
 		if hasDishQuery && dishQuery != "" {
-			// Người dùng tìm món cụ thể
-			lowerDishQuery := strings.ToLower(dishQuery)
+			// Tách query thành các từ (keywords) và chuyển về chữ thường
+			keywords := strings.Fields(strings.ToLower(dishQuery))
+
+			// Xác định ngưỡng khớp (ít nhất 2 từ, hoặc bằng số lượng từ nếu query ngắn hơn 2)
+			threshold := 2
+			if len(keywords) < 2 {
+				threshold = len(keywords)
+			}
+
 			for _, m := range r.Menu {
-				if strings.Contains(strings.ToLower(m.Name), lowerDishQuery) {
+				// Mở rộng không gian tìm kiếm sang cả tên món và nguyên liệu để tăng độ chính xác
+				searchSpace := strings.ToLower(m.Name + " " + m.Ingredients)
+				matchCount := 0
+
+				for _, kw := range keywords {
+					if strings.Contains(searchSpace, kw) {
+						matchCount++
+					}
+				}
+
+				if matchCount >= threshold {
 					featuredDishes = append(featuredDishes, createDishMap(m))
 				}
 			}
 
-			// Nếu không tìm thấy món nào khớp, lấy 3 món đầu tiên làm gợi ý
+			// Logic dự phòng (Fallback): Nếu lọc theo từ khóa không ra món nào, tự động lấy 3 món đầu tiên.
+			// Điều này đảm bảo `featured_dishes` không bao giờ bị rỗng.
 			if len(featuredDishes) == 0 && len(r.Menu) > 0 {
 				limit := 3
 				if len(r.Menu) < 3 {
@@ -344,7 +365,7 @@ func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]inter
 				}
 			}
 		} else {
-			// Người dùng không tìm món cụ thể, lấy toàn bộ menu (giữ nguyên hành vi cũ)
+			// Trường hợp không có dish query: Lấy toàn bộ menu
 			for _, m := range r.Menu {
 				featuredDishes = append(featuredDishes, createDishMap(m))
 			}

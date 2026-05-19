@@ -38,3 +38,12 @@ type FeaturedDish struct {
 	CreatedAt    time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
 }
+
+type DishImage struct {
+	ID          int       `db:"id" json:"id"`
+	MenuItemID  int       `db:"menu_item_id" json:"menu_item_id"`
+	ImageURL    string    `db:"image_url" json:"image_url"`
+	Caption     string    `db:"caption" json:"caption"`
+	IsThumbnail bool      `db:"is_thumbnail" json:"is_thumbnail"`
+	CreatedAt   time.Time `db:"created_at" json:"created_at"`
+}

@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 
 	"backend/core/internal/config"
 	"backend/core/internal/routes"
@@ -22,11 +22,14 @@ func main() {
 	config.LoadConfig()
 	// Khởi tạo Database (
 	services.InitDB()
+	services.InitCloudinary()
 	// Init Firebase (THÊM DÒNG NÀY)
 	if err := services.InitFirebase(context.Background()); err != nil {
 		panic(err)
 	}
 
+	// Init Cloudinary
+	services.InitCloudinary()
 	// Tạo server
 	r := gin.Default()
 

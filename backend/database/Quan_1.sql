@@ -6,22 +6,22 @@ GO
 -- ==========================================
 
 INSERT INTO Restaurants (name, address, lat, lng, rating, price_range, open_time, close_time, type) VALUES 
-(N'Cháo Sườn Cô Giang - Quận 1', N'15bis Đinh Tiên Hoàng, P. Đa Kao, Quận 1, TP. HCM', 10.79038, 106.6974993, 4.7, 40000, '06:00', '23:00', 'vietnamese'),
-(N'Nem Nướng Nha Trang - Since 1982 - Quận 1', N'Hẻm TK 25/3 Trần Hưng Đạo, P. Cầu Kho, Quận 1, TP. HCM', 10.7577826, 106.687461, 3.8, 70000, '09:00', '22:00', 'vietnamese'),
-(N'Cơm Phủ Trứng Sốt Sệt - Quận 1', N'Số 7B Tôn Thất Tùng, P. Phạm Ngũ Lão, Quận 1, TP. HCM', 10.7701035, 106.6883820, 4.3, 75000, '10:00', '21:00', 'asian'),
-(N'Bún Ốc Sườn Cô Sáu - Quận 1', N'454 Hai Bà Trưng, P. Tân Định , Quận 1, TP. HCM', 10.7917682, 106.6871762, 4.6, 65000, '07:00', '22:00', 'vietnamese'),
-(N'Bánh Mì 1 Phút 30 Giây - Lạc Long Quân', N'219 Lạc Long Quân, P. 3, Quận 11, TP. HCM', 10.7639496, 106.6421519, 4.2, 35000, '06:00', '13:00', 'fastfood'),
-(N'Bánh Kem Phương Loan Quận 1 - Cống Quỳnh', N'185F Cống Quỳnh, P. Phạm Ngũ Lão, Quận 1, TP. HCM', 10.7664286, 106.6883326, 4.9, 100000, '08:00', '22:00', 'bakery'),
-(N'Trà Sữa Thế Giới - Nguyễn Du', N'155 Nguyễn Du, P. Bến Thành, Quận 1, TP. HCM', 10.7723079, 106.6929944, 4.4, 25000, '09:00', '23:00', 'beverage'),
-(N'Quán Chay Diệu Hạnh - Tân Thới Nhất 1', N'75/6Bis Tân Thới Nhất 1, P. Tân Thới Nhất, Quận 12, TP. HCM', 10.8335575, 106.6160156, 0.3, 30000, '07:00', '20:00', 'vegetarian'),
-(N'Bún Mắm Nêm Chị Linh Quận 1 - 15 Lê Thánh Tôn', N'15 Lê Thánh Tôn, P. Bến Nghé, Quận 1, TP. HCM', 10.7808536, 106.7048691, 4.7, 55000, '08:00', '21:00', 'vietnamese'),
-(N'Vua Gà Tần - Since 1999 - Quận 1', N'130 Cô Bắc, P. Cô Giang, Quận 1, TP. HCM', 10.7644521, 106.6941977, 4.1, 120000, '10:00', '23:00', 'vietnamese'),
-(N'Gà Tần Gia Bảo - Quận 1', N'TK24/9 Nguyễn Cảnh Chân, P. Cầu Kho, Quận 1, TP. HCM', 10.7573279, 106.6891781, 4.8, 110000, '09:00', '22:30', 'vietnamese'),
-(N'Cô Thảo Tôm Cá - Cá Hồi Ngâm Tương - Quận 1', N'42/2 Trần Đình Xu, P. Cô Giang, Quận 1, TP. HCM', 10.7599604, 106.6923702, 4.3, 150000, '10:00', '21:30', 'korean'),
-(N'Tiệm Xôi Mềm - CN Nguyễn Trãi Quận 1', N'215J-215K Nguyễn Trãi, P. Cầu Ông Lãnh, Quận 1, TP. HCM', 10.7649255, 106.6877622, 4.6, 55000, '07:00', '22:00', 'vietnamese'),
-(N'BẾP LÀNH QUẬN 1 - COFFEE, TEA & CƠM VĂN PHÒNG', N'331/03 Trần Hưng Đạo, P. Cầu Ông Lãnh, Quận 1, TP. HCM', 10.7615468, 106.6903982, 4.7, 50000, '07:00', '20:00', 'cafe'),
-(N'Highlands Coffee - Trà, Cà Phê & Bánh - 46 Bùi Thị Xuân - Quận 1', N'46 - 48 Bùi Thị Xuân, P. Bến Thành, Quận 1, TP. HCM', 10.7715827, 106.6899971, 4.4, 60000, '07:00', '23:00', 'cafe'),
-(N'Hủ Tiếu Cô Tám Quận 1 - Nguyễn Thái Bình', N'Đối Diện 81 Nguyễn Thái Bình, P. Nguyễn Thái Bình, Quận 1, TP. HCM', 10.7691748, 106.6997809, 4.8, 60000, '06:00', '14:00', 'vietnamese');
+(N'Cháo Sườn Cô Giang - Quận 1', N'15bis Đinh Tiên Hoàng, P. Đa Kao, Quận 1, TP. HCM', 10.79038, 106.6974993, 4.7, 40000, '06:00', '23:00', N'vietnamese, bình dân'),
+(N'Nem Nướng Nha Trang - Since 1982 - Quận 1', N'Hẻm TK 25/3 Trần Hưng Đạo, P. Cầu Kho, Quận 1, TP. HCM', 10.7577826, 106.687461, 3.8, 70000, '09:00', '22:00', N'vietnamese, bình dân'),
+(N'Cơm Phủ Trứng Sốt Sệt - Quận 1', N'Số 7B Tôn Thất Tùng, P. Phạm Ngũ Lão, Quận 1, TP. HCM', 10.7701035, 106.6883820, 4.3, 75000, '10:00', '21:00', N'asian, bình dân'),
+(N'Bún Ốc Sườn Cô Sáu - Quận 1', N'454 Hai Bà Trưng, P. Tân Định , Quận 1, TP. HCM', 10.7917682, 106.6871762, 4.6, 65000, '07:00', '22:00', N'vietnamese, bình dân'),
+(N'Bánh Mì 1 Phút 30 Giây - Lạc Long Quân', N'219 Lạc Long Quân, P. 3, Quận 11, TP. HCM', 10.7639496, 106.6421519, 4.2, 35000, '06:00', '13:00', N'fastfood, bình dân'),
+(N'Bánh Kem Phương Loan Quận 1 - Cống Quỳnh', N'185F Cống Quỳnh, P. Phạm Ngũ Lão, Quận 1, TP. HCM', 10.7664286, 106.6883326, 4.9, 100000, '08:00', '22:00', N'bakery, bình dân'),
+(N'Trà Sữa Thế Giới - Nguyễn Du', N'155 Nguyễn Du, P. Bến Thành, Quận 1, TP. HCM', 10.7723079, 106.6929944, 4.4, 25000, '09:00', '23:00', N'beverage, bình dân, trà sữa'),
+(N'Quán Chay Diệu Hạnh - Tân Thới Nhất 1', N'75/6Bis Tân Thới Nhất 1, P. Tân Thới Nhất, Quận 12, TP. HCM', 10.8335575, 106.6160156, 0.3, 30000, '07:00', '20:00', N'vegetarian, bình dân'),
+(N'Bún Mắm Nêm Chị Linh Quận 1 - 15 Lê Thánh Tôn', N'15 Lê Thánh Tôn, P. Bến Nghé, Quận 1, TP. HCM', 10.7808536, 106.7048691, 4.7, 55000, '08:00', '21:00', N'vietnamese, bình dân'),
+(N'Vua Gà Tần - Since 1999 - Quận 1', N'130 Cô Bắc, P. Cô Giang, Quận 1, TP. HCM', 10.7644521, 106.6941977, 4.1, 120000, '10:00', '23:00', N'vietnamese, sang trọng'),
+(N'Gà Tần Gia Bảo - Quận 1', N'TK24/9 Nguyễn Cảnh Chân, P. Cầu Kho, Quận 1, TP. HCM', 10.7573279, 106.6891781, 4.8, 110000, '09:00', '22:30', N'vietnamese, bình dân'),
+(N'Cô Thảo Tôm Cá - Cá Hồi Ngâm Tương - Quận 1', N'42/2 Trần Đình Xu, P. Cô Giang, Quận 1, TP. HCM', 10.7599604, 106.6923702, 4.3, 150000, '10:00', '21:30', N'korean, mang về'),
+(N'Tiệm Xôi Mềm - CN Nguyễn Trãi Quận 1', N'215J-215K Nguyễn Trãi, P. Cầu Ông Lãnh, Quận 1, TP. HCM', 10.7649255, 106.6877622, 4.6, 55000, '07:00', '22:00', N'vietnamese, sang trọng'),
+(N'BẾP LÀNH QUẬN 1 - COFFEE, TEA & CƠM VĂN PHÒNG', N'331/03 Trần Hưng Đạo, P. Cầu Ông Lãnh, Quận 1, TP. HCM', 10.7615468, 106.6903982, 4.7, 50000, '07:00', '20:00', N'cafe, bình dân'),
+(N'Highlands Coffee - Trà, Cà Phê & Bánh - 46 Bùi Thị Xuân - Quận 1', N'46 - 48 Bùi Thị Xuân, P. Bến Thành, Quận 1, TP. HCM', 10.7715827, 106.6899971, 4.4, 60000, '07:00', '23:00', N'cafe, sang trọng'),
+(N'Hủ Tiếu Cô Tám Quận 1 - Nguyễn Thái Bình', N'Đối Diện 81 Nguyễn Thái Bình, P. Nguyễn Thái Bình, Quận 1, TP. HCM', 10.7691748, 106.6997809, 4.8, 60000, '06:00', '14:00', N'vietnamese, bình dân');
 GO
 
 DECLARE @IdChaoSuon INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Cháo Sườn Cô Giang - Quận 1');

@@ -1000,14 +1000,18 @@ func SearchRestaurants(
 // Chưa hoàn thiện vì còn thiếu bảng ảnh, nhưng sẽ trả về được menu và reviews để handler có thể hiển thị chi tiết.
 func GetRestaurantDetail(ctx context.Context, id int) (*models.RestaurantDetail, error) {
 	query := `
-		SELECT id, name, address, lat, lng, rating, price_range, 
-		       open_time, close_time, type, created_at
-		FROM Restaurants WHERE id = @id
+		SELECT 
+			r.id, r.name, r.address, r.lat, r.lng, r.rating, r.price_range, 
+			r.open_time, r.close_time, r.type, r.created_at,
+			ISNULL(s.story, '') AS story
+		FROM Restaurants r
+		LEFT JOIN RestaurantStories s ON r.id = s.restaurant_id
+		WHERE r.id = @id
 	`
 	var rd models.RestaurantDetail
 	err := db.QueryRowContext(ctx, query, sql.Named("id", id)).Scan(
-		&rd.ID, &rd.Name, &rd.Address, &rd.Lat, &rd.Lng, &rd.Rating,
-		&rd.PriceRange, &rd.OpenTime, &rd.CloseTime, &rd.Type, &rd.CreatedAt,
+		&rd.ID, &rd.Name, &rd.Address, &rd.Lat, &rd.Lng, &rd.Rating, 
+		&rd.PriceRange, &rd.OpenTime, &rd.CloseTime, &rd.Type,  &rd.CreatedAt, &rd.Story,
 	)
 	if err == sql.ErrNoRows {
 		return nil, fmt.Errorf("không tìm thấy nhà hàng")
@@ -1198,6 +1202,17 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 	}
 
 	return tempItems, nil
+}
+
+func UpdateAvgRating(restaurantID int) {
+	_, err := db.Exec(`
+		UPDATE Restaurants
+		SET rating = (SELECT AVG(CAST(rating AS FLOAT)) FROM UserRatings WHERE restaurant_id = @rid)
+		WHERE id = @rid
+	`, sql.Named("rid", restaurantID))
+	if err != nil {
+		log.Printf("[DB] Lỗi cập nhật rating trung bình: %v", err)
+	}
 }
 
 // [Minh]
@@ -1462,3 +1477,5 @@ func GetChatHistoryByUserID(ctx context.Context, userID int) ([]ChatHistoryEntry
 	}
 	return history, nil
 }
+
+

@@ -84,7 +84,7 @@ func CallPythonEngine(reqData dto.AIRecommendRequest) (*dto.AIRecommendResponse,
 
 	// 6. Kiểm tra logic success từ phía Python
 	if !wrapper.Success {
-		return nil, fmt.Errorf("python AI xử lý thất bại: %v", wrapper.Message)
+		return nil, fmt.Errorf("python AI xử lý thất bại: %v (Lỗi nội bộ: %v)", wrapper.Message, wrapper.Error)
 	}
 
 	// Trả về phần Data (chứa RecommendedRestaurants)

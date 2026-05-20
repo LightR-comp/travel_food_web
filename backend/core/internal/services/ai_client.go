@@ -282,6 +282,8 @@ func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]inter
 		r := rankedItem.restaurant
 		finalScore := rankedItem.finalScore
 
+		log.Printf("[DEBUG_AI_CLIENT] Processing restaurant '%s' (ID: %d). Menu items from DB: %d", r.Name, r.ID, len(r.Menu))
+
 		// Bỏ qua nếu tên nhà hàng này đã được thêm vào kết quả
 		if _, seen := seenNames[r.Name]; seen {
 			continue
@@ -307,23 +309,52 @@ func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]inter
 			if ingredients == nil {
 				ingredients = []string{}
 			}
+
+			var dishImg string
+			if len(m.Images) > 0 {
+				// Đây chính là link lấy từ bảng DishImages trường ImageURL
+				dishImg = m.Images[0].ImageURL
+			} else {
+				dishImg = "https://placehold.co/200x200?text=No+Dish+Image"
+			}
+
 			return map[string]interface{}{
 				"name":        m.Name,
 				"price":       m.Price,
 				"ingredients": ingredients,
+				"image_url":   dishImg,
 			}
 		}
 
+		// 1. Nếu người dùng tìm món cụ thể, thực hiện lọc trong menu
 		if hasDishQuery && dishQuery != "" {
-			// Người dùng tìm món cụ thể
-			lowerDishQuery := strings.ToLower(dishQuery)
+			// Tách query thành các từ (keywords) và chuyển về chữ thường
+			keywords := strings.Fields(strings.ToLower(dishQuery))
+
+			// Xác định ngưỡng khớp (ít nhất 2 từ, hoặc bằng số lượng từ nếu query ngắn hơn 2)
+			threshold := 2
+			if len(keywords) < 2 {
+				threshold = len(keywords)
+			}
+
 			for _, m := range r.Menu {
-				if strings.Contains(strings.ToLower(m.Name), lowerDishQuery) {
+				// Mở rộng không gian tìm kiếm sang cả tên món và nguyên liệu để tăng độ chính xác
+				searchSpace := strings.ToLower(m.Name + " " + m.Ingredients)
+				matchCount := 0
+
+				for _, kw := range keywords {
+					if strings.Contains(searchSpace, kw) {
+						matchCount++
+					}
+				}
+
+				if matchCount >= threshold {
 					featuredDishes = append(featuredDishes, createDishMap(m))
 				}
 			}
 
-			// Nếu không tìm thấy món nào khớp, lấy 3 món đầu tiên làm gợi ý
+			// Logic dự phòng (Fallback): Nếu lọc theo từ khóa không ra món nào, tự động lấy 3 món đầu tiên.
+			// Điều này đảm bảo `featured_dishes` không bao giờ bị rỗng.
 			if len(featuredDishes) == 0 && len(r.Menu) > 0 {
 				limit := 3
 				if len(r.Menu) < 3 {
@@ -334,28 +365,39 @@ func FetchRestaurantsFromEntities(ctx context.Context, entities map[string]inter
 				}
 			}
 		} else {
-			// Người dùng không tìm món cụ thể, lấy toàn bộ menu (giữ nguyên hành vi cũ)
+			// Trường hợp không có dish query: Lấy toàn bộ menu
 			for _, m := range r.Menu {
 				featuredDishes = append(featuredDishes, createDishMap(m))
 			}
 		}
 
-		// Tính giá trung bình từ menu để thay cho giá hardcode
-		var avgPrice float64
+		// Ưu tiên lấy giá từ cột price_range của nhà hàng
+		displayPrice := float64(r.PriceRange)
+
+		// Nếu có menu, tính giá trung bình để có con số cập nhật nhất
 		if len(r.Menu) > 0 {
 			var totalPrice float64
 			for _, item := range r.Menu {
 				totalPrice += item.Price
 			}
-			avgPrice = totalPrice / float64(len(r.Menu))
+			displayPrice = totalPrice / float64(len(r.Menu))
+		}
+
+		resImage := ""
+		if len(r.Images) > 0 {
+			// Lấy ảnh đầu tiên của quán
+			resImage = r.Images[0].ImageURL
+		}
+		if resImage == "" {
+			resImage = "https://placehold.co/400x300?text=" + r.Name
 		}
 
 		results = append(results, map[string]interface{}{
 			"id":              r.ID,
 			"res_name":        r.Name,
 			"rating":          r.Rating,
-			"price":           avgPrice, // Sử dụng giá trung bình tính được
-			"image_url":       "https://placehold.co/400x300?text=" + r.Name,
+			"price":           displayPrice, // Trả về price_range hoặc giá trung bình menu
+			"image_url":       resImage,
 			"distance_km":     1.5, // Giả định khi không có tọa độ người dùng
 			"type":            r.Type,
 			"featured_dishes": featuredDishes,

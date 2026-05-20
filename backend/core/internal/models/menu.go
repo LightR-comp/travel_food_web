@@ -7,36 +7,36 @@ import "time"
 
 // MenuItem đại diện cho một món ăn trong menu của quán
 type MenuItem struct {
-	ID           int       `db:"id" json:"id"`
-	RestaurantID int       `db:"restaurant_id" json:"restaurant_id"`
+	ID           int `db:"id" json:"id"`
+	RestaurantID int `db:"restaurant_id" json:"restaurant_id"`
 
-	Name         string    `db:"name" json:"name"`
-	Description  string    `db:"description" json:"description"`
+	Name        string `db:"name" json:"name"`
+	Description string `db:"description" json:"description"`
 
-	Price        float64   `db:"price" json:"price"`
-	FoodType     string    `db:"food_type" json:"food_type"`
+	Price    float64 `db:"price" json:"price"`
+	FoodType string  `db:"food_type" json:"food_type"`
 
-	Ingredients  string    `db:"ingredients" json:"ingredients"` // "chicken,garlic"
-	Story	string    `db:"story" json:"story"` // Câu chuyện đằng sau món ăn, có thể được sử dụng để gợi ý nếu người dùng quan tâm đến trải nghiệm ẩm thực
+	Ingredients string `db:"ingredients" json:"ingredients"` // "chicken,garlic"
+	Story       string `db:"story" json:"story"`             // Câu chuyện đằng sau món ăn, có thể được sử dụng để gợi ý nếu người dùng quan tâm đến trải nghiệm ẩm thực
 
-	CreatedAt    time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
+
+	Images []DishImage `json:"images"`
 }
-
-//Món đặc trưng của quán, có thể được sử dụng để gợi ý nếu người dùng có sở thích ăn uống cụ thể
 type FeaturedDish struct {
-	ID           int       `db:"id" json:"id"`
-	RestaurantID int       `db:"restaurant_id" json:"restaurant_id"`
-	
-	Name         string    `db:"name" json:"name"`
-	Description  string    `db:"description" json:"description"`
-	
-	Price        float64   `db:"price" json:"price"`
-	FoodType     string    `db:"food_type" json:"food_type"`
-	
-	Ingredients  string    `db:"ingredients" json:"ingredients"` // "chicken,garlic"
-	CreatedAt    time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
+	ID           int `db:"id" json:"id"`
+	RestaurantID int `db:"restaurant_id" json:"restaurant_id"`
+
+	Name        string `db:"name" json:"name"`
+	Description string `db:"description" json:"description"`
+
+	Price    float64 `db:"price" json:"price"`
+	FoodType string  `db:"food_type" json:"food_type"`
+
+	Ingredients string    `db:"ingredients" json:"ingredients"` // "chicken,garlic"
+	CreatedAt   time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
 }
 
 type DishImage struct {

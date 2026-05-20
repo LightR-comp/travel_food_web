@@ -67,3 +67,24 @@ export const getRestaurantByIdApi = async (id) => {
   const { data } = await axiosInstance.get(`/restaurants/${id}`);
   return data; // { success, message, data: { ...restaurant }, error }
 };
+
+/**
+ * POST /api/v1/recommend
+ * Gợi ý quán ăn dựa trên sở thích & bối cảnh của người dùng (AI engine).
+ * @param {{
+ *   user_id: number,
+ *   location: { lat: number, lng: number },
+ *   preferences: {
+ *     budget: number,
+ *     people: number,
+ *     dietary: string[],
+ *     food_types: string[],
+ *     mood: string,
+ *     weather: string
+ *   }
+ * }} payload
+ */
+export const getRecommendationsApi = async (payload) => {
+  const { data } = await axiosInstance.post('/recommend', payload);
+  return data; // { success, message, data: { restaurants }, error }
+};

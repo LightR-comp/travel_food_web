@@ -7,7 +7,7 @@ const PostCard = ({ post }) => {
   return (
     <article
       className="bg-white rounded-2xl overflow-hidden shadow-sm hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer group"
-      onClick={() => navigate(`/detail/${restaurant_id}`)}
+      onClick={() => navigate(`/forum/${id}`)}
       id={`post-card-${id}`}
     >
       {/* Image */}

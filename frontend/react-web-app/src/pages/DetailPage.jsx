@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import PhotoGallery from '../components/detail/PhotoGallery';
 import MenuSection from '../components/detail/MenuSection';
 import ReviewSection from '../components/detail/ReviewSection';
+import ReviewModal from '../components/detail/ReviewModal';
+import LoginRequireModal from '../components/detail/LoginRequireModal';
+import StarRating from '../components/ui/StarRating';
 
 import { Spinner } from '../components/ui/index.jsx';
 import { getRestaurantByIdApi } from '../api/restaurantApi';
@@ -16,27 +19,49 @@ import { getRestaurantByIdApi } from '../api/restaurantApi';
 function mapApiToSections(raw) {
   if (!raw) return null;
 
-  // Tính is_open_now dựa trên open_time / close_time (HH:MM)
+  const parseTime = (timeStr) => (timeStr || '').split(',').map(s => s.trim()).filter(Boolean);
+  const openTimes = parseTime(raw.open_time);
+  const closeTimes = parseTime(raw.close_time);
+
+  let schedule = 'Chưa có thông tin';
+  if (openTimes.length > 0 && closeTimes.length > 0) {
+    const pairs = [];
+    const count = Math.max(openTimes.length, closeTimes.length);
+    for (let i = 0; i < count; i++) {
+      const o = openTimes[i] || openTimes[0];
+      const c = closeTimes[i] || closeTimes[0];
+      if (o && c) pairs.push(`${o} – ${c}`);
+    }
+    if (pairs.length > 0) schedule = pairs.join(' và ');
+  }
+
+  // Tính is_open_now dựa trên mảng các khung giờ
   const isOpenNow = (() => {
     try {
+      if (openTimes.length === 0 || closeTimes.length === 0) return false;
       const now = new Date();
-      const [oh, om] = (raw.open_time || '').split(':').map(Number);
-      const [ch, cm] = (raw.close_time || '').split(':').map(Number);
       const cur = now.getHours() * 60 + now.getMinutes();
-      const open = oh * 60 + om;
-      const close = ch * 60 + cm;
-      if (close > open) return cur >= open && cur <= close;
-      // Trường hợp qua nửa đêm
-      return cur >= open || cur <= close;
+
+      const count = Math.min(openTimes.length, closeTimes.length);
+      for (let i = 0; i < count; i++) {
+        const [oh, om] = openTimes[i].split(':').map(Number);
+        const [ch, cm] = closeTimes[i].split(':').map(Number);
+        if (isNaN(oh) || isNaN(om) || isNaN(ch) || isNaN(cm)) continue;
+
+        const open = oh * 60 + om;
+        const close = ch * 60 + cm;
+        if (close > open) {
+          if (cur >= open && cur <= close) return true;
+        } else {
+          // Trường hợp qua nửa đêm
+          if (cur >= open || cur <= close) return true;
+        }
+      }
+      return false;
     } catch {
       return false;
     }
   })();
-
-  const schedule =
-    raw.open_time && raw.close_time
-      ? `${raw.open_time} – ${raw.close_time}`
-      : 'Chưa có thông tin';
 
   // Galleries: ưu tiên ảnh từ API, fallback rỗng
   const galleries = Array.isArray(raw.images)
@@ -50,6 +75,9 @@ function mapApiToSections(raw) {
   const restaurant_info = {
     name: raw.name || 'Không có tên',
     type: raw.type || '',
+    established_year: raw.established_year || null,
+    description: raw.description || null,
+    history: raw.history || null,
     contact: {
       address: raw.address || 'Chưa có địa chỉ',
       phone: raw.phone || null,
@@ -96,6 +124,28 @@ const DetailPage = () => {
   const [data, setData] = useState(null);   // mapped sections
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showBioModal, setShowBioModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showLoginRequireModal, setShowLoginRequireModal] = useState(false);
+  
+  // Giả lập trạng thái đăng nhập (đổi thành logic thực tế của project sau)
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleReviewClick = () => {
+    if (isLoggedIn) {
+      setShowReviewModal(true);
+    } else {
+      setShowLoginRequireModal(true);
+    }
+  };
+
+  const handleMockLogin = () => {
+    // Giả lập đăng nhập thành công
+    setIsLoggedIn(true);
+    setShowLoginRequireModal(false);
+    // Tùy chọn mở luôn form đánh giá sau khi đăng nhập xong
+    setShowReviewModal(true);
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -196,9 +246,8 @@ const DetailPage = () => {
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <span className="text-[#F5A623] text-lg">⭐</span>
-                <span className="font-bold text-[#2C1810] text-base">{meta.rating}</span>
+              <div className="flex items-center gap-1.5 flex-shrink-0 bg-white px-3 py-1.5 rounded-full border border-[#E0D3C8] shadow-sm">
+                <StarRating rating={meta.rating} showMax={false} />
                 <span className="text-[#7B7068] text-sm">({meta.review_count})</span>
               </div>
             </div>
@@ -248,21 +297,34 @@ const DetailPage = () => {
                 href={`https://maps.google.com/?q=${encodeURIComponent(contact.address)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#F5A623] text-white font-bold text-sm rounded-full hover:bg-[#E8960A] transition-colors shadow-sm"
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#E0D3C8] text-[#4A3728] font-semibold text-sm rounded-full hover:bg-[#F5A623] hover:border-[#F5A623] hover:text-white transition-colors duration-300"
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M3.4 20.4l17.45-7.48a1 1 0 000-1.84L3.4 3.6a.993.993 0 00-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.51c0 .71.73 1.2 1.39.91z"/>
                 </svg>
                 Chỉ đường
               </a>
-              <button className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#E0D3C8] text-[#4A3728] font-semibold text-sm rounded-full hover:border-[#F5A623] hover:text-[#F5A623] transition-colors">
+              <button 
+                onClick={() => setShowBioModal(true)}
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#E0D3C8] text-[#4A3728] font-semibold text-sm rounded-full hover:bg-[#F5A623] hover:border-[#F5A623] hover:text-white transition-colors duration-300"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+                Tiểu sử
+              </button>
+              <button className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#E0D3C8] text-[#4A3728] font-semibold text-sm rounded-full hover:bg-[#F5A623] hover:border-[#F5A623] hover:text-white transition-colors duration-300">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
                   <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
                 </svg>
                 Chia sẻ
               </button>
-              <button className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#E0D3C8] text-[#4A3728] font-semibold text-sm rounded-full hover:border-[#F5A623] hover:text-[#F5A623] transition-colors">
+              <button 
+                onClick={handleReviewClick}
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#E0D3C8] text-[#4A3728] font-semibold text-sm rounded-full hover:bg-[#F5A623] hover:border-[#F5A623] hover:text-white transition-colors duration-300"
+              >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
                   <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -313,24 +375,24 @@ const DetailPage = () => {
               <hr className="border-[#F5EDD8] mb-4" />
 
               {/* Rating */}
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-2xl flex-shrink-0">⭐</span>
+              <div className="flex items-start gap-3 mb-4">
+                <span className="text-2xl flex-shrink-0 mt-0.5">⭐</span>
                 <div>
-                  <p className="text-xs text-[#7B7068] mb-0.5">Đánh giá</p>
-                  <p className="text-sm font-semibold text-[#2C1810]">
-                    {'★'.repeat(Math.min(5, Math.round(meta.rating)))}{'☆'.repeat(Math.max(0, 5 - Math.round(meta.rating)))}{' '}
-                    <span className="text-[#F5A623]">{meta.rating} / 5</span>
-                  </p>
+                  <p className="text-xs text-[#7B7068] mb-1">Đánh giá</p>
+                  <StarRating rating={meta.rating} showMax={false} />
                 </div>
               </div>
 
               {/* Hours */}
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-2xl flex-shrink-0">🕐</span>
+              <div className="flex items-start gap-3 mb-4">
+                <span className="text-2xl flex-shrink-0 mt-0.5">🕐</span>
                 <div>
-                  <p className="text-xs text-[#7B7068] mb-0.5">Giờ mở cửa</p>
-                  <p className={`text-sm font-semibold ${operating_hours.is_open_now ? 'text-green-600' : 'text-red-500'}`}>
-                    {operating_hours.is_open_now ? 'Đang mở' : 'Đóng cửa'} • {operating_hours.schedule}
+                  <p className="text-xs text-[#7B7068] mb-1">Giờ mở cửa</p>
+                  <p className={`text-sm font-semibold mb-1 ${operating_hours.is_open_now ? 'text-green-600' : 'text-red-500'}`}>
+                    {operating_hours.is_open_now ? 'Đang mở' : 'Đóng cửa'}
+                  </p>
+                  <p className="text-sm font-medium text-[#2C1810]">
+                    {operating_hours.schedule}
                   </p>
                 </div>
               </div>
@@ -371,6 +433,137 @@ const DetailPage = () => {
         </div>
 
       </div>
+
+      {/* ── Bio Modal ── */}
+      {showBioModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 md:p-6 transition-opacity" onClick={() => setShowBioModal(false)}>
+          <div 
+            className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col relative transform transition-transform scale-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 pb-4 border-b border-[#F5EDD8]">
+              <div>
+                <h2 className="font-[Baloo_2,sans-serif] text-2xl font-bold text-[#2C1810]">
+                  Tiểu sử {name}
+                </h2>
+                <p className="text-sm text-[#7B7068] mt-1 flex items-center gap-2">
+                  {restaurant_info.established_year && (
+                    <>
+                      <span className="font-medium">Thành lập: {restaurant_info.established_year}</span>
+                      <span className="w-1 h-1 rounded-full bg-[#E0D3C8]"></span>
+                    </>
+                  )}
+                  <span className="truncate max-w-[200px] sm:max-w-xs">{contact.address}</span>
+                </p>
+              </div>
+              <button 
+                onClick={() => setShowBioModal(false)}
+                className="w-10 h-10 rounded-full bg-[#FAFAF7] text-[#7B7068] flex items-center justify-center hover:bg-[#FDECE4] hover:text-[#E8623A] transition-colors flex-shrink-0"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-8" style={{ scrollbarWidth: 'thin' }}>
+              
+              {/* Lịch sử */}
+              {restaurant_info.history && (
+                <section>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-9 h-9 rounded-full bg-[#FFF8EE] flex items-center justify-center text-[#E8623A] shadow-sm">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <path d="M2 15h10" />
+                        <path d="M9 18v-6H5v6z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-bold text-[#2C1810]">Câu chuyện hình thành</h3>
+                  </div>
+                  <p className="text-[#4A3728] leading-relaxed text-[15px] bg-[#FAFAF7] p-5 rounded-2xl border border-[#F5EDD8] shadow-inner">
+                    {restaurant_info.history}
+                  </p>
+                </section>
+              )}
+
+              {/* Món ăn đặc trưng */}
+              {data.signature_dish && (
+                <section>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-9 h-9 rounded-full bg-[#FFF8EE] flex items-center justify-center text-[#E8623A] shadow-sm">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-bold text-[#2C1810]">Món ăn đặc trưng</h3>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-5 bg-white border border-[#F5EDD8] p-4 rounded-2xl hover:shadow-md transition-shadow">
+                    <div className="w-full sm:w-32 h-40 sm:h-32 rounded-xl bg-[#FAFAF7] flex-shrink-0 overflow-hidden shadow-sm">
+                      {data.signature_dish.image_url ? (
+                        <img src={data.signature_dish.image_url} alt={data.signature_dish.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-4xl">🍲</div>
+                      )}
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <h4 className="font-bold text-[#2C1810] text-lg mb-1">{data.signature_dish.name}</h4>
+                      <p className="text-[#E8623A] font-bold text-sm mb-2">
+                        {data.signature_dish.price ? Number(data.signature_dish.price).toLocaleString('vi-VN') + ' đ' : 'Liên hệ'}
+                      </p>
+                      <p className="text-[15px] text-[#7B7068] line-clamp-2 sm:line-clamp-3">
+                        {data.signature_dish.description}
+                      </p>
+                    </div>
+                  </div>
+                </section>
+              )}
+
+              {/* Hình ảnh */}
+              {galleries.length > 0 && (
+                <section>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-9 h-9 rounded-full bg-[#FFF8EE] flex items-center justify-center text-[#E8623A] shadow-sm">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                        <circle cx="8.5" cy="8.5" r="1.5" />
+                        <polyline points="21 15 16 10 5 21" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-bold text-[#2C1810]">Hình ảnh nổi bật</h3>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {galleries.slice(0, 3).map((img, idx) => (
+                      <div key={idx} className="aspect-square rounded-xl overflow-hidden shadow-sm border border-[#F5EDD8]">
+                        <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Review Modal ── */}
+      <ReviewModal 
+        isOpen={showReviewModal} 
+        onClose={() => setShowReviewModal(false)} 
+        restaurantName={name}
+      />
+
+      {/* ── Login Require Modal ── */}
+      <LoginRequireModal
+        isOpen={showLoginRequireModal}
+        onClose={() => setShowLoginRequireModal(false)}
+        onLogin={handleMockLogin}
+      />
+
     </div>
   );
 };

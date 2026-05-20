@@ -286,7 +286,7 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 	}
 
 	if len(allItemIDs) > 0 {
-		dishImgMap, err := getDishImagesByMenuItemIDs(ctx, allItemIDs)
+		dishImgMap, err := getImagesByMenuItemIDs(ctx, allItemIDs)
 		if err != nil {
 			log.Printf("[DB] Lỗi lấy ảnh món ăn: %v", err)
 			return result, nil
@@ -349,7 +349,7 @@ func getImagesByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.
 	return result, nil
 }
 
-func getDishImagesByMenuItemIDs(ctx context.Context, ids []int) (map[int][]models.DishImage, error) {
+func getImagesByMenuItemIDs(ctx context.Context, ids []int) (map[int][]models.DishImage, error) {
 	if len(ids) == 0 {
 		return make(map[int][]models.DishImage), nil
 	}
@@ -518,6 +518,17 @@ func GetForumPostsByRestaurantID(ctx context.Context, restaurantID int) ([]model
 // ============================================================
 // HELPER UTILS
 // ============================================================
+
+func intSliceToSQL(ids []int) string {
+	s := ""
+	for i, id := range ids {
+		if i > 0 {
+			s += ","
+		}
+		s += fmt.Sprintf("%d", id)
+	}
+	return s
+}
 
 func toJSONArray(arr []string) string {
 	if len(arr) == 0 {
@@ -935,7 +946,6 @@ func SearchRestaurants(
 		defer menuRows.Close()
 
 		menuMap := make(map[int][]models.MenuItem)
-		var allItemIDs []int
 
 		for menuRows.Next() {
 			var mi models.MenuItem
@@ -952,21 +962,6 @@ func SearchRestaurants(
 			)
 			if err == nil {
 				menuMap[mi.RestaurantID] = append(menuMap[mi.RestaurantID], mi)
-				allItemIDs = append(allItemIDs, mi.ID)
-			}
-		}
-
-		// Load ảnh cho các món ăn trong kết quả tìm kiếm
-		if len(allItemIDs) > 0 {
-			dishImgMap, _ := getDishImagesByMenuItemIDs(ctx, allItemIDs)
-			for resID, items := range menuMap {
-				for j := range items {
-					if imgs, ok := dishImgMap[items[j].ID]; ok {
-						menuMap[resID][j].Images = imgs
-					} else {
-						menuMap[resID][j].Images = []models.DishImage{}
-					}
-				}
 			}
 		}
 
@@ -1010,8 +1005,8 @@ func GetRestaurantDetail(ctx context.Context, id int) (*models.RestaurantDetail,
 	`
 	var rd models.RestaurantDetail
 	err := db.QueryRowContext(ctx, query, sql.Named("id", id)).Scan(
-		&rd.ID, &rd.Name, &rd.Address, &rd.Lat, &rd.Lng, &rd.Rating, 
-		&rd.PriceRange, &rd.OpenTime, &rd.CloseTime, &rd.Type,  &rd.CreatedAt, &rd.Story,
+		&rd.ID, &rd.Name, &rd.Address, &rd.Lat, &rd.Lng, &rd.Rating,
+		&rd.PriceRange, &rd.OpenTime, &rd.CloseTime, &rd.Type, &rd.CreatedAt, &rd.Story,
 	)
 	if err == sql.ErrNoRows {
 		return nil, fmt.Errorf("không tìm thấy nhà hàng")
@@ -1180,7 +1175,7 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 	}
 
 	if len(dishIDs) > 0 {
-		imageMap, err := getDishImagesByMenuItemIDs(ctx, dishIDs)
+		imageMap, err := getImagesByMenuItemIDs(ctx, dishIDs)
 		if err == nil {
 			for _, item := range tempItems {
 				dishInfo := item["dish_info"].(map[string]interface{})
@@ -1188,6 +1183,14 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 
 				images := imageMap[dID]
 				var finalImg string
+
+				for _, img := range images {
+					if img.IsThumbnail {
+						finalImg = img.ImageURL
+						break
+					}
+				}
+
 				if finalImg == "" && len(images) > 0 {
 					finalImg = images[0].ImageURL
 				}
@@ -1219,7 +1222,7 @@ func UpdateAvgRating(restaurantID int) {
 // SearchRestaurantsForChatbot truy vấn quán ăn dựa trên các thực thể intent từ người dùng (Chatbot)
 func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interface{}) ([]models.Restaurant, error) {
 	query := `
-		SELECT DISTINCT r.id, r.name, r.address, r.lat, r.lng, r.rating, r.price_range, r.open_time, r.close_time, r.type
+		SELECT r.id, r.name, r.address, r.lat, r.lng, r.rating, r.price_range, r.open_time, r.close_time, r.type
 		FROM Restaurants r
 		WHERE 1=1
 	`
@@ -1235,12 +1238,6 @@ func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interf
 	if location, ok := entities["location"].(string); ok && location != "" {
 		query += ` AND r.address LIKE @loc`
 		namedArgs = append(namedArgs, sql.Named("loc", "%"+location+"%"))
-	}
-
-	// Lọc theo loại hình quán ăn (nếu có)
-	if rType, ok := entities["type"].(string); ok && rType != "" {
-		query += ` AND r.type LIKE @type`
-		namedArgs = append(namedArgs, sql.Named("type", "%"+rType+"%"))
 	}
 
 	query += ` ORDER BY r.rating DESC OFFSET 0 ROWS FETCH NEXT 5 ROWS ONLY`
@@ -1262,10 +1259,6 @@ func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interf
 		); err != nil {
 			continue
 		}
-		// Khởi tạo mảng rỗng để đảm bảo JSON output là `[]` thay vì `null`
-		r.Images = []models.RestaurantImage{}
-		r.Menu = []models.MenuItem{}
-
 		restaurants = append(restaurants, r)
 		ids = append(ids, r.ID)
 	}
@@ -1274,26 +1267,10 @@ func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interf
 		return restaurants, nil
 	}
 
-	// 1. Lấy ảnh đại diện nhà hàng
-	imageMap, err := getImagesByRestaurantIDs(ctx, ids)
-	if err != nil {
-		log.Printf("[DB] Lỗi lấy ảnh nhà hàng: %v", err)
-	}
-
-	// 2. Lấy Menu (Hàm này đã được sửa ở trên để nạp kèm DishImages)
 	menuMap, err := getMenusByRestaurantIDs(ctx, ids)
-	if err != nil {
-		log.Printf("[DB] Lỗi lấy menu: %v", err)
-	}
-
-	// 3. Mapping dữ liệu vào Struct
-	for i := range restaurants {
-		resID := restaurants[i].ID
-		if imgs, ok := imageMap[resID]; ok {
-			restaurants[i].Images = imgs
-		}
-		if menuItems, ok := menuMap[resID]; ok {
-			restaurants[i].Menu = menuItems
+	if err == nil {
+		for i := range restaurants {
+			restaurants[i].Menu = menuMap[restaurants[i].ID]
 		}
 	}
 
@@ -1477,5 +1454,3 @@ func GetChatHistoryByUserID(ctx context.Context, userID int) ([]ChatHistoryEntry
 	}
 	return history, nil
 }
-
-

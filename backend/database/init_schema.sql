@@ -225,3 +225,10 @@ GO
 CREATE INDEX IX_DishImages_MenuItemID ON DishImages(menu_item_id);
 GO
 
+CREATE TABLE RestaurantStories (
+    restaurant_id INT PRIMARY KEY,
+    story NVARCHAR(MAX) NULL, -- NULL nghĩa là được phép trống thoải mái
+    updated_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (restaurant_id) REFERENCES Restaurants(id) ON DELETE CASCADE
+);
+GO

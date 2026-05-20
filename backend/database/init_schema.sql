@@ -212,7 +212,7 @@ CREATE TABLE DishImages (
     menu_item_id INT NOT NULL,
     image_url NVARCHAR(MAX) NOT NULL,
     caption NVARCHAR(500) NULL,
-    is_thumbnail BIT NOT NULL DEFAULT 1,
+    is_thumbnail BIT NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     
     -- Liên kết khóa ngoại tới bảng MenuItems để đảm bảo toàn vẹn dữ liệu

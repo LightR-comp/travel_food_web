@@ -221,86 +221,32 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 		return make(map[int][]models.MenuItem), nil
 	}
 
-	// Sử dụng parameterized query để tránh SQL injection và cải thiện hiệu suất
-	placeholders := make([]string, len(ids))
-	args := make([]interface{}, len(ids))
+	idStrings := make([]string, len(ids))
 	for i, id := range ids {
-		paramName := fmt.Sprintf("id%d", i)
-		placeholders[i] = "@" + paramName
-		args[i] = sql.Named(paramName, id)
+		idStrings[i] = fmt.Sprintf("%d", id)
 	}
-
 	query := fmt.Sprintf(`
-		SELECT restaurant_id, id, name, description, price, food_type, ingredients, story
+		SELECT restaurant_id, id, name, description, price, food_type, ingredients 
 		FROM MenuItems 
 		WHERE restaurant_id IN (%s)
-	`, strings.Join(placeholders, ","))
+	`, strings.Join(idStrings, ","))
 
-	log.Printf("[DEBUG_DB] Executing Query: %s", query)
-	rows, err := db.QueryContext(ctx, query, args...)
+	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	result := make(map[int][]models.MenuItem)
-	totalItemsFetched := 0
 	for rows.Next() {
 		var item models.MenuItem
-		// Sử dụng sql.NullString cho các cột có thể là NULL trong DB để tránh lỗi scan
-		var description, ingredients, story sql.NullString
-
 		if err := rows.Scan(
-			&item.RestaurantID, &item.ID, &item.Name, &description,
-			&item.Price, &item.FoodType, &ingredients, &story,
+			&item.RestaurantID, &item.ID, &item.Name, &item.Description,
+			&item.Price, &item.FoodType, &item.Ingredients,
 		); err != nil {
-			log.Printf("[DB_SCAN_ERROR] Lỗi khi đọc dòng MenuItem: %v", err)
-			continue // Bỏ qua dòng lỗi và tiếp tục
+			continue
 		}
-
-		// Gán giá trị nếu nó không phải là NULL, nếu là NULL thì trường trong struct sẽ là chuỗi rỗng ""
-		if description.Valid {
-			item.Description = description.String
-		}
-		if ingredients.Valid {
-			item.Ingredients = ingredients.String
-		}
-		if story.Valid {
-			item.Story = story.String
-		}
-
 		result[item.RestaurantID] = append(result[item.RestaurantID], item)
-		totalItemsFetched++
-	}
-
-	log.Printf("[DEBUG_DB] Querying MenuItems for restaurant IDs: %v", ids)
-	log.Printf("[DEBUG_DB] getMenusByRestaurantIDs: Fetched %d total menu items for %d restaurants.", totalItemsFetched, len(ids))
-
-	// Lấy ảnh cho từng món ăn vừa tìm thấy
-	// Bước 2: Gom tất cả ID món ăn để lấy ảnh (Batch query)
-	var allItemIDs []int
-	for _, items := range result {
-		for _, itm := range items {
-			allItemIDs = append(allItemIDs, itm.ID)
-		}
-	}
-
-	if len(allItemIDs) > 0 {
-		dishImgMap, err := getDishImagesByMenuItemIDs(ctx, allItemIDs)
-		if err != nil {
-			log.Printf("[DB] Lỗi lấy ảnh món ăn: %v", err)
-			return result, nil
-		}
-
-		for resID, items := range result {
-			for j := range items {
-				if imgs, ok := dishImgMap[items[j].ID]; ok {
-					result[resID][j].Images = imgs
-				} else {
-					result[resID][j].Images = []models.DishImage{}
-				}
-			}
-		}
 	}
 
 	return result, nil
@@ -308,23 +254,14 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 
 // Image handling
 func getImagesByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.RestaurantImage, error) {
-	// Sử dụng parameterized query để tránh SQL injection
-	placeholders := make([]string, len(ids))
-	args := make([]interface{}, len(ids))
-	for i, id := range ids {
-		paramName := fmt.Sprintf("id%d", i)
-		placeholders[i] = "@" + paramName
-		args[i] = sql.Named(paramName, id)
-	}
-
 	query := fmt.Sprintf(`
 		SELECT id, restaurant_id, image_url, caption, is_thumbnail, created_at
 		FROM RestaurantImages
 		WHERE restaurant_id IN (%s)
 		ORDER BY is_thumbnail DESC
-	`, strings.Join(placeholders, ","))
+	`, intSliceToSQL(ids))
 
-	rows, err := db.QueryContext(ctx, query, args...)
+	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -334,43 +271,34 @@ func getImagesByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.
 	for rows.Next() {
 		var img models.RestaurantImage
 		var restaurantID int
-		var caption sql.NullString
 		if err := rows.Scan(
 			&img.ID, &restaurantID, &img.ImageURL,
-			&caption, &img.IsThumbnail, &img.CreatedAt,
+			&img.Caption, &img.IsThumbnail, &img.CreatedAt,
 		); err != nil {
 			continue
-		}
-		if caption.Valid {
-			img.Caption = caption.String
 		}
 		result[restaurantID] = append(result[restaurantID], img)
 	}
 	return result, nil
 }
 
-func getDishImagesByMenuItemIDs(ctx context.Context, ids []int) (map[int][]models.DishImage, error) {
+func getImagesByMenuItemIDs(ctx context.Context, ids []int) (map[int][]models.DishImage, error) {
 	if len(ids) == 0 {
 		return make(map[int][]models.DishImage), nil
 	}
 
-	// Sử dụng parameterized query để tránh SQL injection
-	placeholders := make([]string, len(ids))
-	args := make([]interface{}, len(ids))
+	idStrings := make([]string, len(ids))
 	for i, id := range ids {
-		paramName := fmt.Sprintf("id%d", i)
-		placeholders[i] = "@" + paramName
-		args[i] = sql.Named(paramName, id)
+		idStrings[i] = fmt.Sprintf("%d", id)
 	}
-
 	query := fmt.Sprintf(`
 		SELECT id, menu_item_id, image_url, caption, is_thumbnail, created_at
 		FROM DishImages
 		WHERE menu_item_id IN (%s)
 		ORDER BY is_thumbnail DESC
-	`, strings.Join(placeholders, ","))
+	`, strings.Join(idStrings, ","))
 
-	rows, err := db.QueryContext(ctx, query, args...)
+	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -379,12 +307,8 @@ func getDishImagesByMenuItemIDs(ctx context.Context, ids []int) (map[int][]model
 	result := make(map[int][]models.DishImage)
 	for rows.Next() {
 		var img models.DishImage
-		var caption sql.NullString
-		if err := rows.Scan(&img.ID, &img.MenuItemID, &img.ImageURL, &caption, &img.IsThumbnail, &img.CreatedAt); err != nil {
+		if err := rows.Scan(&img.ID, &img.MenuItemID, &img.ImageURL, &img.Caption, &img.IsThumbnail, &img.CreatedAt); err != nil {
 			continue
-		}
-		if caption.Valid {
-			img.Caption = caption.String
 		}
 		result[img.MenuItemID] = append(result[img.MenuItemID], img)
 	}
@@ -519,6 +443,17 @@ func GetForumPostsByRestaurantID(ctx context.Context, restaurantID int) ([]model
 // HELPER UTILS
 // ============================================================
 
+func intSliceToSQL(ids []int) string {
+	s := ""
+	for i, id := range ids {
+		if i > 0 {
+			s += ","
+		}
+		s += fmt.Sprintf("%d", id)
+	}
+	return s
+}
+
 func toJSONArray(arr []string) string {
 	if len(arr) == 0 {
 		return "[]"
@@ -644,76 +579,76 @@ func LocalLogin(ctx context.Context, username, password string) (*models.User, e
 
 // Tạo reset token, lưu DB, trả về token để gửi mail
 func CreatePasswordResetToken(ctx context.Context, username string) (string, string, error) {
-	// Lấy user_id VÀ email từ DB
-	var userID int
-	var email string
-	row := db.QueryRowContext(ctx, `
+    // Lấy user_id VÀ email từ DB
+    var userID int
+    var email string
+    row := db.QueryRowContext(ctx, `
         SELECT ua.user_id, u.email 
         FROM UserAuth ua
         INNER JOIN Users u ON ua.user_id = u.id
         WHERE ua.provider = 'local' AND ua.provider_id = @username
     `, sql.Named("username", username))
 
-	if err := row.Scan(&userID, &email); err == sql.ErrNoRows {
-		return "", "", fmt.Errorf("không tìm thấy tài khoản")
-	} else if err != nil {
-		return "", "", err
-	}
+    if err := row.Scan(&userID, &email); err == sql.ErrNoRows {
+        return "", "", fmt.Errorf("không tìm thấy tài khoản")
+    } else if err != nil {
+        return "", "", err
+    }
 
-	// Tạo token như cũ
-	b := make([]byte, 32)
-	rand.Read(b)
-	token := hex.EncodeToString(b)
-	exp := time.Now().Add(15 * time.Minute)
+    // Tạo token như cũ
+    b := make([]byte, 32)
+    rand.Read(b)
+    token := hex.EncodeToString(b)
+    exp := time.Now().Add(15 * time.Minute)
 
-	db.ExecContext(ctx, `
+    db.ExecContext(ctx, `
         UPDATE UserAuth SET reset_token = @token, reset_token_exp = @exp
         WHERE provider = 'local' AND provider_id = @username
     `,
-		sql.Named("token", token),
-		sql.Named("exp", exp),
-		sql.Named("username", username),
-	)
+        sql.Named("token", token),
+        sql.Named("exp", exp),
+        sql.Named("username", username),
+    )
 
-	return token, email, nil // trả về cả email
+    return token, email, nil // trả về cả email
 }
 
 // Đổi mật khẩu mới sau khi xác thực token
 func ResetPassword(ctx context.Context, token, newPassword string) error {
-	var userID int
-	var expTime time.Time
+    var userID int
+    var expTime time.Time
 
-	row := db.QueryRowContext(ctx, `
+    row := db.QueryRowContext(ctx, `
         SELECT user_id, reset_token_exp FROM UserAuth
         WHERE reset_token = @token AND provider = 'local'
     `, sql.Named("token", token))
 
-	if err := row.Scan(&userID, &expTime); err == sql.ErrNoRows {
-		return fmt.Errorf("token không hợp lệ hoặc đã hết hạn")
-	} else if err != nil {
-		return err
-	}
+    if err := row.Scan(&userID, &expTime); err == sql.ErrNoRows {
+        return fmt.Errorf("token không hợp lệ hoặc đã hết hạn")
+    } else if err != nil {
+        return err
+    }
 
-	if time.Now().After(expTime) {
-		return fmt.Errorf("token đã hết hạn")
-	}
+    if time.Now().After(expTime) {
+        return fmt.Errorf("token đã hết hạn")
+    }
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
-	if err != nil {
-		return fmt.Errorf("lỗi hash password")
-	}
+    hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+    if err != nil {
+        return fmt.Errorf("lỗi hash password")
+    }
 
-	_, err = db.ExecContext(ctx, `
+    _, err = db.ExecContext(ctx, `
         UPDATE UserAuth
         SET password_hash   = @hash,
             reset_token     = NULL,
             reset_token_exp = NULL
         WHERE user_id = @userID AND provider = 'local'
     `,
-		sql.Named("hash", string(hash)),
-		sql.Named("userID", userID),
-	)
-	return err
+        sql.Named("hash", string(hash)),
+        sql.Named("userID", userID),
+    )
+    return err
 }
 
 // [Nhut]
@@ -935,7 +870,6 @@ func SearchRestaurants(
 		defer menuRows.Close()
 
 		menuMap := make(map[int][]models.MenuItem)
-		var allItemIDs []int
 
 		for menuRows.Next() {
 			var mi models.MenuItem
@@ -952,21 +886,6 @@ func SearchRestaurants(
 			)
 			if err == nil {
 				menuMap[mi.RestaurantID] = append(menuMap[mi.RestaurantID], mi)
-				allItemIDs = append(allItemIDs, mi.ID)
-			}
-		}
-
-		// Load ảnh cho các món ăn trong kết quả tìm kiếm
-		if len(allItemIDs) > 0 {
-			dishImgMap, _ := getDishImagesByMenuItemIDs(ctx, allItemIDs)
-			for resID, items := range menuMap {
-				for j := range items {
-					if imgs, ok := dishImgMap[items[j].ID]; ok {
-						menuMap[resID][j].Images = imgs
-					} else {
-						menuMap[resID][j].Images = []models.DishImage{}
-					}
-				}
 			}
 		}
 
@@ -1079,7 +998,7 @@ func GetPopularRestaurants(ctx context.Context, limit int) ([]models.Restaurant,
 		// Khởi tạo mảng rỗng thay vì để null nhằm tránh lỗi phía Frontend
 		r.Menu = []models.MenuItem{}
 		r.Images = []models.RestaurantImage{}
-
+		
 		// Logic tính toán trạng thái đóng/mở cửa dựa trên thời gian thực hệ thống
 		now := time.Now().Format("15:00")
 		if r.OpenTime <= r.CloseTime {
@@ -1164,7 +1083,7 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 				"price":       price,
 				"description": dDesc,
 				"badge":       badge,
-				"image_url":   "",
+				"image_url":   "", 
 			},
 			"restaurant_info": map[string]interface{}{
 				"id":      rID,
@@ -1174,24 +1093,32 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 				"type":    rType,
 			},
 		}
-
+		
 		tempItems = append(tempItems, item)
 		dishIDs = append(dishIDs, dID)
 	}
 
 	if len(dishIDs) > 0 {
-		imageMap, err := getDishImagesByMenuItemIDs(ctx, dishIDs)
+		imageMap, err := getImagesByMenuItemIDs(ctx, dishIDs)
 		if err == nil {
 			for _, item := range tempItems {
 				dishInfo := item["dish_info"].(map[string]interface{})
 				dID := dishInfo["id"].(int)
-
+				
 				images := imageMap[dID]
 				var finalImg string
+				
+				for _, img := range images {
+					if img.IsThumbnail {
+						finalImg = img.ImageURL
+						break
+					}
+				}
+				
 				if finalImg == "" && len(images) > 0 {
 					finalImg = images[0].ImageURL
 				}
-
+				
 				dishInfo["image_url"] = finalImg
 			}
 		}
@@ -1219,7 +1146,7 @@ func UpdateAvgRating(restaurantID int) {
 // SearchRestaurantsForChatbot truy vấn quán ăn dựa trên các thực thể intent từ người dùng (Chatbot)
 func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interface{}) ([]models.Restaurant, error) {
 	query := `
-		SELECT DISTINCT r.id, r.name, r.address, r.lat, r.lng, r.rating, r.price_range, r.open_time, r.close_time, r.type
+		SELECT r.id, r.name, r.address, r.lat, r.lng, r.rating, r.price_range, r.open_time, r.close_time, r.type
 		FROM Restaurants r
 		WHERE 1=1
 	`
@@ -1235,12 +1162,6 @@ func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interf
 	if location, ok := entities["location"].(string); ok && location != "" {
 		query += ` AND r.address LIKE @loc`
 		namedArgs = append(namedArgs, sql.Named("loc", "%"+location+"%"))
-	}
-
-	// Lọc theo loại hình quán ăn (nếu có)
-	if rType, ok := entities["type"].(string); ok && rType != "" {
-		query += ` AND r.type LIKE @type`
-		namedArgs = append(namedArgs, sql.Named("type", "%"+rType+"%"))
 	}
 
 	query += ` ORDER BY r.rating DESC OFFSET 0 ROWS FETCH NEXT 5 ROWS ONLY`
@@ -1262,10 +1183,6 @@ func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interf
 		); err != nil {
 			continue
 		}
-		// Khởi tạo mảng rỗng để đảm bảo JSON output là `[]` thay vì `null`
-		r.Images = []models.RestaurantImage{}
-		r.Menu = []models.MenuItem{}
-
 		restaurants = append(restaurants, r)
 		ids = append(ids, r.ID)
 	}
@@ -1274,26 +1191,10 @@ func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interf
 		return restaurants, nil
 	}
 
-	// 1. Lấy ảnh đại diện nhà hàng
-	imageMap, err := getImagesByRestaurantIDs(ctx, ids)
-	if err != nil {
-		log.Printf("[DB] Lỗi lấy ảnh nhà hàng: %v", err)
-	}
-
-	// 2. Lấy Menu (Hàm này đã được sửa ở trên để nạp kèm DishImages)
 	menuMap, err := getMenusByRestaurantIDs(ctx, ids)
-	if err != nil {
-		log.Printf("[DB] Lỗi lấy menu: %v", err)
-	}
-
-	// 3. Mapping dữ liệu vào Struct
-	for i := range restaurants {
-		resID := restaurants[i].ID
-		if imgs, ok := imageMap[resID]; ok {
-			restaurants[i].Images = imgs
-		}
-		if menuItems, ok := menuMap[resID]; ok {
-			restaurants[i].Menu = menuItems
+	if err == nil {
+		for i := range restaurants {
+			restaurants[i].Menu = menuMap[restaurants[i].ID]
 		}
 	}
 

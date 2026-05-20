@@ -34,7 +34,6 @@ func GetPopularPosts(ctx context.Context) ([]models.Post, error) {
 func GetListPosts(ctx context.Context, page, limit int) ([]models.Post, int, error) {
 	offset := (page - 1) * limit
 
-	// Đếm tổng
 	var total int
 	db.QueryRowContext(ctx, `SELECT COUNT(*) FROM Posts`).Scan(&total)
 
@@ -61,7 +60,6 @@ func GetListPosts(ctx context.Context, page, limit int) ([]models.Post, int, err
 }
 
 func GetPostDetail(ctx context.Context, postID int) (*models.Post, error) {
-	// Tăng view_count
 	db.ExecContext(ctx, `UPDATE Posts SET view_count = view_count + 1 WHERE id = @id`,
 		sql.Named("id", postID))
 
@@ -76,8 +74,7 @@ func GetPostDetail(ctx context.Context, postID int) (*models.Post, error) {
 	`, sql.Named("id", postID))
 
 	var p models.Post
-	var authorName string
-	var contentStr string
+	var authorName, contentStr string
 	err := row.Scan(
 		&p.ID, &p.AuthorID, &authorName, &p.Prefix, &p.Title, &contentStr,
 		&p.Summary, &p.ThumbnailURL, &p.Type, &p.ViewCount, &p.ReplyCount,
@@ -90,12 +87,10 @@ func GetPostDetail(ctx context.Context, postID int) (*models.Post, error) {
 		return nil, fmt.Errorf("GetPostDetail: %w", err)
 	}
 	p.Content = json.RawMessage(contentStr)
+	p.AuthorName = authorName
 
-	// Lấy comments
-	p.Comments, err = GetCommentsByPost(ctx, int(p.ID))
-	if err != nil {
-		p.Comments = []models.Comment{}
-	}
+	p.Comments, _ = GetCommentsByPost(ctx, int(p.ID))
+	p.Images, _ = GetPostImages(ctx, int(p.ID))
 
 	return &p, nil
 }
@@ -118,10 +113,55 @@ func CreatePost(ctx context.Context, userID int, post models.Post) (*models.Post
 	)
 
 	if err := row.Scan(&post.ID, &post.CreatedAt, &post.UpdatedAt); err != nil {
-		return nil, fmt.Errorf("CreatePost: %w", err)
+    fmt.Printf("[CreatePost] lỗi: %v\n", err)
+    return nil, fmt.Errorf("CreatePost: %w", err)
 	}
 	post.AuthorID = uint64(userID)
 	return &post, nil
+}
+
+// ============================================================
+// POST IMAGES
+// ============================================================
+
+func AddPostImages(ctx context.Context, postID int, imageURLs []string) error {
+	for i, url := range imageURLs {
+		_, err := db.ExecContext(ctx, `
+			INSERT INTO PostImages (post_id, image_url, order_index, created_at)
+			VALUES (@postID, @url, @order, GETDATE())
+		`,
+			sql.Named("postID", postID),
+			sql.Named("url", url),
+			sql.Named("order", i),
+		)
+		if err != nil {
+			fmt.Printf("[AddPostImages] lỗi insert ảnh %d: %v\n", i, err)
+			return fmt.Errorf("AddPostImages[%d]: %w", i, err)
+		}
+		fmt.Printf("[AddPostImages] insert ảnh %d thành công: %s\n", i, url)
+	}
+	return nil
+}
+
+func GetPostImages(ctx context.Context, postID int) ([]models.PostImage, error) {
+	rows, err := db.QueryContext(ctx, `
+		SELECT id, post_id, image_url, order_index, created_at
+		FROM PostImages
+		WHERE post_id = @postID
+		ORDER BY order_index ASC
+	`, sql.Named("postID", postID))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var images []models.PostImage
+	for rows.Next() {
+		var img models.PostImage
+		rows.Scan(&img.ID, &img.PostID, &img.ImageURL, &img.OrderIndex, &img.CreatedAt)
+		images = append(images, img)
+	}
+	return images, nil
 }
 
 // ============================================================
@@ -130,7 +170,7 @@ func CreatePost(ctx context.Context, userID int, post models.Post) (*models.Post
 
 func GetCommentsByPost(ctx context.Context, postID int) ([]models.Comment, error) {
 	rows, err := db.QueryContext(ctx, `
-		SELECT c.id, c.post_id, c.author_id, u.name, c.content, c.like_count, c.created_at
+		SELECT c.id, c.post_id, c.author_id, u.name, c.content, c.image_url, c.like_count, c.created_at
 		FROM Comments c
 		INNER JOIN Users u ON c.author_id = u.id
 		WHERE c.post_id = @postID
@@ -145,34 +185,49 @@ func GetCommentsByPost(ctx context.Context, postID int) ([]models.Comment, error
 	for rows.Next() {
 		var cm models.Comment
 		var authorName string
-		rows.Scan(&cm.ID, &cm.PostID, &cm.AuthorID, &authorName, &cm.Content, &cm.LikeCount, &cm.CreatedAt)
+		var imageURL sql.NullString
+		rows.Scan(&cm.ID, &cm.PostID, &cm.AuthorID, &authorName, &cm.Content, &imageURL, &cm.LikeCount, &cm.CreatedAt)
+		if imageURL.Valid {
+			cm.ImageURL = imageURL.String
+		}
 		comments = append(comments, cm)
 	}
 	return comments, nil
 }
 
-func AddComment(ctx context.Context, userID, postID int, content string) (*models.Comment, error) {
+func AddComment(ctx context.Context, userID, postID int, content, imageURL string) (*models.Comment, error) {
 	var cm models.Comment
+
+	// imageURL có thể rỗng (comment chữ thường)
+	var imgParam interface{}
+	if imageURL != "" {
+		imgParam = imageURL
+	} else {
+		imgParam = nil
+	}
+
 	row := db.QueryRowContext(ctx, `
-		INSERT INTO Comments (post_id, author_id, content, created_at)
+		INSERT INTO Comments (post_id, author_id, content, image_url, created_at)
 		OUTPUT INSERTED.id, INSERTED.created_at
-		VALUES (@postID, @authorID, @content, GETDATE())
+		VALUES (@postID, @authorID, @content, @imageURL, GETDATE())
 	`,
 		sql.Named("postID", postID),
 		sql.Named("authorID", userID),
 		sql.Named("content", content),
+		sql.Named("imageURL", imgParam),
 	)
 	if err := row.Scan(&cm.ID, &cm.CreatedAt); err != nil {
-		return nil, fmt.Errorf("AddComment: %w", err)
+    fmt.Printf("[AddComment] lỗi: %v\n", err)
+    return nil, fmt.Errorf("AddComment: %w", err)
 	}
 
-	// Tăng reply_count
 	db.ExecContext(ctx, `UPDATE Posts SET reply_count = reply_count + 1 WHERE id = @id`,
 		sql.Named("id", postID))
 
 	cm.PostID = uint64(postID)
 	cm.AuthorID = uint64(userID)
 	cm.Content = content
+	cm.ImageURL = imageURL
 	return &cm, nil
 }
 
@@ -191,11 +246,7 @@ func LikePost(ctx context.Context, userID, postID int) (bool, error) {
 
 	if count > 0 {
 		db.ExecContext(ctx, `DELETE FROM PostLikes WHERE post_id = @postID AND user_id = @userID`,
-			sql.Named("postID", postID),
-			sql.Named("userID", userID),
-		)
-		db.ExecContext(ctx, `UPDATE Posts SET likes_count = likes_count - 1 WHERE id = @id`,
-			sql.Named("id", postID))
+			sql.Named("postID", postID), sql.Named("userID", userID))
 		return false, nil
 	}
 
@@ -209,8 +260,39 @@ func LikePost(ctx context.Context, userID, postID int) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("LikePost: %w", err)
 	}
-	db.ExecContext(ctx, `UPDATE Posts SET likes_count = likes_count + 1 WHERE id = @id`,
-		sql.Named("id", postID))
+	return true, nil
+}
+
+func LikeComment(ctx context.Context, userID, commentID int) (bool, error) {
+	var count int
+	db.QueryRowContext(ctx, `
+		SELECT COUNT(*) FROM CommentLikes WHERE comment_id = @commentID AND user_id = @userID
+	`,
+		sql.Named("commentID", commentID),
+		sql.Named("userID", userID),
+	).Scan(&count)
+
+	if count > 0 {
+		db.ExecContext(ctx, `DELETE FROM CommentLikes WHERE comment_id = @commentID AND user_id = @userID`,
+			sql.Named("commentID", commentID), sql.Named("userID", userID))
+		db.ExecContext(ctx, `UPDATE Comments SET like_count = like_count - 1 WHERE id = @id`,
+			sql.Named("id", commentID))
+		return false, nil
+	}
+
+	_, err := db.ExecContext(ctx, `
+		INSERT INTO CommentLikes (comment_id, user_id, created_at)
+		VALUES (@commentID, @userID, GETDATE())
+	`,
+		sql.Named("commentID", commentID),
+		sql.Named("userID", userID),
+	)
+	if err != nil {
+		fmt.Printf("[LikeComment] lỗi insert: %v\n", err)
+		return false, fmt.Errorf("LikeComment: %w", err)
+	}
+	db.ExecContext(ctx, `UPDATE Comments SET like_count = like_count + 1 WHERE id = @id`,
+		sql.Named("id", commentID))
 	return true, nil
 }
 
@@ -222,8 +304,7 @@ func scanPosts(rows *sql.Rows) ([]models.Post, error) {
 	var posts []models.Post
 	for rows.Next() {
 		var p models.Post
-		var authorName string
-		var contentStr string
+		var authorName, contentStr string
 		if err := rows.Scan(
 			&p.ID, &p.AuthorID, &authorName, &p.Prefix, &p.Title, &contentStr,
 			&p.Summary, &p.ThumbnailURL, &p.Type, &p.ViewCount, &p.ReplyCount,
@@ -232,6 +313,7 @@ func scanPosts(rows *sql.Rows) ([]models.Post, error) {
 			continue
 		}
 		p.Content = json.RawMessage(contentStr)
+		p.AuthorName = authorName
 		posts = append(posts, p)
 	}
 	return posts, nil

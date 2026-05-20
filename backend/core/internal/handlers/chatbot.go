@@ -6,7 +6,10 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/base64"
 	"fmt" // Thêm import fmt để sử dụng fmt.Sprintf
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -21,6 +24,18 @@ import (
 // ChatbotProcess is the main handler for the /chat endpoint.
 // It orchestrates the entire chatbot workflow as defined in the API contract.
 func ChatbotProcess(c *gin.Context) {
+	// RẼ NHÁNH LOGIC: Kiểm tra nếu request có chứa file ảnh (multipart form)
+	contentType := c.ContentType()
+	if strings.Contains(contentType, "multipart/form-data") {
+		handleImageIdentification(c)
+		return
+	}
+
+	// LOGIC CHAT VĂN BẢN (Giữ nguyên logic cũ bên dưới)
+	processTextChat(c)
+}
+
+func processTextChat(c *gin.Context) {
 	// Lấy data từ Request
 	var req dto.ChatbotMessageRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -84,7 +99,8 @@ func ChatbotProcess(c *gin.Context) {
 	}
 
 	// GIAI ĐOẠN 2: Xử lý nội bộ tại Go (DATABASE FETCH)
-	foundRestaurants := services.FetchRestaurantsFromEntities(c.Request.Context(), intentRes.Data.Entities)
+	// Truyền userID vào để hệ thống có thể cá nhân hóa kết quả dựa trên lịch sử tương tác
+	foundRestaurants := services.FetchRestaurantsFromEntities(c.Request.Context(), intentRes.Data.Entities, userID)
 	if foundRestaurants == nil {
 		foundRestaurants = []map[string]interface{}{} // Ép kiểu luôn là mảng rỗng, ngăn chặn giá trị null
 	}
@@ -98,26 +114,29 @@ func ChatbotProcess(c *gin.Context) {
 			"budget":  nil, // Dùng nil để AI biết là không có budget cụ thể
 		},
 	}
+
 	// Nếu có userID, thử lấy preferences từ DB
 	if userID > 0 {
 		if prefs, err := services.GetUserPreferences(c.Request.Context(), userID); err == nil && prefs != nil {
-			// Xử lý trường dietary: DB có thể lưu dưới dạng chuỗi "vegan,vegetarian"
-			// Cần chuyển đổi thành mảng ["vegan", "vegetarian"] để khớp với Pydantic model của Python
-			var dietaryPreferences []string
+			preferencesMap := userContext["preferences"].(map[string]interface{})
+
 			if prefs.Dietary != "" {
 				items := strings.Split(prefs.Dietary, ",")
+				var dietaryPreferences []string
 				for _, item := range items {
 					trimmedItem := strings.TrimSpace(item)
 					if trimmedItem != "" {
 						dietaryPreferences = append(dietaryPreferences, trimmedItem)
 					}
 				}
+				preferencesMap["dietary"] = dietaryPreferences
 			}
 
-			// Ghi đè preferences mặc định bằng dữ liệu từ DB
-			userContext["preferences"] = map[string]interface{}{
-				"dietary": dietaryPreferences,         // Sử dụng slice đã được xử lý
-				"budget":  int(prefs.BudgetPerPerson), // Ép kiểu float64 sang int để khớp với Pydantic
+			// Ghi đè budget
+			if prefs.BudgetPerPerson > 0 {
+				preferencesMap["budget"] = int(prefs.BudgetPerPerson)
+			} else {
+				preferencesMap["budget"] = nil
 			}
 		}
 	}
@@ -162,28 +181,164 @@ func ChatbotProcess(c *gin.Context) {
 		return
 	}
 
-	// GIAI ĐOẠN 4.5: Lưu lịch sử chat vào Database (chỉ lưu nếu có userID)
+	// GIAI ĐOẠN 4.5: Lưu lịch sử chat và các gợi ý vào Database (chỉ lưu nếu có userID)
 	if userID > 0 {
 		botReply := genRes.Data.Reply
 
-		errDB := services.SaveChatHistory(c.Request.Context(), userID, req.Message, botReply)
+		// Bước 1: Lưu tin nhắn chat chính và lấy ID của nó để liên kết
+		chatHistoryID, errDB := services.SaveChatHistory(c.Request.Context(), userID, req.Message, botReply)
 		if errDB != nil {
+			// Nếu lưu chat chính bị lỗi, vẫn trả về kết quả cho FE nhưng log lỗi và báo lỗi server
+			log.Printf("[Chatbot] Lỗi nghiêm trọng: không thể lưu tin nhắn chat chính: %v", errDB)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"success": false,
 				"message": "AI đã trả lời nhưng lỗi lưu Database (Xem chi tiết ở error)",
-				"data":    nil,
+				"data":    genRes.Data, // Vẫn trả về data cho FE dù DB lỗi
 				"error":   errDB.Error(),
 			})
 			return
 		}
+
+		// Bước 2: Chuẩn bị và lưu các gợi ý chi tiết vào bảng phụ ChatSuggestionLog
+		if genRes.Data.SuggestedPlaces != nil && len(genRes.Data.SuggestedPlaces) > 0 {
+			var suggestionsToLog []services.ChatSuggestionLogEntry
+			for _, placeMap := range genRes.Data.SuggestedPlaces {
+				// Trích xuất dữ liệu từ map (AI trả về JSON số dưới dạng float64)
+				var restaurantID int
+				var restaurantName string
+				var score float64
+
+				if restaurantData, ok := placeMap["restaurant"].(map[string]interface{}); ok {
+					if id, ok := restaurantData["id"].(float64); ok {
+						restaurantID = int(id)
+					}
+					if name, ok := restaurantData["res_name"].(string); ok {
+						restaurantName = name
+					}
+				}
+				if s, ok := placeMap["score"].(float64); ok {
+					score = s
+				}
+
+				suggestionsToLog = append(suggestionsToLog, services.ChatSuggestionLogEntry{
+					RestaurantID:   restaurantID,
+					RestaurantName: restaurantName,
+					Score:          score,
+				})
+			}
+
+			errLog := services.SaveChatSuggestions(c.Request.Context(), chatHistoryID, suggestionsToLog)
+			if errLog != nil {
+				// Lỗi lưu bảng phụ không quá nghiêm trọng, chỉ cần log lại để debug, không cần báo lỗi cho user
+				log.Printf("[Chatbot] Lỗi lưu chi tiết gợi ý (ChatHistoryID: %d): %v", chatHistoryID, errLog)
+			}
+		}
 	}
 
-	// GIAI ĐOẠN 4 & FINAL OUTPUT: Python -> Go -> Frontend
+	// GIAI ĐOẠN 5: Chuẩn bị dữ liệu trả về cho Frontend (loại bỏ score)
+	// Mục đích là chỉ lưu 'score' vào DB để phân tích, không cần hiển thị cho người dùng.
+	var placesForFrontend []map[string]interface{}
+	if genRes.Data.SuggestedPlaces != nil {
+		for _, place := range genRes.Data.SuggestedPlaces {
+			// Tạo bản sao để xóa trường score trước khi trả về FE
+			placeMap := make(map[string]interface{})
+			for k, v := range place {
+				if k == "score" {
+					continue
+				}
+				placeMap[k] = v
+			}
+
+			placesForFrontend = append(placesForFrontend, placeMap)
+		}
+	}
+
+	// Đóng gói dữ liệu cuối cùng cho frontend
+	frontendData := gin.H{
+		"reply":            genRes.Data.Reply,
+		"suggested_places": placesForFrontend, // Sử dụng danh sách đã được xử lý
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Thành công",
-		"data":    genRes.Data,
+		"data":    frontendData,
 		"error":   nil,
+	})
+}
+
+// handleImageIdentification xử lý logic nhận diện món ăn khi endpoint /chat nhận được file
+func handleImageIdentification(c *gin.Context) {
+	file, err := c.FormFile("image") // Tên field này phải khớp với Key trong Postman/Frontend
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Vui lòng cung cấp hình ảnh", "error": err.Error()})
+		return
+	}
+
+	userID, _ := strconv.Atoi(c.PostForm("user_id"))
+	if userID == 0 {
+		userID = c.GetInt("user_id")
+	}
+
+	// Fallback cho testing tương tự luồng chat văn bản
+	if userID == 0 {
+		userID = 1
+	}
+
+	f, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Không thể mở file", "error": err.Error()})
+		return
+	}
+	defer f.Close()
+
+	imgBytes, err := io.ReadAll(f)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Lỗi đọc dữ liệu ảnh", "error": err.Error()})
+		return
+	}
+	imgBase64 := base64.StdEncoding.EncodeToString(imgBytes)
+
+	// 2.5 Upload ảnh lên Cloudinary để lấy link lưu vào Database
+	imageURL, errUpload := services.UploadToCloudinary(c.Request.Context(), bytes.NewReader(imgBytes), "yummap_chats")
+	if errUpload != nil {
+		log.Printf("[Identify] Lỗi upload Cloudinary: %v", errUpload)
+		// Fallback nếu upload lỗi để không làm gián đoạn tiến trình của AI
+		imageURL = "[Hình ảnh món ăn]"
+	}
+
+	aiReq := dto.AIIdentifyDishRequest{
+		UserID:   userID,
+		ImageB64: imgBase64,
+	}
+
+	aiRes, err := services.CallAIIdentifyDish(aiReq)
+	if err != nil {
+		log.Printf("[Identify] AI Error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "AI không thể nhận diện món ăn lúc này",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if userID > 0 {
+		botReply := fmt.Sprintf("Tôi nhận ra đây là món **%s**.\n\n**Nguyên liệu chính:** %s\n\n**Công thức:**\n%s",
+			aiRes.DishName,
+			strings.Join(aiRes.Ingredients, ", "),
+			aiRes.Recipe,
+		)
+		_, errDB := services.SaveChatHistory(c.Request.Context(), userID, imageURL, botReply)
+		if errDB != nil {
+			log.Printf("[Identify] Lỗi lưu lịch sử DB cho UserID %d: %v", userID, errDB)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Nhận diện thành công",
+		"data":    aiRes,
 	})
 }
 

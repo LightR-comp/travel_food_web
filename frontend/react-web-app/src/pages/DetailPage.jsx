@@ -6,6 +6,7 @@ import ReviewSection from '../components/detail/ReviewSection';
 import ReviewModal from '../components/detail/ReviewModal';
 import LoginRequireModal from '../components/detail/LoginRequireModal';
 import StarRating from '../components/ui/StarRating';
+import { useAuth } from '../context/AuthContext';
 
 import { Spinner } from '../components/ui/index.jsx';
 import { getRestaurantByIdApi } from '../api/restaurantApi';
@@ -128,8 +129,8 @@ const DetailPage = () => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showLoginRequireModal, setShowLoginRequireModal] = useState(false);
   
-  // Giả lập trạng thái đăng nhập (đổi thành logic thực tế của project sau)
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user } = useAuth();
+  const isLoggedIn = !!user;
 
   const handleReviewClick = () => {
     if (isLoggedIn) {
@@ -140,22 +141,13 @@ const DetailPage = () => {
   };
 
   const handleMockLogin = () => {
-    // Giả lập đăng nhập thành công
-    setIsLoggedIn(true);
     setShowLoginRequireModal(false);
-    // Tùy chọn mở luôn form đánh giá sau khi đăng nhập xong
-    setShowReviewModal(true);
+    navigate('/login');
   };
 
-  useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    setError(null);
-    setData(null);
-
+  const fetchRestaurantData = () => {
     getRestaurantByIdApi(id)
       .then((res) => {
-        // Backend: { success, data: RestaurantDetail, ... }
         const raw = res?.data ?? null;
         if (!raw) throw new Error('Không có dữ liệu');
         const mapped = mapApiToSections(raw);
@@ -169,6 +161,14 @@ const DetailPage = () => {
         setError(msg);
       })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    setError(null);
+    setData(null);
+    fetchRestaurantData();
   }, [id]);
 
   // ── Loading ──
@@ -555,6 +555,7 @@ const DetailPage = () => {
         isOpen={showReviewModal} 
         onClose={() => setShowReviewModal(false)} 
         restaurantName={name}
+        onReviewSubmitted={fetchRestaurantData}
       />
 
       {/* ── Login Require Modal ── */}

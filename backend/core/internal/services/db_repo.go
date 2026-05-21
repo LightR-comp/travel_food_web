@@ -496,10 +496,11 @@ func getImagesByUserRatingIDs(ctx context.Context, ratingIDs []int) (map[int][]m
 
 func GetReviewsByRestaurant(ctx context.Context, restaurantID int) ([]models.UserRating, error) {
 	rows, err := db.QueryContext(ctx, `
-		SELECT id, user_id, restaurant_id, rating, comment, created_at
-		FROM UserRatings
-		WHERE restaurant_id = @rid
-		ORDER BY created_at DESC
+		SELECT ur.id, ur.user_id, ISNULL(u.name, N'Ẩn danh'), ISNULL(u.avatar_url, ''), ur.restaurant_id, ur.rating, ur.comment, ur.created_at
+		FROM UserRatings ur
+		LEFT JOIN Users u ON ur.user_id = u.id
+		WHERE ur.restaurant_id = @rid
+		ORDER BY ur.created_at DESC
 	`, sql.Named("rid", restaurantID))
 	if err != nil {
 		return nil, err
@@ -511,7 +512,7 @@ func GetReviewsByRestaurant(ctx context.Context, restaurantID int) ([]models.Use
 
 	for rows.Next() {
 		var rv models.UserRating
-		if err := rows.Scan(&rv.ID, &rv.UserID, &rv.RestaurantID, &rv.Rating, &rv.Comment, &rv.CreatedAt); err != nil {
+		if err := rows.Scan(&rv.ID, &rv.UserID, &rv.UserName, &rv.UserAvatar, &rv.RestaurantID, &rv.Rating, &rv.Comment, &rv.CreatedAt); err != nil {
 			continue
 		}
 		rv.Images = []models.UserRatingImage{} // khởi tạo mảng rỗng mặc định

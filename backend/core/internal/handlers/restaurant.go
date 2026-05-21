@@ -185,7 +185,7 @@ type ImageInput struct {
 
 type ReviewInput struct {
 	Rating  float64      `json:"rating" binding:"required,min=1,max=5"`
-	Comment string       `json:"comment" binding:"required"`
+	Comment string       `json:"comment"`
 	Images  []ImageInput `json:"images"` 
 }
 
@@ -197,7 +197,7 @@ func CreateComment(c *gin.Context) {
 		return
 	}
 
-	userIDVal, exists := c.Get("userID")
+	userIDVal, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Chưa đăng nhập"})
 		return
@@ -275,7 +275,7 @@ func UpdateComment(c *gin.Context) {
 		return
 	}
 
-	userIDVal, exists := c.Get("userID")
+	userIDVal, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Chưa đăng nhập"})
 		return
@@ -327,7 +327,7 @@ func DeleteComment(c *gin.Context) {
 		return
 	}
 
-	userIDVal, exists := c.Get("userID")
+	userIDVal, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Chưa đăng nhập"})
 		return

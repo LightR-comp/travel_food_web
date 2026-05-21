@@ -17,7 +17,7 @@ func GetPopularPosts(ctx context.Context) ([]models.Post, error) {
 	rows, err := db.QueryContext(ctx, `
 		SELECT TOP 10
 			p.id, p.author_id, u.name, p.prefix, p.title, p.content,
-			p.summary, p.thumbnail_url, p.type, p.view_count, p.reply_count,
+			p.summary, p.thumbnail_url, p.type, p.view_count, p.like_count, p.reply_count,
 			p.is_locked, p.created_at, p.updated_at
 		FROM Posts p
 		INNER JOIN Users u ON p.author_id = u.id
@@ -40,7 +40,7 @@ func GetListPosts(ctx context.Context, page, limit int) ([]models.Post, int, err
 	rows, err := db.QueryContext(ctx, `
 		SELECT
 			p.id, p.author_id, u.name, p.prefix, p.title, p.content,
-			p.summary, p.thumbnail_url, p.type, p.view_count, p.reply_count,
+			p.summary, p.thumbnail_url, p.type, p.view_count, p.like_count, p.reply_count,
 			p.is_locked, p.created_at, p.updated_at
 		FROM Posts p
 		INNER JOIN Users u ON p.author_id = u.id
@@ -305,20 +305,20 @@ func LikeComment(ctx context.Context, userID, commentID int) (bool, error) {
 // ============================================================
 
 func scanPosts(rows *sql.Rows) ([]models.Post, error) {
-	var posts []models.Post
-	for rows.Next() {
-		var p models.Post
-		var authorName, contentStr string
-		if err := rows.Scan(
-			&p.ID, &p.AuthorID, &authorName, &p.Prefix, &p.Title, &contentStr,
-			&p.Summary, &p.ThumbnailURL, &p.Type, &p.ViewCount, &p.ReplyCount,
-			&p.IsLocked, &p.CreatedAt, &p.UpdatedAt,
-		); err != nil {
-			continue
-		}
-		p.Content = json.RawMessage(contentStr)
-		p.AuthorName = authorName
-		posts = append(posts, p)
-	}
-	return posts, nil
+    var posts []models.Post
+    for rows.Next() {
+        var p models.Post
+        var authorName, contentStr string
+        if err := rows.Scan(
+            &p.ID, &p.AuthorID, &authorName, &p.Prefix, &p.Title, &contentStr,
+            &p.Summary, &p.ThumbnailURL, &p.Type, &p.ViewCount, &p.LikeCount, &p.ReplyCount,
+            &p.IsLocked, &p.CreatedAt, &p.UpdatedAt,
+        ); err != nil {
+            continue
+        }
+        p.Content = json.RawMessage(contentStr)
+        p.AuthorName = authorName
+        posts = append(posts, p)
+    }
+    return posts, nil
 }

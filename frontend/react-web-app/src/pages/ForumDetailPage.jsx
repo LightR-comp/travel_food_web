@@ -317,6 +317,25 @@ const ForumDetailPage = () => {
                   })}
                 </div>
 
+                {/* Attached Images */}
+                {post.images && post.images.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                    {post.images.map((img) => (
+                      <div 
+                        key={img.id || img.image_url} 
+                        className="rounded-xl overflow-hidden border border-[#F5EDD8] shadow-sm bg-white aspect-video relative group cursor-pointer"
+                        onClick={() => window.open(img.image_url, '_blank')}
+                      >
+                        <img
+                          src={img.image_url}
+                          alt="Attached content"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {/* Action bar bài viết */}
                 <div className="flex items-center gap-4 mt-8 pt-5 border-t border-[#F5EDD8]">
                   <button

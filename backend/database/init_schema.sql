@@ -232,3 +232,4 @@ CREATE TABLE RestaurantStories (
     FOREIGN KEY (restaurant_id) REFERENCES Restaurants(id) ON DELETE CASCADE
 );
 GO
+ALTER TABLE Posts ADD like_count INT NOT NULL DEFAULT 0;

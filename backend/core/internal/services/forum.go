@@ -17,7 +17,7 @@ func GetPopularPosts(ctx context.Context) ([]models.Post, error) {
 	rows, err := db.QueryContext(ctx, `
 		SELECT TOP 10
 			p.id, p.author_id, u.name, p.prefix, p.title, p.content,
-			p.summary, p.thumbnail_url, p.type, p.view_count, p.reply_count,
+			p.summary, p.thumbnail_url, p.type, p.view_count, p.like_count, p.reply_count,
 			p.is_locked, p.created_at, p.updated_at
 		FROM Posts p
 		INNER JOIN Users u ON p.author_id = u.id
@@ -40,7 +40,7 @@ func GetListPosts(ctx context.Context, page, limit int) ([]models.Post, int, err
 	rows, err := db.QueryContext(ctx, `
 		SELECT
 			p.id, p.author_id, u.name, p.prefix, p.title, p.content,
-			p.summary, p.thumbnail_url, p.type, p.view_count, p.reply_count,
+			p.summary, p.thumbnail_url, p.type, p.view_count, p.like_count, p.reply_count,
 			p.is_locked, p.created_at, p.updated_at
 		FROM Posts p
 		INNER JOIN Users u ON p.author_id = u.id
@@ -60,26 +60,26 @@ func GetListPosts(ctx context.Context, page, limit int) ([]models.Post, int, err
 }
 
 func GetPostDetail(ctx context.Context, postID int) (*models.Post, error) {
-	db.ExecContext(ctx, `UPDATE Posts SET view_count = view_count + 1 WHERE id = @id`,
-		sql.Named("id", postID))
+    db.ExecContext(ctx, `UPDATE Posts SET view_count = view_count + 1 WHERE id = @id`,
+        sql.Named("id", postID))
 
-	row := db.QueryRowContext(ctx, `
-		SELECT
-			p.id, p.author_id, u.name, p.prefix, p.title, p.content,
-			p.summary, p.thumbnail_url, p.type, p.view_count, p.reply_count,
-			p.is_locked, p.created_at, p.updated_at
-		FROM Posts p
-		INNER JOIN Users u ON p.author_id = u.id
-		WHERE p.id = @id
-	`, sql.Named("id", postID))
+    row := db.QueryRowContext(ctx, `
+        SELECT
+            p.id, p.author_id, u.name, p.prefix, p.title, p.content,
+            p.summary, p.thumbnail_url, p.type, p.view_count, p.like_count, p.reply_count,
+            p.is_locked, p.created_at, p.updated_at
+        FROM Posts p
+        INNER JOIN Users u ON p.author_id = u.id
+        WHERE p.id = @id
+    `, sql.Named("id", postID))
 
-	var p models.Post
-	var authorName, contentStr string
-	err := row.Scan(
-		&p.ID, &p.AuthorID, &authorName, &p.Prefix, &p.Title, &contentStr,
-		&p.Summary, &p.ThumbnailURL, &p.Type, &p.ViewCount, &p.ReplyCount,
-		&p.IsLocked, &p.CreatedAt, &p.UpdatedAt,
-	)
+    var p models.Post
+    var authorName, contentStr string
+    err := row.Scan(
+        &p.ID, &p.AuthorID, &authorName, &p.Prefix, &p.Title, &contentStr,
+        &p.Summary, &p.ThumbnailURL, &p.Type, &p.ViewCount, &p.LikeCount, &p.ReplyCount,
+        &p.IsLocked, &p.CreatedAt, &p.UpdatedAt,
+    )
 	if err == sql.ErrNoRows {
 		return nil, fmt.Errorf("bài viết không tồn tại")
 	}
@@ -169,8 +169,10 @@ func GetPostImages(ctx context.Context, postID int) ([]models.PostImage, error) 
 // ============================================================
 
 func GetCommentsByPost(ctx context.Context, postID int) ([]models.Comment, error) {
+	// Lấy tất cả comments của bài (cả cha lẫn reply) một lần
 	rows, err := db.QueryContext(ctx, `
-		SELECT c.id, c.post_id, c.author_id, u.name, c.content, c.image_url, c.like_count, c.created_at
+		SELECT c.id, c.post_id, c.author_id, u.name,
+		       c.parent_id, c.content, c.image_url, c.like_count, c.created_at
 		FROM Comments c
 		INNER JOIN Users u ON c.author_id = u.id
 		WHERE c.post_id = @postID
@@ -180,54 +182,108 @@ func GetCommentsByPost(ctx context.Context, postID int) ([]models.Comment, error
 		return nil, err
 	}
 	defer rows.Close()
-
-	var comments []models.Comment
+ 
+	// Map id -> comment để ghép replies
+	commentMap := make(map[uint64]*models.Comment)
+	var allComments []*models.Comment
+ 
 	for rows.Next() {
 		var cm models.Comment
 		var authorName string
 		var imageURL sql.NullString
-		rows.Scan(&cm.ID, &cm.PostID, &cm.AuthorID, &authorName, &cm.Content, &imageURL, &cm.LikeCount, &cm.CreatedAt)
+		var parentID sql.NullInt64
+ 
+		rows.Scan(
+			&cm.ID, &cm.PostID, &cm.AuthorID, &authorName,
+			&parentID, &cm.Content, &imageURL, &cm.LikeCount, &cm.CreatedAt,
+		)
+		cm.AuthorName = authorName
 		if imageURL.Valid {
 			cm.ImageURL = imageURL.String
 		}
-		comments = append(comments, cm)
+		if parentID.Valid {
+			pid := uint64(parentID.Int64)
+			cm.ParentID = &pid
+		}
+		cm.Replies = []models.Comment{} // khởi tạo rỗng, tránh null JSON
+ 
+		commentMap[cm.ID] = &cm
+		allComments = append(allComments, &cm)
 	}
-	return comments, nil
+ 
+	// Ghép replies vào comment cha
+	var rootComments []models.Comment
+	for _, cm := range allComments {
+		if cm.ParentID != nil {
+			if parent, ok := commentMap[*cm.ParentID]; ok {
+				parent.Replies = append(parent.Replies, *cm)
+			}
+			// reply không thuộc của bất kỳ cha nào (dữ liệu lỗi) thì bỏ qua
+		} else {
+			rootComments = append(rootComments, *cm)
+		}
+	}
+ 
+	return rootComments, nil
 }
 
-func AddComment(ctx context.Context, userID, postID int, content, imageURL string) (*models.Comment, error) {
+func AddComment(ctx context.Context, userID, postID int, content, imageURL string, parentID *int) (*models.Comment, error) {
 	var cm models.Comment
-
-	// imageURL có thể rỗng (comment chữ thường)
+ 
 	var imgParam interface{}
 	if imageURL != "" {
 		imgParam = imageURL
 	} else {
 		imgParam = nil
 	}
-
+ 
+	// parentID có thể nil (comment gốc) hoặc có giá trị (reply)
+	var parentParam interface{}
+	if parentID != nil {
+		// Kiểm tra parent tồn tại và thuộc đúng bài viết
+		var exists int
+		db.QueryRowContext(ctx, `
+			SELECT COUNT(*) FROM Comments WHERE id = @id AND post_id = @postID AND parent_id IS NULL
+		`, sql.Named("id", *parentID), sql.Named("postID", postID)).Scan(&exists)
+		if exists == 0 {
+			return nil, fmt.Errorf("comment cha không tồn tại hoặc không thuộc bài viết này")
+		}
+		parentParam = *parentID
+	} else {
+		parentParam = nil
+	}
+ 
 	row := db.QueryRowContext(ctx, `
-		INSERT INTO Comments (post_id, author_id, content, image_url, created_at)
+		INSERT INTO Comments (post_id, author_id, parent_id, content, image_url, created_at)
 		OUTPUT INSERTED.id, INSERTED.created_at
-		VALUES (@postID, @authorID, @content, @imageURL, GETDATE())
+		VALUES (@postID, @authorID, @parentID, @content, @imageURL, GETDATE())
 	`,
 		sql.Named("postID", postID),
 		sql.Named("authorID", userID),
+		sql.Named("parentID", parentParam),
 		sql.Named("content", content),
 		sql.Named("imageURL", imgParam),
 	)
 	if err := row.Scan(&cm.ID, &cm.CreatedAt); err != nil {
-    fmt.Printf("[AddComment] lỗi: %v\n", err)
-    return nil, fmt.Errorf("AddComment: %w", err)
+		fmt.Printf("[AddComment] lỗi: %v\n", err)
+		return nil, fmt.Errorf("AddComment: %w", err)
 	}
-
-	db.ExecContext(ctx, `UPDATE Posts SET reply_count = reply_count + 1 WHERE id = @id`,
-		sql.Named("id", postID))
-
+ 
+	// Chỉ tăng reply_count cho bài viết khi là comment gốc
+	if parentID == nil {
+		db.ExecContext(ctx, `UPDATE Posts SET reply_count = reply_count + 1 WHERE id = @id`,
+			sql.Named("id", postID))
+	}
+ 
 	cm.PostID = uint64(postID)
 	cm.AuthorID = uint64(userID)
 	cm.Content = content
 	cm.ImageURL = imageURL
+	if parentID != nil {
+		pid := uint64(*parentID)
+		cm.ParentID = &pid
+	}
+	cm.Replies = []models.Comment{}
 	return &cm, nil
 }
 
@@ -235,32 +291,36 @@ func AddComment(ctx context.Context, userID, postID int, content, imageURL strin
 // LIKE
 // ============================================================
 
-func LikePost(ctx context.Context, userID, postID int) (bool, error) {
-	var count int
-	db.QueryRowContext(ctx, `
-		SELECT COUNT(*) FROM PostLikes WHERE post_id = @postID AND user_id = @userID
-	`,
-		sql.Named("postID", postID),
-		sql.Named("userID", userID),
-	).Scan(&count)
+func LikePost(ctx context.Context, userID, postID int) (bool, int, error) {
+    var count int
+    db.QueryRowContext(ctx, `
+        SELECT COUNT(*) FROM PostLikes WHERE post_id = @postID AND user_id = @userID
+    `, sql.Named("postID", postID), sql.Named("userID", userID)).Scan(&count)
 
-	if count > 0 {
-		db.ExecContext(ctx, `DELETE FROM PostLikes WHERE post_id = @postID AND user_id = @userID`,
-			sql.Named("postID", postID), sql.Named("userID", userID))
-		return false, nil
-	}
+    if count > 0 {
+        db.ExecContext(ctx, `DELETE FROM PostLikes WHERE post_id = @postID AND user_id = @userID`,
+            sql.Named("postID", postID), sql.Named("userID", userID))
+        db.ExecContext(ctx, `UPDATE Posts SET like_count = like_count - 1 WHERE id = @id`,
+            sql.Named("id", postID))
 
-	_, err := db.ExecContext(ctx, `
-		INSERT INTO PostLikes (post_id, user_id, created_at)
-		VALUES (@postID, @userID, GETDATE())
-	`,
-		sql.Named("postID", postID),
-		sql.Named("userID", userID),
-	)
-	if err != nil {
-		return false, fmt.Errorf("LikePost: %w", err)
-	}
-	return true, nil
+        var likeCount int
+        db.QueryRowContext(ctx, `SELECT like_count FROM Posts WHERE id = @id`,
+            sql.Named("id", postID)).Scan(&likeCount)
+        return false, likeCount, nil
+    }
+
+    _, err := db.ExecContext(ctx, `INSERT INTO PostLikes (post_id, user_id, created_at) VALUES (@postID, @userID, GETDATE())`,
+        sql.Named("postID", postID), sql.Named("userID", userID))
+    if err != nil {
+        return false, 0, fmt.Errorf("LikePost: %w", err)
+    }
+    db.ExecContext(ctx, `UPDATE Posts SET like_count = like_count + 1 WHERE id = @id`,
+        sql.Named("id", postID))
+
+    var likeCount int
+    db.QueryRowContext(ctx, `SELECT like_count FROM Posts WHERE id = @id`,
+        sql.Named("id", postID)).Scan(&likeCount)
+    return true, likeCount, nil
 }
 
 func LikeComment(ctx context.Context, userID, commentID int) (bool, error) {
@@ -301,20 +361,20 @@ func LikeComment(ctx context.Context, userID, commentID int) (bool, error) {
 // ============================================================
 
 func scanPosts(rows *sql.Rows) ([]models.Post, error) {
-	var posts []models.Post
-	for rows.Next() {
-		var p models.Post
-		var authorName, contentStr string
-		if err := rows.Scan(
-			&p.ID, &p.AuthorID, &authorName, &p.Prefix, &p.Title, &contentStr,
-			&p.Summary, &p.ThumbnailURL, &p.Type, &p.ViewCount, &p.ReplyCount,
-			&p.IsLocked, &p.CreatedAt, &p.UpdatedAt,
-		); err != nil {
-			continue
-		}
-		p.Content = json.RawMessage(contentStr)
-		p.AuthorName = authorName
-		posts = append(posts, p)
-	}
-	return posts, nil
+    var posts []models.Post
+    for rows.Next() {
+        var p models.Post
+        var authorName, contentStr string
+        if err := rows.Scan(
+            &p.ID, &p.AuthorID, &authorName, &p.Prefix, &p.Title, &contentStr,
+            &p.Summary, &p.ThumbnailURL, &p.Type, &p.ViewCount, &p.LikeCount, &p.ReplyCount,
+            &p.IsLocked, &p.CreatedAt, &p.UpdatedAt,
+        ); err != nil {
+            continue
+        }
+        p.Content = json.RawMessage(contentStr)
+        p.AuthorName = authorName
+        posts = append(posts, p)
+    }
+    return posts, nil
 }

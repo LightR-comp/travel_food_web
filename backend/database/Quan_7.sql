@@ -51,7 +51,7 @@ DECLARE @IdPaveGlace INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Pave
 DECLARE @IdLabubu149 INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7');
 DECLARE @IdLuXaBu INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7');
 DECLARE @IdTacosXinChao INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7');
-DECLARE @IdPateHaiPhong INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1');
+DECLARE @IdPateHaiPhong INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1');
 DECLARE @IdADuyFood INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7');
 DECLARE @IdOlaTacos INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'Ola Tacos Quận 7');
 DECLARE @IdLaSiMi INT = (SELECT TOP 1 id FROM Restaurants WHERE name = N'LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17');
@@ -219,139 +219,116 @@ SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7r98o-lr0em4v6yk
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7r98o-lr0b50c6si3d04' FROM MenuItems WHERE restaurant_id = @IdMiCaySasin AND name = N'Mì trộn tương đen mandu' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7r98o-lqzc68n0tvh505' FROM MenuItems WHERE restaurant_id = @IdMiCaySasin AND name = N'Mì kim chi Bò Mỹ' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7r98o-lqzc79xe9h211e' FROM MenuItems WHERE restaurant_id = @IdMiCaySasin AND name = N'Mì kim chi hải sản' UNION ALL
-
 -- Phan Rang Quán
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m3u57vgtf92te5' FROM MenuItems WHERE restaurant_id = @IdPhanRangQuan AND name = N'Nem cuốn đặc biệt' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m3u58y36wlv993' FROM MenuItems WHERE restaurant_id = @IdPhanRangQuan AND name = N'Nem cuốn thường' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7r98o-lr3xqar95i8p68' FROM MenuItems WHERE restaurant_id = @IdPhanRangQuan AND name = N'Bún nem nướng' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7r98o-lr3vhwd2qx7dd9' FROM MenuItems WHERE restaurant_id = @IdPhanRangQuan AND name = N'Nem phần tự cuốn' UNION ALL
-
 -- Ốc Trứng Muối
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-megx5u0yzt3a81' FROM MenuItems WHERE restaurant_id = @IdOcTrungMuoi AND name = N'Ốc hương sốt trứng muối' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-megx5u0yzt3a81' FROM MenuItems WHERE restaurant_id = @IdOcTrungMuoi AND name = N'Ốc hương cháy tỏi tóp mỡ' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-megx5u0yzt3a81' FROM MenuItems WHERE restaurant_id = @IdOcTrungMuoi AND name = N'Ốc hương hấp sả' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-megx5u0yzt3a81' FROM MenuItems WHERE restaurant_id = @IdOcTrungMuoi AND name = N'Ốc hương sốt bơ tỏi bắp mỹ' UNION ALL
-
 -- Link Ốc
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m10vfk0q54tbc8' FROM MenuItems WHERE restaurant_id = @IdLinkOc AND name = N'Tôm Mắm Nhĩ' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m10vgt642l2322' FROM MenuItems WHERE restaurant_id = @IdLinkOc AND name = N'Sứa mắm nhĩ' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m10x0qkfph270a' FROM MenuItems WHERE restaurant_id = @IdLinkOc AND name = N'Tôm phô mai đút lò' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mnrcyeynvh8o94' FROM MenuItems WHERE restaurant_id = @IdLinkOc AND name = N'Khô mực khoai môn chiên mắm' UNION ALL
-
 -- Bún Riêu
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ra0g-m8wrwymwt17y6a' FROM MenuItems WHERE restaurant_id = @IdBunRieu AND name = N'Bún riêu bát đặc biệt' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ra0g-m8ws07s2k772d9' FROM MenuItems WHERE restaurant_id = @IdBunRieu AND name = N'Bún riêu bát đầy đủ' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ra0g-m8ws228d9yem02' FROM MenuItems WHERE restaurant_id = @IdBunRieu AND name = N'Bún riêu bát tùy chọn ít topping' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mbnaw15ovt6v1b' FROM MenuItems WHERE restaurant_id = @IdBunRieu AND name = N'Bún riêu bát nhỏ' UNION ALL
-
 -- Lẩu Cá Đuối
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-meeitws1iio36f' FROM MenuItems WHERE restaurant_id = @IdLauCaDuoi AND name = N'Gỏi Cá Trích' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-memeansoe4uad5' FROM MenuItems WHERE restaurant_id = @IdLauCaDuoi AND name = N'Chả giò cá trích(Không rau)' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-memec3aobocg70' FROM MenuItems WHERE restaurant_id = @IdLauCaDuoi AND name = N'Chả giò cá trích(Có rau)' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-meei0452oa9z63' FROM MenuItems WHERE restaurant_id = @IdLauCaDuoi AND name = N'Lẩu Cá Đuối(Vừa)' UNION ALL
-
 -- MayCha
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-mjnig2xoynlv0d' FROM MenuItems WHERE restaurant_id = @IdMayCha AND name = N'Trà Bí Đao XL' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mnp1nimwyzgl4c' FROM MenuItems WHERE restaurant_id = @IdMayCha AND name = N'COMBO 4 LY' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mnp1nimwkzcwc6' FROM MenuItems WHERE restaurant_id = @IdMayCha AND name = N'COMBO 5 LY' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mo0em9idjzlu38' FROM MenuItems WHERE restaurant_id = @IdMayCha AND name = N'Trà Quýt Ép Tươi' UNION ALL
-
 -- Mì Ý Dì Hiền
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-mj3g0kd5a802a4' FROM MenuItems WHERE restaurant_id = @IdMiYDiHien AND name = N'(Món Mới) Mì Ý Thịt Bằm Gà Viên' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mcjzbo3t6hpe0d' FROM MenuItems WHERE restaurant_id = @IdMiYDiHien AND name = N'Mì Ý Bò Bằm' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mcjzbo3tc3z6b4' FROM MenuItems WHERE restaurant_id = @IdMiYDiHien AND name = N'Mì Ý Bò Bằm Thập Cẩm' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mcvgagdiji2n9b' FROM MenuItems WHERE restaurant_id = @IdMiYDiHien AND name = N'Mì Ý Bò Bằm Trứng Ốp La' UNION ALL
-
 -- ICHI QUÁN
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mbm59eqowj5gc4' FROM MenuItems WHERE restaurant_id = @IdIchiQuan AND name = N'Bún Chả Hà Nội Truyền Thống' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mbq4ywc4y6l126' FROM MenuItems WHERE restaurant_id = @IdIchiQuan AND name = N'Bún Chả Hà Nội - Thịt Viên, thịt miếng' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mbq7jewv0j8yda' FROM MenuItems WHERE restaurant_id = @IdIchiQuan AND name = N'Bún Nem Cua Bể + Thịt viên, thịt miếng' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mc0ejizv7bea9c' FROM MenuItems WHERE restaurant_id = @IdIchiQuan AND name = N'Bún Nem Cua Bể' UNION ALL
-
 -- Tacos Labubu
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mdbphfz7cn6k69' FROM MenuItems WHERE restaurant_id = @IdTacosLabubu AND name = N'Khoai tây chiên phủ phô mai' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mdbq7d5reg5b0e' FROM MenuItems WHERE restaurant_id = @IdTacosLabubu AND name = N'Khoai tây chiên đặc biệt' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mdbq7d5rd1kvc1' FROM MenuItems WHERE restaurant_id = @IdTacosLabubu AND name = N'Khoai tây chiên trộn bò bằm' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mdek6qh7khwx92' FROM MenuItems WHERE restaurant_id = @IdTacosLabubu AND name = N'Cặp đôi hoàn cảnh' UNION ALL
-
 -- Chicken 3S
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mmolxm9nmoea18' FROM MenuItems WHERE restaurant_id = @IdChicken3S AND name = N'Đùi Gà (1 Cái)' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mnhbj0ildczm57' FROM MenuItems WHERE restaurant_id = @IdChicken3S AND name = N'Cánh Gà (1 Cánh)' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mnhbk49o9q1054' FROM MenuItems WHERE restaurant_id = @IdChicken3S AND name = N'Gà Nửa Con' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mmolx6zh5zicc3' FROM MenuItems WHERE restaurant_id = @IdChicken3S AND name = N'Gà Không Xương (400Gram)' UNION ALL
-
 -- Tứ Quý Trà
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mkav6jwilszq09' FROM MenuItems WHERE restaurant_id = @IdTuQuyTra AND name = N'Bạc xĩu' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mkay29mwc8w384' FROM MenuItems WHERE restaurant_id = @IdTuQuyTra AND name = N'Sữa đá' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mkav6jyjlvyabe' FROM MenuItems WHERE restaurant_id = @IdTuQuyTra AND name = N'Cafe kem béo' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mkav6jem0r9ffd' FROM MenuItems WHERE restaurant_id = @IdTuQuyTra AND name = N'Cafe sương sáo' UNION ALL
-
 -- Chiang Thai
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m3nqyk95y71de7' FROM MenuItems WHERE restaurant_id = @IdChiangThai AND name = N'Trứng ốp la' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m3nr1q3lcnng53' FROM MenuItems WHERE restaurant_id = @IdChiangThai AND name = N'Bún tươi' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m3npqbh6tq640e' FROM MenuItems WHERE restaurant_id = @IdChiangThai AND name = N'Cơm chiên Cua' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m3nqczty5fi412' FROM MenuItems WHERE restaurant_id = @IdChiangThai AND name = N'Cơm chiên thịt Bò' UNION ALL
-
 -- Tiệm Fulleaf
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-mgb6h6bxan0ta4' FROM MenuItems WHERE restaurant_id = @IdFulleaf AND name = N'TRÀ SỮA NGUYÊN LÁ (Best Seller)' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7r98o-ltgtr7k5rwgd37' FROM MenuItems WHERE restaurant_id = @IdFulleaf AND name = N'TRÀ SỮA LÀI' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-md4ir4kufwktd1' FROM MenuItems WHERE restaurant_id = @IdFulleaf AND name = N'TRÀ MÃNG CẦU (Best Seller)' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-md4irooh0yp944' FROM MenuItems WHERE restaurant_id = @IdFulleaf AND name = N'CHANH THÁI ĐỎ' UNION ALL
-
 -- Gangnam Tanghulu
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m2vy2goc27y294' FROM MenuItems WHERE restaurant_id = @IdTanghulu AND name = N'Tanghulu Dâu tây & Nho mẫu đơn' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m2vy3hvdo3rafe' FROM MenuItems WHERE restaurant_id = @IdTanghulu AND name = N'Tanghulu Nho mẫu đơn' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mnog5euj2eboa1' FROM MenuItems WHERE restaurant_id = @IdTanghulu AND name = N'Tanghulu Cầu Vồng' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m2vy4q1szax2a2' FROM MenuItems WHERE restaurant_id = @IdTanghulu AND name = N'Tanghulu Dâu Tây-Mẫu Đơn-Quýt Tách Múi' UNION ALL
-
 -- Pave Glace Chocolate
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7r98o-lr73yjcnpiftf4' FROM MenuItems WHERE restaurant_id = @IdPaveGlace AND name = N'Socola hạnh nhân 50gr' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7r98o-lr4fwapngpms72' FROM MenuItems WHERE restaurant_id = @IdPaveGlace AND name = N'Hạt Macca Caramel 50gr' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7r98o-lr73yg5icm2s33' FROM MenuItems WHERE restaurant_id = @IdPaveGlace AND name = N'Socola macca 50gr' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7r98o-lr08hisj82bof1' FROM MenuItems WHERE restaurant_id = @IdPaveGlace AND name = N'Hạt hạnh nhân Caramel 50gr' UNION ALL
-
 -- Labubu 149
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mn9jjpszf30k53' FROM MenuItems WHERE restaurant_id = @IdLabubu149 AND name = N'MỲ TRỘN FULL TOPPING' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mn9jjpszavb82d' FROM MenuItems WHERE restaurant_id = @IdLabubu149 AND name = N'MỲ TRỘN TRỨNG XÚC XÍCH' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mn9jjpszhw5c8c' FROM MenuItems WHERE restaurant_id = @IdLabubu149 AND name = N'MỲ TRỘN BÒ BẰM' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mn9jjpszc9vo76' FROM MenuItems WHERE restaurant_id = @IdLabubu149 AND name = N'MỲ GÀ XÙ BƠ CAY' UNION ALL
-
 -- LuXaBu
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-mi2lylql4o3o73' FROM MenuItems WHERE restaurant_id = @IdLuXaBu AND name = N'Bò Bằm Phô Mai' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-mi2lwld1c9hd4e' FROM MenuItems WHERE restaurant_id = @IdLuXaBu AND name = N'Gà Phô Mai Mozzrarela' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-mi2m3nknq2vc0d' FROM MenuItems WHERE restaurant_id = @IdLuXaBu AND name = N'Tôm Chiên Sốt Cay' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-mi2m6ro9ysxsd1' FROM MenuItems WHERE restaurant_id = @IdLuXaBu AND name = N'Trứng Xúc Xích' UNION ALL
-
 -- Tacos Xin Chào
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-mgcyd75j318of6' FROM MenuItems WHERE restaurant_id = @IdTacosXinChao AND name = N'Bò Bằm Phô Mai' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-mgcy2mkn2lfy12' FROM MenuItems WHERE restaurant_id = @IdTacosXinChao AND name = N'Gà Phô Mai MOZZARELLA' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-mgcyfroaqjnx2f' FROM MenuItems WHERE restaurant_id = @IdTacosXinChao AND name = N'Đặc Biệt Thập Cẩm' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-mgrii1orjtop79' FROM MenuItems WHERE restaurant_id = @IdTacosXinChao AND name = N'Tôm Chiên Giòn Sốt Cay' UNION ALL
-
 -- Pate Hải Phòng
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-mfqq0qxti96xe9' FROM MenuItems WHERE restaurant_id = @IdPateHaiPhong AND name = N'Combo Ăn Sáng Chuẩn Gu' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mnjifwr5p24h74' FROM MenuItems WHERE restaurant_id = @IdPateHaiPhong AND name = N'Tương ớt Bắc chai 1kg' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mchk7zb4de02aa' FROM MenuItems WHERE restaurant_id = @IdPateHaiPhong AND name = N'Xôi mặn' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134505-7ras8-md9x14d3d3mk78' FROM MenuItems WHERE restaurant_id = @IdPateHaiPhong AND name = N'Xôi gà xé' UNION ALL
-
 -- A Duy Food
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m0shzyq7s7f30a' FROM MenuItems WHERE restaurant_id = @IdADuyFood AND name = N'0.5kg xu xoa rong biển Lý sơn' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m0shf78vmr5954' FROM MenuItems WHERE restaurant_id = @IdADuyFood AND name = N'Ống cơm lam' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-m0shdb2zdqq7d7' FROM MenuItems WHERE restaurant_id = @IdADuyFood AND name = N'Combo Gà Quay Size Lớn Siêu To' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mcosqowohg0sbf' FROM MenuItems WHERE restaurant_id = @IdADuyFood AND name = N'Combo 1/2 Vịt Quay Da Giòn Rút Xương Size Lớn 2.6-2.8lg' UNION ALL
-
 -- Ola Tacos
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mdpp7x1p3zchb0' FROM MenuItems WHERE restaurant_id = @IdOlaTacos AND name = N'Bánh khoai mỡ Truyền Thống-Không nhân' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mdpp7x1p6shd21' FROM MenuItems WHERE restaurant_id = @IdOlaTacos AND name = N'Bánh khoai mỡ nhân phô mai' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mdpp7x1p5dwx77' FROM MenuItems WHERE restaurant_id = @IdOlaTacos AND name = N'Bánh khoai mỡ truyền thống không nhân' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-7ras8-mdpp7x1pgmgh38' FROM MenuItems WHERE restaurant_id = @IdOlaTacos AND name = N'Bánh khoai mỡ mix 3 loại- lắc pm free' UNION ALL
-
 -- LaSiMi
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mlql33ubb6dc3f' FROM MenuItems WHERE restaurant_id = @IdLaSiMi AND name = N'OLONG LÀI SỮA' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mlql33ur9onj62' FROM MenuItems WHERE restaurant_id = @IdLaSiMi AND name = N'OLONG SỮA HẠNH NHÂN' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mlql337f321485' FROM MenuItems WHERE restaurant_id = @IdLaSiMi AND name = N'ỔI NHÃN HOA' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-81ztc-mlql33v5fksgaa' FROM MenuItems WHERE restaurant_id = @IdLaSiMi AND name = N'TRÀ OLONG SEN VÀNG KEM PHÔMAI' UNION ALL
-
 -- Sâm Chill Me
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-mioaeo0ze13b28' FROM MenuItems WHERE restaurant_id = @IdSamChillMe AND name = N'Me Đác Mê Mẫn' UNION ALL
 SELECT id, 'https://down-bs-vn.img.susercontent.com/vn-11134517-820l4-mioa1v6m8m4jc9' FROM MenuItems WHERE restaurant_id = @IdSamChillMe AND name = N'Me Mê Mẫn' UNION ALL

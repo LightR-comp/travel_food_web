@@ -1355,12 +1355,14 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 				"image_url":   "",
 			},
 			"restaurant_info": map[string]interface{}{
-				"id":      rID,
-				"name":    rName,
-				"address": rAddr,
-				"rating":  rating,
-				"type":    rType,
-				"is_open": isOpenNow(openTime, closeTime),
+				"id":         rID,
+				"name":       rName,
+				"address":    rAddr,
+				"rating":     rating,
+				"type":       rType,
+				"is_open":    isOpenNow(openTime, closeTime),
+				"open_time":  openTime,
+				"close_time": closeTime,
 			},
 		}
 

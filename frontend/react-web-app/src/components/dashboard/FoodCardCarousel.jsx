@@ -19,6 +19,40 @@ const ScrollBtn = ({ direction, onClick }) => (
   </button>
 );
 
+// Helper: Check open status in real-time based on current local time
+const checkIsOpenRealTime = (openTimeStr, closeTimeStr) => {
+  if (!openTimeStr || !closeTimeStr) return false;
+  try {
+    const parseTime = (timeStr) => (timeStr || '').split(',').map(s => s.trim()).filter(Boolean);
+    const openTimes = parseTime(openTimeStr);
+    const closeTimes = parseTime(closeTimeStr);
+    
+    if (openTimes.length === 0 || closeTimes.length === 0) return false;
+    
+    const now = new Date();
+    const cur = now.getHours() * 60 + now.getMinutes();
+
+    const count = Math.min(openTimes.length, closeTimes.length);
+    for (let i = 0; i < count; i++) {
+      const [oh, om] = openTimes[i].split(':').map(Number);
+      const [ch, cm] = closeTimes[i].split(':').map(Number);
+      if (isNaN(oh) || isNaN(om) || isNaN(ch) || isNaN(cm)) continue;
+
+      const open = oh * 60 + om;
+      const close = ch * 60 + cm;
+      if (close > open) {
+        if (cur >= open && cur <= close) return true;
+      } else {
+        // Trường hợp qua nửa đêm
+        if (cur >= open || cur <= close) return true;
+      }
+    }
+    return false;
+  } catch {
+    return false;
+  }
+};
+
 // ---- Single Food Card ----
 export const FoodCard = ({ restaurant, featured = false }) => {
   const navigate = useNavigate();
@@ -33,10 +67,15 @@ export const FoodCard = ({ restaurant, featured = false }) => {
     distance_km,
     images,
     is_open,
+    open_time,
+    close_time,
   } = restaurant;
 
   const tags = type ? type.split(',').map(t => t.trim()) : [];
   const image_url = images?.[0] || DEFAULT_IMAGE;
+
+  // Tính trạng thái mở cửa theo thời gian thực tế của client
+  const isOpenRealTime = checkIsOpenRealTime(open_time, close_time);
 
   if (featured) {
     return (
@@ -45,6 +84,7 @@ export const FoodCard = ({ restaurant, featured = false }) => {
         onClick={() => navigate(`/detail/${id}`)}
       >
         <div className="relative h-[145px] bg-gradient-to-br from-[#3D1A0A] to-[#6B2D15] flex items-center justify-center">
+          {!isOpenRealTime && <Badge label="Đóng cửa" className="!left-auto right-2 animate-pulse" />}
           <div className="text-center px-3">
             <p className="text-[0.65rem] text-white/70 font-semibold tracking-widest uppercase mb-1">
               {name?.split(' ').slice(0, 2).join(' ')}
@@ -68,6 +108,15 @@ export const FoodCard = ({ restaurant, featured = false }) => {
             <Distance km={distance_km} />
           </div>
           <PriceTag priceRange={price_range} />
+          {open_time && close_time && (
+            <p className="text-[0.72rem] text-[#7B7068] flex items-center gap-1.5 mt-2 flex-wrap">
+              <span>🕐</span>
+              <span>{open_time} - {close_time}</span>
+              <span className={`text-[0.68rem] font-bold px-1.5 py-0.5 rounded transition-colors ${isOpenRealTime ? 'text-green-600 bg-green-50' : 'text-red-500 bg-red-50'}`}>
+                {isOpenRealTime ? 'Đang mở cửa' : 'Đã đóng cửa'}
+              </span>
+            </p>
+          )}
         </div>
       </div>
     );
@@ -86,9 +135,9 @@ export const FoodCard = ({ restaurant, featured = false }) => {
             src={image_url}
             alt={name}
             loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-500"
+            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
           />
-          {!is_open && <Badge label="Đóng cửa" />}
+          {!isOpenRealTime && <Badge label="Đóng cửa" className="!left-auto right-2 animate-pulse" />}
         </div>
       </div>
 
@@ -103,6 +152,15 @@ export const FoodCard = ({ restaurant, featured = false }) => {
           <Distance km={distance_km} />
         </div>
         <PriceTag priceRange={price_range} />
+        {open_time && close_time && (
+          <p className="text-[0.72rem] text-[#7B7068] flex items-center gap-1.5 mt-2 flex-wrap">
+            <span>🕐</span>
+            <span>{open_time} - {close_time}</span>
+            <span className={`text-[0.68rem] font-bold px-1.5 py-0.5 rounded transition-colors ${isOpenRealTime ? 'text-green-600 bg-green-50' : 'text-red-500 bg-red-50'}`}>
+              {isOpenRealTime ? 'Đang mở cửa' : 'Đã đóng cửa'}
+            </span>
+          </p>
+        )}
       </div>
     </div>
   );

@@ -26,6 +26,9 @@ const HomePage = () => {
             type: item.restaurant_info?.type,
             images: [item.dish_info?.image_url],
             badge: item.dish_info?.badge,
+            is_open: item.restaurant_info?.is_open,
+            open_time: item.restaurant_info?.open_time,
+            close_time: item.restaurant_info?.close_time,
           }));
           setTrending(dishes);
         }

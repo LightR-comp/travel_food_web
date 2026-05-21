@@ -1,12 +1,46 @@
 import { useNavigate } from 'react-router-dom';
 import { StarRating, Distance, PriceTag, Tag, Badge } from '../ui/index.jsx';
 
+// Helper: Check open status in real-time based on current local time
+const checkIsOpenRealTime = (openTimeStr, closeTimeStr) => {
+  if (!openTimeStr || !closeTimeStr) return false;
+  try {
+    const parseTime = (timeStr) => (timeStr || '').split(',').map(s => s.trim()).filter(Boolean);
+    const openTimes = parseTime(openTimeStr);
+    const closeTimes = parseTime(closeTimeStr);
+    
+    if (openTimes.length === 0 || closeTimes.length === 0) return false;
+    
+    const now = new Date();
+    const cur = now.getHours() * 60 + now.getMinutes();
+
+    const count = Math.min(openTimes.length, closeTimes.length);
+    for (let i = 0; i < count; i++) {
+      const [oh, om] = openTimes[i].split(':').map(Number);
+      const [ch, cm] = closeTimes[i].split(':').map(Number);
+      if (isNaN(oh) || isNaN(om) || isNaN(ch) || isNaN(cm)) continue;
+
+      const open = oh * 60 + om;
+      const close = ch * 60 + cm;
+      if (close > open) {
+        if (cur >= open && cur <= close) return true;
+      } else {
+        // Trường hợp qua nửa đêm
+        if (cur >= open || cur <= close) return true;
+      }
+    }
+    return false;
+  } catch {
+    return false;
+  }
+};
+
 /**
  * Single search result row – matches the Search page mockup
  */
 const RestaurantListItem = ({ restaurant }) => {
   const navigate = useNavigate();
-  const { id, name, address, rating, price_range, type, distance_km, ai_analysis, badge } = restaurant;
+  const { id, name, address, rating, price_range, type, distance_km, ai_analysis, badge, is_open, open_time, close_time } = restaurant;
   
   // Xử lý giá tiền (price_range đang là số, VD: 150000 -> 150.000 đ)
   const formattedPrice = price_range ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price_range) : 'Đang cập nhật';
@@ -15,6 +49,9 @@ const RestaurantListItem = ({ restaurant }) => {
   const imageUrl = restaurant.image_url || `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80`;
 
   const tags = type ? [type] : [];
+
+  // Tính trạng thái mở cửa theo thời gian thực tế của client
+  const isOpenRealTime = checkIsOpenRealTime(open_time, close_time);
 
   return (
     <div
@@ -32,6 +69,7 @@ const RestaurantListItem = ({ restaurant }) => {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
           {badge && <Badge label={badge} />}
+          {!isOpenRealTime && <Badge label="Đóng cửa" className="!left-auto right-2 animate-pulse" />}
         </div>
       </div>
 
@@ -61,6 +99,19 @@ const RestaurantListItem = ({ restaurant }) => {
             <span>🏷️</span>
             <span className="font-medium">{formattedPrice}</span>
           </p>
+
+          {/* Operating hours */}
+          {open_time && close_time && (
+            <p className="flex items-center gap-1.5 mt-2 text-sm text-[#4A3728]">
+              <span>🕐</span>
+              <span>
+                {open_time} - {close_time}
+                <span className={`ml-2 text-xs font-semibold ${isOpenRealTime ? 'text-green-600' : 'text-red-500'}`}>
+                  • {isOpenRealTime ? 'Đang mở cửa' : 'Đã đóng cửa'}
+                </span>
+              </span>
+            </p>
+          )}
 
           {/* AI reason badge */}
           {ai_analysis?.reason && (

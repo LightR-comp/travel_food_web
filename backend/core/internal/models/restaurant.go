@@ -44,7 +44,15 @@ type UserRating struct {
 	RestaurantID int       `db:"restaurant_id" json:"restaurant_id"`
 	Rating       float64   `db:"rating" json:"rating"`
 	Comment      string    `db:"comment" json:"comment"`
+	Images       []UserRatingImage `json:"images"`
 	CreatedAt    time.Time `db:"created_at" json:"created_at"`
+}
+
+type UserRatingImage struct {
+	ID           int       `json:"id"`
+	UserRatingID int       `json:"user_rating_id"`
+	ImageURL     string    `json:"image_url"`
+	CreatedAt    time.Time `json:"created_at"`
 }
 
 // RestaurantFilter định nghĩa các tiêu chí để lọc quán ăn khi truy vấn cơ sở dữ liệu, có thể được xây dựng từ UserContext

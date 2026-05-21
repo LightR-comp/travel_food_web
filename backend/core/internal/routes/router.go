@@ -44,7 +44,15 @@ func SetupRouter(r *gin.Engine) {
 			restaurants.GET("/popular", handlers.GetPopularRestaurants) // Good spots for food
 		 	restaurants.GET("/search", handlers.SearchRestaurants)      // Bộ lọc & Tìm kiếm (q, price, sort...)
 			restaurants.GET("/:id", handlers.GetRestaurantDetail)       // Chi tiết nhà hàng.
-			restaurants.POST("/:id/rating", handlers.CreateComment)    // Xem menu của nhà hàng
+			restaurants.GET("/:id/ratings", handlers.GetReviews)         
+
+    			// Routes cần auth
+    			restaurantAuth := restaurants.Group("", middlewares.FirebaseAuthMiddleware())
+    			{
+        			restaurantAuth.POST("/:id/rating", handlers.CreateComment)
+        			restaurantAuth.PUT("/:id/rating/:reviewId", handlers.UpdateComment)
+        			restaurantAuth.DELETE("/:id/rating/:reviewId", handlers.DeleteComment) 
+    			}
 		}
 
 		v1.GET("/dishes/trending", handlers.GetTrendingDishes)

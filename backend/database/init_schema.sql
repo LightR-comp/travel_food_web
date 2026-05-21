@@ -93,6 +93,15 @@ CREATE TABLE UserRatings (
 )
 GO
 
+CREATE TABLE UserRatingImages (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    user_rating_id INT NOT NULL,
+    image_url NVARCHAR(500) NOT NULL,
+    created_at DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_UserRatingImages_UserRatings FOREIGN KEY (user_rating_id) 
+        REFERENCES UserRatings(id) ON DELETE CASCADE
+);
+
 -- Bảng ChatHistory: Lưu lịch sử chat
 CREATE TABLE ChatHistory (
     id INT IDENTITY(1,1) PRIMARY KEY,

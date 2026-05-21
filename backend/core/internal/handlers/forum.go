@@ -107,6 +107,7 @@ func AddComment(c *gin.Context) {
 	var req struct {
 		Content  string `json:"content"`
 		ImageURL string `json:"image_url"` // optional
+		ParentID *int   `json:"parent_id"` // nil = comment gốc, có giá trị = reply
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Dữ liệu không hợp lệ"})
@@ -119,9 +120,9 @@ func AddComment(c *gin.Context) {
 		return
 	}
 
-	comment, err := services.AddComment(c.Request.Context(), userID, postID, req.Content, req.ImageURL)
+	comment, err := services.AddComment(c.Request.Context(), userID, postID, req.Content, req.ImageURL, req.ParentID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo bình luận"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -136,25 +137,23 @@ func AddComment(c *gin.Context) {
 // ============================================================
 
 func LikePost(c *gin.Context) {
-	userID := c.GetInt("user_id")
+    userID := c.GetInt("user_id")
+    postID, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "id không hợp lệ"})
+        return
+    }
 
-	postID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "id không hợp lệ"})
-		return
-	}
+    liked, likeCount, err := services.LikePost(c.Request.Context(), userID, postID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi xử lý like"})
+        return
+    }
 
-	liked, err := services.LikePost(c.Request.Context(), userID, postID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi xử lý like"})
-		return
-	}
-
-	msg := "Đã thích bài viết"
-	if !liked {
-		msg = "Đã bỏ thích bài viết"
-	}
-	c.JSON(http.StatusOK, gin.H{"message": msg, "liked": liked})
+    c.JSON(http.StatusOK, gin.H{
+        "liked":      liked,
+        "like_count": likeCount,
+    })
 }
 
 func LikeComment(c *gin.Context) {

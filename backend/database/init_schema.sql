@@ -93,6 +93,15 @@ CREATE TABLE UserRatings (
 )
 GO
 
+CREATE TABLE UserRatingImages (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    user_rating_id INT NOT NULL,
+    image_url NVARCHAR(500) NOT NULL,
+    created_at DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_UserRatingImages_UserRatings FOREIGN KEY (user_rating_id) 
+        REFERENCES UserRatings(id) ON DELETE CASCADE
+);
+
 -- Bảng ChatHistory: Lưu lịch sử chat
 CREATE TABLE ChatHistory (
     id INT IDENTITY(1,1) PRIMARY KEY,
@@ -132,6 +141,7 @@ CREATE TABLE Posts (
     thumbnail_url NVARCHAR(500) NULL,
     type          NVARCHAR(50) DEFAULT 'discussion',
     view_count    INT DEFAULT 0,
+    like_count    INT DEFAULT 0,
     reply_count   INT DEFAULT 0,
     is_locked     BIT DEFAULT 0,
     created_at    DATETIME DEFAULT GETDATE(),
@@ -144,6 +154,7 @@ CREATE TABLE Comments (
     id         BIGINT IDENTITY(1,1) PRIMARY KEY,
     post_id    BIGINT NOT NULL FOREIGN KEY REFERENCES Posts(id) ON DELETE CASCADE,
     author_id  INT NOT NULL FOREIGN KEY REFERENCES Users(id),
+    parent_id  BIGINT NULL FOREIGN KEY REFERENCES Comments(id),
     content    NVARCHAR(MAX) NOT NULL,
     like_count INT DEFAULT 0,
     created_at DATETIME DEFAULT GETDATE()

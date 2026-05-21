@@ -392,7 +392,15 @@ func getImagesByMenuItemIDs(ctx context.Context, ids []int) (map[int][]models.Di
 }
 
 func CreateReview(ctx context.Context, rv models.UserRating) (*models.UserRating, error) {
-	row := db.QueryRowContext(ctx, `
+	// 1. Khởi tạo Transaction
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, fmt.Errorf("CreateReview begin tx: %w", err)
+	}
+	defer tx.Rollback() // Sẽ rollback nếu có lỗi xảy ra giữa chừng
+
+	// 2. Chèn dữ liệu vào bảng UserRatings
+	row := tx.QueryRowContext(ctx, `
 		INSERT INTO UserRatings (restaurant_id, user_id, rating, comment, created_at)
 		OUTPUT INSERTED.id, INSERTED.created_at
 		VALUES (@rid, @uid, @rating, @comment, GETDATE())
@@ -403,9 +411,87 @@ func CreateReview(ctx context.Context, rv models.UserRating) (*models.UserRating
 		sql.Named("comment", rv.Comment),
 	)
 	if err := row.Scan(&rv.ID, &rv.CreatedAt); err != nil {
-		return nil, fmt.Errorf("CreateReview: %w", err)
+		return nil, fmt.Errorf("CreateReview scan rating: %w", err)
 	}
+
+	// 3. Nếu có danh sách ảnh kèm theo, tiến hành chèn vào bảng UserRatingImages
+	if len(rv.Images) > 0 {
+		stmt, err := tx.PrepareContext(ctx, `
+			INSERT INTO UserRatingImages (user_rating_id, image_url, created_at)
+			OUTPUT INSERTED.id, INSERTED.created_at
+			VALUES (@ratingId, @imgUrl, GETDATE())
+		`)
+		if err != nil {
+			return nil, fmt.Errorf("CreateReview prepare img stmt: %w", err)
+		}
+		defer stmt.Close()
+
+		for i, img := range rv.Images {
+			var newImgID int
+			var newImgCreatedAt time.Time
+			
+			err := stmt.QueryRowContext(ctx,
+				sql.Named("ratingId", rv.ID),
+				sql.Named("imgUrl", img.ImageURL),
+			).Scan(&newImgID, &newImgCreatedAt)
+			
+			if err != nil {
+				return nil, fmt.Errorf("CreateReview insert img failed at index %d: %w", i, err)
+			}
+			
+			// Cập nhật lại thông tin ID và ngày tạo của ảnh vào struct để trả về
+			rv.Images[i].ID = newImgID
+			rv.Images[i].UserRatingID = rv.ID
+			rv.Images[i].CreatedAt = newImgCreatedAt
+		}
+	} else {
+		// Đảm bảo không bị null ở JSON response
+		rv.Images = []models.UserRatingImage{}
+	}
+
+	// 4. Commit transaction thành công
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("CreateReview commit tx: %w", err)
+	}
+
 	return &rv, nil
+}
+
+func getImagesByUserRatingIDs(ctx context.Context, ratingIDs []int) (map[int][]models.UserRatingImage, error) {
+	result := make(map[int][]models.UserRatingImage)
+	if len(ratingIDs) == 0 {
+		return result, nil
+	}
+
+	placeholders := make([]string, len(ratingIDs))
+	args := make([]interface{}, len(ratingIDs))
+	for i, id := range ratingIDs {
+		paramName := fmt.Sprintf("rid%d", i)
+		placeholders[i] = "@" + paramName
+		args[i] = sql.Named(paramName, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT id, user_rating_id, image_url, created_at
+		FROM UserRatingImages
+		WHERE user_rating_id IN (%s)
+		ORDER BY id ASC
+	`, strings.Join(placeholders, ","))
+
+	rows, err := db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var img models.UserRatingImage
+		if err := rows.Scan(&img.ID, &img.UserRatingID, &img.ImageURL, &img.CreatedAt); err != nil {
+			continue
+		}
+		result[img.UserRatingID] = append(result[img.UserRatingID], img)
+	}
+	return result, nil
 }
 
 func GetReviewsByRestaurant(ctx context.Context, restaurantID int) ([]models.UserRating, error) {
@@ -421,23 +507,45 @@ func GetReviewsByRestaurant(ctx context.Context, restaurantID int) ([]models.Use
 	defer rows.Close()
 
 	var reviews []models.UserRating
+	var reviewIDs []int
+
 	for rows.Next() {
 		var rv models.UserRating
 		if err := rows.Scan(&rv.ID, &rv.UserID, &rv.RestaurantID, &rv.Rating, &rv.Comment, &rv.CreatedAt); err != nil {
 			continue
 		}
+		rv.Images = []models.UserRatingImage{} // khởi tạo mảng rỗng mặc định
 		reviews = append(reviews, rv)
+		reviewIDs = append(reviewIDs, rv.ID)
 	}
 
-	if reviews == nil {
+	if len(reviewIDs) == 0 {
 		return []models.UserRating{}, nil
+	}
+
+	// Gọi hàm Helper để map đống ảnh vào từng bài review tương ứng
+	imgMap, err := getImagesByUserRatingIDs(ctx, reviewIDs)
+	if err == nil {
+		for i := range reviews {
+			if imgs, found := imgMap[reviews[i].ID]; found {
+				reviews[i].Images = imgs
+			}
+		}
 	}
 
 	return reviews, nil
 }
 
 func UpdateReview(ctx context.Context, reviewID int, userID int, update models.UserRating) error {
-	result, err := db.ExecContext(ctx, `
+	// 1. Khởi tạo Transaction để đảm bảo tính toàn vẹn dữ liệu
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("UpdateReview begin tx: %w", err)
+	}
+	defer tx.Rollback() // Rollback nếu có lỗi xảy ra giữa chừng
+
+	// 2. Cập nhật nội dung review (kiểm tra luôn quyền sở hữu qua user_id)
+	result, err := tx.ExecContext(ctx, `
 		UPDATE UserRatings SET rating = @rating, comment = @comment
 		WHERE id = @id AND user_id = @uid
 	`,
@@ -447,16 +555,73 @@ func UpdateReview(ctx context.Context, reviewID int, userID int, update models.U
 		sql.Named("uid", userID),
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("UpdateReview update rating: %w", err)
 	}
+
 	n, _ := result.RowsAffected()
 	if n == 0 {
 		return fmt.Errorf("không tìm thấy review hoặc không có quyền")
 	}
+
+	// 3. Xóa sạch các liên kết ảnh cũ của review này trong DB
+	_, err = tx.ExecContext(ctx, `
+		DELETE FROM UserRatingImages WHERE user_rating_id = @id
+	`, sql.Named("id", reviewID))
+	if err != nil {
+		return fmt.Errorf("UpdateReview delete old images: %w", err)
+	}
+
+	// 4. Chèn danh sách ảnh mới (nếu có)
+	if len(update.Images) > 0 {
+		stmt, err := tx.PrepareContext(ctx, `
+			INSERT INTO UserRatingImages (user_rating_id, image_url, created_at)
+			VALUES (@ratingId, @imgUrl, GETDATE())
+		`)
+		if err != nil {
+			return fmt.Errorf("UpdateReview prepare img stmt: %w", err)
+		}
+		defer stmt.Close()
+
+		for _, img := range update.Images {
+			_, err := stmt.ExecContext(ctx,
+				sql.Named("ratingId", reviewID),
+				sql.Named("imgUrl", img.ImageURL),
+			)
+			if err != nil {
+				return fmt.Errorf("UpdateReview insert image failed: %w", err)
+			}
+		}
+	}
+
+	// 5. Commit hoàn tất transaction
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("UpdateReview commit tx: %w", err)
+	}
+
 	return nil
 }
 
 func DeleteReview(ctx context.Context, reviewID int, userID int) error {
+	// 1. (Tùy chọn) Lấy danh sách link ảnh cũ để xóa file vật lý trên server nếu cần
+	rows, err := db.QueryContext(ctx, `
+		SELECT uri.image_url FROM UserRatingImages uri
+		INNER JOIN UserRatings ur ON uri.user_rating_id = ur.id
+		WHERE ur.id = @id AND ur.user_id = @uid
+	`, sql.Named("id", reviewID), sql.Named("uid", userID))
+	
+	var imageUrls []string
+	if err == nil {
+		for rows.Next() {
+			var url string
+			if err := rows.Scan(&url); err == nil {
+				imageUrls = append(imageUrls, url)
+			}
+		}
+		rows.Close()
+	}
+
+	// 2. Thực hiện xóa Review trong DB
+	// Nhờ hiệu ứng ON DELETE CASCADE, các bản ghi ảnh trong DB tự động biến mất
 	result, err := db.ExecContext(ctx, `
 		DELETE FROM UserRatings WHERE id = @id AND user_id = @uid
 	`,
@@ -464,14 +629,28 @@ func DeleteReview(ctx context.Context, reviewID int, userID int) error {
 		sql.Named("uid", userID),
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("DeleteReview: %w", err)
 	}
+
 	n, _ := result.RowsAffected()
 	if n == 0 {
 		return fmt.Errorf("không tìm thấy review hoặc không có quyền")
 	}
+
+	// 3. (Tùy chọn) Tiến hành xóa file vật lý trên ổ cứng server sau khi DB đã xóa thành công
+	// Giả sử đường dẫn lưu file của bạn có dạng: "/uploads/reviews/xxx.jpg"
+	for _, url := range imageUrls {
+		// Loại bỏ dấu "/" ở đầu nếu đường dẫn lưu trong DB là đường dẫn tuyệt đối dạng web
+		filePath := strings.TrimPrefix(url, "/") 
+		if err := os.Remove(filePath); err != nil {
+			log.Printf("[WARN] Không thể xóa file ảnh vật lý %s: %v", filePath, err)
+			// Chỉ log cảnh báo, không chặn luồng chạy chính của user
+		}
+	}
+
 	return nil
 }
+
 
 func updateAvgRating(restaurantID int) {
 	_, err := db.Exec(`

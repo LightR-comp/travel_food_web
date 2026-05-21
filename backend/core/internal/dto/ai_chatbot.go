@@ -49,6 +49,7 @@ type AIChatGenerateResponse struct {
 type AIIdentifyDishRequest struct {
 	UserID   int    `json:"user_id"`
 	ImageB64 string `json:"image_base64"` // Dữ liệu ảnh dạng chuỗi Base64
+	Message  string `json:"message"`
 }
 
 // AIIdentifyDishResponse: Kết quả nhận diện món ăn từ AI

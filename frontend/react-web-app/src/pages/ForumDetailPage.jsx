@@ -53,15 +53,51 @@ const StarDisplay = ({ score }) => {
 };
 
 /* ─── Component hiển thị từng bình luận ─── */
-const CommentItem = ({ comment, isReply = false }) => {
+const CommentItem = ({ comment, isReply = false, postId, onReplySubmit }) => {
   const [liked, setLiked] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyText, setReplyText] = useState('');
+  const [submitting, setSubmitting] = useState(false); // State chống spam click
 
   const formatCommentTime = (timeStr) => {
     if (!timeStr) return 'Vừa xong';
     const dateObj = new Date(timeStr);
     return isNaN(dateObj.getTime()) ? timeStr : dateObj.toLocaleDateString('vi-VN');
+  };
+
+  const handleReplySubmit = async () => {
+    if (!replyText.trim() || submitting) return;
+
+    try {
+      setSubmitting(true);
+      
+      // Giả định API forumApi của YumMap hỗ trợ addReply(postId, commentId, content)
+      // Nếu API gom chung vào addComment có parent_id thì đổi lại: forumApi.addComment(postId, replyText, comment.id)
+      const response = await forumApi.addComment(postId, replyText, comment.id); 
+
+      // Tạo object reply mới đồng bộ với UI
+      const newReply = {
+        id: response.data?.id || Date.now(), // Fallback id nếu backend không trả về
+        content: replyText,
+        author_name: 'Bạn', 
+        avatar_url: '👤',
+        created_at: new Date().toISOString()
+      };
+
+      // Gọi callback báo lên component cha cập nhật state
+      if (onReplySubmit) {
+        onReplySubmit(comment.id, newReply);
+      }
+
+      // Reset ô nhập liệu và đóng khung input
+      setReplyText('');
+      setShowReplyInput(false);
+    } catch (err) {
+      console.error("Lỗi gửi reply:", err);
+      alert("Đăng phản hồi thất bại. Vui lòng kiểm tra lại đăng nhập.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -73,7 +109,7 @@ const CommentItem = ({ comment, isReply = false }) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-sm font-bold text-[#2C1810]">{comment.author_name || 'Thành viên'}</span>
-            <span className="text-[0.65rem] text-[#C8BEB5]">•</span>
+            <span className="text-[0.65rem] text-[#C8BEB5]"> • </span>
             <span className="text-[0.65rem] text-[#7B7068]">{formatCommentTime(comment.created_at)}</span>
           </div>
           <p className="text-sm text-[#4A3728] leading-relaxed mb-2">{comment.content}</p>
@@ -104,11 +140,17 @@ const CommentItem = ({ comment, isReply = false }) => {
                 type="text"
                 value={replyText}
                 onChange={e => setReplyText(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleReplySubmit()} /* Nhấn enter để gửi nhanh */
                 placeholder="Viết trả lời..."
+                disabled={submitting}
                 className="flex-1 px-4 py-2 rounded-full bg-[#FFF8EE] border border-[#F5EDD8] text-sm text-[#2C1810] placeholder:text-[#C8BEB5] outline-none focus:border-[#E8623A] focus:ring-2 focus:ring-[#E8623A]/15 transition-all"
               />
-              <button className="px-4 py-2 bg-gradient-to-r from-[#E8623A] to-[#C04D2B] text-white rounded-full text-xs font-bold hover:shadow-md transition-shadow">
-                Gửi
+              <button 
+                onClick={handleReplySubmit}
+                disabled={submitting || !replyText.trim()}
+                className="px-4 py-2 bg-gradient-to-r from-[#E8623A] to-[#C04D2B] text-white rounded-full text-xs font-bold hover:shadow-md transition-shadow disabled:opacity-50"
+              >
+                {submitting ? '...' : 'Gửi'}
               </button>
             </div>
           )}
@@ -118,7 +160,14 @@ const CommentItem = ({ comment, isReply = false }) => {
       {comment.replies?.length > 0 && (
         <div className="mt-4 space-y-4">
           {comment.replies.map(reply => (
-            <CommentItem key={reply.id} comment={reply} isReply />
+            /* Đệ quy bọc tiếp comment con, truyền prop đầy đủ */
+            <CommentItem 
+              key={reply.id} 
+              comment={reply} 
+              isReply 
+              postId={postId}
+              onReplySubmit={onReplySubmit} 
+            />
           ))}
         </div>
       )}
@@ -381,7 +430,25 @@ const ForumDetailPage = () => {
                 {/* Danh sách bình luận động */}
                 <div className="space-y-6">
                   {post.comments && post.comments.map(comment => (
-                    <CommentItem key={comment.id} comment={comment} />
+                    <CommentItem 
+                      key={comment.id} 
+                      comment={comment} 
+                      postId={id} /* Truyền thêm postId để gọi API bên dưới con */
+                      onReplySubmit={(commentId, newReply) => {
+                        setPost(prev => ({
+                          ...prev,
+                          comments: prev.comments.map(c => {
+                            if (c.id === commentId) {
+                              return {
+                                ...c,
+                                replies: [...(c.replies || []), newReply]
+                              };
+                            }
+                            return c;
+                          })
+                        }));
+                      }}
+                    />
                   ))}
                 </div>
               </div>

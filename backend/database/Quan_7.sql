@@ -1,4 +1,4 @@
-USE travel_food_db_1
+USE travel_food_db
 GO
 
 -- ==========================================

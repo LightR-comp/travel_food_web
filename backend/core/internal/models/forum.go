@@ -25,6 +25,7 @@ type Post struct {
     ThumbnailURL  string    `json:"thumbnail_url"`   // Ảnh minh họa cho bài viết
     Type          string    `json:"type"`            // "discussion" hoặc "poll"
     ViewCount     int       `json:"view_count"`      // Lượt xem
+    LikeCount     int       `json:"like_count"`     // Lượt thích
     ReplyCount    int       `json:"reply_count"`     // Lượt trả lời
     IsLocked      bool      `json:"is_locked"`
     CreatedAt     time.Time `json:"created_at"`

@@ -60,26 +60,26 @@ func GetListPosts(ctx context.Context, page, limit int) ([]models.Post, int, err
 }
 
 func GetPostDetail(ctx context.Context, postID int) (*models.Post, error) {
-	db.ExecContext(ctx, `UPDATE Posts SET view_count = view_count + 1 WHERE id = @id`,
-		sql.Named("id", postID))
+    db.ExecContext(ctx, `UPDATE Posts SET view_count = view_count + 1 WHERE id = @id`,
+        sql.Named("id", postID))
 
-	row := db.QueryRowContext(ctx, `
-		SELECT
-			p.id, p.author_id, u.name, p.prefix, p.title, p.content,
-			p.summary, p.thumbnail_url, p.type, p.view_count, p.reply_count,
-			p.is_locked, p.created_at, p.updated_at
-		FROM Posts p
-		INNER JOIN Users u ON p.author_id = u.id
-		WHERE p.id = @id
-	`, sql.Named("id", postID))
+    row := db.QueryRowContext(ctx, `
+        SELECT
+            p.id, p.author_id, u.name, p.prefix, p.title, p.content,
+            p.summary, p.thumbnail_url, p.type, p.view_count, p.like_count, p.reply_count,
+            p.is_locked, p.created_at, p.updated_at
+        FROM Posts p
+        INNER JOIN Users u ON p.author_id = u.id
+        WHERE p.id = @id
+    `, sql.Named("id", postID))
 
-	var p models.Post
-	var authorName, contentStr string
-	err := row.Scan(
-		&p.ID, &p.AuthorID, &authorName, &p.Prefix, &p.Title, &contentStr,
-		&p.Summary, &p.ThumbnailURL, &p.Type, &p.ViewCount, &p.ReplyCount,
-		&p.IsLocked, &p.CreatedAt, &p.UpdatedAt,
-	)
+    var p models.Post
+    var authorName, contentStr string
+    err := row.Scan(
+        &p.ID, &p.AuthorID, &authorName, &p.Prefix, &p.Title, &contentStr,
+        &p.Summary, &p.ThumbnailURL, &p.Type, &p.ViewCount, &p.LikeCount, &p.ReplyCount,
+        &p.IsLocked, &p.CreatedAt, &p.UpdatedAt,
+    )
 	if err == sql.ErrNoRows {
 		return nil, fmt.Errorf("bài viết không tồn tại")
 	}
@@ -235,32 +235,36 @@ func AddComment(ctx context.Context, userID, postID int, content, imageURL strin
 // LIKE
 // ============================================================
 
-func LikePost(ctx context.Context, userID, postID int) (bool, error) {
-	var count int
-	db.QueryRowContext(ctx, `
-		SELECT COUNT(*) FROM PostLikes WHERE post_id = @postID AND user_id = @userID
-	`,
-		sql.Named("postID", postID),
-		sql.Named("userID", userID),
-	).Scan(&count)
+func LikePost(ctx context.Context, userID, postID int) (bool, int, error) {
+    var count int
+    db.QueryRowContext(ctx, `
+        SELECT COUNT(*) FROM PostLikes WHERE post_id = @postID AND user_id = @userID
+    `, sql.Named("postID", postID), sql.Named("userID", userID)).Scan(&count)
 
-	if count > 0 {
-		db.ExecContext(ctx, `DELETE FROM PostLikes WHERE post_id = @postID AND user_id = @userID`,
-			sql.Named("postID", postID), sql.Named("userID", userID))
-		return false, nil
-	}
+    if count > 0 {
+        db.ExecContext(ctx, `DELETE FROM PostLikes WHERE post_id = @postID AND user_id = @userID`,
+            sql.Named("postID", postID), sql.Named("userID", userID))
+        db.ExecContext(ctx, `UPDATE Posts SET like_count = like_count - 1 WHERE id = @id`,
+            sql.Named("id", postID))
 
-	_, err := db.ExecContext(ctx, `
-		INSERT INTO PostLikes (post_id, user_id, created_at)
-		VALUES (@postID, @userID, GETDATE())
-	`,
-		sql.Named("postID", postID),
-		sql.Named("userID", userID),
-	)
-	if err != nil {
-		return false, fmt.Errorf("LikePost: %w", err)
-	}
-	return true, nil
+        var likeCount int
+        db.QueryRowContext(ctx, `SELECT like_count FROM Posts WHERE id = @id`,
+            sql.Named("id", postID)).Scan(&likeCount)
+        return false, likeCount, nil
+    }
+
+    _, err := db.ExecContext(ctx, `INSERT INTO PostLikes (post_id, user_id, created_at) VALUES (@postID, @userID, GETDATE())`,
+        sql.Named("postID", postID), sql.Named("userID", userID))
+    if err != nil {
+        return false, 0, fmt.Errorf("LikePost: %w", err)
+    }
+    db.ExecContext(ctx, `UPDATE Posts SET like_count = like_count + 1 WHERE id = @id`,
+        sql.Named("id", postID))
+
+    var likeCount int
+    db.QueryRowContext(ctx, `SELECT like_count FROM Posts WHERE id = @id`,
+        sql.Named("id", postID)).Scan(&likeCount)
+    return true, likeCount, nil
 }
 
 func LikeComment(ctx context.Context, userID, commentID int) (bool, error) {

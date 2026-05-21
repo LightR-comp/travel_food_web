@@ -39,10 +39,13 @@ type Comment struct {
     ID        uint64    `json:"id"`
     PostID    uint64    `json:"post_id"`
     AuthorID  uint64    `json:"author_id"`
+    AuthorName string    `json:"author_name"`           // thêm để frontend hiển thị tên
+	ParentID   *uint64   `json:"parent_id,omitempty"`   // nil = comment gốc, có giá trị = reply
     Content   string    `json:"content"`
     LikeCount int       `json:"like_count"`
     CreatedAt time.Time `json:"created_at"`
     ImageURL  string    `json:"image_url,omitempty"`
+    Replies    []Comment `json:"replies,omitempty"`
 }
 
 type Attachment struct {

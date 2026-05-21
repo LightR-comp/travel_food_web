@@ -107,6 +107,7 @@ func AddComment(c *gin.Context) {
 	var req struct {
 		Content  string `json:"content"`
 		ImageURL string `json:"image_url"` // optional
+		ParentID *int   `json:"parent_id"` // nil = comment gốc, có giá trị = reply
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Dữ liệu không hợp lệ"})
@@ -119,9 +120,9 @@ func AddComment(c *gin.Context) {
 		return
 	}
 
-	comment, err := services.AddComment(c.Request.Context(), userID, postID, req.Content, req.ImageURL)
+	comment, err := services.AddComment(c.Request.Context(), userID, postID, req.Content, req.ImageURL, req.ParentID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo bình luận"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 

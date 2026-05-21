@@ -849,2502 +849,6 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
     INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
 
--- Câu chuyện cho quán: Mì Cay Sasin - Tân Phong Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Mì Cay Sasin Tân Phong Quận 7 là nơi bạn tìm thấy hương vị Hàn Quốc bình dân nhưng đầy lôi cuốn, với những món ăn đặc sản mang phong cách riêng không thể lẫn. Mỗi bát mì cay nóng hổi hay món ngon độc đáo đều được chế biến tỉ mỉ, gửi gắm trọn vẹn tâm huyết của người đầu bếp. Đến Sasin, bạn sẽ được thưởng thức ẩm thực ngon miệng trong một không gian ấm cúng, thân thuộc như chính ngôi nhà của mình.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Mì Cay Sasin - Tân Phong Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Phan Rang Quán Quận 7 mang đến hương vị đặc sản miền biển nắng gió, được biến tấu tinh tế theo phong cách riêng của quán. Tại 399 Lê Văn Lương, mỗi món ăn là sự kết hợp của nguyên liệu tươi ngon và cái tâm gửi gắm trong từng công đoạn. Hãy ghé thăm để tận hưởng bữa cơm ấm cúng, đậm đà như nhà làm, một trải nghiệm ẩm thực chất Phan Rang đích thực giữa lòng Sài Gòn.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ốc Trứng Muối - Chi Nhánh 17 Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến với Ốc Trứng Muối Quận 7 – nơi hương vị đặc trưng và không khí ấm cúng hòa quyện. Chúng tôi tự hào mang đến món ốc trứng muối trứ danh béo ngậy, cùng các loại hải sản tươi ngon chế biến theo phong cách rất riêng, đảm bảo sẽ làm hài lòng cả những vị giác khó tính nhất. Hãy ghé 109 Đường Số 79, P. Tân Quy để sẻ chia niềm vui ẩm thực bình dị và những khoảnh khắc thật đáng nhớ bên bạn bè, người thân nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ốc Trứng Muối - Chi Nhánh 17 Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Link Ốc Quận 7 - Đường Số 10
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Link Ốc Quận 7, chúng tôi tự hào mang đến những món ốc và hải sản tươi rói, chế biến với công thức đặc biệt chỉ có tại Đường Số 10. Mỗi đĩa ăn không chỉ là món nhậu ngon mà còn là tâm huyết của người đầu bếp, kết nối những khoảnh khắc vui vẻ. Hãy ghé để thưởng thức hương vị độc đáo và cảm nhận sự ấm cúng như ở nhà.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Link Ốc Quận 7 - Đường Số 10'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu là điểm hẹn của những tâm hồn yêu ẩm thực. Mỗi tô bún riêu tại đây là sự kết hợp tinh tế của nước lèo đậm đà, riêu cua đồng tươi ngon và đặc biệt là tóp mỡ giòn tan, béo ngậy tạo nên hương vị có "một không hai". Chúng tôi đặt trọn vẹn cái tâm vào từng nguyên liệu, từng công đoạn để mang đến trải nghiệm khó quên. Ghé 269 Phạm Hữu Lầu để khám phá hương vị đã chinh phục hàng ngàn thực khách.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Lẩu Cá Đuối 79k - Lotte Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến Lẩu Cá Đuối 79k, nơi hương vị biển cả gói trọn trong nồi lẩu cá đuối chua cay, đậm đà khó quên. Mỗi món nhậu đặc sắc tại đây đều là sự kết hợp hoàn hảo giữa nguyên liệu tươi ngon và bí quyết chế biến riêng, tạo nên trải nghiệm ẩm thực Việt đầy bất ngờ. Dù là tụ họp bạn bè hay thư giãn cuối ngày, Lẩu Cá Đuối 79k hứa hẹn mang đến khoảnh khắc sum vầy ấm áp và vị giác bùng nổ.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Lẩu Cá Đuối 79k - Lotte Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trà Sữa MayCha - Yola, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Trà Sữa MayCha - Yola, chúng tôi mời bạn khám phá thế giới hương vị đặc sản không lẫn vào đâu được. Mỗi món ăn là một tác phẩm mang đậm phong cách riêng, được tạo nên từ cái tâm và sự sáng tạo. Hãy để ly trà sữa thân quen và những món ngon đạt 4.8 sao tại Quận 7 này khơi gợi mọi giác quan của bạn trong không gian ấm cúng, gần gũi.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trà Sữa MayCha - Yola, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Trạm Mì Ý Dì Hiền Quận 7, bạn sẽ tìm thấy một góc Ý ấm cúng ngay giữa lòng Sài Gòn. Mỗi suất mì là sự kết hợp tinh tế của hương vị truyền thống và phong cách độc đáo của Dì Hiền, tạo nên những "đặc sản" riêng biệt, khó quên. Với cái tâm gửi gắm trong từng sợi mì, Dì Hiền mời bạn ghé 6 Đường 15 để thưởng thức bữa ăn ngon chuẩn vị và đầy ắp tình cảm.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến với Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN Quận 7, nơi mỗi món ăn là một câu chuyện về cái tâm và sự sáng tạo. Chúng tôi tự hào mang đến hương vị Bún Chả Hà Nội đậm đà và Nem Cua Bể giòn tan theo một phong cách riêng biệt, không thể tìm thấy ở nơi nào khác. Tại đây, bạn sẽ tìm thấy sự kết hợp hoàn hảo giữa nét truyền thống ấm áp và sự tinh tế hiện đại, trong không gian thân thuộc và gần gũi.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Labubu Quận 7 - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng đến Tacos Labubu Quận 7! Tại 145 Đường Số 17, chúng tôi tin rằng fastfood cũng có thể mang đậm dấu ấn riêng. Mỗi chiếc taco là sự kết hợp hoàn hảo của nguyên liệu tươi ngon và công thức độc đáo, gửi gắm trọn vẹn tâm huyết của người đầu bếp. Hãy đến và khám phá những hương vị đặc trưng chỉ có tại Labubu, nơi bạn luôn được chào đón.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Labubu Quận 7 - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Đến Chicken 3S Nguyễn Thị Thập để khám phá thế giới gà rán xốt Hàn giòn tan, đượm vị và những tô mì cay bùng nổ trứ danh. Mỗi món ăn tại đây là sự kết hợp hoàn hảo của bí quyết riêng và cái tâm người đầu bếp, mang đến trải nghiệm ẩm thực chuẩn Hàn nhưng rất riêng của Chicken 3S. Không gian ấm áp, thân thiện chắc chắn sẽ là điểm đến lý tưởng cho những bữa ăn gia đình tràn ngập tiếng cười. Hãy để chúng tôi mang đến cho bạn những khoảnh khắc ngon khó quên!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tứ Quý Trà - Carameo Machiato Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Tứ Quý Trà - Carameo Machiato Quận 7, mỗi góc nhỏ đều ấp ủ sự ấm cúng và những bất ngờ vị giác. Nơi đây, bạn sẽ được thưởng thức các món đặc sản đậm đà, mang dấu ấn riêng biệt được chế biến bằng cả tấm lòng. Hãy đến trải nghiệm ly Carameo Machiato thơm lừng hay bữa ăn ngon miệng, để cảm nhận một khoảnh khắc yên bình và tràn đầy năng lượng cho ngày mới.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tứ Quý Trà - Carameo Machiato Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chiang Thai Delivery - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Chiang Thai Delivery Quận 7, mỗi món ăn là một câu chuyện hương vị Thái được kể bằng bí quyết riêng, gửi gắm trọn vẹn cái tâm của người đầu bếp. Từ vị chua cay nồng nàn đến béo ngậy đậm đà, bạn sẽ được trải nghiệm bản giao hưởng ẩm thực tinh túy, độc đáo ngay tại nhà. Hơn cả một bữa ăn, đây là trải nghiệm 4.8 sao ấm áp, chuẩn vị Thái và rất riêng của chúng tôi dành cho bạn.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chiang Thai Delivery - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tiệm Fulleaf - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tìm một góc nhỏ ấm cúng giữa Quận 7 để xoa dịu tâm hồn? Tiệm Fulleaf là điểm hẹn lý tưởng! Chúng tôi tự hào mang đến những món đặc sản mang phong cách riêng, được gửi gắm trọn vẹn tâm tình để bạn khám phá những hương vị độc đáo, khó quên. Hãy ghé Tiệm Fulleaf để cảm nhận sự ấm áp và khởi đầu một hành trình ẩm thực đầy cảm hứng!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tiệm Fulleaf - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Gangnam Tanghulu - Lotte Mart Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Giữa nhịp sống Lotte Mart Quận 7, Gangnam Tanghulu là điểm dừng chân lý tưởng để bạn khám phá những hương vị Á Châu độc đáo, được chế biến với tâm huyết riêng. Từng viên kẹo hồ lô giòn tan ngọt lịm hay các đặc sản khác tại đây đều là hành trình vị giác đầy mê hoặc, mang đến trải nghiệm khó quên. Với đánh giá 4.7/5 sao, chúng tôi mời bạn đến thưởng thức và cảm nhận sự khác biệt trong từng món ăn chuẩn vị, ấm cúng và đầy cảm hứng.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Gangnam Tanghulu - Lotte Mart Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Pave Glace Chocolate Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Pave Glace Chocolate Quận 7 không chỉ là điểm đến của những tín đồ yêu ngọt, mà còn là nơi mỗi hương vị kể một câu chuyện. Chúng tôi tỉ mỉ tạo nên những đặc sản chocolate và dessert độc đáo, mang đậm phong cách riêng, gói trọn tinh hoa và cái tâm người làm. Từng chiếc bánh, viên kẹo là lời mời gọi ngọt ngào để bạn tự thưởng hoặc trao gửi những món quà ý nghĩa nhất.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Pave Glace Chocolate Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Tacos Nhà Labubu 149, mỗi chiếc taco là một tác phẩm nghệ thuật vị giác, mang đậm dấu ấn riêng biệt mà bạn sẽ khó tìm thấy ở bất cứ đâu. Chúng tôi đặt trọn tâm huyết vào từng nguyên liệu, từng công đoạn, để mang đến những "đặc sản" fastfood không chỉ ngon mà còn đầy cảm hứng. Hãy ghé 149 Phạm Hữu Lầu để tự mình khám phá hương vị độc đáo và cảm nhận sự ấm áp, gần gũi như chính ngôi nhà của mình nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Tacos Nhà LuXaBu, 335 Nguyễn Hữu Thọ, Quận 7, chúng tôi tự hào mang đến những chiếc taco fastfood bình dân nhưng ẩn chứa hương vị "độc quyền" khó quên. Mỗi chiếc bánh là câu chuyện của sự kết hợp tinh tế giữa nguyên liệu tươi ngon và bí quyết riêng, gói trọn tâm huyết người làm. Đến với "Nhà LuXaBu", bạn không chỉ thưởng thức món ăn mà còn cảm nhận sự ấm áp, khác biệt làm nên 4.2 sao của chúng tôi. Ghé ngay để trải nghiệm nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tacos Xin Chào mời bạn khám phá thế giới hương vị đặc trưng, nơi mỗi chiếc taco là một tác phẩm ẩm thực độc đáo, gói trọn tâm huyết và công thức bí truyền của quán. Tại 333 Nguyễn Hữu Thọ, chúng tôi chào đón bạn bằng sự nồng hậu và những món ăn chuẩn 4.8 sao, biến fastfood bình dân thành trải nghiệm khó quên. Ghé ngay để cảm nhận sự tươi ngon, bùng nổ và sự ấm áp trong từng cuốn bánh!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến Bánh Mì Pate Hải Phòng Quận 7 – nơi tinh hoa ẩm thực đất Cảng được gửi gắm trọn vẹn trong từng món ăn. Với phần pate độc quyền, béo ngậy, thơm lừng cùng bí quyết riêng, mỗi chiếc bánh mì hay đặc sản khác tại 141 Đường Số 1 đều là một trải nghiệm vị giác khó quên. Hãy ghé để cảm nhận hương vị thân quen mà độc đáo, được chúng tôi chuẩn bị bằng cả tấm lòng và sự tỉ mỉ.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến với A Duy Food Quận 7, nơi hương vị Việt truyền thống được nâng tầm bằng cái tâm và bí quyết riêng của gia đình. Từng miếng gà quay, sườn quay vàng óng hay hạt cơm lam dẻo thơm đều gói trọn tinh hoa, mang đến bữa ăn ấm cúng như nhà làm. Đây chính là điểm đến lý tưởng cho những bữa ăn sum vầy, mang đậm bản sắc ẩm thực riêng của A Duy Food. Hãy ghé 163 Nguyễn Thị Thập để thưởng thức và cảm nhận sự khác biệt đã làm nên thương hiệu được yêu mến.' AS story 
-    FROM Restaurants 
-    WHERE name = N'A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ola Tacos Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Đến Ola Tacos Quận 7, bạn sẽ được thưởng thức những chiếc taco mang hương vị rất riêng, là sự kết hợp hoàn hảo của nguyên liệu tươi ngon và bí quyết chế biến đầy tâm huyết. Chúng tôi tin rằng mỗi món ăn không chỉ làm no bụng mà còn phải chạm đến vị giác, để lại ấn tượng khó quên. Ghé 50 Đường Số 10 để trải nghiệm sự tận tâm và khám phá phong cách ẩm thực độc đáo của chúng tôi ngay hôm nay!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ola Tacos Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến với LaSiMi Quận 7 – Trà Ngon Đậm Vị, một góc nhỏ bình yên tại 147c Đường Số 17. Nơi đây, bạn sẽ được thưởng thức những ly trà chuẩn vị, đậm đà cùng các món ăn đặc sản được chế biến theo phong cách riêng đầy sáng tạo. Mỗi hương vị đều được gửi gắm cái tâm của đội ngũ, hứa hẹn mang lại trải nghiệm ấm cúng, khó quên. Ghé LaSiMi để cảm nhận sự khác biệt và nạp năng lượng cho ngày mới!' AS story 
-    FROM Restaurants 
-    WHERE name = N'LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Sâm Chill Me - Lý Phục Man Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Sâm Chill Me Lý Phục Man mời bạn ghé thăm góc nhỏ bình yên giữa lòng Quận 7, nơi hương vị đặc sản được thổi hồn theo phong cách riêng đầy sáng tạo. Mỗi món ăn, thức uống tại đây đều là một câu chuyện ấm áp, khơi gợi ký ức và đánh thức vị giác của bạn. Hãy đến để tìm một không gian thư thái, thưởng thức những bữa ăn ngon lành mang đậm dấu ấn riêng không thể lẫn vào đâu được.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Sâm Chill Me - Lý Phục Man Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Mì Cay Sasin - Tân Phong Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Mì Cay Sasin - Tân Phong Quận 7 là điểm dừng chân lý tưởng cho những tâm hồn yêu ẩm thực Hàn Quốc bình dân. Tại đây, bạn sẽ khám phá những món đặc sản được chế biến theo phong cách Sasin độc đáo, nơi vị cay nồng ấm lòng hòa quyện cùng hương vị riêng biệt khó cưỡng. Từng tô mì, từng món ăn đều là thành quả của sự tận tâm, mang đến trải nghiệm vị giác bùng nổ và cảm giác ấm áp như ở nhà. Hãy ghé 69 Đường số 1 để tự mình trải nghiệm bạn nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Mì Cay Sasin - Tân Phong Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Phan Rang Quán Quận 7, chúng tôi chắt chiu tinh hoa ẩm thực Phan Rang, mang hương vị biển cả và nắng gió đặc trưng về giữa lòng Sài Gòn. Mỗi món đặc sản tại 399 Lê Văn Lương là một câu chuyện về sự tận tâm, được chế biến theo phong cách riêng, vừa quen vừa lạ. Hãy đến để thưởng thức vị ngon khó quên, nơi mỗi đĩa ăn đều là lời mời gọi ấm áp như bữa cơm nhà.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ốc Trứng Muối - Chi Nhánh 17 Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Ốc Trứng Muối - Quận 7, chúng tôi mang đến hương vị hải sản bình dị nhưng đầy cuốn hút. Nổi bật là các món ốc tươi rói đượm sốt trứng muối béo ngậy, sánh mịn theo công thức gia truyền, đánh thức mọi giác quan. Mỗi món ăn là tâm huyết, là niềm vui được sẻ chia, mời bạn ghé 109 Đường Số 79 để cùng khám phá và tận hưởng!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ốc Trứng Muối - Chi Nhánh 17 Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Link Ốc Quận 7 - Đường Số 10
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Đến Link Ốc Quận 7 - Đường Số 10, bạn sẽ khám phá thế giới hải sản tươi ngon được biến tấu đầy sáng tạo, mang đậm phong cách riêng của quán. Mỗi món ăn là sự kết hợp tinh tế của nguyên liệu tuyển chọn và tâm huyết người đầu bếp, tạo nên hương vị đặc trưng khó quên. Trong không gian ấm cúng, rộn rã tiếng cười, đây là điểm hẹn lý tưởng để bạn cùng bạn bè thưởng thức những bữa nhậu chất lừ. Mời bạn ghé 1 Đường Số 10 để cảm nhận sự khác biệt!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Link Ốc Quận 7 - Đường Số 10'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Khám phá Bún Riêu Tóp Mỡ Đặc Biệt Quận 7, nơi mỗi tô bún là sự kết tinh của hương vị truyền thống và cái tâm của người nấu. Nước lèo riêu cua đồng chuẩn vị, thanh ngọt, quyện cùng tóp mỡ vàng giòn rụm béo ngậy, tạo nên nét đặc trưng khó quên. Dù bình dân, không gian ấm cúng tại 269 Phạm Hữu Lầu luôn chào đón bạn ghé đến để thưởng thức tinh hoa ẩm thực đã làm hài lòng bao thực khách.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Lẩu Cá Đuối 79k - Lotte Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Lẩu Cá Đuối 79k mời gọi bạn khám phá hương vị biển cả tươi rói, thấm đẫm trong từng miếng cá đuối ngọt thanh cùng nước lẩu chua cay đậm đà, chuẩn phong cách riêng của quán. Mỗi món đặc sản Việt tại đây đều được chế biến bằng cả tấm lòng, mang đến trải nghiệm nhậu hấp dẫn và trọn vẹn. Hãy ghé 621 Nguyễn Thị Thập, Quận 7 để tận hưởng không gian ấm cúng và những khoảnh khắc sum vầy thật đáng nhớ cùng người thân, bạn bè.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Lẩu Cá Đuối 79k - Lotte Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trà Sữa MayCha - Yola, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Bước vào Trà Sữa MayCha - Yola, Quận 7, bạn sẽ tìm thấy một không gian ấm cúng, thân quen giữa phố thị. Nơi đây mời gọi thực khách với những ly trà sữa MayCha thơm lừng, cùng các món ăn đặc sản mang phong vị riêng độc đáo, được chế biến bằng tất cả tâm huyết. Mỗi hương vị đều là câu chuyện, mang đến trải nghiệm khó quên và cảm giác được chào đón như về nhà.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trà Sữa MayCha - Yola, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Trạm Mì Ý Dì Hiền Quận 7 là điểm hẹn lý tưởng cho những tín đồ ẩm thực Ý bình dân, nơi mỗi món ăn đều được "biến hóa" theo phong cách rất riêng của Dì Hiền. Từ những sợi mì dai ngon đến sốt kem béo ngậy, tất cả đều thấm đượm hương vị đặc trưng khó quên. Dì Hiền đã gửi gắm cả tâm huyết vào từng suất ăn, mang đến trải nghiệm ấm áp như bữa cơm nhà. Hãy đến 6 Đường 15 và cảm nhận sự khác biệt bạn nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'ICHI QUÁN mang trọn tinh hoa ẩm thực Hà Nội đến giữa lòng Sài Gòn, đặc biệt với Bún Chả và Nem Cua Bể chuẩn vị truyền thống. Mỗi món ăn là kết tinh của nguyên liệu tươi ngon và bí quyết gia truyền, được nêm nếm bằng cả tấm lòng, tạo nên hương vị đặc trưng rất riêng. Ghé thăm ICHI QUÁN tại Quận 7, bạn sẽ tìm thấy một không gian ấm cúng để thưởng thức những đặc sản đậm đà, gợi nhớ về chút hồn quê Bắc Bộ trong từng miếng ăn.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Labubu Quận 7 - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Đến với Tacos Labubu Quận 7 - Đường Số 17, bạn sẽ tìm thấy những chiếc taco fastfood mang phong cách riêng có một không hai. Mỗi hương vị là sự kết hợp tinh tế của nguyên liệu tươi ngon và cái tâm của người đầu bếp, tạo nên trải nghiệm ẩm thực bùng nổ mà vẫn gần gũi. Ghé ngay để tự mình cảm nhận sự khác biệt và tận hưởng bữa ăn ấm cúng, đậm đà chỉ có tại Labubu!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Labubu Quận 7 - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Ghé Chicken 3S để cảm nhận hương vị Hàn Quốc đích thực gói trọn trong từng miếng gà rán giòn tan hay tô mỳ cay xì xụp. Tại 475A Nguyễn Thị Thập, chúng tôi không chỉ phục vụ món ăn mà còn là nơi gắn kết gia đình, bạn bè qua những hương vị đặc trưng, đầy tâm huyết. Mỗi bữa ăn là một câu chuyện ấm áp, mời gọi bạn đến thưởng thức và cảm nhận sự khác biệt.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tứ Quý Trà - Carameo Machiato Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tứ Quý Trà - Carameo Machiato Quận 7 mời gọi bạn ghé thăm một không gian bình yên giữa lòng Quận 7 nhộn nhịp. Tại đây, bạn sẽ được thưởng thức Carameo Machiato ngọt ngào cùng những món đặc sản độc đáo, mang đậm dấu ấn riêng của quán. Mỗi hương vị đều được ủ ấp từ cái tâm người nấu, hứa hẹn mang đến một trải nghiệm ẩm thực ấm áp và khó quên.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tứ Quý Trà - Carameo Machiato Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chiang Thai Delivery - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng đến với Chiang Thai Delivery Quận 7, nơi mỗi món ăn là một tấm vé đưa bạn phiêu lưu đến xứ sở Chùa Vàng. Với hương vị Thái chuẩn mực được biến tấu đầy sáng tạo, chúng tôi tự hào mang đến những trải nghiệm ẩm thực độc đáo khó quên. Mỗi nguyên liệu tươi ngon đều được chọn lựa tỉ mỉ, gửi gắm trọn vẹn tâm huyết của người đầu bếp để tạo nên những món đặc sản riêng biệt, đậm đà khó cưỡng. Hãy để Chiang Thai Delivery đánh thức mọi giác quan và làm ấm lòng bạn ngay hôm nay!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chiang Thai Delivery - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tiệm Fulleaf - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tiệm Fulleaf Quận 7 mời bạn ghé thăm một góc nhỏ bình yên, nơi mỗi món ăn đặc sản đều được ấp ủ bằng cả tấm lòng. Từ ly cà phê đậm đà đến hương vị riêng biệt của thực đơn độc đáo, chúng tôi tin rằng trải nghiệm ẩm thực tại đây sẽ đánh thức mọi giác quan. Hãy để Fulleaf kể bạn nghe câu chuyện của vị giác và sự ấm áp.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tiệm Fulleaf - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Gangnam Tanghulu - Lotte Mart Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Gangnam Tanghulu, chúng tôi mời bạn khám phá thế giới ẩm thực Á Châu mang đậm phong cách riêng, ngay tại Lotte Mart Quận 7. Mỗi món đặc sản đều được chế biến bằng cả tâm huyết, từ vị mặn đậm đà đến những xiên Tanghulu giòn rụm ngọt ngào, hứa hẹn mang đến trải nghiệm vị giác khó quên. Ghé thăm để tận hưởng những hương vị độc đáo, bình dị mà đầy cuốn hút!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Gangnam Tanghulu - Lotte Mart Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Pave Glace Chocolate Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Pave Glace Chocolate Quận 7, mỗi món tráng miệng không chỉ là hương vị mà còn là cả một câu chuyện ngọt ngào từ tâm huyết. Chúng tôi tự hào mang đến những đặc sản độc đáo, được chế biến tỉ mỉ với phong cách riêng biệt, đánh thức mọi giác quan. Ghé thăm để đắm chìm trong thế giới dessert đầy mê hoặc và chọn cho mình, hoặc người thân, món quà ý nghĩa nhất!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Pave Glace Chocolate Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến với Tacos Nhà Labubu 149, nơi mỗi chiếc taco là một khám phá vị giác đầy bất ngờ! Dù là fast food bình dân, chúng tôi tự hào mang đến những hương vị đặc trưng, được chế biến bằng tất cả cái tâm và sự sáng tạo riêng biệt. Ghé 149 Phạm Hữu Lầu, Quận 7 để trải nghiệm những món đặc sản "có một không hai" và cảm nhận sự ấm áp, gần gũi như ở nhà nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng đến Tacos Nhà LuXaBu 335 Nguyễn Hữu Thọ! Tại đây, mỗi chiếc taco không chỉ là fastfood mà là cả tâm huyết, biến tấu thành "đặc sản" riêng của nhà. Hương vị độc đáo, quen mà lạ, đủ sức khơi gợi mọi giác quan ngay lần thử đầu tiên. Ghé LuXaBu để trải nghiệm sự ấm áp và ngon miệng khó quên!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tacos Xin Chào mời bạn đến khám phá thế giới hương vị taco đặc sắc, nơi mỗi món ăn là sự kết hợp tinh tế của truyền thống và sáng tạo. Với cái tâm của người đầu bếp, chúng tôi mang đến những trải nghiệm ẩm thực nhanh gọn mà vẫn đậm đà, khó quên. Tại Tacos Xin Chào, bạn sẽ luôn được chào đón bằng vị ngon 4.8 sao và sự ấm áp từ những món đặc sản riêng biệt.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Bánh Mì Pate Hải Phòng Quận 7, chúng tôi tự hào mang đến hương vị Hải Phòng trứ danh giữa lòng Sài Gòn. Mỗi ổ bánh mì pate, mỗi món đặc sản đều được chế biến với tâm huyết, giữ trọn nét truyền thống và pha chút biến tấu riêng đầy tinh tế. Ghé 141 Đường Số 1, bạn sẽ tìm thấy sự ấm áp trong từng món ăn bình dị, ngon miệng và chân thành.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'A Duy Food Quận 7 hân hạnh mang đến những bữa ăn đậm đà hương vị Việt, nơi gà quay giòn tan và sườn quay thơm lừng được chế biến bằng bí quyết gia truyền cùng tất cả tâm huyết. Cơm lam dẻo ngọt quyện trong từng miếng thịt sẽ đánh thức ký ức về những bữa cơm gia đình ấm cúng. Trải nghiệm hương vị chuẩn nhà làm đã làm nên đánh giá 4.7 sao tuyệt vời, chỉ có tại 163 Nguyễn Thị Thập.' AS story 
-    FROM Restaurants 
-    WHERE name = N'A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ola Tacos Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tìm kiếm một bữa ăn nhanh gọn nhưng đầy bất ngờ về hương vị tại Quận 7? Ola Tacos Quận 7 chính là điểm dừng chân lý tưởng của bạn tại 50 Đường Số 10. Tại đây, chúng tôi tự hào mang đến những món đặc sản Tacos được biến tấu theo phong cách riêng, mỗi miếng đều đong đầy tâm huyết và sự sáng tạo. Hãy đến và cảm nhận sự khác biệt trong từng hương vị, nơi ẩm thực bình dân được nâng tầm để mọi khoảnh khắc ăn uống đều là một trải nghiệm đáng nhớ.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ola Tacos Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến LaSiMi Quận 7, nơi mỗi tách trà đậm vị và món đặc sản phong cách riêng đều ẩn chứa sự tận tâm. Tại không gian bình dị, ấm cúng của chúng tôi, bạn sẽ tìm thấy những hương vị độc đáo, được hàng ngàn thực khách tin yêu và đánh giá 4.9/5 sao. Hãy ghé thăm LaSiMi để tận hưởng những phút giây thư thái và ngon miệng trọn vẹn!' AS story 
-    FROM Restaurants 
-    WHERE name = N'LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Sâm Chill Me - Lý Phục Man Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Giữa nhịp sống Quận 7 hối hả, Sâm Chill Me tại 89 Lý Phục Man là chốn dừng chân lý tưởng để bạn tìm lại sự an yên. Chúng tôi tự hào mang đến những món đặc sản độc đáo, được chế biến bằng tất cả tâm huyết và nguyên liệu tươi ngon nhất. Mỗi hương vị tại Sâm Chill Me là một câu chuyện riêng biệt, mời bạn đến thưởng thức và cảm nhận sự thư thái lan tỏa. Hãy ghé thăm để "chill" và nạp năng lượng cùng chúng tôi!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Sâm Chill Me - Lý Phục Man Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Mì Cay Sasin - Tân Phong Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Bạn đã sẵn sàng cho một cuộc phiêu lưu vị giác chưa? Mì Cay Sasin - Tân Phong Quận 7 chào đón bạn đến với thế giới ẩm thực Hàn Quốc bình dân nhưng đầy tinh hoa, nơi mỗi món ăn là một câu chuyện hương vị độc đáo. Từ bát mì cay nồng hít hà đến những món đặc sản trứ danh, tất cả đều được chúng tôi gửi gắm sự tận tâm, hứa hẹn một bữa ăn ấm áp và khó quên.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Mì Cay Sasin - Tân Phong Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Phan Rang Quán Quận 7 tự hào mang đến những món đặc sản đậm đà hương vị quê hương, được chế biến bằng cả tấm lòng và phong cách riêng biệt. Mỗi món ăn là sự kết hợp tinh tế của nguyên liệu tươi ngon và bí quyết truyền thống, khơi gợi ký ức đẹp về ẩm thực Phan Rang. Đến với không gian bình dị, ấm cúng của chúng tôi, bạn sẽ được thưởng thức bữa ăn ngon như nhà làm, tràn đầy sự chân thành và gần gũi. Hãy để Phan Rang Quán Quận 7 đánh thức vị giác của bạn.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ốc Trứng Muối - Chi Nhánh 17 Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Ốc Trứng Muối - Chi Nhánh 17 Quận 7, chúng tôi mời bạn ghé thăm một không gian bình dị, ấm cúng nhưng đầy ắp hương vị biển cả tươi ngon. Từng con ốc được chọn lọc kỹ càng, biến tấu khéo léo, đặc biệt là món ốc trứng muối trứ danh với sốt sánh mịn, béo ngậy đậm đà, khó cưỡng. Đó là sự kết hợp hoàn hảo giữa hải sản tươi rói và công thức riêng biệt, tạo nên những trải nghiệm ẩm thực độc đáo, chỉ có tại quán.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ốc Trứng Muối - Chi Nhánh 17 Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Link Ốc Quận 7 - Đường Số 10
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Link Ốc Quận 7 - Đường Số 10 mời bạn khám phá thế giới ốc Sài Gòn với phong vị độc đáo có một không hai. Từng món đặc sản tại đây là sự kết tinh của nguyên liệu tươi ngon và bí quyết riêng, mang đến trải nghiệm vị giác bùng nổ, khiến bạn phải xuýt xoa. Hãy ghé Link Ốc để tận hưởng không gian ấm cúng, tiếng cười rộn rã và những khoảnh khắc sum vầy bên bàn tiệc đậm đà hương vị biển cả.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Link Ốc Quận 7 - Đường Số 10'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tọa lạc trên con đường Phạm Hữu Lầu, Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 đã trở thành điểm đến quen thuộc của thực khách gần xa. Nồi nước lèo riêu cua chuẩn vị, thơm lừng quyện cùng những miếng tóp mỡ giòn rụm độc đáo tạo nên hương vị bún riêu khó cưỡng, không lẫn vào đâu được. Từng tô bún đều được chế biến bằng cả cái tâm, mang đến trải nghiệm ẩm thực ấm áp, đậm đà hương vị truyền thống mà bạn nhất định phải thử.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Lẩu Cá Đuối 79k - Lotte Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Ghé Lẩu Cá Đuối 79k để khám phá hương vị lẩu cá đuối chua cay, đậm đà làm say lòng người. Mỗi món ăn tại đây đều là một đặc sản được chế biến với tâm huyết, mang đến trải nghiệm nhậu chuẩn vị Việt. Không gian ấm cúng, thoáng đãng tại Quận 7 sẽ là nơi lý tưởng để bạn bè, gia đình sum vầy và tận hưởng những khoảnh khắc tuyệt vời bên nhau.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Lẩu Cá Đuối 79k - Lotte Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trà Sữa MayCha - Yola, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Trà Sữa MayCha - Yola, không chỉ có những ly trà sữa thơm ngon mà còn là cả một thế giới ẩm thực đặc sắc đang chờ bạn khám phá. Chúng tôi tự hào mang đến các món ăn đặc sản đậm phong cách riêng, được chế biến tỉ mỉ với tất cả tâm huyết. Hãy ghé thăm không gian ấm áp của chúng tôi để thưởng thức hương vị tuyệt vời và cảm nhận sự khác biệt mà MayCha mang lại!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trà Sữa MayCha - Yola, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Ghé Trạm Mì Ý Dì Hiền Quận 7 để khám phá không gian bình dị, ấm cúng và những đĩa mì Ý đậm đà phong cách rất riêng của Dì. Mỗi món ăn là tâm huyết được gửi gắm tỉ mẩn, từ sợi mì dai ngon đến sốt sánh mịn, mang đến hương vị đặc sắc khó quên. Dù bình dân, quán vẫn giữ trọn vẹn chất lượng đỉnh cao, chờ bạn ghé 6 Đường 15 trải nghiệm sự khác biệt.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN, chúng tôi tự hào mang đến hương vị chuẩn mực của tinh hoa ẩm thực Bắc Bộ giữa lòng Sài Gòn. Mỗi món ăn không chỉ là công thức mà còn là cái tâm, là sự tỉ mỉ trong từng nguyên liệu và cách chế biến riêng biệt, làm nên nét đặc trưng không thể trộn lẫn. Dù là bữa trưa vội vã hay khoảnh khắc quây quần, ICHI QUÁN ở Quận 7 luôn sẵn sàng chào đón bạn bằng không gian ấm cúng và những món ăn đậm đà, khó quên. Hãy đến và cảm nhận sự khác biệt!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Labubu Quận 7 - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Đến Tacos Labubu Đường Số 17, bạn sẽ khám phá những chiếc taco mang phong cách riêng đầy bất ngờ, gói trọn hương vị độc đáo không thể tìm thấy ở nơi khác. Mỗi miếng cắn là sự kết hợp tinh tế của nguyên liệu tươi ngon và bí quyết đặc trưng, được tạo nên từ tâm huyết của người đầu bếp. Một điểm hẹn ẩm thực bình dân nhưng lại chứa đựng cả thế giới hương vị đang chờ bạn khám phá.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Labubu Quận 7 - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Chicken 3S, mỗi món ăn là một câu chuyện tình yêu với ẩm thực Hàn Quốc. Từ miếng gà rán giòn tan đẫm sốt độc quyền, đến tô mỳ cay chuẩn vị làm ấm lòng, chúng tôi luôn đặt trọn tâm huyết để mang đến trải nghiệm vị giác khó quên. Hãy cùng gia đình và bạn bè tận hưởng không gian ấm cúng, thưởng thức những hương vị đặc sắc chỉ có tại 475A Nguyễn Thị Thập, Quận 7!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tứ Quý Trà - Carameo Machiato Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại 79A Đường 79, Quận 7, Tứ Quý Trà mở ra một không gian ấm cúng, nơi bạn tìm thấy sự bình yên giữa phố thị. Nổi tiếng với Carameo Machiato ngọt ngào và những món đặc sản mang phong vị riêng độc đáo, mỗi hương vị tại đây đều được ấp ủ bằng tâm huyết của người đầu bếp. Hãy đến để cảm nhận trọn vẹn sự tinh tế trong từng món ăn và thức uống, tạo nên những khoảnh khắc đáng nhớ.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tứ Quý Trà - Carameo Machiato Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chiang Thai Delivery - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Chiang Thai Delivery - Quận 7, chúng tôi tin rằng ẩm thực là câu chuyện của đam mê và hương vị. Mỗi món đặc sản Thái được chế biến tỉ mỉ bằng công thức riêng, gói trọn vị chua cay mặn ngọt hài hòa, khó quên. Với đánh giá 4.8/5 sao từ thực khách, hãy để Chiang Thai mang tinh hoa xứ sở Chùa Vàng đến tận cửa nhà bạn, thắp lên niềm vui trong từng bữa ăn.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chiang Thai Delivery - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tiệm Fulleaf - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến Tiệm Fulleaf - chốn bình yên giữa Quận 7! Nơi đây không chỉ là một quán cà phê thân thiện mà còn là điểm hẹn của những hương vị độc đáo. Mỗi món đặc sản tại Fulleaf được chế biến với tất cả tâm huyết, mang đậm phong cách riêng, hứa hẹn đánh thức mọi giác quan của bạn. Hãy đến để thưởng thức và cảm nhận sự khác biệt!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tiệm Fulleaf - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Gangnam Tanghulu - Lotte Mart Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng đến Gangnam Tanghulu - Lotte Mart Quận 7, nơi hương vị Á Châu bình dị gặp gỡ sự sáng tạo độc đáo. Chúng tôi tự hào mang đến thực đơn các món đặc sản theo phong cách riêng, mỗi suất ăn là một câu chuyện về nguyên liệu tươi ngon và bí quyết được gửi gắm trọn vẹn. Hãy ghé thăm để tận hưởng không gian ấm cúng và những trải nghiệm ẩm thực khó quên, chắc chắn sẽ khiến bạn muốn quay lại.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Gangnam Tanghulu - Lotte Mart Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Pave Glace Chocolate Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Pave Glace Chocolate Quận 7 là chốn dừng chân ngọt ngào, nơi mỗi món tráng miệng kể câu chuyện của đam mê. Từng thanh chocolate, từng chiếc bánh đặc sản độc đáo đều được làm thủ công với cả tâm huyết, mang đến hương vị không lẫn vào đâu được. Ghé số 98 Đường 65 để đắm mình trong vị ngọt tinh tế và tìm những món quà ý nghĩa nhất.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Pave Glace Chocolate Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến với Tacos Nhà Labubu 149, nơi những chiếc taco không chỉ là món ăn mà còn là cả một "phòng thí nghiệm" hương vị đầy sáng tạo. Tại đây, mỗi chiếc bánh là sự kết hợp tinh tế của nguyên liệu tươi ngon và bí quyết độc đáo, mang đậm phong cách Labubu không lẫn vào đâu được. Dù bạn là tín đồ fastfood hay mê mẩn ẩm thực đường phố, hãy ghé 149 Phạm Hữu Lầu để tự mình khám phá món ngon và cảm nhận sự ấm áp, thân quen như ở nhà nhé.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Dừng chân tại 335 Nguyễn Hữu Thọ, Tacos Nhà LuXaBu mời bạn khám phá thế giới Tacos "độc quyền" đậm chất riêng, nơi mỗi chiếc bánh là một câu chuyện hương vị. Với bí quyết gia truyền và nguyên liệu tươi ngon, chúng tôi gói trọn cái tâm vào từng nhân bánh đầy đặn, vỏ giòn tan cùng nước sốt bí truyền khó cưỡng. Dù là fastfood bình dân, chúng tôi tin rằng trải nghiệm ẩm thực phải thật đặc biệt và đáng nhớ. Ghé LuXaBu ngay để cảm nhận sự khác biệt!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào bạn đến với Tacos Xin Chào! Nơi những chiếc taco không chỉ là món ăn nhanh, mà là một hành trình vị giác đầy bất ngờ với phong cách riêng biệt. Mỗi miếng nhân đậm đà, vỏ bánh giòn tan đều gói trọn tâm huyết, mang đến hương vị khó quên mà bạn sẽ muốn quay lại mãi. Ghé 333 Nguyễn Hữu Thọ, Quận 7 để tự mình khám phá tinh hoa ẩm thực đường phố!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Ngay tại Quận 7, Bánh Mì Pate Hải Phòng - 141 Đường Số 1 tự hào mang đến hành trình vị giác đậm đà hương vị miền biển. Mỗi chiếc bánh mì giòn rụm hay những món đặc sản tại đây đều được chế biến bằng cả tấm lòng, gìn giữ nét tinh hoa ẩm thực Hải Phòng. Ghé thăm để cảm nhận sự ấm cúng và thưởng thức những món ăn đặc sắc, chất lượng chuẩn nhà làm trong không gian thân quen.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng đến A Duy Food Quận 7, nơi hương vị truyền thống Việt Nam hòa quyện trong không gian ấm cúng. Tại đây, gà quay giòn rụm, sườn quay đậm đà và cơm lam dẻo thơm mang phong vị độc đáo được chế biến từ tâm huyết của những người đầu bếp. Hãy ghé A Duy để trải nghiệm bữa cơm gia đình tròn vị, ấm áp như mẹ nấu.' AS story 
-    FROM Restaurants 
-    WHERE name = N'A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ola Tacos Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào bạn ghé Ola Tacos Quận 7! Chúng tôi tự hào mang đến những hương vị đặc trưng có 1-0-2, nơi mỗi chiếc bánh đều là sự kết tinh của công thức riêng và cái tâm người đầu bếp. Dù là bữa ăn nhanh, bạn sẽ luôn tìm thấy sự ấm áp, chuẩn vị và đầy bất ngờ trong từng món. Ghé 50 Đường Số 10 để tự mình khám phá nét ẩm thực riêng có này nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ola Tacos Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'LaSiMi Quận 7 tại Đường Số 17 là điểm dừng chân lý tưởng để thưởng thức trà ngon đậm vị và khám phá những món đặc sản độc đáo. Mỗi hương vị tại đây đều được chế biến bằng tất cả sự tận tâm, mang đến trải nghiệm ẩm thực vừa quen thuộc vừa đầy bất ngờ. Đến với LaSiMi, bạn không chỉ ăn ngon mà còn cảm nhận được sự ấm áp, thân tình như trở về nhà.' AS story 
-    FROM Restaurants 
-    WHERE name = N'LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Sâm Chill Me - Lý Phục Man Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Sâm Chill Me Lý Phục Man mời bạn ghé thăm một không gian bình dị nhưng tràn đầy hương vị độc đáo tại Quận 7. Mỗi món ăn đặc sản tại đây đều được chế biến bằng cả tâm huyết, mang đến sự kết hợp tinh tế giữa truyền thống và phong cách riêng đầy sáng tạo. Hãy để Sâm Chill Me đưa bạn vào hành trình khám phá ẩm thực thư thái, nơi mọi giác quan được đánh thức và bạn tìm thấy một góc "chill" thật sự.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Sâm Chill Me - Lý Phục Man Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Mì Cay Sasin - Tân Phong Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Mì Cay Sasin - Tân Phong Quận 7 mở cửa đón bạn vào thế giới ẩm thực Hàn Quốc bình dân đầy lôi cuốn. Từng tô mì cay bùng vị, đậm đà theo phong cách Sasin độc đáo, được chế biến bằng cả tâm huyết, chắc chắn sẽ khiến mọi giác quan của bạn thức tỉnh. Đến Sasin, không chỉ là ăn mà còn là trải nghiệm không gian ấm cúng và hương vị đặc trưng chỉ tìm thấy ở đây.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Mì Cay Sasin - Tân Phong Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng đến Phan Rang Quán Quận 7! Tại 399 Lê Văn Lương, chúng tôi gói trọn tinh hoa ẩm thực Việt bình dân trong từng món đặc sản đậm đà hương vị độc đáo. Mỗi món ăn là một câu chuyện được kể bằng cả tấm lòng, qua bàn tay tài hoa cùng bí quyết riêng, mang đến trải nghiệm ấm cúng như nhà. Ghé thăm để cảm nhận sự khác biệt đã làm nên đánh giá 4.7/5 sao của chúng tôi!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ốc Trứng Muối - Chi Nhánh 17 Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Ốc Trứng Muối Quận 7, chúng tôi mang đến trải nghiệm ẩm thực bình dân độc đáo, nơi hương vị biển cả tươi rói hòa quyện hoàn hảo cùng sốt trứng muối béo ngậy, đậm đà khó cưỡng. Mỗi món ốc đặc sản đều được chế biến bằng cả tâm huyết, biến tấu theo công thức riêng, hứa hẹn đánh thức mọi giác quan của bạn. Hãy ghé ngay để tận hưởng không khí ấm cúng và những bữa ăn ngon miệng, đậm chất Sài Gòn bình dị!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ốc Trứng Muối - Chi Nhánh 17 Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Link Ốc Quận 7 - Đường Số 10
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Link Ốc Quận 7 - Đường Số 10 là nơi hội tụ tinh hoa hải sản tươi ngon với phong cách chế biến độc đáo, không lẫn vào đâu được. Mỗi món ăn là sự kết hợp hoàn hảo của gia vị bí truyền và tâm huyết người đầu bếp, khơi gợi mọi giác quan. Ghé Link Ốc để cùng bạn bè lai rai, tận hưởng không gian thoáng đãng và chìm đắm trong hương vị đặc sắc, khó quên.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Link Ốc Quận 7 - Đường Số 10'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng đến với Bún Riêu Tóp Mỡ Đặc Biệt Quận 7, nơi hương vị truyền thống được nâng tầm. Thưởng thức tô bún riêu cua đỏ au, nước lèo đậm đà quyện cùng tóp mỡ giòn tan béo ngậy – tạo nên bản giao hưởng ẩm thực độc đáo. Mỗi muỗng là một trải nghiệm từ cái tâm người nấu, mang đến sự ấm lòng khó tả. Ghé 269 Phạm Hữu Lầu để khám phá ngay món ngon "đặc biệt" này!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Lẩu Cá Đuối 79k - Lotte Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến Lẩu Cá Đuối 79k - Lotte Quận 7, nơi hương vị biển cả hội tụ trong nồi lẩu cá đuối chua cay đậm đà, chuẩn vị đặc trưng của riêng chúng tôi. Mỗi món nhậu tại đây đều là sự kết hợp tinh tế giữa nguyên liệu tươi ngon và bí quyết độc đáo, làm nên phong cách ẩm thực Việt khó quên. Với không gian ấm cúng và sự tận tâm trong từng món ăn, chúng tôi mong muốn mang đến những bữa ăn thật trọn vẹn và niềm vui sum họp. Mời bạn ghé 621 Nguyễn Thị Thập để cùng trải nghiệm!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Lẩu Cá Đuối 79k - Lotte Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trà Sữa MayCha - Yola, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Trà Sữa MayCha - Yola, Quận 7, mỗi món đặc sản là một câu chuyện hương vị được sáng tạo với tất cả tâm huyết và phong cách riêng biệt. Ghé thăm không gian ấm cúng, thân thiện để bạn tìm thấy giây phút thư giãn bên những món ăn ngon, khó quên. Hơn cả một quán ăn, chúng tôi mang đến trải nghiệm ẩm thực độc đáo, được hàng ngàn thực khách yêu mến và đánh giá cao.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trà Sữa MayCha - Yola, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Trạm Mì Ý Dì Hiền Quận 7, mỗi đĩa mì không chỉ là món ăn mà còn là lời mời gọi ấm áp về một hương vị Ý bình dị nhưng đầy tinh tế. Dì Hiền tự tay chế biến từng món đặc sản theo phong cách riêng, mang đến những trải nghiệm ẩm thực gần gũi mà khó quên. Ghé 6 Đường 15 để thưởng thức bữa ăn ngon chuẩn vị nhà làm với đánh giá 4.6/5 sao!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'ICHI QUÁN Quận 7 mời bạn khám phá Bún Chả Hà Nội và Nem Cua Bể trứ danh, nơi hương vị truyền thống được chúng tôi khoác lên chiếc áo mới, đầy phong cách và tinh tế. Mỗi món ăn là tâm huyết, là sự chắt lọc từ nguyên liệu tươi ngon nhất, mang đến cho bạn trải nghiệm ẩm thực đặc sắc không thể quên. Hãy ghé ICHI QUÁN để cảm nhận sự ấm áp và thưởng thức đặc sản Việt Nam chuẩn vị, đậm chất riêng!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Labubu Quận 7 - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Đừng bỏ lỡ Tacos Labubu Quận 7 - Đường Số 17, nơi mỗi chiếc taco là một hành trình vị giác đầy bất ngờ và lôi cuốn. Chúng tôi khéo léo kết hợp những nguyên liệu tươi ngon cùng công thức độc đáo, tạo nên hương vị đặc trưng làm say lòng thực khách. Ghé 145 Đường Số 17 để thưởng thức ''đặc sản'' mang đậm dấu ấn riêng của Labubu, và cảm nhận ngay sự khác biệt trong từng miếng cắn bạn nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Labubu Quận 7 - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Chicken 3S, chúng tôi tin rằng ẩm thực là nơi kết nối yêu thương. Hãy đến 475A Nguyễn Thị Thập để thưởng thức gà rán xốt Hàn bí truyền và mỳ cay độc đáo, mỗi món đều mang đậm dấu ấn riêng của quán. Từ công thức ủ vị đặc biệt đến không gian ấm cúng, chúng tôi tạo nên trải nghiệm ẩm thực khó quên, hoàn hảo cho những bữa ăn gia đình ấm áp và tràn ngập niềm vui.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tứ Quý Trà - Carameo Machiato Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến Tứ Quý Trà - Carameo Machiato Quận 7, nơi hương vị độc đáo và không gian ấm cúng hòa quyện. Thưởng thức Carameo Machiato thơm béo đặc trưng cùng những món đặc sản được chế biến tỉ mỉ, mang phong cách riêng của quán. Mỗi món ăn, thức uống đều chứa đựng trọn vẹn tâm huyết, mời bạn ghé 79A Đường 79 để cảm nhận sự gần gũi và ngon miệng như ở nhà.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tứ Quý Trà - Carameo Machiato Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chiang Thai Delivery - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chiang Thai Delivery Quận 7 là nơi tinh hoa ẩm thực Thái được biến tấu đầy sáng tạo, mang đến phong vị riêng không lẫn vào đâu được. Từ những nguyên liệu tươi ngon nhất, mỗi món ăn đều được chế biến bằng cả tâm huyết, chắt lọc bí quyết để hương vị bùng nổ và khó quên. Với 4.8 sao đánh giá, chúng tôi tự hào trao gửi những bữa ăn chuẩn vị, ấm lòng đến tận nhà bạn, biến mọi khoảnh khắc thưởng thức thành trải nghiệm đặc biệt.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chiang Thai Delivery - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tiệm Fulleaf - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Bước vào Tiệm Fulleaf - Quận 7, bạn sẽ tìm thấy một không gian bình dị, ấm cúng như chính ngôi nhà của mình. Nơi đây, hương cà phê thơm lừng hòa quyện cùng những món đặc sản được chế biến với tất cả tâm huyết, mang đậm phong cách riêng khó quên. Mỗi món ăn là một lời mời chân thành để bạn khám phá vị ngon độc đáo, để mỗi lần ghé là một kỷ niệm đáng nhớ.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tiệm Fulleaf - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Gangnam Tanghulu - Lotte Mart Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Gangnam Tanghulu tại Lotte Mart Quận 7 là điểm hẹn của những tâm hồn yêu ẩm thực Á Châu, nơi bạn sẽ khám phá các món đặc sản mang phong vị rất riêng, khó quên. Mỗi đĩa ăn là sự hòa quyện tinh tế giữa nguyên liệu tươi ngon và công thức bí truyền, được chúng tôi chăm chút bằng tất cả niềm đam mê. Hãy ghé thăm để trải nghiệm một bữa ăn ấm cúng, chuẩn vị đã chinh phục trái tim của biết bao thực khách!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Gangnam Tanghulu - Lotte Mart Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Pave Glace Chocolate Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến Pave Glace Chocolate Quận 7, nơi lan tỏa hương vị ngọt ngào và ấm áp. Chúng tôi tự hào giới thiệu những món tráng miệng đặc trưng, được chế biến bằng cả tâm huyết và công thức riêng biệt, mang đến trải nghiệm vị giác khó quên. Hãy ghé thăm để tận hưởng khoảnh khắc thư thái hoặc chọn những món quà ý nghĩa, làm cho mỗi ngày thêm ngọt.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Pave Glace Chocolate Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến Tacos Nhà Labubu 149, nơi mỗi chiếc taco bình dị lại chứa đựng cả một câu chuyện hương vị riêng đầy mê hoặc. Chúng tôi tự hào mang đến những món đặc sản được chế biến với phong cách độc đáo, từ vỏ bánh giòn rụm đến nhân thịt đậm đà, tươi ngon. Hãy ghé 149 Phạm Hữu Lầu để khám phá và cảm nhận sự khác biệt đúng chất Labubu, nơi vị giác của bạn được nuông chiều một cách đặc biệt nhất.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại 335 Nguyễn Hữu Thọ, Quận 7, Tacos Nhà LuXaBu mời bạn ghé thăm để trải nghiệm thế giới taco đầy mê hoặc. Mỗi chiếc taco mang phong cách Nhà LuXaBu độc đáo là sự kết hợp tinh tế giữa nguyên liệu tươi ngon và bí quyết riêng, gói trọn cái tâm của người làm bếp. Từng miếng cắn giòn tan, nhân đậm đà cùng nước sốt đặc trưng sẽ đánh thức mọi giác quan, mang đến trải nghiệm ẩm thực ấm áp và đáng nhớ.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tacos Xin Chào tại 333 Nguyễn Hữu Thọ, Quận 7, là điểm hẹn ẩm thực nơi hương vị độc đáo gặp gỡ sự nồng nhiệt. Mỗi chiếc taco không chỉ là món ăn fastfood bình dân, mà là một tác phẩm gói trọn niềm đam mê và công thức đặc biệt của chúng tôi. Từ nguyên liệu tươi ngon đến cách chế biến tinh tế, chúng tôi tự hào mang đến những đặc sản làm nên dấu ấn riêng, được khách hàng đánh giá 4.8 sao. Hãy ghé Tacos Xin Chào để thưởng thức sự khác biệt!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Bánh Mì Pate Hải Phòng Quận 7, chúng tôi tự hào mang đến những hương vị đặc sản Việt gói trọn cả cái tâm người đầu bếp. Từ ổ bánh mì pate trứ danh đến các món ngon độc đáo theo phong cách riêng, mỗi suất ăn là một hành trình vị giác đậm đà, khó quên. Đến đây, bạn không chỉ thưởng thức món ngon bình dân mà còn cảm nhận sự ấm áp, thân thuộc như bữa cơm nhà. Hân hoan chào đón bạn ghé 141 Đường Số 1 để trải nghiệm!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'A Duy Food Quận 7 - nơi tinh hoa ẩm thực Việt giao hòa cùng phong vị độc đáo. Mỗi đĩa Gà Quay, Sườn Quay hay Cơm Lam tại đây đều là sự kết tinh của nguyên liệu tươi ngon và công thức gia truyền, thấm đượm tâm huyết người đầu bếp. Hãy đến 163 Nguyễn Thị Thập để cảm nhận một bữa ăn trọn vẹn, ấm cúng và đầy xúc cảm bên gia đình thân yêu.' AS story 
-    FROM Restaurants 
-    WHERE name = N'A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ola Tacos Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng đến Ola Tacos Quận 7, nơi hương vị đường phố bùng nổ trong từng món đặc sản được chế biến theo phong cách độc đáo của riêng chúng tôi. Không cầu kỳ, chỉ đơn giản là những chiếc taco gói trọn tâm huyết, mang đến trải nghiệm ẩm thực nhanh gọn mà khó quên. Ghé 50 Đường Số 10 ngay để cảm nhận sự khác biệt và nạp năng lượng với những món ngon khó cưỡng!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ola Tacos Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại LaSiMi Quận 7 – Trà Ngon Đậm Vị, chúng tôi kiến tạo một không gian bình yên để bạn tạm quên đi phố thị, đắm mình vào từng ngụm trà đậm đà và thưởng thức món đặc sản mang phong cách riêng không lẫn vào đâu được. Mỗi món ăn, thức uống tại 147c đường số 17 đều là sự chắt lọc tinh hoa và tâm huyết, mang đến cho bạn trải nghiệm ẩm thực ấm áp, gần gũi như ở nhà. Hãy ghé LaSiMi để cảm nhận sự khác biệt trong từng câu chuyện hương vị.' AS story 
-    FROM Restaurants 
-    WHERE name = N'LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Sâm Chill Me - Lý Phục Man Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Sâm Chill Me - Lý Phục Man chào đón bạn đến một góc nhỏ ấm cúng, nơi mỗi món đặc sản đều kể một câu chuyện hương vị riêng. Chúng tôi gửi gắm cả tâm huyết vào từng nguyên liệu, từng công thức độc đáo để mang đến trải nghiệm ẩm thực khó quên. Hãy đến và cảm nhận sự thư thái, cùng vị ngon đặc trưng chỉ có tại Sâm Chill Me!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Sâm Chill Me - Lý Phục Man Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Mì Cay Sasin - Tân Phong Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Mì Cay Sasin - Tân Phong Quận 7 là điểm đến lý tưởng cho những tín đồ ẩm thực yêu thích hương vị Hàn Quốc đậm đà. Tại đây, bạn sẽ khám phá những tô mì cay và món đặc sản được chế biến theo công thức độc đáo, mang phong cách riêng không lẫn vào đâu được của Sasin. Mỗi món ăn không chỉ ngon miệng mà còn chứa đựng tâm huyết của chúng tôi, hứa hẹn mang đến một trải nghiệm ấm cúng, khó quên!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Mì Cay Sasin - Tân Phong Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến với Phan Rang Quán Quận 7 - nơi hương vị Việt truyền thống được nâng tầm bằng phong cách riêng độc đáo. Tại số 399 Lê Văn Lương, bạn sẽ tìm thấy không gian bình dị ấm cúng và những món đặc sản thấm đượm tâm huyết người nấu. Thưởng thức bữa ăn ngon chuẩn 4.7/5 sao, để mỗi miếng là một trải nghiệm khó quên!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ốc Trứng Muối - Chi Nhánh 17 Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Ốc Trứng Muối - Chi Nhánh 17 Quận 7, mỗi món ốc bình dân đều ẩn chứa cả tâm huyết và sự sáng tạo. Hương vị trứng muối độc quyền béo ngậy, đậm đà quyện cùng hải sản tươi ngon sẽ đánh thức mọi giác quan. Ghé ngay để khám phá thực đơn đặc sắc mang phong cách riêng và cảm nhận sự ấm cúng, gần gũi như nhà mình!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ốc Trứng Muối - Chi Nhánh 17 Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Link Ốc Quận 7 - Đường Số 10
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Link Ốc Quận 7 - Đường Số 10 không chỉ là quán ốc, mà là điểm hẹn của những hương vị độc đáo, được chế biến với tất cả tâm huyết. Tại đây, mỗi món hải sản tươi ngon đều mang "phong cách riêng" không lẫn vào đâu được, khiến thực khách say mê từ miếng đầu tiên. Còn gì tuyệt hơn khi cùng bạn bè nhâm nhi ốc nóng hổi trong không gian ấm cúng, đậm chất Sài Gòn? Mời bạn ghé 1 Đường Số 10 để khám phá ngay!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Link Ốc Quận 7 - Đường Số 10'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tìm một chút ấm áp giữa lòng Sài Gòn? Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 tại 269 Phạm Hữu Lầu chính là điểm đến bạn cần. Nước lèo bún riêu đậm đà, thanh ngọt được nấu từ công thức gia truyền, kết hợp cùng lớp tóp mỡ giòn rụm, béo ngậy tạo nên hương vị "đặc biệt" không thể lẫn vào đâu được. Mỗi tô bún là cả tâm huyết và sự tỉ mỉ, mang đến trải nghiệm ẩm thực bình dân nhưng đầy tinh tế. Hãy ghé ngay để cảm nhận sự khác biệt và hương vị khó quên này!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Lẩu Cá Đuối 79k - Lotte Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Lẩu Cá Đuối 79k - Lotte Quận 7 mời bạn tìm về hương vị đặc trưng của biển cả và những món nhậu truyền thống Việt Nam. Từng nồi lẩu cá đuối chua thanh, thịt cá tươi ngọt cùng các đặc sản độc đáo được chế biến từ tâm huyết sẽ đánh thức mọi giác quan. Đây là điểm hẹn lý tưởng tại 621 Nguyễn Thị Thập để sẻ chia những khoảnh khắc ấm cúng, tràn đầy niềm vui bên bàn ăn đậm đà bản sắc riêng của chúng tôi.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Lẩu Cá Đuối 79k - Lotte Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trà Sữa MayCha - Yola, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Trà Sữa MayCha - Yola là điểm dừng chân lý tưởng giữa lòng Quận 7, nơi bạn tìm thấy những góc nhỏ ấm cúng cho buổi hẹn hò hay phút giây thư giãn. Tại đây, chúng tôi tự hào mang đến thực đơn đặc sản độc đáo, mang phong cách riêng cùng những ly trà sữa thơm lừng, được chế biến bằng trọn vẹn tâm huyết. Từng hương vị đều được chăm chút tỉ mỉ, hứa hẹn một trải nghiệm ẩm thực khó quên và những khoảnh khắc ấm áp bên người thân yêu. Hãy ghé Trà Sữa MayCha - Yola để cảm nhận sự khác biệt!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trà Sữa MayCha - Yola, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tìm chút ấm áp giữa lòng Quận 7? Trạm Mì Ý Dì Hiền chào đón bạn với những đĩa mì Ý mang đậm dấu ấn riêng, được chế biến bằng cả tấm lòng. Giữa không gian bình dị nhưng tràn ngập mùi hương quyến rũ, mỗi sợi mì, mỗi loại sốt đều được Dì Hiền chăm chút tỉ mỉ. Hãy đến và tự mình cảm nhận sự đặc biệt trong từng hương vị, nơi ẩm thực Ý hòa quyện với nét bình dân gần gũi, tạo nên trải nghiệm 4.6 sao khó quên mà thực khách luôn tin yêu.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Giữa lòng Sài Gòn nhộn nhịp, ICHI QUÁN Quận 7 mở ra một không gian ẩm thực Việt bình dị mà ấm cúng. Tại đây, bạn sẽ khám phá hương vị Bún Chả Hà Nội trứ danh và Nem Cua Bể giòn tan, được chế biến với bí quyết riêng biệt, thấm đẫm tâm huyết của người đầu bếp. Mỗi món ăn là một câu chuyện, mang đậm dấu ấn riêng và khơi gợi ký ức đẹp. Mời bạn ghé thưởng thức để cảm nhận trọn vẹn sự tinh túy trong từng miếng ngon!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Labubu Quận 7 - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Đến Tacos Labubu Đường Số 17, bạn sẽ được thưởng thức những chiếc Tacos fastfood không chỉ nhanh gọn mà còn ngập tràn hương vị đặc trưng, có một không hai. Chúng tôi gửi gắm cả tâm huyết và sự sáng tạo vào từng nguyên liệu, từng lớp nhân đậm đà. Ghé Tacos Labubu để trải nghiệm một bữa ăn ngon miệng, đậm chất riêng và tràn đầy cảm hứng ẩm thực nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Labubu Quận 7 - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chicken 3S là nơi hội tụ tinh hoa ẩm thực Hàn Quốc dành cho gia đình bạn tại 475A Nguyễn Thị Thập, Quận 7. Khám phá ngay những miếng gà rán giòn tan đẫm sốt độc quyền và tô mì cay chuẩn vị, mỗi món đều gói trọn tâm huyết của người đầu bếp. Hãy đến và tận hưởng không gian ấm cúng, để mỗi bữa ăn là một kỷ niệm đáng nhớ tràn ngập hương vị và tiếng cười.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tứ Quý Trà - Carameo Machiato Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tứ Quý Trà là góc nhỏ thân quen giữa lòng Quận 7, nơi bạn luôn tìm thấy sự ấm áp và bình yên. Từ ly Carameo Machiato béo thơm đặc trưng đến những món đặc sản đậm đà, mỗi hương vị đều gói trọn cái tâm người làm. Ghé Tứ Quý Trà để tự mình cảm nhận, rồi bạn sẽ hiểu vì sao nơi đây luôn khiến người ta muốn quay lại.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tứ Quý Trà - Carameo Machiato Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chiang Thai Delivery - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chiang Thai Delivery - Quận 7 mang đến tinh hoa ẩm thực Thái Lan với phong cách riêng độc đáo, ngay tại nhà bạn. Mỗi món đặc sản, từ Tom Yum chua cay nồng nàn đến Pad Thai đậm đà, đều là sự kết hợp hoàn hảo của nguyên liệu tươi ngon và cái tâm của người đầu bếp. Hãy để chúng tôi đánh thức mọi giác quan của bạn bằng một trải nghiệm vị giác chuẩn Thái, tiện lợi và đầy cảm hứng.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chiang Thai Delivery - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tiệm Fulleaf - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tiệm Fulleaf - Quận 7 là chốn dừng chân lý tưởng để bạn tìm thấy sự bình yên và những hương vị rất riêng. Mỗi món đặc sản ở đây đều được chúng tôi chuẩn bị bằng tất cả cái tâm, mang đến trải nghiệm ẩm thực độc đáo không lẫn vào đâu được. Hãy ghé Tiệm Fulleaf để cảm nhận sự ấm áp và để vị giác dẫn lối khám phá những bất ngờ.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tiệm Fulleaf - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Gangnam Tanghulu - Lotte Mart Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Gangnam Tanghulu, chúng tôi mời bạn khám phá thế giới hương vị Á Đông đặc sắc ngay trong Lotte Mart Quận 7. Mỗi món ăn, từ những xiên kẹo trái cây giòn tan đến các đặc sản nóng hổi mang phong cách riêng, đều được chế biến bằng tất cả tâm huyết để mang lại trải nghiệm ẩm thực độc đáo. Ghé thăm để cảm nhận sự ấm áp và thưởng thức bữa ăn ngon miệng, chất lượng làm nên thương hiệu của chúng tôi.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Gangnam Tanghulu - Lotte Mart Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Pave Glace Chocolate Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Đến với Pave Glace Chocolate Quận 7, bạn sẽ tìm thấy một thế giới ngọt ngào ẩn mình tại 98 Đường 65. Mỗi món tráng miệng đặc trưng của chúng tôi là sự hòa quyện tinh tế của hương vị chocolate độc đáo và niềm đam mê sáng tạo. Từ những viên kẹo ngọt ngào làm quà tặng đến khoảnh khắc thưởng thức riêng, hãy để Pave Glace lan tỏa niềm vui và sự ấm áp đến bạn.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Pave Glace Chocolate Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến với Tacos Nhà Labubu 149, nơi những chiếc taco bình dân được nâng tầm thành trải nghiệm ẩm thực đặc sắc. Mỗi miếng bánh là sự hòa quyện hoàn hảo của nguyên liệu tươi ngon cùng công thức "bí mật" mang đậm phong cách Labubu. Ghé ngay 149 Phạm Hữu Lầu, Quận 7 để khám phá hương vị độc đáo, khó quên và cảm nhận sự ấm áp trong từng món ăn bạn nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Bước chân vào Tacos Nhà LuXaBu ở 335 Nguyễn Hữu Thọ, bạn sẽ ngạc nhiên với những chiếc taco bình dân nhưng đậm đà chất riêng. Tại đây, mỗi chiếc bánh là sự kết hợp hoàn hảo của vỏ giòn tan, nhân tươi ngon và hương vị độc đáo, được làm bằng tất cả tâm huyết. Ghé ngay để khám phá phong cách ẩm thực đặc sắc, nơi những hương vị khó quên đang chờ đón bạn!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Xin chào các tín đồ ẩm thực! Tại Tacos Xin Chào 333 Nguyễn Hữu Thọ, chúng tôi tự hào mang đến những chiếc taco bùng nổ hương vị, độc đáo với phong cách riêng không lẫn vào đâu được. Từng nguyên liệu tươi ngon được chế biến đầy tâm huyết, tạo nên món fastfood chất lượng chuẩn nhà làm mà giá thì bình dân. Ghé ngay để cảm nhận sự "Xin Chào" chân thành qua từng miếng cắn giòn tan, đậm đà khó quên nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Bánh Mì Pate Hải Phòng Quận 7, chúng tôi tự hào mang đến những hương vị đặc trưng từ phố Cảng với phong cách riêng đầy sáng tạo. Mỗi món ăn, đặc biệt là bánh mì pate trứ danh, đều là kết quả của công thức gia truyền và tâm huyết gửi gắm vào từng nguyên liệu tươi ngon. Hãy đến 141 Đường Số 1 để trải nghiệm nét ẩm thực bình dị mà quyến rũ, đã làm hài lòng hàng ngàn thực khách.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại A Duy Food Quận 7, mỗi món ăn là một câu chuyện hương vị đậm đà, được nêm nếm bằng cả tấm lòng. Từng miếng gà quay vàng óng, sườn quay thấm vị hay chén cơm lam dẻo thơm đều mang phong cách đặc trưng, gợi nhớ bữa cơm gia đình ấm cúng. Đến và cảm nhận sự khác biệt từ những đặc sản riêng có, đã làm nên thương hiệu được thực khách yêu mến.' AS story 
-    FROM Restaurants 
-    WHERE name = N'A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ola Tacos Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Đến với Ola Tacos Quận 7, bạn sẽ khám phá những chiếc tacos đặc sản với phong cách ẩm thực độc đáo, chỉ riêng tại đây. Mỗi chiếc bánh giòn tan, nhân đầy ắp hương vị đậm đà là kết quả của sự tỉ mỉ và tâm huyết, hứa hẹn mang đến một trải nghiệm vị giác bùng nổ. Hãy để Ola Tacos đánh thức vị giác của bạn bằng nét chấm phá khó quên này!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ola Tacos Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào bạn ghé LaSiMi Quận 7, điểm hẹn ấm cúng trên Đường Số 17 tấp nập. Tại đây, bạn sẽ khám phá không chỉ những ly trà ngon đậm vị mà còn là thế giới của các món đặc sản riêng biệt, được chế biến bằng tất cả tâm huyết. Mỗi hương vị là một câu chuyện chân thành, mang đến trải nghiệm ẩm thực khó quên mà thực khách đã tin yêu với 4.9/5 sao. Mời bạn đến cảm nhận và tận hưởng những khoảnh khắc thật chill cùng LaSiMi nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Sâm Chill Me - Lý Phục Man Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Sâm Chill Me Lý Phục Man chào đón bạn đến với không gian ấm cúng, nơi thời gian dường như chậm lại. Chúng tôi tự hào mang đến những món đặc sản độc đáo, được chế biến bằng tất cả tâm huyết để mỗi hương vị đều là một trải nghiệm khó quên. Ghé Sâm Chill Me để "chill" với tách cafe thơm lừng và khám phá phong cách ẩm thực riêng biệt chỉ có tại 89 Lý Phục Man nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Sâm Chill Me - Lý Phục Man Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Mì Cay Sasin - Tân Phong Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Mì Cay Sasin Tân Phong Quận 7 không chỉ là quán ăn, mà là nơi chúng tôi gửi gắm cả tâm huyết vào từng món Hàn chuẩn vị, mang đậm dấu ấn riêng. Mỗi tô mì cay nóng hổi, mỗi món ăn đặc sắc đều được chế biến cẩn thận, hứa hẹn đánh thức mọi giác quan. Ghé Sasin, bạn sẽ tìm thấy sự ấm áp, quen thuộc và những trải nghiệm vị giác khó quên trong không gian bình dị, gần gũi.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Mì Cay Sasin - Tân Phong Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Phan Rang Quán Quận 7 là chốn dừng chân lý tưởng trên con đường Lê Văn Lương, nơi hương vị miền Trung chân thật được giữ trọn vẹn. Mỗi món đặc sản tại đây đều thấm đượm cái tâm người đầu bếp, mang đến phong vị riêng độc đáo, bình dị mà lôi cuốn. Hãy đến và cảm nhận sự ấm áp, vị ngon khó cưỡng như bữa cơm nhà mẹ nấu, chắc chắn sẽ khiến bạn hài lòng.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ốc Trứng Muối - Chi Nhánh 17 Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Ốc Trứng Muối - Chi Nhánh 17 Quận 7 tự hào mang đến những món ốc tươi ngon, đậm đà hương vị đặc trưng mà không nơi nào có được. Nổi bật nhất là sự kết hợp hoàn hảo của ốc và trứng muối béo ngậy, tạo nên trải nghiệm vị giác khó quên. Với không gian bình dân, ấm cúng, chúng tôi mời bạn ghé thăm để cùng sẻ chia những khoảnh khắc ẩm thực đầy hứng khởi và niềm vui!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ốc Trứng Muối - Chi Nhánh 17 Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Link Ốc Quận 7 - Đường Số 10
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Link Ốc Đường Số 10 là điểm dừng chân lý tưởng cho những tâm hồn yêu hải sản và mê nhậu tại Quận 7. Từng món ốc tươi rói, thấm đẫm gia vị độc quyền mang phong cách Link Ốc, hứa hẹn đánh thức mọi giác quan. Đến đây, không gian ấm cúng, rộn rã tiếng cười sẽ là chất xúc tác hoàn hảo cho những cuộc tụ họp đáng nhớ. Link Ốc không chỉ là bữa ăn, mà là trải nghiệm vị giác đầy cảm hứng chờ bạn khám phá.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Link Ốc Quận 7 - Đường Số 10'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tìm về hương vị xưa trên con đường Phạm Hữu Lầu, Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 là điểm đến không thể bỏ lỡ. Nồi nước lèo đỏ au, thơm lừng cùng gạch cua béo ngậy và miếng tóp mỡ vàng giòn tan chảy, tạo nên sự giao thoa vị giác độc đáo. Chúng tôi gửi gắm cả tình yêu vào từng tô bún, mang đến cho bạn bữa ăn ấm cúng, đậm đà chất Sài Gòn. Hãy ghé 269 Phạm Hữu Lầu để cảm nhận sự khác biệt!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Lẩu Cá Đuối 79k - Lotte Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Lẩu Cá Đuối 79k - Lotte Quận 7, bạn sẽ được đắm mình trong hương vị lẩu cá đuối chua cay đậm đà, chuẩn gu nhậu Việt. Không gian ấm cúng tại 621 Nguyễn Thị Thập là nơi lý tưởng để tụ họp, sẻ chia những câu chuyện bên bàn ăn chất lượng. Chúng tôi tỉ mẩn gửi gắm nét riêng biệt và sự tươi ngon vào từng món, mang đến trải nghiệm ẩm thực khó quên. Mời bạn ghé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Lẩu Cá Đuối 79k - Lotte Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trà Sữa MayCha - Yola, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'MayCha Yola, điểm hẹn bình yên tại Quận 7, mời bạn ghé thăm để tận hưởng không gian thoáng đãng và hương vị riêng biệt. Không chỉ có trà sữa thơm ngon, mà mỗi món đặc sản tại đây đều là tâm huyết được gửi gắm, mang đến trải nghiệm ẩm thực độc đáo khó quên. Đến MayCha Yola, nơi bạn luôn tìm thấy sự ấm áp và những khoảnh khắc tuyệt vời bên bàn ăn.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trà Sữa MayCha - Yola, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Trạm Mì Ý Dì Hiền là nơi bạn tìm thấy những đĩa mì Ý quen mà lạ, được Dì Hiền khéo léo biến tấu với phong cách riêng đầy mê hoặc. Mỗi món ăn đều gói trọn cái tâm, mang đến hương vị đậm đà, khó quên trong không gian ấm cúng, gần gũi. Ghé ngay 6 Đường 15 để thưởng thức bữa ăn bình dị nhưng tràn đầy cảm hứng, như một lời chào từ nước Ý qua bàn tay người Việt! Chắc chắn bạn sẽ hiểu vì sao quán luôn được đánh giá cao đến thế.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN: Nơi tinh hoa ẩm thực Hà Thành hội tụ cùng phong cách riêng đầy hấp dẫn ngay giữa lòng Quận 7. Mỗi món ăn là sự kết hợp của tâm huyết và bí quyết đặc biệt, từ bún chả thơm lừng đến nem cua bể giòn rụm. Hãy đến để thưởng thức hương vị khó quên, ấm áp như nhà làm và cảm nhận sự khác biệt!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Labubu Quận 7 - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Tacos Labubu Quận 7 - Đường Số 17, mỗi chiếc taco không chỉ là món ăn nhanh mà còn là cả một câu chuyện hương vị độc đáo. Từ vỏ bánh giòn tan đến nhân thịt đậm đà thấm sốt đặc trưng, tất cả đều được chế biến bằng cái tâm để mang đến trải nghiệm ẩm thực khó quên. Hãy đến và tự mình khám phá phong vị Labubu rất riêng, bạn nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Labubu Quận 7 - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng đến Chicken 3S, nơi mỗi miếng gà rán sốt Hàn giòn rụm hay tô mỳ cay nóng hổi đều được chế biến bằng cả trái tim và bí quyết riêng. Chúng tôi tự hào mang đến hương vị độc đáo, ấm áp đậm chất gia đình, biến mỗi bữa ăn thành khoảnh khắc hạnh phúc khó quên. Ghé thăm ngay 475A Nguyễn Thị Thập để cảm nhận trọn vẹn sự khác biệt!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tứ Quý Trà - Carameo Machiato Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến Tứ Quý Trà - Carameo Machiato Quận 7, một điểm hẹn bình dị nơi hương vị Carameo Machiato ngọt ngào hay tách trà thơm lừng luôn sẵn sàng. Chúng tôi tự hào gửi gắm tâm huyết vào từng món đặc sản, mang phong cách riêng không thể lẫn, để mỗi lần ghé qua là một khám phá vị giác khó quên. Hãy tìm cho mình một góc ấm cúng, thư thái và để Tứ Quý Trà mang đến những trải nghiệm ẩm thực thân tình, mộc mạc giữa lòng Sài Gòn sôi động.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tứ Quý Trà - Carameo Machiato Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chiang Thai Delivery - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Chiang Thai Delivery, chúng tôi gửi gắm cả tấm lòng vào từng món ăn Thái trứ danh, mang đến hương vị đặc trưng "chuẩn Thái, chất riêng" cho Quận 7. Mỗi món là sự hòa quyện hoàn hảo của chua cay mặn ngọt, được chế biến tỉ mỉ với bí quyết độc đáo riêng của quán. Hãy để Chiang Thai đánh thức mọi giác quan và đưa bạn du ngoạn ẩm thực Thái ngay tại nhà!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chiang Thai Delivery - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tiệm Fulleaf - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tiệm Fulleaf Quận 7 là chốn dừng chân bình yên giữa lòng phố, nơi bạn luôn cảm nhận được sự ấm cúng và gần gũi như về nhà. Tại đây, mỗi món ăn đặc sản đều được chúng tôi gửi gắm cả tâm huyết, mang một phong cách riêng độc đáo, khó lẫn. Từ những nguyên liệu tươi ngon nhất, chúng tôi tỉ mỉ biến tấu để mỗi hương vị đều khiến bạn phải vấn vương. Ghé Fulleaf để khám phá và tận hưởng bữa ăn trọn vẹn hương sắc nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tiệm Fulleaf - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Gangnam Tanghulu - Lotte Mart Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Bước vào Gangnam Tanghulu tại Lotte Mart Quận 7, bạn sẽ khám phá một thế giới hương vị châu Á độc đáo, nơi mỗi món ăn là một câu chuyện được kể bằng sự tận tâm. Từ những xiên Tanghulu giòn tan trứ danh đến các món đặc sản mang phong cách riêng, chúng tôi tự hào mang đến trải nghiệm ẩm thực gần gũi và đầy cảm hứng. Hãy ghé thăm gian hàng ấm cúng của chúng tôi để thưởng thức và cảm nhận sự khác biệt bạn nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Gangnam Tanghulu - Lotte Mart Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Pave Glace Chocolate Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Pave Glace Chocolate Quận 7, chúng tôi tự hào mang đến thế giới tráng miệng độc đáo, nơi sự tinh tế và hương vị được "lát" nên từ đam mê. Thưởng thức những viên chocolate Pave Glace mát lạnh tan chảy, cùng các món đặc sản được sáng tạo theo phong cách riêng của quán, hứa hẹn đánh thức mọi giác quan. Một điểm hẹn ngọt ngào lý tưởng để tự thưởng cho mình hoặc trao gửi những món quà chân thành nhất.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Pave Glace Chocolate Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tìm kiếm một "chuyến phiêu lưu" ẩm thực nhanh gọn mà vẫn tràn đầy hương vị đặc sắc? Tacos Nhà Labubu 149 chính là điểm hẹn lý tưởng. Mỗi chiếc taco tại đây không chỉ là món ăn bình dân mà còn là "đặc sản" được chế biến bằng cái tâm và phong cách độc đáo của riêng Nhà Labubu. Hãy đến và tự mình cảm nhận sự khác biệt, nơi hương vị tuyệt vời luôn chờ đón bạn!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tacos Nhà LuXaBu tại 335 Nguyễn Hữu Thọ không chỉ là quán fast food bình dân mà còn là nơi gói trọn niềm đam mê ẩm thực. Mỗi chiếc tacos là sự sáng tạo độc đáo, mang "chất LuXaBu" riêng, khiến thực khách luôn bất ngờ với hương vị đậm đà, khó quên. Đến đây, bạn sẽ tìm thấy những món đặc sản được làm từ cái tâm, vừa vặn cho bữa nhanh gọn mà vẫn ấm áp và đầy hứng khởi. Hãy ghé thăm để trải nghiệm phong vị riêng chỉ có tại Tacos Nhà LuXaBu!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Tacos Xin Chào, chúng tôi tin rằng ẩm thực là một lời chào nồng hậu. Mỗi chiếc taco không chỉ là món fastfood bình dân, mà còn là bản giao hưởng hương vị đặc trưng được làm nên từ sự tỉ mỉ và cái tâm của người đầu bếp. Ghé 333 Nguyễn Hữu Thọ, Quận 7 để cảm nhận trọn vẹn sự giao thoa độc đáo và lý do 4.8 sao mà khách hàng dành tặng chúng tôi!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tìm về tuổi thơ với hương vị Bánh Mì Pate Hải Phòng trứ danh tại Quận 7. Mỗi món ăn tại quán Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1 đều được chế biến bằng tất cả tâm huyết, mang đến trải nghiệm ẩm thực bình dị mà đậm đà khó quên. Ghé ngay 141 Đường Số 1 để thưởng thức sự kết hợp hoàn hảo của truyền thống và phong cách riêng!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến A Duy Food Quận 7, nơi hương vị Gà Quay, Sườn Quay vàng óng và Cơm Lam dẻo thơm luôn mời gọi. Mỗi món ăn là tâm huyết của chúng tôi, được chế biến theo công thức độc quyền, mang đậm dấu ấn đặc trưng mà bạn sẽ khó quên. Hãy cùng gia đình ghé thăm để tận hưởng không gian ấm cúng và bữa ăn truyền thống Việt Nam được nâng tầm, chuẩn vị nhà làm.' AS story 
-    FROM Restaurants 
-    WHERE name = N'A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ola Tacos Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Bỏ túi ngay địa chỉ quen thuộc cho những tín đồ ẩm thực mê Tacos tại Quận 7! Ola Tacos tự hào mang đến những chiếc bánh "đặc sản" biến tấu đầy sáng tạo, đậm dấu ấn riêng không lẫn vào đâu được. Mỗi miếng cắn là sự kết hợp hoàn hảo của nguyên liệu tươi ngon cùng cái tâm người đầu bếp, đảm bảo một bữa ăn chất lượng mà giá lại cực kỳ "hạt dẻ". Ghé 50 Đường Số 10 để trải nghiệm hương vị đặc biệt này!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ola Tacos Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến với LaSiMi Quận 7, nơi Trà Ngon Đậm Vị hòa quyện cùng những món đặc sản mang phong cách riêng, độc đáo. Mỗi hương vị tại LaSiMi đều là kết quả của sự tận tâm, tỉ mỉ, mang đến trải nghiệm ẩm thực bình dị nhưng khó quên. Hãy ghé Đường Số 17 để cảm nhận không gian ấm cúng và sự chào đón nồng hậu, nơi chúng tôi gửi gắm cả tấm lòng vào từng món ăn, thức uống.' AS story 
-    FROM Restaurants 
-    WHERE name = N'LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Sâm Chill Me - Lý Phục Man Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Sâm Chill Me Lý Phục Man chào đón bạn đến với không gian ấm cúng, nơi những món đặc sản độc đáo mang phong cách riêng sẽ đánh thức mọi giác quan. Mỗi hương vị được ủ ấp từ cái tâm người đầu bếp, tạo nên trải nghiệm ẩm thực khác biệt, khó quên. Ghé Sâm Chill Me để thưởng thức và tìm thấy cảm giác thư thái tuyệt vời, cho một ngày thật trọn vẹn!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Sâm Chill Me - Lý Phục Man Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Mì Cay Sasin - Tân Phong Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Mì Cay Sasin - Tân Phong Quận 7 là điểm hẹn lý tưởng cho những ai yêu ẩm thực Hàn Quốc bình dân nhưng đầy cá tính. Tại đây, mỗi tô mì cay nghi ngút hay món đặc sản riêng đều được chế biến bằng cả tâm huyết, mang đến hương vị bùng nổ khó quên mà chỉ Sasin mới có. Hãy đến và cảm nhận sự ấm áp lan tỏa, để vị giác được chiều chuộng trong không gian gần gũi như ở nhà.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Mì Cay Sasin - Tân Phong Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Phan Rang Quán Quận 7 tại 399 Lê Văn Lương là điểm đến ấm cúng cho những tâm hồn yêu ẩm thực Việt. Nơi đây, mỗi món đặc sản đều được chúng tôi gửi gắm trọn vẹn cái tâm, từ nguyên liệu tươi ngon đến phong cách chế biến độc đáo, mang đến hương vị khó quên. Hãy ghé thăm để thưởng thức những bữa ăn đậm đà, thân thuộc như chính bữa cơm nhà mình nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ốc Trứng Muối - Chi Nhánh 17 Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Ốc Trứng Muối Quận 7, chúng tôi tin rằng món ngon nhất đến từ nguyên liệu tươi rói và một chút "tâm tình" riêng. Đến đây, bạn sẽ khám phá thế giới hải sản bình dị nhưng đầy bất ngờ với những món ốc thấm đượm sốt trứng muối béo ngậy đặc trưng. Mỗi đĩa là một câu chuyện hương vị độc đáo, ấm áp chờ bạn thưởng thức. Mời bạn ghé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ốc Trứng Muối - Chi Nhánh 17 Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Link Ốc Quận 7 - Đường Số 10
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Link Ốc Quận 7 – Đường Số 10 là điểm đến lý tưởng cho những tâm hồn yêu ẩm thực biển. Tại đây, mỗi món đặc sản ốc và hải sản nhậu đều được chế biến với cái tâm, mang phong cách riêng độc đáo, khơi dậy trọn vẹn mọi giác quan. Hãy đến và tận hưởng không gian ấm cúng, để những buổi gặp gỡ bạn bè thêm phần gắn kết bên mâm ốc nóng hổi, đậm đà hương vị khó quên.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Link Ốc Quận 7 - Đường Số 10'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến với Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu, nơi mỗi tô bún riêu cua dậy vị quyện cùng tóp mỡ giòn tan sẽ đánh thức mọi giác quan. Chúng tôi tỉ mẩn chọn lựa nguyên liệu tươi ngon, gửi gắm trọn vẹn tâm huyết để mang đến hương vị chuẩn mực và độc đáo riêng. Hãy ghé 269 Phạm Hữu Lầu để thưởng thức món ngon nhà làm, ấm lòng và đầy ắp kỷ niệm!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Lẩu Cá Đuối 79k - Lotte Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Lẩu Cá Đuối 79k - Lotte Quận 7 là nơi hội tụ tinh hoa ẩm thực Việt, mang đến món lẩu cá đuối trứ danh với hương vị chua cay hài hòa, cá tươi roi rói cùng nước dùng đậm đà khó quên. Mỗi món ăn tại đây đều được chế biến bằng cả tâm huyết, với bí quyết riêng, tạo nên phong cách đặc sắc không lẫn vào đâu được. Hãy cùng bạn bè, người thân quây quần bên bàn ăn ấm cúng, nhâm nhi những món nhậu ngon đúng điệu và tận hưởng những khoảnh khắc sum vầy đáng nhớ. Chúng tôi tin rằng bạn sẽ tìm thấy một góc Sài Gòn thân thương và tràn đầy cảm xúc tại Lẩu Cá Đuối 79k.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Lẩu Cá Đuối 79k - Lotte Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trà Sữa MayCha - Yola, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Trà Sữa MayCha - Yola, mỗi ly trà sữa là một bản giao hưởng hương vị, còn các món đặc sản lại kể một câu chuyện ẩm thực riêng biệt, được chế biến bằng cả tâm huyết. Chúng tôi kiến tạo không gian ấm cúng, gần gũi ngay tại Quận 7 để bạn thưởng thức những sáng tạo độc đáo này. Với 4.8 sao đánh giá, MayCha cam kết mang đến những trải nghiệm ngon miệng và khó quên, biến mỗi khoảnh khắc ghé thăm thành một kỷ niệm đẹp.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trà Sữa MayCha - Yola, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng đến Trạm Mì Ý Dì Hiền, nơi mỗi đĩa mì Ý không chỉ là món ăn mà còn là cả tấm lòng Dì Hiền gửi gắm. Với công thức riêng đầy sáng tạo, những món đặc sản tại đây mang hương vị Ý quen mà lạ, thấm đượm nét Sài Gòn bình dị. Ghé số 6 Đường 15, Quận 7 để thưởng thức vị ngon đặc trưng và cảm nhận sự ấm áp như ở nhà.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN, chúng tôi tự hào mang hương vị Hà Nội trứ danh về giữa lòng Quận 7. Mỗi suất bún chả thơm lừng hay nem cua bể giòn rụm đều được chế biến bằng cả cái tâm và công thức riêng biệt, đảm bảo giữ trọn vẹn bản sắc ẩm thực truyền thống nhưng vẫn rất độc đáo. Hãy ghé thăm để tìm lại những ký ức ẩm thực thân thương trong không gian bình dị, ấm cúng và thưởng thức những món đặc sản đậm đà, khó quên.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Labubu Quận 7 - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tacos Labubu Đường Số 17 là điểm dừng chân bình dân nhưng ấm áp, nơi bạn sẽ khám phá những chiếc taco mang hương vị đặc trưng "chuẩn Labubu" có một không hai. Với tất cả tâm huyết gói ghém trong từng nguyên liệu tươi ngon và công thức độc đáo, chúng tôi tạo nên phong cách ẩm thực riêng, khơi gợi mọi giác quan. Ghé Labubu ngay để trải nghiệm hương vị cuốn hút và cảm nhận sự chào đón nồng nhiệt từ chúng tôi!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Labubu Quận 7 - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Chicken 3S, chúng tôi tin rằng món ăn ngon nhất đến từ cái tâm và sự sáng tạo không ngừng. Từng miếng gà rán giòn tan đẫm xốt Hàn độc quyền, hay tô mỳ cay đậm đà đều được chế biến với tất cả tâm huyết. Hãy ghé 475A Nguyễn Thị Thập để cảm nhận không gian ấm cúng và thưởng thức hương vị đặc sắc, chuẩn vị gia đình bạn nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tứ Quý Trà - Carameo Machiato Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tứ Quý Trà - Carameo Machiato Quận 7 là nơi bạn tìm thấy một góc bình yên giữa lòng Sài Gòn, nơi hương vị Carameo Machiato ngọt ngào và sánh mịn đánh thức mọi giác quan. Chúng tôi tự hào mang đến những món đặc sản mang đậm phong cách riêng, được chế biến tỉ mỉ bằng cả tấm lòng để mỗi hương vị đều là một trải nghiệm khó quên. Ghé 79A Đường 79 để cảm nhận sự ấm áp và sự tận tâm trong từng món ăn nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tứ Quý Trà - Carameo Machiato Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chiang Thai Delivery - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chiang Thai Delivery - Quận 7 không chỉ mang đến món ăn, mà là cả một hành trình vị giác đầy mê hoặc. Mỗi món Thái tại đây đều được chế biến bằng tất cả cái tâm, từ nguyên liệu tươi rói đến công thức độc đáo riêng biệt. Hãy để hương vị đậm đà, tinh túy đánh thức mọi giác quan, biến bữa ăn tại nhà bạn thành một trải nghiệm ẩm thực Thái Lan chuẩn vị, ấm cúng.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chiang Thai Delivery - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tiệm Fulleaf - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Giữa Quận 7 năng động, Tiệm Fulleaf là điểm hẹn bình yên, nơi hương cà phê thơm lừng hòa quyện cùng những món đặc sản mang phong cách riêng độc đáo. Mỗi món ăn đều được chế biến bằng cả tâm huyết, mang đến trải nghiệm vị giác khó quên. Ghé Tiệm Fulleaf để tìm về chút ký ức thân quen và thưởng thức nét sáng tạo rất riêng bạn nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tiệm Fulleaf - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Gangnam Tanghulu - Lotte Mart Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến với Gangnam Tanghulu, nơi hương vị Á Đông giao thoa trong những món đặc sản độc đáo, mang đậm phong cách riêng của chúng tôi. Mỗi miếng ăn là sự kết tinh của cái tâm người đầu bếp, hứa hẹn một hành trình vị giác khó quên ngay tại Lotte Mart Quận 7. Hãy ghé thăm để tận hưởng không gian ấm cúng và trải nghiệm ẩm thực tuyệt vời đã làm nên tên tuổi, chờ bạn khám phá và yêu thích.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Gangnam Tanghulu - Lotte Mart Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Pave Glace Chocolate Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Pave Glace Chocolate Quận 7 mời bạn ghé thăm một góc nhỏ bình yên, nơi hương thơm ngọt ngào lan tỏa. Tại đây, mỗi món dessert là câu chuyện của sự tỉ mỉ, niềm đam mê và những công thức độc quyền, mang đến hương vị khó quên chỉ có riêng tại quán. Hãy để vị giác được nuông chiều bởi sự tinh tế và tìm thấy món quà hoàn hảo cho những khoảnh khắc đặc biệt. Chúng tôi chờ đón bạn tại 98 Đường 65 để cùng trải nghiệm!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Pave Glace Chocolate Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến Tacos Nhà Labubu 149, nơi hương vị Tacos truyền thống được biến tấu đầy sáng tạo, mang đậm dấu ấn riêng không thể tìm thấy ở đâu khác. Mỗi chiếc bánh là sự kết hợp hoàn hảo của nguyên liệu tươi ngon và bí quyết gia truyền, gói trọn cái tâm và niềm vui của Labubu gửi gắm. Ghé ngay để khám phá những món ''đặc sản'' đã làm nên tên tuổi của quán, một điểm hẹn ẩm thực ấm cúng giữa lòng Quận 7.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tacos Nhà LuXaBu tại 335 Nguyễn Hữu Thọ là nơi bạn tìm thấy những chiếc Tacos ''đặc sản'' mang đậm dấu ấn riêng, bình dân mà không hề tầm thường. Từng miếng nhân đậm đà, quyện cùng vỏ bánh giòn rụm sẽ đánh thức mọi giác quan. Ghé Tacos Nhà LuXaBu để trải nghiệm hương vị có ''một không hai'', được làm bằng cả cái tâm! Hãy đến và cảm nhận sự khác biệt.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng đến với Tacos Xin Chào, 333 Nguyễn Hữu Thọ, Quận 7 – nơi hương vị độc đáo đã chinh phục thực khách và được đánh giá 4.8/5 sao! Mỗi chiếc taco giòn rụm, đong đầy nhân thấm đẫm sốt nhà làm bí truyền, là minh chứng cho sự tỉ mỉ và cái tâm chúng tôi gửi gắm. Dù là fast food bình dân, Tacos Xin Chào tự hào mang đến trải nghiệm ẩm thực chân thành, đậm đà khó quên, mời bạn ghé và cảm nhận!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Bánh Mì Pate Hải Phòng Quận 7 không chỉ là tên gọi, mà là lời hứa về hương vị nguyên bản từ thành phố Cảng, được chăm chút bằng tất cả cái tâm của người thợ. Mỗi ổ bánh mì tại 141 Đường Số 1 là sự hòa quyện tinh tế của pate thơm béo đặc trưng cùng các món ăn "độc quyền" mang phong cách riêng của quán. Một địa chỉ bình dân, nhưng đậm đà và khó quên, đã chinh phục biết bao tín đồ ẩm thực Sài Gòn. Hãy ghé thăm để trải nghiệm bạn nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'A Duy Food Quận 7 là nơi bạn tìm thấy hương vị Việt thân thương trong mỗi món ăn. Từ gà quay giòn rụm thơm lừng, sườn quay đậm đà khó cưỡng đến cơm lam dẻo thơm đặc trưng, mỗi món đều được chế biến bằng cái tâm và bí quyết riêng của quán. Chúng tôi mong muốn mang đến những bữa cơm gia đình ấm áp, nơi vị giác và cảm xúc được vỗ về trọn vẹn.' AS story 
-    FROM Restaurants 
-    WHERE name = N'A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ola Tacos Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Ola Tacos Quận 7, chúng tôi mang đến những chiếc taco bình dân nhưng bùng nổ hương vị đặc trưng. Mỗi món ăn là sự pha trộn tinh tế của nguyên liệu tươi ngon và bí quyết riêng, tạo nên trải nghiệm ẩm thực khó quên chỉ có ở 50 Đường Số 10. Hãy đến và cảm nhận sự tâm huyết gửi gắm trong từng miếng, nơi vị giác của bạn được đánh thức theo một cách rất riêng!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ola Tacos Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại LaSiMi Quận 7 - Đường Số 17, chúng tôi tự hào mang đến một không gian thật gần gũi, nơi mỗi ngụm trà đều đậm vị ký ức và mỗi món đặc sản đều thấm đượm phong cách riêng không lẫn vào đâu được. Từng hương vị được chăm chút tỉ mỉ, gửi gắm trọn vẹn cái tâm của người làm bếp. Hãy đến và trải nghiệm hương vị 4.9 sao được yêu thích mà bạn khó lòng quên!' AS story 
-    FROM Restaurants 
-    WHERE name = N'LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Sâm Chill Me - Lý Phục Man Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Ghé Sâm Chill Me Lý Phục Man để tìm một góc "chill" thật sự giữa lòng Sài Gòn. Nơi đây, mỗi món ăn là một câu chuyện riêng, được sáng tạo từ cái tâm của người đầu bếp, mang đến hương vị đặc trưng mà bạn sẽ khó tìm thấy ở nơi nào khác. Hãy đến và tận hưởng những khoảnh khắc an yên cùng ẩm thực đầy mê hoặc.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Sâm Chill Me - Lý Phục Man Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Mì Cay Sasin - Tân Phong Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Mì Cay Sasin - Tân Phong Quận 7 là điểm hẹn lý tưởng cho những tín đồ ẩm thực Hàn Quốc mê mẩn vị cay nồng ấm lòng. Mỗi tô mì là sự kết hợp tinh tế của công thức riêng nhà Sasin, mang đến hương vị bùng nổ khó quên. Đến đây để cảm nhận sự ấm cúng và thưởng thức những món ăn được chế biến bằng cả tâm huyết, hứa hẹn một trải nghiệm ẩm thực đầy xúc cảm.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Mì Cay Sasin - Tân Phong Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến Phan Rang Quán Quận 7, nơi hương vị mộc mạc của quê nhà được gói trọn trong từng món đặc sản. Với cái tâm của người làm bếp và không gian bình dị, chúng tôi mang đến những bữa ăn ấm cúng, đậm đà bản sắc Phan Rang ngay giữa lòng Sài Gòn. Hãy ghé 399 Lê Văn Lương để cảm nhận sự chân thành và thưởng thức ẩm thực Việt ngon như nhà làm!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ốc Trứng Muối - Chi Nhánh 17 Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Ốc Trứng Muối - Chi Nhánh 17 Quận 7, chúng tôi tự hào mang đến hương vị biển cả tươi rói hòa quyện cùng sốt trứng muối béo ngậy độc đáo, tạo nên những món ốc trứ danh. Mỗi món đặc sản là sự ấp ủ từ cái tâm của người đầu bếp, với công thức riêng không thể tìm thấy ở nơi nào khác. Hãy ghé 109 Đường Số 79 để cùng bạn bè, người thân tận hưởng không gian bình dị, ấm cúng và những bữa ăn đậm đà, khó quên.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ốc Trứng Muối - Chi Nhánh 17 Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Link Ốc Quận 7 - Đường Số 10
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Link Ốc Quận 7 - Đường Số 10 mời gọi bạn đắm mình vào thế giới hải sản tươi ngon và những món nhậu độc đáo mang phong cách riêng không lẫn vào đâu được. Mỗi món ăn nơi đây là sự kết hợp tinh tế giữa nguyên liệu chọn lọc và gia vị bí truyền, được chế biến bằng cả tâm huyết để đánh thức mọi giác quan. Tại 1 Đường Số 10, bạn sẽ tìm thấy một không gian ấm cúng, rộn ràng tiếng cười, lý tưởng cho những cuộc hội ngộ bạn bè. Hãy đến và trải nghiệm hương vị khó quên cùng khoảnh khắc thư giãn tuyệt vời!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Link Ốc Quận 7 - Đường Số 10'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Bún Riêu Tóp Mỡ Đặc Biệt Quận 7, mỗi tô bún riêu là một bản giao hưởng của hương vị truyền thống và nét chấm phá riêng biệt. Nước lèo chua thanh đậm đà, gạch cua béo ngậy hòa quyện cùng tóp mỡ giòn tan tạo nên trải nghiệm khó quên. Đó là cái tâm, là sự tỉ mỉ chúng tôi gửi gắm, mời bạn ghé 269 Phạm Hữu Lầu để thưởng thức nét "đặc biệt" làm nên tên tuổi quán!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Lẩu Cá Đuối 79k - Lotte Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Lẩu Cá Đuối 79k mời bạn ghé thăm để khám phá món lẩu cá đuối trứ danh, nơi hương vị chua cay đậm đà của nước dùng hòa quyện cùng thịt cá tươi ngon, khiến bạn khó quên. Mỗi nồi lẩu đều được chúng tôi chuẩn bị bằng tất cả tâm huyết, từ nguyên liệu chọn lọc đến công thức riêng biệt, mang đến nét đặc sắc riêng của quán. Đây là điểm hẹn lý tưởng cho những buổi tụ họp bạn bè, gia đình cùng ''nhậu'' vui vẻ, thưởng thức món ngon chuẩn vị Việt ngay tại Quận 7.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Lẩu Cá Đuối 79k - Lotte Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trà Sữa MayCha - Yola, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Giữa lòng Quận 7 nhộn nhịp, Trà Sữa MayCha - Yola mở ra một không gian ấm cúng, chờ đón bạn. Nơi đây không chỉ có những ly trà sữa thơm ngon mà còn tự hào giới thiệu các món ăn đặc sản được chế biến với phong cách độc đáo, gói trọn cái tâm của người làm bếp. Mỗi hương vị là một trải nghiệm khó quên. Mời bạn ghé MayCha để cảm nhận sự khác biệt và sự tinh tế trong từng món ăn.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trà Sữa MayCha - Yola, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến Trạm Mì Ý Dì Hiền Quận 7, nơi mỗi đĩa mì là hành trình vị giác ấm áp và đầy bất ngờ. Với bí quyết riêng cùng tâm huyết của Dì Hiền, từng sợi mì dai hòa quyện trong sốt độc đáo, đậm đà không lẫn vào đâu được. Ghé ngay 6 Đường 15 để thưởng thức hương vị Ý "chuẩn nhà Dì" và cảm nhận sự chân thành trong từng món ăn.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến với ICHI QUÁN Quận 7, nơi hương vị Hà Nội truyền thống được kể lại theo một cách rất riêng, rất ICHI. Từng bát Bún Chả thơm lừng, đậm đà và Nem Cua Bể giòn rụm là tâm huyết của chúng tôi, hòa quyện giữa công thức chuẩn vị và nét sáng tạo độc đáo. Hãy ghé thăm để cảm nhận sự ấm áp, gần gũi và thưởng thức những món ăn đặc sản đầy say mê, như một lời mời gọi thân tình từ ICHI QUÁN.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Labubu Quận 7 - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tacos Labubu Đường Số 17 là điểm đến lý tưởng cho những tín đồ fastfood mê mẩn hương vị độc đáo. Chúng tôi tự hào mang đến những món taco đặc sản theo phong cách riêng, được chế biến tỉ mỉ với niềm đam mê ẩm thực. Mỗi miếng bánh giòn tan, nhân đậm đà sẽ đánh thức mọi giác quan, hứa hẹn một trải nghiệm bình dân mà chất lượng khó quên.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Labubu Quận 7 - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại Chicken 3S, chúng tôi gói trọn hương vị Hàn Quốc đích thực trong từng miếng gà rán sốt cay giòn rụm và tô mỳ cay bùng vị. Với công thức "3S" độc quyền, mỗi món ăn không chỉ là sự kết hợp hoàn hảo của gia vị mà còn là cái tâm gửi gắm, mang đến trải nghiệm ẩm thực khó quên. Ghé 475A Nguyễn Thị Thập để khám phá không gian ấm áp, nơi những bữa ăn gia đình thêm phần trọn vẹn.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tứ Quý Trà - Carameo Machiato Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng đến Tứ Quý Trà - Carameo Machiato Quận 7, nơi bạn tìm thấy góc nhỏ bình yên giữa lòng Sài Gòn. Tại 79A Đường 79, chúng tôi tự hào mang đến những món đặc sản độc đáo cùng hương vị cà phê Carameo Machiato đậm đà, được chế biến với tất cả tâm huyết. Mời bạn ghé thưởng thức và cảm nhận từng dư vị riêng biệt, ấm áp như chính ngôi nhà của mình.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tứ Quý Trà - Carameo Machiato Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Chiang Thai Delivery - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến với Chiang Thai Delivery - Quận 7, nơi hương vị Thái Lan đích thực được chắt chiu và biến tấu theo phong cách riêng đầy mê hoặc. Mỗi món ăn là hành trình của vị giác, từ chút chua cay nồng nàn đến vị ngọt thanh tao, tất cả đều được đội ngũ đầu bếp tận tâm gửi gắm. Với đánh giá 4.8 sao, chúng tôi tự tin mang đến cho bạn bữa tiệc chuẩn Thái ngay tại nhà, ấm áp và khó quên.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Chiang Thai Delivery - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tiệm Fulleaf - Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Bước vào Tiệm Fulleaf - Quận 7, bạn sẽ tìm thấy một góc bình yên để tạm gác lại bộn bề. Nơi đây, mỗi món đặc sản mang phong cách riêng đều được ấp ủ bằng cái tâm, tạo nên hương vị khó quên và không gian ấm cúng. Ghé Tiệm Fulleaf để vị giác thăng hoa và tâm hồn được vỗ về nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tiệm Fulleaf - Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Gangnam Tanghulu - Lotte Mart Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Gangnam Tanghulu - Lotte Mart Quận 7 là điểm dừng chân lý tưởng để bạn khám phá những hương vị Á Đông đặc sắc, được chế biến theo phong cách riêng đầy sáng tạo. Từ những que Tanghulu giòn ngọt đến các món ngon độc đáo khác, mỗi món ăn đều chứa đựng tâm huyết của chúng tôi, mang đến trải nghiệm ẩm thực khó quên. Hãy để Gangnam Tanghulu làm phong phú thêm hành trình vị giác của bạn, ngay tại trung tâm mua sắm sầm uất.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Gangnam Tanghulu - Lotte Mart Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Pave Glace Chocolate Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tìm về một góc nhỏ bình yên tại Quận 7, Pave Glace Chocolate mời bạn đắm chìm vào thế giới hương vị đặc sắc. Mỗi món tráng miệng, từ socola nghệ thuật đến những chiếc bánh tinh tế, đều là tâm huyết được gửi gắm, mang đậm phong cách riêng không thể lẫn. Đây là nơi lý tưởng để tự thưởng cho mình hoặc sẻ chia niềm ngọt ngào qua những món quà ý nghĩa. Ghé Pave Glace để cảm nhận sự ngọt ngào không thể chối từ!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Pave Glace Chocolate Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Bước vào Tacos Nhà Labubu 149, bạn không chỉ ghé một quán ăn mà là đến một ngôi nhà của những hương vị độc đáo, nơi sự sáng tạo và cái tâm quyện vào từng chiếc taco. Tại số 149 Phạm Hữu Lầu, mỗi món đặc sản đều mang phong cách riêng không thể nhầm lẫn, từ nhân sốt đậm đà đến vỏ bánh giòn tan hấp dẫn. Hãy để Labubu chiêu đãi bạn một bữa ăn bình dân nhưng tràn đầy cảm hứng, xứng đáng với 4.6 sao yêu thích từ thực khách!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tacos Nhà LuXaBu chào đón bạn đến với thế giới Tacos bình dân nhưng đầy ắp hương vị độc đáo, được làm nên từ cái tâm và công thức riêng biệt. Mỗi chiếc bánh là sự kết hợp hoàn hảo của nguyên liệu tươi ngon, giòn tan và đậm đà, mang đến trải nghiệm khó quên. Ghé 335 Nguyễn Hữu Thọ, Quận 7 để khám phá ngay vị ngon đã tạo nên dấu ấn 4.2 sao của chúng tôi nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Chào mừng bạn đến Tacos Xin Chào tại 333 Nguyễn Hữu Thọ! Nơi đây, mỗi chiếc taco không chỉ là món ăn nhanh mà là cả một trải nghiệm hương vị đặc trưng, độc đáo riêng của chúng tôi. Từ vỏ giòn rụm đến nhân đậm đà được chế biến thủ công, chúng tôi tự hào mang đến những bữa ăn ngon miệng, ấm lòng và chất lượng 4.8 sao. Ghé Tacos Xin Chào để thưởng thức ngay nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Mang trọn tinh hoa ẩm thực đường phố Hải Phòng về Quận 7, Bánh Mì Pate Hải Phòng - 141 Đường Số 1 chào đón bạn với hương vị pate trứ danh và những món đặc sản đầy tâm huyết. Mỗi ổ bánh mì giòn tan, thơm lừng là sự kết hợp hoàn hảo giữa công thức truyền thống và nét chấm phá riêng của quán. Tại đây, bạn sẽ tìm thấy một không gian bình dị, ấm cúng nhưng ẩn chứa những bất ngờ về hương vị. Hãy ghé thăm để cảm nhận sự gần gũi và khám phá những trải nghiệm vị giác khó quên.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Tại A Duy Food Quận 7, chúng tôi tin rằng ẩm thực là sợi dây gắn kết gia đình. Bạn sẽ được đắm mình trong hương vị độc đáo của gà quay giòn tan, sườn quay đậm đà và cơm lam dẻo thơm, tất cả đều mang phong vị riêng biệt được ấp ủ từ cái tâm của người đầu bếp. Mỗi món ăn không chỉ ngon mà còn là câu chuyện về niềm đam mê. Mời bạn ghé thăm để cùng sẻ chia những bữa ăn trọn vẹn, ấm cúng.' AS story 
-    FROM Restaurants 
-    WHERE name = N'A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Ola Tacos Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Thèm một hương vị mới lạ, đậm đà ngay tại Quận 7? Ola Tacos Quận 7 mang đến những chiếc bánh "đặc sản" với phong cách riêng biệt, làm say lòng thực khách. Mỗi món ăn được chúng tôi chế biến từ nguyên liệu tươi ngon nhất và cái tâm truyền vào, để bạn có trải nghiệm ẩm thực bình dân mà vẫn thật đặc sắc. Ghé 50 Đường Số 10 để khám phá ngay hôm nay!' AS story 
-    FROM Restaurants 
-    WHERE name = N'Ola Tacos Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'LaSiMi Quận 7 mời bạn ghé thăm một góc nhỏ bình yên trên Đường Số 17, nơi Trà Ngon Đậm Vị làm say lòng người. Bên cạnh những ấm trà thơm lừng, quán còn tự hào giới thiệu các món đặc sản độc đáo, mỗi món là cả tâm huyết gói trọn hương vị riêng. Hãy đến LaSiMi để tận hưởng không gian ấm cúng và khám phá những trải nghiệm ẩm thực đáng nhớ bạn nhé!' AS story 
-    FROM Restaurants 
-    WHERE name = N'LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
--- Câu chuyện cho quán: Sâm Chill Me - Lý Phục Man Quận 7
-MERGE RestaurantStories AS target
-USING (
-    SELECT id AS restaurant_id, N'Ghé Sâm Chill Me Lý Phục Man, bạn sẽ tìm thấy một góc yên bình lý tưởng để gác lại âu lo. Chúng tôi tự hào mang đến những món đặc sản được chế biến với phong cách riêng biệt và trọn vẹn cái tâm, khiến mỗi hương vị đều là một khám phá thú vị. Hãy đến và thư giãn cùng Sâm Chill Me, nơi mỗi bữa ăn không chỉ ngon miệng mà còn là khoảnh khắc đáng nhớ của bạn.' AS story 
-    FROM Restaurants 
-    WHERE name = N'Sâm Chill Me - Lý Phục Man Quận 7'
-) AS source
-ON (target.restaurant_id = source.restaurant_id)
-WHEN MATCHED THEN
-    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
-WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
-    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
-
 -- Câu chuyện cho quán: Texas Chicken - PARC  Mall Quận 8
 MERGE RestaurantStories AS target
 USING (
@@ -3813,6 +1317,110 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
     INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
 
+-- Câu chuyện cho quán: Sủi Cảo 193 - Hà Tôn Quyền
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Sủi Cảo 193 - Hà Tôn Quyền, chúng tôi gói ghém cả tâm tình vào từng viên sủi cảo chuẩn vị Hoa truyền thống. Từ lớp vỏ mỏng mượt, nhân thịt đậm đà cho đến nước dùng thanh ngọt trứ danh, mỗi món ăn đều là sự kết tinh của tinh hoa ẩm thực. Mời bạn ghé quán để tìm thấy một góc nhỏ ấm cúng, nơi hương vị sủi cảo đặc biệt sẽ làm hài lòng mọi thực khách, xứng đáng với điểm 4.5 sao yêu thích.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Sủi Cảo 193 - Hà Tôn Quyền'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Sủi Cảo 162 - Hà Tôn Quyền
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Ghé Sủi Cảo 162 - Hà Tôn Quyền, bạn sẽ hiểu vì sao con phố này lại nổi tiếng đến vậy. Từ viên sủi cảo tôm tươi căng mọng, vỏ bánh dai mềm cho đến nước dùng đậm đà tinh túy, mỗi món ăn đều được đôi tay tài hoa và tấm lòng người đầu bếp gửi gắm. Nơi đây không chỉ là một quán ăn bình dân mà còn là điểm hẹn của hương vị truyền thống, ấm áp và ngon khó cưỡng giữa Sài Gòn.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Sủi Cảo 162 - Hà Tôn Quyền'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bò Né 3 Anh Em - Quận 11
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng bạn đến Bò Né 3 Anh Em - Quận 11, nơi mỗi buổi sáng đều bắt đầu với chảo bò né sizzling nóng hổi. Ba anh em chúng tôi gửi gắm cả tình yêu và bí quyết vào từng miếng bò mềm tan, pate thơm lừng và trứng ốp la lòng đào, tạo nên hương vị khó quên. Ghé ngay 221 Hòa Bình để cảm nhận sự ấm cúng và thưởng thức bữa ăn bình dân đậm đà, đánh thức vị giác của bạn!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bò Né 3 Anh Em - Quận 11'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Tàu Hũ tươi Covang Quận 11 - Bình Thới
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tàu Hũ tươi Covang Quận 11 là góc nhỏ ấm áp chờ đón bạn sau ngày dài. Thưởng thức chén Tàu Hũ Co Vang mềm tan, sương sáo gói sữa béo thơm hay panna cotta chanh dây thanh mát, mỗi món đều là sự kết hợp của nguyên liệu tươi ngon và tâm huyết. Trải nghiệm vị ngọt tự nhiên, chuẩn 5 sao để xoa dịu mọi giác quan ngay tại 166 Bình Thới!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Tàu Hũ tươi Covang Quận 11 - Bình Thới'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bánh Cuốn & Bánh Ướt Phú Lâm - Quận 11
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Bánh Cuốn & Bánh Ướt Phú Lâm – Quận 11 tự hào mang đến hương vị ẩm thực truyền thống Việt gói trọn cả cái tâm người đầu bếp. Mỗi chiếc bánh cuốn trứng lá dứa thơm lừng hay bánh ướt đặc biệt đều được chăm chút tỉ mỉ, tươi ngon mỗi ngày. Ghé quán để thưởng thức bữa ăn bình dị, ấm áp như nhà làm, nơi bạn tìm thấy sự quen thuộc và hài lòng giữa lòng Sài Gòn.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bánh Cuốn & Bánh Ướt Phú Lâm - Quận 11'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bánh Sầu Riêng 9 Sạch - Quận 11
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Bánh Sầu Riêng 9 Sạch - Quận 11, chúng tôi ấp ủ niềm đam mê tạo nên những chiếc bánh thơm ngon từ nguyên liệu tuyển chọn "sạch" nhất. Từ hương sầu riêng nồng nàn làm nên tên tuổi, đến những sáng tạo độc đáo như bánh ngàn lớp lá dứa hay phô mai than tre, mỗi món đều gửi gắm sự tỉ mỉ và tâm huyết. Ghé thăm để khám phá thế giới bánh ngọt đa dạng, cảm nhận từng lớp bánh giòn tan, mềm mịn tan chảy và chọn món quà ý nghĩa cho người thân yêu. Một trải nghiệm vị giác ngọt ngào đang chờ đón bạn!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bánh Sầu Riêng 9 Sạch - Quận 11'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Ăn Vặt 3 Chị Em - Quận 11
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Ăn Vặt 3 Chị Em - Quận 11, chúng tôi gói trọn tình cảm vào từng món ăn bình dân, đậm vị Á. Nơi đây là điểm hẹn quen thuộc cho những ai mê mẩn Chân Gà Rút Xương giòn sần sật, Khoai Tây Lắc phô mai thơm lừng hay Mẹt Chiên nóng hổi. Ba chị em tỉ mỉ chọn nguyên liệu, nêm nếm bằng cả trái tim để mỗi miếng ăn là một trải nghiệm khó quên. Ghé ngay để cảm nhận sự hài lòng đã được hơn 4.5 sao khẳng định!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Ăn Vặt 3 Chị Em - Quận 11'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: SOI THAI - MÓN THÁI, TRÀ SỮA QUẬN 11
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'SOI THAI - MÓN THÁI, TRÀ SỮA QUẬN 11 là nơi hội tụ tinh hoa ẩm thực Thái Lan truyền thống giữa lòng Sài Gòn. Từ Pad Thái Tôm trứ danh, Mì TomYum chua cay hấp dẫn đến Xôi Xoài ngọt lịm, mỗi món ăn đều được đầu bếp tận tâm chế biến, mang đậm hương vị bản xứ. Chúng tôi mong muốn mang đến những bữa ăn ngon miệng, ấm cúng và những trải nghiệm khó quên cho gia đình bạn. Hãy ghé SOI THAI để cảm nhận sự khác biệt!' AS story 
+    FROM Restaurants 
+    WHERE name = N'SOI THAI - MÓN THÁI, TRÀ SỮA QUẬN 11'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
 -- Câu chuyện cho quán: Mì Trộn & Xiên Que Cá Con - Quận 11
 MERGE RestaurantStories AS target
 USING (
@@ -3858,6 +1466,19 @@ USING (
     SELECT id AS restaurant_id, N'Tại An Lạc - Ăn Chay, mỗi món ăn là một câu chuyện về sự bình yên và hương vị thuần túy. Từ Bánh mì xíu mại chay thơm lừng đến Mì trộn đậm đà, chúng tôi tự hào mang đến những bữa ăn thanh đạm, được chế biến với tất cả tấm lòng và nguyên liệu tươi ngon. Hãy ghé An Lạc để cảm nhận sự an lành trong từng miếng và nạp năng lượng tích cực cho ngày dài, giữa lòng Quận 11 thân thương.' AS story 
     FROM Restaurants 
     WHERE name = N'An Lạc - Ăn Chay - Quận 11'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Cháo Hàu Ngọc Béo Gò Vấp
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Cháo Hàu Ngọc Béo Gò Vấp: Điểm dừng chân lý tưởng cho tín đồ ẩm thực đường phố. Từng tô cháo hàu nóng hổi, sánh mịn, đậm đà vị hàu tươi rói, ngọt thơm sẽ đánh thức mọi giác quan. Ghé 12 Dương Quảng Hàm để thưởng thức hương vị chất lượng, ấm áp và bình dị, đã làm hài lòng bao thực khách gần xa!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Cháo Hàu Ngọc Béo Gò Vấp'
 ) AS source
 ON (target.restaurant_id = source.restaurant_id)
 WHEN MATCHED THEN
@@ -3930,6 +1551,19 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
     INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
 
+-- Câu chuyện cho quán: Hiếu Hàu Gò Vấp - Lê Đức Thọ
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Hiếu Hàu Gò Vấp - Lê Đức Thọ là điểm hẹn lý tưởng cho những ai trót yêu hương vị biển cả tươi rói. Tại đây, mỗi con hàu được nâng niu, biến tấu thành đủ món hấp dẫn từ nướng phô mai trứng cút béo ngậy, thơm lừng đến hấp thanh mát giữ trọn vị ngọt tự nhiên. Chúng tôi gói trọn cái tâm vào từng đĩa hàu, mong mang đến trải nghiệm ẩm thực bình dị mà cuốn hút, ấm lòng. Hãy ghé Hiếu Hàu để khám phá hương vị đặc trưng, khó quên nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Hiếu Hàu Gò Vấp - Lê Đức Thọ'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
 -- Câu chuyện cho quán: Mì Cay Đại Hàn - Đường Số 19, Gò Vấp
 MERGE RestaurantStories AS target
 USING (
@@ -3943,12 +1577,116 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
     INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
 
+-- Câu chuyện cho quán: QUÁN ĂN HÀN QUỐC SEUON KIM NEKO - Gò Vấp
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tọa lạc trong con hẻm nhỏ Gò Vấp, Quán Ăn Hàn Quốc Seuon Kim Neko là điểm hẹn ấm cúng cho những tâm hồn yêu ẩm thực xứ sở kim chi. Mỗi tô Cơm trộn đầy đặn hay Mì tương đen chuẩn vị đều được chế biến bằng tất cả sự tỉ mỉ và tấm lòng. Đến với chúng tôi, bạn sẽ được thưởng thức hương vị Hàn Quốc chân thật, đậm đà, mang lại cảm giác hài lòng và ấm áp như tại nhà. Một trải nghiệm ẩm thực 4.8 sao đang chờ bạn khám phá!' AS story 
+    FROM Restaurants 
+    WHERE name = N'QUÁN ĂN HÀN QUỐC SEUON KIM NEKO - Gò Vấp'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bếp Mẹ Shin Will - Chân Gà Sốt Thái Cay 5 Cấp Độ Và Trà Sữa, Ăn Vặt
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Bếp Mẹ Shin Will là nơi hội tụ hương vị Á Đông đặc sắc, nơi những món ăn được chế biến bằng cả tấm lòng. Hãy khám phá chân gà sốt Thái cay nồng 5 cấp độ trứ danh, giòn sần sật thấm vị cùng Sứa Sốt Thái thanh mát. Ghé Bếp Mẹ để tận hưởng những buổi "nhậu" ấm cúng bên bạn bè, nhâm nhi trà sữa và cảm nhận sự thân thuộc như bữa cơm gia đình.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bếp Mẹ Shin Will - Chân Gà Sốt Thái Cay 5 Cấp Độ Và Trà Sữa, Ăn Vặt'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Lẩu Khổ Qua Cá Thác Lác - Chợ Gò Vấp
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Lẩu Khổ Qua Cá Thác Lác Chợ Gò Vấp, chúng tôi tự hào gìn giữ hương vị lẩu gia đình truyền thống: vị đắng nhẹ của khổ qua thanh mát hòa quyện cùng miếng cá thác lác dai ngọt tươi rói, tạo nên bản giao hưởng vị giác khó quên. Mỗi nồi lẩu, từ xí quách đậm đà đến đầu cá hồi béo ngậy hay bạch tuột giòn sần sật, đều được nấu bằng cái tâm và sự tỉ mỉ, mang đến bữa ăn ấm cúng như nhà làm. Hãy đến và cảm nhận sự chăm chút trong từng nguyên liệu, từng hương vị đã làm nên thương hiệu được yêu mến tại Gò Vấp.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Lẩu Khổ Qua Cá Thác Lác - Chợ Gò Vấp'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bún Bò Huế Cô Tuyết - Gò Vấp
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Nép mình trong con hẻm nhỏ Gò Vấp, Bún Bò Huế Cô Tuyết là điểm dừng chân ấm áp dành cho những ai tìm kiếm hương vị bún bò chuẩn vị. Nước dùng đậm đà được hầm kỹ, thơm lừng mùi sả ớt, hòa quyện cùng từng lát thịt bò, nạm, gân, giò tươi ngon thấm đượm cái tâm người nấu. Đặc biệt, ly nước sâm nhà làm thanh mát sẽ là cái kết hoàn hảo cho bữa ăn tròn vị, mang đến trải nghiệm ẩm thực chân thành và gần gũi.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bún Bò Huế Cô Tuyết - Gò Vấp'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Cháo Ếch Geylang Gia Bảo - Gò Vấp
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Cháo Ếch Geylang Gia Bảo tự hào mang hương vị Singapore trứ danh về ngay Gò Vấp, Sài Gòn. Mỗi tô cháo nóng hổi, từ thịt ếch tươi ngon thấm đẫm sốt gừng đặc trưng đến hạt cháo mềm mượt, đều được nấu bằng cả tâm huyết, là bí quyết của gia đình chúng tôi. Đến đây, bạn không chỉ thưởng thức cháo ếch lừng danh mà còn có cháo bò sốt tiêu xanh độc đáo, hứa hẹn một bữa ăn ấm bụng, đậm đà và thân thuộc như ở nhà.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Cháo Ếch Geylang Gia Bảo - Gò Vấp'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Snow Bingsu & Tea Gò Vấp
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Snow Bingsu & Tea Gò Vấp ấp ủ tình yêu vào từng ly Bingsu mát lạnh và ly trà sữa thơm lừng, mang đến khoảnh khắc ngọt ngào xua tan mọi mệt mỏi. Từ Bingsu Dâu Xoài tươi rói, Matcha Đậu Đỏ béo bùi đến Hồng Trà Sữa Phomai Dầm độc đáo, mỗi hương vị đều được chăm chút tỉ mỉ. Ghé ngay 78/11 Nguyễn Văn Khối để tìm thấy góc nhỏ bình yên, nơi vị giác và tâm hồn bạn được vỗ về trong không gian ấm cúng, thân thiện!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Snow Bingsu & Tea Gò Vấp'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Hân Gia Ký Gò Vấp - Mì Xào Giòn & Hủ Tiếu Xào - Lê Quang Định
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Hân Gia Ký Gò Vấp tự hào mang đến những món mì xào giòn rụm và hủ tiếu xào hải sản chuẩn vị gia đình, nơi mỗi đĩa ăn đều chứa đựng cái tâm tỉ mỉ. Với bí quyết riêng, từng sợi mì giòn tan, từng miếng hải sản tươi ngon hòa quyện trong nước sốt đậm đà, tạo nên hương vị khó quên. Ghé 583 Lê Quang Định để cảm nhận sự ấm cúng và thưởng thức bữa ăn ngon đúng điệu.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Hân Gia Ký Gò Vấp - Mì Xào Giòn & Hủ Tiếu Xào - Lê Quang Định'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
 -- Câu chuyện cho quán: Tiramisu - Gò vấp
 MERGE RestaurantStories AS target
 USING (
     SELECT id AS restaurant_id, N'Tiramisu - Gò vấp là góc nhỏ ngọt ngào nơi hương vị Tiramisu Ý truyền thống được kể lại bằng những biến tấu đầy bất ngờ. Từ Tiramisu Nhãn thơm lừng đến Tiramisu Dâu tây thanh mát, mỗi chiếc bánh đều chứa đựng sự tinh tế và cái tâm của người làm bánh. Đừng quên Khúc Bạch Sầu Riêng béo ngậy khó cưỡng. Hãy ghé thăm để tìm thấy khoảnh khắc bình yên và những niềm vui ngọt ngào rất riêng giữa lòng Gò Vấp.' AS story 
     FROM Restaurants 
     WHERE name = N'Tiramisu - Gò vấp'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Hạt Dẻ Gò Vấp
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Hạt Dẻ Gò Vấp ủ ấp hương vị mộc mạc của hạt dẻ rang thơm lừng, mang đến trải nghiệm bình yên giữa lòng Sài Gòn. Mỗi hạt dẻ được chọn lựa kỹ lưỡng, rang đều tay, hay nấu thành chè táo đỏ ngọt dịu, thấm đượm cái tâm người làm. Ghé 29/7/22 Lê Đức Thọ để tìm về chút ký ức tuổi thơ, nơi vị ngon 4.7 sao luôn chờ đón bạn với sự ấm áp.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Hạt Dẻ Gò Vấp'
 ) AS source
 ON (target.restaurant_id = source.restaurant_id)
 WHEN MATCHED THEN
@@ -3995,6 +1733,45 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
     INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
 
+-- Câu chuyện cho quán: Trạm Cơm Gà & Bánh Mì 24H - Gò Vấp
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Giữa nhịp sống hối hả Gò Vấp, Trạm Cơm Gà & Bánh Mì 24H là điểm dừng chân lý tưởng, chào đón bạn bất kể ngày đêm. Nơi đây, từ Cơm Gà Xối Mỡ đùi tỏi "siêu ngon" giòn rụm đến Cơm Chiên Gà Trứng Lòng Đào béo ngậy, mỗi món đều được làm từ nguyên liệu tươi ngon và gói trọn tâm huyết. Chúng tôi tự hào mang đến những bữa ăn đậm đà hương vị truyền thống, luôn ấm nóng và xứng đáng với 4.8/5 sao mà thực khách tin yêu.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Trạm Cơm Gà & Bánh Mì 24H - Gò Vấp'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Quán Ốc Tự Chọn Gò Vấp - Lê Hoàng Phái
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Đến Quán Ốc Tự Chọn Gò Vấp - Lê Hoàng Phái để đắm chìm vào thế giới ốc tự chọn tươi ngon, chuẩn vị nhậu. Từ ốc len xào dừa béo ngậy, nghêu hấp Thái cay nồng đến càng ghẹ xào me chua ngọt hấp dẫn, mỗi món là một câu chuyện hương vị riêng. Hẹn hò bạn bè và tận hưởng những khoảnh khắc vui vẻ tại góc nhỏ ấm áp trên đường Lê Hoàng Phái nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Quán Ốc Tự Chọn Gò Vấp - Lê Hoàng Phái'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Delica - Mỳ Ý & Pizza - Phan Văn Trị
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Delica - Mỳ Ý & Pizza Phan Văn Trị, bạn sẽ tìm thấy không gian ấm cúng lý tưởng cho những buổi hẹn hò lãng mạn. Từng món ăn, từ pizza phô mai xúc xích bacon béo ngậy đến mì Ý tôm tỏi sốt bơ cay đặc biệt, đều được đầu bếp gửi gắm trọn vẹn hương vị và tâm huyết. Hãy ghé Delica 558 Phan Văn Trị để trải nghiệm ẩm thực 4.7 sao, nơi mỗi bữa ăn là một kỷ niệm khó quên.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Delica - Mỳ Ý & Pizza - Phan Văn Trị'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
 -- Câu chuyện cho quán: Bê Tươi Quyết Thắng Gò Vấp
 MERGE RestaurantStories AS target
 USING (
@@ -4021,12 +1798,207 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
     INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
 
+-- Câu chuyện cho quán: Nem Nướng Nha Trang Bé Thảo
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Dừng chân tại Nem Nướng Nha Trang Bé Thảo trên con hẻm nhỏ Hoàng Sa, bạn sẽ được chào đón bởi hương thơm nem nướng vàng ươm, giòn rụm chuẩn vị Nha Trang. Mỗi phần ăn là sự kết hợp tinh tế giữa nem, rau sống tươi rói và chén nước chấm bí truyền đậm đà, gói trọn cả cái tâm của người làm. Nơi đây là điểm hẹn quen thuộc cho những ai yêu mến ẩm thực đường phố và đã được hàng ngàn thực khách tin yêu với 4.8/5 sao.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Nem Nướng Nha Trang Bé Thảo'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Tacos Toro - Nhà Bè
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tacos Toro - Nhà Bè: Nơi hương vị Tacos bùng nổ ngay giữa lòng Nhà Bè! Chúng tôi tự hào mang đến những chiếc Tacos nóng hổi, vỏ giòn tan cùng nhân Bò Phô Mai béo ngậy, Gà thơm lừng hay Hải Sản tươi rói, mỗi món ăn là cả tâm huyết của người đầu bếp. Ghé 2129/47 Huỳnh Tấn Phát để khám phá hương vị độc đáo, nạp đầy năng lượng và trải nghiệm sự ấm áp mà chỉ Tacos Toro mới có!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Tacos Toro - Nhà Bè'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Thị Gọt Fruits - Trái Cây Tươi Gọt Sẵn - Nhà Bè
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng đến với Thị Gọt Fruits – nơi những lát trái cây tươi ngon nhất được gọt sẵn, trao tận tay bạn. Từng miếng Mận Hậu giòn chua, Thơm Thái ngọt thanh hay Xoài chín mềm mọng đều được chọn lựa kỹ lưỡng bằng cả tấm lòng. Chúng tôi mong muốn mang đến sự tiện lợi, một chút ngọt lành xua tan mọi mệt mỏi trong ngày. Ghé Thị Gọt để cảm nhận hương vị tự nhiên và sự tươi mới đánh thức mọi giác quan nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Thị Gọt Fruits - Trái Cây Tươi Gọt Sẵn - Nhà Bè'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Nhà Food - Lê Tấn Bê
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Nhà Food - Lê Tấn Bê, chúng tôi tin rằng bữa ăn ngon nhất là bữa ăn mang lại cảm giác ấm cúng như ở nhà. Hãy thử món mì Indomie trộn trứ danh với sợi mì dai ngon quyện cùng nước sốt đậm đà và topping đa dạng, từ gà viên đến xá xíu thơm lừng. Với không gian bình dị, giá cả phải chăng, đây chính là điểm dừng chân lý tưởng để bạn nạp năng lượng và tận hưởng hương vị quen thuộc một cách thật đặc biệt.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Nhà Food - Lê Tấn Bê'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Highlands Coffee - Trà, Cà Phê & Bánh - Dragon Hill 1 Nhà Bè
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng bạn ghé Highlands Coffee Dragon Hill 1 Nhà Bè, nơi bạn có thể tìm thấy một góc bình yên để thưởng thức. Từ hương vị cà phê PhinĐI Choco đậm đà chuẩn Việt đến trà sữa trà xanh thanh mát, mỗi món đều được pha chế với tất cả tâm huyết. Đừng quên thử Bánh Mì Que Pate giòn rụm trứ danh. Ghé thăm để thư giãn và nạp năng lượng cho ngày mới nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Highlands Coffee - Trà, Cà Phê & Bánh - Dragon Hill 1 Nhà Bè'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Cơm Nhà Bé Bự
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Cơm Nhà Bé Bự không chỉ là quán ăn, mà là nơi bạn tìm về hương vị ấm áp của bữa cơm nhà. Mỗi món ăn, từ Bún nước tương Keo Vy đặc biệt đến Cơm Ba Rọi Chiên Sả Ớt đậm đà, đều được nêm nếm bằng cả tấm lòng và những công thức lưu giữ. Chúng tôi tự hào mang đến trải nghiệm "Bé Bự" đúng nghĩa: ngon miệng, no bụng và đong đầy tình cảm. Ghé Cơm Nhà Bé Bự để cảm nhận sự khác biệt bạn nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Cơm Nhà Bé Bự'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Yn Tea - Tiệm Trà Sữa Nhà Bè
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Yn Tea - Tiệm Trà Sữa Nhà Bè là điểm đến lý tưởng cho những ai tìm kiếm sự bình yên và hương vị thân quen giữa lòng phố thị. Từ Matcha Latte đậm đà, Matcha Dâu tươi mới đến Nguyên Lá Kem Cheese béo ngậy, mỗi ly trà đều được pha chế bằng cả cái tâm, chọn lọc từ những nguyên liệu tốt nhất. Hãy ghé Yn Tea để thư giãn, tận hưởng những khoảnh khắc ngọt ngào và cảm nhận sự khác biệt trong từng ngụm trà. Chúng tôi luôn chờ đón bạn!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Yn Tea - Tiệm Trà Sữa Nhà Bè'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bếp Nhà - Cơm Văn Phòng & Cơm Phần
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Bếp Nhà mời bạn về với mâm cơm nhà đúng điệu Sài Gòn, nơi mỗi món ăn đều được nêm nếm bằng cả tấm lòng. Từ miếng sườn cốt lết nướng trứ danh đến cá hú kho tộ đậm đà, chúng tôi chắt chiu tinh hoa ẩm thực Việt để mang đến bữa trưa văn phòng ấm bụng, chuẩn vị như mẹ nấu. Hàng nghìn thực khách đã tin chọn hương vị thân thương này, còn bạn thì sao?' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bếp Nhà - Cơm Văn Phòng & Cơm Phần'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bếp Nhà Bin - Kinh Dương Vương
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Bếp Nhà Bin, mỗi món ăn là một câu chuyện ấm áp, ẩn mình trong con hẻm nhỏ 600/12/4A Kinh Dương Vương. Từ Kimbap tươi ngon, mì cay bùng vị đến crepe sầu riêng béo ngậy, chúng tôi gói ghém cả tâm tình vào từng hương vị Á-Âu quen thuộc. Hãy ghé Bếp Nhà Bin để trải nghiệm bữa ăn "nhà làm" đầy đặn và tràn ngập yêu thương, nơi ẩm thực bình dân mang đến sự ấm lòng.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bếp Nhà Bin - Kinh Dương Vương'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: BÁNH XÈO MIỀN TÂY - HUỲNH THỊ ĐỒNG, NHÀ BÈ
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Ẩn mình tại Nhà Bè, BÁNH XÈO MIỀN TÂY - HUỲNH THỊ ĐỒNG là điểm hẹn lý tưởng cho những ai khao khát hương vị miền Tây chân chất. Từng chiếc bánh xèo giòn tan, vàng ươm hay đĩa nui/mì xào bò thơm lừng đều được làm bằng cả tấm lòng. Nơi đây mang đến bữa ăn ngon miệng và ấm cúng, cảm giác gần gũi, đậm đà như nhà làm mà thực khách luôn yêu mến. Hãy ghé để thưởng thức và cảm nhận sự đặc biệt này!' AS story 
+    FROM Restaurants 
+    WHERE name = N'BÁNH XÈO MIỀN TÂY - HUỲNH THỊ ĐỒNG, NHÀ BÈ'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bánh Mì Sốt Gạch Cua Nhà Bé Chi
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Trong con hẻm nhỏ Nguyễn Đình Chiểu, Bánh Mì Sốt Gạch Cua Nhà Bé Chi chờ đón bạn với hương vị đặc trưng khó quên. Mỗi ổ bánh mì nóng giòn hòa quyện cùng sốt gạch cua béo ngậy, thơm lừng và nhân đầy đặn, được chế biến bằng tất cả tấm lòng. Ghé Nhà Bé Chi để thưởng thức sự ấm áp, đậm đà như bữa cơm nhà, chắc chắn sẽ khiến bạn mê mẩn mãi không thôi!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bánh Mì Sốt Gạch Cua Nhà Bé Chi'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Khoai Mỡ Lắc - Nhà Bé Gôn
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Khoai Mỡ Lắc - Nhà Bé Gôn tự hào mang đến những món khoai chiên giòn rụm, nóng hổi, gói trọn hương vị tuổi thơ ấm áp. Từ khoai mỡ lắc phô mai béo ngậy đến khoai tây lốc xoáy độc đáo, mỗi phần ăn đều được chuẩn bị với tất cả sự tỉ mỉ và tình yêu thương. Ghé qua để thưởng thức và cảm nhận không khí thân quen như nhà mình bạn nhé, đảm bảo sẽ khiến bạn mê mẩn mãi không thôi!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Khoai Mỡ Lắc - Nhà Bé Gôn'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Khói Quán Nhà Bè
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Ghé Khói Quán Nhà Bè tại Khu 4T Park để tìm một góc bình yên, nơi hương vị Việt thân quen được chăm chút và nâng tầm. Từ Chả Mực chiên vàng giòn đến Cơm Chiên Hải Sản thơm lừng, mỗi món ăn đều thấm đượm cái "tâm" của người đầu bếp, mang đến những bữa "nhậu" ấm cúng và đầy ắp tiếng cười. Khói Quán mời bạn đến thưởng thức trọn vẹn khoảnh khắc sum vầy bên bạn bè và người thân.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Khói Quán Nhà Bè'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: T & T Coffee - NHÀ BÈ
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại T & T Coffee - NHÀ BÈ, bạn sẽ tìm thấy một góc nhỏ ấm cúng, quen thuộc giữa lòng Nhà Bè. Nổi tiếng với Cà Phê Muối đậm đà khó quên, Bạc Xỉu Đá thơm lừng hay Đá Xay Matcha thanh mát, mỗi ly đồ uống đều được pha chế bằng cả tâm huyết. Hãy ghé thăm để tận hưởng hương vị đặc trưng và những khoảnh khắc thư giãn tuyệt vời!' AS story 
+    FROM Restaurants 
+    WHERE name = N'T & T Coffee - NHÀ BÈ'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
 -- Câu chuyện cho quán: Sầu Riêng Nhà Vườn Bé Sáo - Lê Quang Định
 MERGE RestaurantStories AS target
 USING (
     SELECT id AS restaurant_id, N'Chào bạn đến với Sầu Riêng Nhà Vườn Bé Sáo, nơi hương vị chuẩn nhà vườn được gói ghém cẩn thận. Chúng tôi tự hào mang đến những múi sầu Ri6 vàng ươm, sầu Thái chín cây ngậy béo và Chuồng Bò thơm lừng, được tuyển chọn kỹ càng. Từng hộp cơm sầu là cả tâm huyết, đảm bảo độ tươi ngon, ngọt béo tan chảy ngay từ muỗng đầu tiên. Hãy ghé Bé Sáo để cảm nhận sự tinh túy và biến khoảnh khắc thưởng thức thành món quà ý nghĩa!' AS story 
     FROM Restaurants 
     WHERE name = N'Sầu Riêng Nhà Vườn Bé Sáo - Lê Quang Định'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Sâm Chill Me Nhà Bè - Phạm Hữu Lầu
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Sâm Chill Me Nhà Bè – Phạm Hữu Lầu, góc nhỏ bình yên ngay giữa lòng Nhà Bè đang chờ đón bạn. Thư thái cùng Sâm Táo Bát Bảo thanh mát hay đắm chìm trong vị Nước Dừa Tắc sảng khoái, Me Đác Mê Mẫn độc đáo. Mỗi ly thức uống đều được pha chế bằng cả tâm huyết, mang đến những khoảnh khắc "chill" đúng điệu và ngọt ngào khó quên.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Sâm Chill Me Nhà Bè - Phạm Hữu Lầu'
 ) AS source
 ON (target.restaurant_id = source.restaurant_id)
 WHEN MATCHED THEN
@@ -4079,6 +2051,45 @@ USING (
     SELECT id AS restaurant_id, N'Bước vào Nem Nướng Nha Trang - Bếp Của Vân, bạn sẽ được chào đón bởi hương thơm nem nướng Nha Trang lừng danh, giòn rụm đậm đà. Mỗi món ăn, từ set đặc biệt đến nem kem phô mai độc đáo, đều được chế biến bằng công thức gia truyền và cả tấm lòng của Bếp Vân. Chúng tôi mời bạn đến thưởng thức hương vị ấm cúng, chuẩn vị gia đình đã chinh phục mọi thực khách.' AS story 
     FROM Restaurants 
     WHERE name = N'Nem Nướng Nha Trang - Bếp Của Vân'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bò Lá Lốt & Mỡ Chài - Phú Nhuận
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Bước chân vào con hẻm nhỏ 491/189, bạn sẽ tìm thấy Bò Lá Lốt & Mỡ Chài – Phú Nhuận, nơi hương thơm lá lốt nướng quyện mỡ chài dậy lên đầy mời gọi. Mỗi cuốn bò nóng hổi, đậm đà vị truyền thống, ăn kèm mắm nêm, bún và rau tươi xanh mướt, mang đến trải nghiệm ẩm thực chuẩn vị Sài Gòn. Với đánh giá 4.8 sao, đây chính là điểm hẹn lý tưởng để bạn khám phá món ngon bình dân nhưng đầy tinh tế, gói trọn cả cái tâm của người đầu bếp.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bò Lá Lốt & Mỡ Chài - Phú Nhuận'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Mì Indomie & Ăn Vặt Phú Nhuận - Phú Nhuận Food
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Mì Indomie & Ăn Vặt Phú Nhuận là nơi biến tấu sợi mì Indomie quen thuộc thành những tuyệt phẩm vị giác khó quên. Tại đây, mỗi đĩa Mì Trộn Indomie Tôm hay Thịt Cua Phủ Trứng đều được ủ ấp bởi công thức sốt độc đáo và nguyên liệu tươi ngon. Hãy ghé 127/1 Cô Giang để khám phá hương vị đậm đà, cùng những món ăn vặt giòn tan, mang đến cho bạn bữa ăn ấm cúng và trọn vẹn nhất.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Mì Indomie & Ăn Vặt Phú Nhuận - Phú Nhuận Food'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Hủ Tiếu Xào & Mì Xào Giòn - Phong Ký Phú Nhuận
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Bước chân vào Phong Ký, bạn sẽ được đánh thức mọi giác quan với hương thơm đặc trưng của Hủ Tiếu Xào và Mì Xào Giòn. Chúng tôi tự hào mang đến những món xào trứ danh với bí quyết gia truyền, từng sợi mì, hủ tiếu giòn rụm bên ngoài, mềm dai bên trong cùng nước sốt đậm đà khó cưỡng. Mỗi đĩa ăn là cả tâm huyết, hứa hẹn một bữa ngon miệng, ấm lòng ngay tại 63 Phan Đình Phùng. Ghé Phong Ký để cảm nhận hương vị thân quen, đậm đà chất Sài Gòn.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Hủ Tiếu Xào & Mì Xào Giòn - Phong Ký Phú Nhuận'
 ) AS source
 ON (target.restaurant_id = source.restaurant_id)
 WHEN MATCHED THEN
@@ -4216,6 +2227,58 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
     INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
 
+-- Câu chuyện cho quán: TAKOYAKI TKY - Phú Nhuận
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'TAKOYAKI TKY - Phú Nhuận mời bạn đến 78 Thích Quảng Đức để khám phá thế giới Takoyaki chuẩn vị Nhật. Từng viên bánh tròn xinh, nóng hổi, giòn rụm lớp vỏ ngoài và mềm tan bên trong, ẩn chứa nhân bạch tuộc tươi ngon hoặc phô mai béo ngậy. Đây là nơi hương vị đường phố giao thoa cùng sự tâm huyết, mang đến khoảnh khắc thưởng thức ấm áp và khó quên.' AS story 
+    FROM Restaurants 
+    WHERE name = N'TAKOYAKI TKY - Phú Nhuận'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Zin Zin - Cà Phê & Tea - Phú Nhuận
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Zin Zin Phú Nhuận là chốn dừng chân ấm cúng, nơi hương vị Sài Gòn thân quen gặp gỡ những sáng tạo độc đáo. Nhấp một ngụm Cafe Sữa đậm đà hay thử Bạc Xỉu Muối, Matcha Kem Muối đầy bất ngờ, bạn sẽ cảm nhận trọn vẹn sự tỉ mỉ trong từng ly nước. Chúng tôi tin rằng mỗi thức uống không chỉ giải khát mà còn là niềm vui nhỏ, mang đến khoảnh khắc thư thái giữa phố phường tấp nập.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Zin Zin - Cà Phê & Tea - Phú Nhuận'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Tiệm Hải Sản The Spicy Crab - Miến, Cơm & Mì - Phú Nhuận
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng bạn đến với Tiệm Hải Sản The Spicy Crab, nơi hương vị biển cả tươi rói hòa quyện cùng vị cay nồng đặc trưng, đánh thức mọi giác quan. Mỗi món ăn tại đây, từ Crawfish sốt Thái đậm đà đến Mì trộn tôm sò điệp độc đáo, đều là tâm huyết của người đầu bếp, hứa hẹn mang đến bữa tiệc hải sản chuẩn vị cho cả gia đình. Hãy ghé thăm để tận hưởng không gian ấm cúng và những trải nghiệm ẩm thực khó quên, nơi niềm vui và hương vị thăng hoa.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Tiệm Hải Sản The Spicy Crab - Miến, Cơm & Mì - Phú Nhuận'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bánh Mì Huynh Hoa - Phan Xích Long
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng bạn đến Bánh Mì Huynh Hoa Phan Xích Long, nơi tinh hoa ẩm thực đường phố Sài Gòn được gói trọn trong từng ổ bánh. Chiếc bánh mì truyền thống đặc biệt trứ danh với nhân đầy ắp, đậm đà khó cưỡng sẽ đánh thức mọi giác quan của bạn. Ghé thăm để thưởng thức hương vị thân quen, giòn rụm và ấm áp, đã làm nên thương hiệu được yêu mến suốt bao năm.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bánh Mì Huynh Hoa - Phan Xích Long'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
 -- Câu chuyện cho quán: Cơm Tấm Ba Ghiền Không Chi Nhánh - 84 Đặng Văn Ngữ
 MERGE RestaurantStories AS target
 USING (
@@ -4294,6 +2357,32 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
     INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
 
+-- Câu chuyện cho quán: Gà Rán Jimama - Gà Rán, Mỳ Ý & Ăn Vặt - CMT8 Tân Bình
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Gà Rán Jimama tại CMT8 Tân Bình tự hào mang đến hành trình vị giác khó quên. Từng miếng gà giòn rụm cùng sốt cay ngọt Hàn Quốc độc đáo, hay mì Ý đậm đà chuẩn vị và cơm gà nóng hổi đều được chế biến với tất cả tâm huyết. Chúng tôi tin rằng, một bữa ăn nhanh cũng phải thật ngon, thật chất lượng, và đó là lý do vì sao Jimama luôn được đánh giá 4.8 sao. Hãy ghé thăm và cảm nhận sự khác biệt!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Gà Rán Jimama - Gà Rán, Mỳ Ý & Ăn Vặt - CMT8 Tân Bình'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Ăn Vặt Mợ Ba - Shop Online - Tân Bình Tân Hoà
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Ăn Vặt Mợ Ba là điểm hẹn của những tâm hồn mê đồ ăn vặt chuẩn vị, nơi hương vị truyền thống được gửi gắm trong từng món ăn. Từ Tóp Mỡ Mắm Da Giòn giòn rụm khó cưỡng đến Da Cá Trứng Muối béo thơm, mỗi món đều là sự tỉ mỉ của Mợ Ba. Với đánh giá 4.7/5 sao, chúng tôi tự hào mang đến trải nghiệm ẩm thực bình dân nhưng cực kỳ lôi cuốn, ăn là mê ngay!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Ăn Vặt Mợ Ba - Shop Online - Tân Bình Tân Hoà'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
 -- Câu chuyện cho quán: Ăn Vặt Ma Bư Food - Mì Trộn & Gà Rán Tân Bình
 MERGE RestaurantStories AS target
 USING (
@@ -4313,6 +2402,32 @@ USING (
     SELECT id AS restaurant_id, N'Gà Rán Jimama là điểm hẹn của những tâm hồn yêu ẩm thực bình dân nhưng chất lượng. Từng miếng gà giòn rụm, mỳ Ý đậm đà hay gà sốt mật ong Brasil độc đáo đều được chế biến bằng cả tâm huyết, mang đến trải nghiệm vị giác khó quên. Ghé Jimama 175 Nguyễn Thị Nhỏ để tìm thấy niềm vui trong mỗi bữa ăn ngon miệng, ấm áp bạn nhé!' AS story 
     FROM Restaurants 
     WHERE name = N'Gà Rán Jimama - Gà Rán, Mỳ Ý & Ăn Vặt - 175 Nguyễn Thị Nhỏ Tân Bình'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Amy Food - Bánh Mì & Cơm Cháy Chà Bông - Tân Bình
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng bạn đến với Amy Food Tân Bình, nơi hương vị Việt truyền thống được gói trọn trong từng món ăn. Từ miếng cơm cháy chà bông giòn rụm thơm lừng đến khô heo, khô bò đậm đà cay tê, mỗi món đều được làm bằng cả tấm lòng. Ghé Amy Food để thưởng thức những hương vị thân quen, đánh thức mọi giác quan và cảm nhận sự chân thành trong từng nguyên liệu.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Amy Food - Bánh Mì & Cơm Cháy Chà Bông - Tân Bình'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bà Na Food - Lẩu Thái Hải Sản, Lẩu Bò & Mì Trộn Cá Viên Chiên - CN Tân Bình
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Bà Na Food, mỗi món ăn là một câu chuyện tình yêu ẩm thực. Từ nồi lẩu Thái hải sản chua cay thơm lừng chuẩn vị cho đến đĩa mì trộn cá viên chiên giòn rụm đậm đà, tất cả đều được nêm nếm bằng cái tâm của Bà Na. Ghé Bà Na, bạn không chỉ thưởng thức món ngon mà còn tìm thấy hương vị ấm áp như bữa cơm nhà.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bà Na Food - Lẩu Thái Hải Sản, Lẩu Bò & Mì Trộn Cá Viên Chiên - CN Tân Bình'
 ) AS source
 ON (target.restaurant_id = source.restaurant_id)
 WHEN MATCHED THEN
@@ -4378,6 +2493,84 @@ USING (
     SELECT id AS restaurant_id, N'Đến Ăn Vặt, Chân Gà Sốt Thái & Vịt Cay Gia Truyền - Bình Tân để trải nghiệm bữa ăn ngon miệng, đậm đà hương vị Á đặc trưng! Nơi đây, mỗi món ăn vặt đều được chế biến tỉ mỉ, từ gỏi đu đủ tôm tươi giòn sần sật đến bún thập cẩm đầy đặn. Đặc biệt, đừng bỏ lỡ món chân gà sốt Thái chua cay mặn ngọt gia truyền, mix trứng non béo ngậy đầy lôi cuốn. Mời bạn ghé 203 Mã Lò để thưởng thức và cảm nhận tất cả tâm huyết của chúng tôi trong từng hương vị.' AS story 
     FROM Restaurants 
     WHERE name = N'Ăn Vặt, Chân Gà Sốt Thái & Vịt Cay Gia Truyền - Bình Tân'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Gỏi Cuốn, Bò Bía & Bún Mắm Nêm - Chị Hạnh Tân Bình
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tìm về một góc nhỏ bình yên tại Tân Bình, bạn sẽ khám phá Gỏi Cuốn Chị Hạnh – nơi mỗi món ăn là một câu chuyện về hương vị Sài Gòn. Từ những cuốn gỏi tươi mát, bò bía thanh đạm đến tô bún mắm nêm dậy mùi đặc trưng, tất cả đều được Chị Hạnh tỉ mỉ chuẩn bị với trọn vẹn cái tâm. Hãy ghé để thưởng thức hương vị thân quen, đậm đà, khó quên này nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Gỏi Cuốn, Bò Bía & Bún Mắm Nêm - Chị Hạnh Tân Bình'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Tiệm Ân - Bánh Bao Phô Mai, Pizza & Bánh Tart Trứng - Bình Tân
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Tiệm Ân, chúng tôi tin rằng mỗi chiếc bánh không chỉ là món ăn mà còn là cả tấm lòng. Từng chiếc bánh bao phô mai tan chảy, bánh kim sa ngọt ngào hay bánh tart trứng thơm lừng đều được ủ ấm bằng công thức độc đáo và sự tỉ mẩn. Với hơn 4.8 sao yêu mến, Tiệm Ân mời bạn ghé để cảm nhận hương vị đặc trưng, ấm áp như nhà làm, cho một bữa ăn vừa vặn, trọn vẹn ngay tại Bình Tân.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Tiệm Ân - Bánh Bao Phô Mai, Pizza & Bánh Tart Trứng - Bình Tân'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Nước Mía Henry - Rau Má, Cà Phê Sữa Tươi & Trà Tắc - Bình Tân
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Giữa nắng nóng Bình Tân, Nước Mía Henry mời bạn dừng chân với những ly nước giải khát "khổng lồ" đầy ắp sảng khoái. Nước mía tắc thanh mát, rau má đậu xanh béo bùi hay sữa dừa thơm lừng đều được pha chế từ tâm, mang đến hương vị tươi ngon khó cưỡng. Đến Henry để cảm nhận sự tươi mới, tiếp thêm năng lượng cho ngày dài bận rộn!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Nước Mía Henry - Rau Má, Cà Phê Sữa Tươi & Trà Tắc - Bình Tân'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Ông Trấn - Bánh Mì Bình Định - Tân Sơn Nhì
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Bước vào Ông Trấn tại 93 Tân Sơn Nhì, bạn sẽ cảm nhận ngay không khí ấm cúng và hương thơm quyến rũ đặc trưng. Mỗi ổ bánh mì giòn rụm hay đĩa bánh cuốn Bình Định tại đây đều là sự kết hợp tinh tế giữa nguyên liệu tươi ngon và bí quyết gia truyền từ quê hương Ông Trấn. Chúng tôi mong muốn mang đến những bữa ăn đậm đà hương vị, làm ấm lòng thực khách và gợi nhớ về những khoảnh khắc bình dị mà đặc biệt. Hãy ghé qua và tự mình trải nghiệm nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Ông Trấn - Bánh Mì Bình Định - Tân Sơn Nhì'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: 1705 Matcha - Trà Matcha Nguyên Chất Nhật Bản - Tân Bình
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng đến 1705 Matcha! Nơi đây là điểm hẹn của những tâm hồn yêu trà, tìm kiếm hương vị matcha nguyên chất Nhật Bản hòa quyện cùng sự sáng tạo bất ngờ như Matcha Yuzu hay Coconut Matcha tươi mát. Với đánh giá 4.7/5 sao, chúng tôi mời bạn ghé không gian bình dị ấm cúng tại Tân Bình để thưởng thức, tìm thấy khoảnh khắc thư thái và năng lượng mới trong từng ngụm trà đậm đà.' AS story 
+    FROM Restaurants 
+    WHERE name = N'1705 Matcha - Trà Matcha Nguyên Chất Nhật Bản - Tân Bình'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Nuri Juices - Sinh Tố, Nước Ép & Trái Cây Tô - Bình Tân
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Nuri Juices là điểm dừng chân lý tưởng để bạn tìm về sự tươi mát và năng lượng tích cực ngay giữa lòng Bình Tân. Mỗi ly Trà Trái Cây Nhiệt Đới rực rỡ hay tô Trái Cây Tô đầy ắp đều được chúng tôi chuẩn bị bằng tất cả cái tâm, chọn lọc nguyên liệu tươi ngon nhất. Hãy ghé 117 Đường Số 14 để thưởng thức hương vị đặc trưng, cảm nhận sự sảng khoái và tận hưởng những khoảnh khắc ngọt lành, thư thái.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Nuri Juices - Sinh Tố, Nước Ép & Trái Cây Tô - Bình Tân'
 ) AS source
 ON (target.restaurant_id = source.restaurant_id)
 WHEN MATCHED THEN
@@ -4476,6 +2669,19 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
     INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
 
+-- Câu chuyện cho quán: Nem Nướng Nha Trang - Since 1982 - Tân Phú
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng bạn đến với Nem Nướng Nha Trang - Since 1982, nơi hương vị truyền thống được gìn giữ qua hơn bốn thập kỷ. Mỗi cuốn nem nướng vàng ruộm, thơm lừng là cả tâm huyết, sự tỉ mỉ từ công thức gia truyền đến từng nguyên liệu tươi ngon nhất. Hãy ghé Nem Nướng Nha Trang - Tân Phú để cảm nhận miếng nem giòn dai, đậm đà quyện cùng nước chấm đặc trưng, và tìm thấy một góc bình dị, ấm cúng đúng chất Nha Trang giữa lòng Sài Gòn.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Nem Nướng Nha Trang - Since 1982 - Tân Phú'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
 -- Câu chuyện cho quán: Trái Cây Tươi Tân Phú - Trái Cây Tô, Nước Ép & Sinh Tố
 MERGE RestaurantStories AS target
 USING (
@@ -4515,6 +2721,19 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
     INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
 
+-- Câu chuyện cho quán: Cafe Mr Lee - Tân Phú
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Cafe Mr Lee - Tân Phú là góc nhỏ bình yên, nơi hương cà phê sữa đá đậm đà hòa quyện cùng những câu chuyện thân mật. Mỗi ly Cà Phê Sữa Đá chuẩn vị, Bạc Xỉu ngọt dịu hay Trà Đào Cam Sả thanh mát đều được pha chế bằng trọn vẹn tâm huyết, mang đến hương vị làm say lòng thực khách. Chúng tôi mời bạn ghé qua để tìm thấy một chốn dừng chân ấm áp, thư thái giữa lòng Tây Thạnh.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Cafe Mr Lee - Tân Phú'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
 -- Câu chuyện cho quán: Chân Gà Rút Xương 100% - Tân Phước
 MERGE RestaurantStories AS target
 USING (
@@ -4528,12 +2747,233 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
     INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
 
+-- Câu chuyện cho quán: Mì Trộn Tóp Mỡ Trứng Lòng Đào - Tân Phú
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Mì Trộn Tóp Mỡ Trứng Lòng Đào Tân Phú không chỉ là một cái tên, mà là cả một trải nghiệm vị giác khiến bao người mê mẩn. Hãy thử ngay tô mì trộn đặc biệt với tóp mỡ giòn rụm, trứng lòng đào béo ngậy tan chảy cùng sợi mì dai ngon thấm vị, đảm bảo gây nghiện ngay từ đũa đầu tiên. Với không gian bình dị ấm cúng và hương vị đỉnh cao được đánh giá 4.9/5 sao, chúng tôi mời bạn ghé Tân Phú để khám phá ''linh hồn'' ẩm thực đường phố tại đây.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Mì Trộn Tóp Mỡ Trứng Lòng Đào - Tân Phú'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
 -- Câu chuyện cho quán: Nakajima Susian Sushi - Aeon Mall Tân Phú
 MERGE RestaurantStories AS target
 USING (
     SELECT id AS restaurant_id, N'Tại Nakajima Susian Sushi, chúng tôi mời bạn khám phá thế giới hương vị Nhật Bản tươi ngon, nơi mỗi lát sashimi cá hồi óng ả hay cuộn cơm California đầy màu sắc đều được tạo nên bằng cả tâm huyết. Hãy để vị giác của bạn được đánh thức bởi sự tinh túy của ẩm thực và tận hưởng không gian ấm cúng, lý tưởng cho những khoảnh khắc sum vầy bên gia đình tại Aeon Mall Tân Phú. Trải nghiệm ẩm thực chân thực đang chờ đón bạn.' AS story 
     FROM Restaurants 
     WHERE name = N'Nakajima Susian Sushi - Aeon Mall Tân Phú'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: HUYỀN FOOD LAB - Ăn Vặt, Bánh Tráng & Chân Gà - Tân Phú
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Đến HUYỀN FOOD LAB để khám phá "công thức" hạnh phúc từ những món ăn vặt thân quen. Nơi đây, từng sợi bánh tráng trộn đậm đà hay chiếc chân gà dai giòn đều được chế biến bằng tất cả sự tỉ mỉ và niềm vui. Ghé 72G/11 Nguyễn Văn Yến, Tân Phú để cảm nhận hương vị đặc trưng, ấm áp như nhà làm, đánh thức mọi giác quan.' AS story 
+    FROM Restaurants 
+    WHERE name = N'HUYỀN FOOD LAB - Ăn Vặt, Bánh Tráng & Chân Gà - Tân Phú'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bún Đậu Mắm Tôm A Chảnh - Tân Phú
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Bún Đậu Mắm Tôm A Chảnh là điểm hẹn lý tưởng cho những ai trót yêu ẩm thực Hà Nội dân dã, ấm cúng giữa lòng Sài Gòn. Tại đây, mỗi mẹt bún đậu đều được chuẩn bị tươm tất với mắm tôm bí truyền đậm đà, đậu rán giòn tan và nem chua rán thơm lừng khó cưỡng. Ghé 123 Trương Vĩnh Ký để cảm nhận sự ấm áp và hương vị tuyệt vời, chắc chắn bạn sẽ muốn quay lại nhiều lần!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bún Đậu Mắm Tôm A Chảnh - Tân Phú'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Trà Sữa MayCha - Tân Phú
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Trà Sữa MayCha - Tân Phú, chúng mình ấp ủ từng ly trà sữa với trọn vẹn sự tỉ mỉ và đam mê. Từ Trà Sữa Truyền Thống thơm lừng đến Olong Macchiato béo ngậy, mỗi hương vị đều được chọn lọc kỹ càng, mang đến trải nghiệm ngọt ngào và thư giãn. Hãy ghé 456 Lũy Bán Bích để tìm thấy góc nhỏ ấm áp, nhâm nhi thức uống yêu thích và tận hưởng những khoảnh khắc thật chill bạn nhé.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Trà Sữa MayCha - Tân Phú'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Lẩu Gà Lá É 109 - Tân Phú
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Lẩu Gà Lá É 109, chúng tôi tự hào mang đến trải nghiệm ẩm thực Việt ấm áp và chân thành. Nồi lẩu gà lá é đặc trưng, với nước dùng thanh ngọt, lá é the thơm và thịt gà đồng dai ngon, sẽ là điểm nhấn hoàn hảo cho bữa ăn gia đình bạn. Hãy ghé 89 Tân Sơn Nhì, Tân Phú để cùng người thân tận hưởng những khoảnh khắc sum vầy bên hương vị 4.6 sao chuẩn vị nhé.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Lẩu Gà Lá É 109 - Tân Phú'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bánh Tráng Trộn Cô Út - Tân Phú
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Bánh Tráng Trộn Cô Út - Tân Phú không chỉ là địa điểm ăn vặt mà còn là nơi gửi gắm cái tâm của Cô Út trong từng sợi bánh. Với công thức gia truyền, món bánh tráng trộn trứ danh tại 12 Nguyễn Sơn sẽ khiến bạn ngất ngây bởi sự hòa quyện hoàn hảo của chua, cay, mặn, ngọt. Hãy ghé thăm để trải nghiệm hương vị đặc sắc và nhâm nhi Trà Tắc Xí Muội mát lạnh, cảm nhận sự thân thuộc đã làm nên đánh giá 4.4 sao ấm áp.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bánh Tráng Trộn Cô Út - Tân Phú'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Mì Trộn, Ăn Vặt & Cá Viên - Bình Chánh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Mì Trộn, Ăn Vặt & Cá Viên Bình Chánh mời bạn ghé thăm để trải nghiệm hương vị ẩm thực bình dân nhưng đầy tinh tế. Mỗi tô mì trộn thập cẩm full topping hay Combo chiên mắm tỏi đều được chế biến bằng cái tâm, mang đến sự ấm áp và no lòng. Đừng quên thử Phô mai que siêu to độc đáo và tận hưởng khoảnh khắc ăn vặt vui vẻ, thân thuộc như ở nhà nhé.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Mì Trộn, Ăn Vặt & Cá Viên - Bình Chánh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Ốc Trứng Muối - Chi Nhánh 14 Bình Chánh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Ốc Trứng Muối Bình Chánh, chúng tôi tự hào mang đến hương vị biển cả tươi ngon, gần gũi như chính mảnh đất này. Từng đĩa Ốc mỡ cháy tỏi tóp mỡ giòn thơm hay Sò huyết xào me đậm đà đều là sự kết tinh của cái tâm người đầu bếp và nguyên liệu tuyển chọn. Ghé thăm không gian bình dân, ấm cúng của chúng tôi để thưởng thức bữa tiệc hải sản hấp dẫn, nơi vị giác của bạn sẽ được đánh thức trọn vẹn và mọi lo toan dường như tan biến.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Ốc Trứng Muối - Chi Nhánh 14 Bình Chánh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: MÊ - Coffee, Tea & Matcha - Bình Chánh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng bạn đến với MÊ - Coffee, Tea & Matcha, góc nhỏ bình yên tại Bình Chánh nơi mỗi ly thức uống đều được ủ ấp bằng cả tấm lòng. Từ vị Matcha Latte chuẩn Nhật, Trà Sữa MÊ gây thương nhớ, đến Dừa Sen Full Topping thanh mát và Cacao Sữa Gấu ngọt ngào, chúng tôi mời bạn đắm chìm trong hương vị đặc trưng. Hãy ghé MÊ để tìm thấy chốn thư giãn, quên đi bộn bề và để vị giác dẫn lối!' AS story 
+    FROM Restaurants 
+    WHERE name = N'MÊ - Coffee, Tea & Matcha - Bình Chánh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Gà Rán KFC - Central Plaza
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Đến Gà Rán KFC - Central Plaza để đánh thức mọi giác quan với hương vị gà rán giòn tan, mọng nước đã làm nên tên tuổi. Mỗi miếng gà vàng ươm, thơm lừng là sự kết hợp hoàn hảo của bí quyết riêng, mang đến bữa ăn nhanh ngon, tiện lợi nhưng vẫn trọn vẹn. Không gian ấm cúng, phục vụ chu đáo, chúng tôi luôn sẵn sàng chào đón bạn cho những khoảnh khắc ẩm thực vui vẻ.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Gà Rán KFC - Central Plaza'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Tiệm Bánh Kem Ngon Nhất - Bình Chánh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tiệm Bánh Kem Ngon Nhất - Bình Chánh chào đón bạn bằng hương thơm ấm áp của những chiếc bánh vừa ra lò. Nơi đây, bạn sẽ tìm thấy sự hòa quyện hoàn hảo trong bánh su kem hộp thanh mát, bánh mì phô mai tan chảy béo ngậy, hay bánh crep sầu riêng nồng nàn. Mỗi món đều được làm bằng cả tấm lòng, mang đến niềm vui ngọt ngào cho mọi khoảnh khắc của bạn.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Tiệm Bánh Kem Ngon Nhất - Bình Chánh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Highlands Coffee - Trà, Cà Phê & Bánh - Central Mall Bình Chánh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tìm một góc bình yên giữa lòng Bình Chánh? Highlands Coffee Central Mall mời bạn ghé thăm để tận hưởng không gian ấm cúng và hương cà phê Việt đậm đà. Khám phá sự tươi mới của MatchaĐI Dừa Mây hay khởi đầu ngày mới đầy năng lượng với Combo Sáng, mỗi món đều được pha chế bằng cả tâm huyết. Nơi đây là điểm hẹn lý tưởng cho những khoảnh khắc thư giãn và kết nối.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Highlands Coffee - Trà, Cà Phê & Bánh - Central Mall Bình Chánh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: 3 Râu - Gà Rán, Pizza & Trà Sữa - Đường Số 1, Bình Chánh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'3 Râu - Gà Rán, Pizza & Trà Sữa là điểm hẹn ấm cúng tại Bình Chánh, nơi mỗi món ăn đều được chuẩn bị với trọn vẹn cái tâm. Từ miếng gà rán giòn tan, mì Ý bò bằm đậm đà đến gà sốt Hàn Quốc lạ miệng, tất cả đều sẵn sàng khơi gợi vị giác bạn. Chúng tôi mang đến những bữa ăn ngon miệng, giá cả phải chăng, là nơi lý tưởng để sẻ chia niềm vui cùng gia đình và bạn bè. Ghé 3 Râu để tận hưởng hương vị tuyệt vời trong không gian thân thiện!' AS story 
+    FROM Restaurants 
+    WHERE name = N'3 Râu - Gà Rán, Pizza & Trà Sữa - Đường Số 1, Bình Chánh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Highlands Coffee - Trà, Cà Phê & Bánh - Số 1 Bình Chánh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Highlands Coffee Bình Chánh là điểm hẹn quen thuộc, nơi bạn tìm thấy sự an yên giữa bộn bề cuộc sống. Đắm mình trong hương cà phê phin đậm chất Việt, hay nhâm nhi PhinĐI Matcha Dâu đầy sáng tạo và Trà Thạch Vải thanh khiết. Từng món đồ uống đều được pha chế với tất cả tâm tình, mời bạn đến tận hưởng không gian ấm cúng và trải nghiệm vị giác đáng nhớ.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Highlands Coffee - Trà, Cà Phê & Bánh - Số 1 Bình Chánh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Highlands Coffee - Trà, Cà Phê & Bánh - West Gate Bình Chánh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Highlands Coffee West Gate Bình Chánh chào đón bạn đến một không gian ấm cúng, nơi hương vị thân quen hòa quyện cùng sự thư thái. Đắm mình trong thế giới trà đặc sắc: từ Trà Sen Vàng thanh khiết, Trà Thạch Vải ngọt ngào đến Trà Sữa Đài Loan đậm đà. Mỗi ly trà được pha chế bằng cả tấm lòng, là liều thuốc cho tâm hồn sau một ngày dài. Hãy ghé qua và để chúng tôi chăm sóc bạn!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Highlands Coffee - Trà, Cà Phê & Bánh - West Gate Bình Chánh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bánh Tráng Lòng Đào - Bình Chánh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Bánh Tráng Lòng Đào - Bình Chánh, bạn sẽ khám phá thế giới hương vị cuốn hút từ trứng non lòng đào béo ngậy tan chảy, kết hợp hoàn hảo cùng các món bánh tráng và chân gà sốt thái trứ danh. Mỗi món ăn là tâm huyết của chúng tôi, mang đến trải nghiệm ẩm thực bình dân nhưng đầy tinh tế, chuẩn vị Á ngay giữa lòng Bình Chánh. Hãy ghé số 349 Tân Túc để tận hưởng không gian ấm cúng và những khoảnh khắc ngon lành khó quên!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bánh Tráng Lòng Đào - Bình Chánh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Gà Rán KFC - Nguyễn Thị Tú
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Gà Rán KFC Nguyễn Thị Tú, hương vị gà giòn tan, nóng hổi trứ danh luôn sẵn sàng chiều lòng bạn. Thưởng thức combo Cơm Gà Mắm Tỏi đậm đà hay Mì Ý béo ngậy, mỗi món đều là lựa chọn hoàn hảo cho bữa trưa nhanh gọn mà vẫn tròn vị. Ghé ngay để nạp năng lượng, tận hưởng sự tiện lợi và những khoảnh khắc ẩm thực vui vẻ bên bạn bè, gia đình nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Gà Rán KFC - Nguyễn Thị Tú'
 ) AS source
 ON (target.restaurant_id = source.restaurant_id)
 WHEN MATCHED THEN
@@ -4632,6 +3072,305 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
     INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
 
+-- Câu chuyện cho quán: Gà Rán KFC - Giga Mall
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Giữa lòng Giga Mall nhộn nhịp, KFC là điểm dừng chân lý tưởng để bạn nuông chiều vị giác với hương vị gà rán trứ danh. Từng miếng gà vàng ươm, giòn rụm bên ngoài và mọng nước bên trong, đậm đà gia vị bí truyền, luôn sẵn sàng xua tan mọi mệt mỏi. Ghé ngay để tận hưởng bữa ăn ngon lành, ấm áp và tạo nên những kỷ niệm đẹp cùng bạn bè, gia đình!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Gà Rán KFC - Giga Mall'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Xôi Bình Tiên - Phạm Hùng
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Xôi Bình Tiên - Phạm Hùng: Nơi gói ghém trọn vẹn hương vị xôi truyền thống Việt. Mỗi phần xôi, từ mặn mà xôi đùi gà trứ danh đến ngọt bùi xôi nếp than hay xôi ca dé, đều được nấu bằng cái tâm và bí quyết gia truyền. Chúng tôi tự hào mang đến những đĩa xôi nóng hổi, thơm lừng, như một lời mời gọi ấm áp cho mọi bữa ăn ngon tại 163 Phạm Hùng.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Xôi Bình Tiên - Phạm Hùng'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Gà Rán & Burger McDonald’s Satra Pham Hung
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng bạn đến McDonald’s Satra Phạm Hùng, nơi mỗi bữa ăn là một trải nghiệm vui tươi và đầy bất ngờ! Hãy khám phá ngay Gà Xốt Kem Lá Chanh độc đáo, giòn rụm bên ngoài, đậm đà vị lá chanh và kem béo ngậy tan chảy trong miệng. Cùng phần mì Ý Spaghetti ấm áp hay những chiếc burger kinh điển, đây là điểm dừng chân lý tưởng để nạp năng lượng. Đến và tận hưởng không gian ấm cúng, nơi bạn có thể thư giãn và tạo thêm những kỷ niệm đẹp sau những giờ mua sắm sôi động.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Gà Rán & Burger McDonald’s Satra Pham Hung'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: ỐC HÀ ĐỒNG GIÁ 40K - Đinh Đức Thiện
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Ghét bỏ ưu phiền, về với ỐC HÀ ĐỒNG GIÁ 40K – nơi hương vị biển cả gói trọn trong từng đĩa ốc nóng hổi. Từ ốc tỏi nướng mỡ hành dậy mùi cho đến sò huyết rang me chua ngọt hay trứng gà non xào bơ bắp béo ngậy, mỗi món đều được chế biến bằng cái tâm của người yêu ẩm thực. Đến 442 Đinh Đức Thiện để trải nghiệm những bữa nhậu lai rai vui vẻ, ấm cúng và tận hưởng hương vị đặc trưng chỉ với 40K.' AS story 
+    FROM Restaurants 
+    WHERE name = N'ỐC HÀ ĐỒNG GIÁ 40K - Đinh Đức Thiện'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bếp Nhà Thỏ - Ăn Vặt Hàn Quốc - Quốc Lộ 50
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng bạn đến với Bếp Nhà Thỏ trên Quốc Lộ 50, nơi hương vị Hàn Quốc đường phố sôi động hòa quyện cùng những món ăn vặt quen thuộc, chuẩn vị ''nhà làm''. Từ gà sốt phô mai tan chảy nóng hổi đến mì Ý đậm đà hay Matcha kem muối lạ miệng, mỗi món đều được chế biến với tất cả tâm huyết. Ghé ngay để cảm nhận sự ấm cúng, gần gũi và thưởng thức bữa tiệc vị giác đầy bất ngờ, ngon miệng, chuẩn 4.8 sao!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bếp Nhà Thỏ - Ăn Vặt Hàn Quốc - Quốc Lộ 50'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bánh Tacos Pháp Newday - Trần Đại Nghĩa
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Bước vào Bánh Tacos Pháp Newday, bạn sẽ khám phá một thế giới hương vị độc đáo nơi tinh hoa ẩm thực Pháp hòa quyện bất ngờ trong từng chiếc tacos thơm lừng, giòn rụm. Từ Tacos Bò Xào Gà Giòn đậm đà đến Tacos Thập Cẩm Khủng Lồ đầy ắp, mỗi món ăn đều được chúng tôi chuẩn bị bằng tất cả tâm huyết để mang lại trải nghiệm ẩm thực khó quên. Hãy đến và thưởng thức sự kết hợp mới mẻ, hấp dẫn, đảm bảo sẽ khơi gợi vị giác và làm hài lòng những tín đồ mê Tacos!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bánh Tacos Pháp Newday - Trần Đại Nghĩa'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bánh Mì Mập - Thịt Chả - Huỳnh Mẫn Đạt, Bình Thạnh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Bánh Mì Mập, tên gọi không chỉ là định danh mà còn là lời hứa về một ổ bánh mì đầy ắp, đậm đà hương vị. Mỗi chiếc Bánh Mì MẬP Đặc Biệt giòn rụm, nhân thịt chả thơm lừng hay chiếc bánh bao nóng hổi đều được chúng tôi tỉ mỉ chuẩn bị bằng cả tấm lòng. Ghé 11a Huỳnh Mẫn Đạt để cảm nhận sự ấm áp, thân thuộc của món ăn Sài Gòn chuẩn vị, tiếp thêm năng lượng cho ngày mới.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bánh Mì Mập - Thịt Chả - Huỳnh Mẫn Đạt, Bình Thạnh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Mì Quảng Bình Thạnh - Phan Văn Hân
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Mì Quảng Bình Thạnh - Phan Văn Hân, mỗi tô mì là một câu chuyện ấm áp, gói trọn hương vị đặc trưng của miền Trung. Sợi mì dai mềm, nước dùng đậm đà bí truyền cùng các loại topping tươi ngon như gà ta, sườn non, thịt trứng cút sẽ đánh thức mọi giác quan. Ghé 182 Phan Văn Hân để thưởng thức và cảm nhận sự tận tâm trong từng nguyên liệu, làm nên một địa chỉ Mì Quảng được yêu mến suốt bao năm qua.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Mì Quảng Bình Thạnh - Phan Văn Hân'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bánh Mì Hamburger & Cà Phê Legacy Bình Thạnh - FastFood - Tân Cảnh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Bánh Mì Hamburger & Cà Phê Legacy Bình Thạnh, mỗi chiếc Burger hay Hotdog đều được chúng tôi làm bằng cả tâm huyết. Hương vị bùng nổ từ Burger Đầy Đủ nóng hổi hay Hotdog Xúc Xích Phô Mai tan chảy sẽ khiến bạn khó quên. Ghé ngay đối diện 37 Tân Cảng để thưởng thức món ngon bình dân, chất lượng và cảm nhận sự ấm áp thân quen nơi đây.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bánh Mì Hamburger & Cà Phê Legacy Bình Thạnh - FastFood - Tân Cảnh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bánh Bao Thọ Phát Bình Thạnh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Bánh Bao Thọ Phát Bình Thạnh, chúng tôi tự hào mang đến những món ngon chuẩn vị, nơi hương vị truyền thống giao thoa cùng sự sáng tạo hiện đại. Dù là chiếc Hamburger bò thơm lừng, Bánh Bao Thập Cẩm đậm đà hay ly cà phê sữa đá nguyên chất, mỗi món đều được chuẩn bị bằng cả tấm lòng. Không gian ấm cúng, giá cả bình dân cùng chất lượng 4.8 sao đã làm nên một Thọ Phát rất riêng giữa Nơ Trang Long. Ghé thăm để thưởng thức và cảm nhận sự khác biệt!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bánh Bao Thọ Phát Bình Thạnh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Ăn Vặt Bình Thạnh - Xôi Chiên - Lê Quang Định
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Giữa lòng Bình Thạnh, Ăn Vặt Lê Quang Định là điểm đến quen thuộc cho những ai trót yêu hương vị xôi chiên giòn rụm, nóng hổi. Mỗi chiếc xôi vàng ươm, nhân thịt đậm đà hay chà bông thơm lừng đều được làm bằng cả tấm lòng, mang đến vị ngon khó cưỡng. Ghé ngay 377/9/45 Lê Quang Định để cảm nhận sự ấm áp, bình dị và hương vị đặc trưng đã làm nên tên tuổi của quán nhỏ chúng tôi nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Ăn Vặt Bình Thạnh - Xôi Chiên - Lê Quang Định'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Phở Bò Thanh Đa - Bình Quới
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Phở Bò Thanh Đa - Bình Quới mời gọi bạn ghé thăm để khám phá hương vị truyền thống chuẩn vị của phở bò, nơi mỗi tô là cả một câu chuyện. Nước dùng được ninh hầm công phu, ngọt thanh tự nhiên, quyện cùng từng lát bò mềm và đậm đà khó quên. Đừng quên thử món Bò kho bánh mì hay Phở bò kho độc đáo, chắc chắn sẽ làm bạn phải xiêu lòng. Ghé Phở Bò Thanh Đa để tìm thấy sự ấm cúng và những tinh hoa ẩm thực bình dân ngay hôm nay!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Phở Bò Thanh Đa - Bình Quới'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bánh Mì Bình Định Thanh Mai - Nguyễn Quang Bích
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Bánh Mì Bình Định Thanh Mai - Nguyễn Quang Bích, mỗi ổ bánh mì không chỉ là bữa ăn mà còn là cả một câu chuyện về hương vị xứ Nẫu dung dị mà đậm đà. Bánh mì giòn rụm, nóng hổi, từ phần Đặc Biệt đậm đà chuẩn vị đến Heo Quay giòn tan hay Trứng Opla béo ngậy, đều được làm bằng cả cái tâm và công thức gia truyền. Hãy ghé 2 Nguyễn Quang Bích để cảm nhận sự chân thành trong từng nguyên liệu và sự ấm áp như được ăn bánh mì nhà làm, nơi bạn luôn tìm thấy bữa ăn ngon miệng và đầy hoài niệm.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bánh Mì Bình Định Thanh Mai - Nguyễn Quang Bích'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Quán Bún Cá Rô Đồng Bà Thành - Nguyễn Thái Bình
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Quán Bún Cá Rô Đồng Bà Thành, bạn sẽ tìm thấy hương vị cá rô đồng chuẩn Bắc đầy tinh tế. Mỗi tô bún hay bánh đa đều là tâm huyết của Bà Thành, từ nước dùng ngọt thanh tự nhiên đến từng miếng thịt cá được gỡ xương tỉ mỉ. Đây là món quà ẩm thực ấm lòng, đậm đà tình quê giữa lòng Sài Gòn. Ghé Quán Bà Thành để cảm nhận hương vị khó quên, nơi hương vị truyền thống được gìn giữ trọn vẹn!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Quán Bún Cá Rô Đồng Bà Thành - Nguyễn Thái Bình'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Sầu Riêng - Lan Ngọc - Bình Thành
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Sầu Riêng - Lan Ngọc, chúng tôi kiến tạo một thiên đường ngọt ngào, nơi hương vị sầu riêng Ri6 Cái Mơn hảo hạng hay Monthong Thái chất lượng cao được tuyển chọn kỹ lưỡng. Từng hộp cơm sầu vàng óng, thơm lừng hay trái sầu nguyên múi đều là món quà tinh túy từ thiên nhiên, được gửi gắm bằng cả tâm huyết. Hãy ghé 299 Bình Thành để tận hưởng và sẻ chia những khoảnh khắc ngọt ngào khó quên!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Sầu Riêng - Lan Ngọc - Bình Thành'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bánh Mì Bình Định Thanh Mai - 21 Lê Lợi
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Bánh Mì Bình Định Thanh Mai, 21 Lê Lợi, chúng tôi tự hào mang hương vị tuổi thơ và biển cả xứ Nẫu về Sài Gòn. Mỗi ổ bánh mì giòn rụm, từ chả cá dai ngon đến heo quay trứng luộc đậm đà, đều gói trọn cái tâm và công thức gia truyền. Ghé Thanh Mai để thưởng thức bữa sáng, bữa trưa dân dã mà đầy ắp tình cảm, đánh thức mọi giác quan của bạn.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bánh Mì Bình Định Thanh Mai - 21 Lê Lợi'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Ăn Vặt - Landmark Bình Thạnh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Ăn Vặt - Landmark Bình Thạnh, chúng tôi mang đến một góc nhỏ ấm cúng ngay giữa lòng Landmark 4 để bạn thỏa sức khám phá thế giới ăn vặt Á Đông đầy mê hoặc. Nơi đây, những miếng Tokbokki phô mai béo ngậy hay khoai tây lắc giòn rụm không chỉ đơn thuần là món ăn, mà còn là hành trình vị giác bất ngờ, đặc biệt với Tokbokki lắc phô mai sốt sô-cô-la độc đáo. Ghé ngay để nạp năng lượng và tận hưởng niềm vui giản dị, ngon miệng!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Ăn Vặt - Landmark Bình Thạnh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Ăn Vặt Tiger - Khô Bò - Bình Thạnh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Ăn Vặt Tiger chào đón bạn giữa lòng Bình Thạnh, nơi những hương vị Á Đông quen thuộc được thổi hồn một cách mạnh mẽ và đầy lôi cuốn. Hãy đắm mình trong vị Khô Bò, Xoài Sấy muối ớt chua cay hay Mực Cán tẩm vị đậm đà – mỗi món đều là sự kết hợp hoàn hảo của vị giác. Tại đây, chúng tôi gửi gắm sự tỉ mỉ vào từng món ăn vặt "có võ", biến mỗi buổi tụ họp trở nên rôm rả và khó quên hơn.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Ăn Vặt Tiger - Khô Bò - Bình Thạnh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Cơm Tấm Miền Tây - Bún Thịt Nướng & Bánh Mì Thịt Nướng - Bình Thành Liên Khu 4-5
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Đến Cơm Tấm Miền Tây để khám phá bản sắc ẩm thực chân chất từ đồng bằng sông Cửu Long! Từ miếng sườn nướng vàng ruộm trên đĩa cơm tấm dẻo thơm, đến tô bún thịt nướng đậm đà, hay chiếc bánh mì thịt nướng giòn rụm – mỗi món đều chan chứa cái tâm và công thức gia truyền. Chúng tôi mời bạn ghé 6/3A Bình Thành để thưởng thức bữa ăn chuẩn vị, ấm lòng như bữa cơm nhà.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Cơm Tấm Miền Tây - Bún Thịt Nướng & Bánh Mì Thịt Nướng - Bình Thành Liên Khu 4-5'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Hoàng Anh Bakery - Bánh Kem & Bánh Ngọt Ngon - Bình Thạnh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Hoàng Anh Bakery là nơi tình yêu và tâm huyết gia đình hòa quyện trong từng chiếc bánh. Từ Bánh Cua Phô Mai béo ngậy tan chảy đến Bông Lan Trứng Muối mặn ngọt hài hòa, mỗi món đều được nướng tươi mỗi ngày, mang đến hương vị thân quen ấm áp như nhà làm. Ghé 434 Nơ Trang Long để trải nghiệm không gian ngọt ngào và thưởng thức những khoảnh khắc đáng nhớ cùng gia đình Hoàng Anh nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Hoàng Anh Bakery - Bánh Kem & Bánh Ngọt Ngon - Bình Thạnh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Omsom - Cà Phê Đặc Sản, Trà Sữa & Trà Trái Cây - Bình Thạnh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Omsom chào đón bạn đến một không gian ấm cúng tại Bình Thạnh, nơi mỗi tách cà phê không chỉ là thức uống mà còn là câu chuyện. Chúng tôi tỉ mỉ chọn lọc để mang đến Espresso "1 Shot Là Tỉnh", Latte "Sữa Ôm Cà Phê" hay Matcha "Mát Tim" với hương vị đặc sắc, đánh thức mọi giác quan. Ghé Omsom để tìm thấy sự bình yên và nạp đầy năng lượng cho ngày mới, tất cả được gửi gắm bằng cả tâm huyết.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Omsom - Cà Phê Đặc Sản, Trà Sữa & Trà Trái Cây - Bình Thạnh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bánh Mì Hoàng Thanh - Hiệp Bình
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Bánh Mì Hoàng Thanh - Hiệp Bình mời gọi bạn đến với thế giới hương vị bánh mì Việt thân thuộc, nơi mỗi chiếc bánh là sự kết hợp hoàn hảo giữa vỏ giòn rụm và nhân đậm đà. Từ gà xé thơm lừng đến chả cá Nha Trang chuẩn vị hay nem nướng hấp dẫn, chúng tôi gói trọn cái tâm của người làm nghề vào từng nguyên liệu tươi ngon. Hãy ghé 45A Hiệp Bình để tận hưởng bữa sáng, bữa xế đầy năng lượng, ấm áp tình người ngay tại Thủ Đức nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bánh Mì Hoàng Thanh - Hiệp Bình'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Ăn Vặt Bé Thảo - Bình Thạnh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Ghé Ăn Vặt Bé Thảo tại 80/57D Hoàng Hoa Thám để khám phá thế giới quà vặt đậm chất Sài Gòn. Mỗi món ăn, từ cơm cháy mắm hành giòn rụm đến bánh tráng cuốn sốt me bơ độc đáo, đều được Bé Thảo chăm chút với tất cả tâm huyết. Cảm nhận hương vị khó quên và sự ấm áp như ở nhà, nơi đây đã trở thành điểm đến yêu thích được đánh giá 4.7 sao của nhiều thực khách.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Ăn Vặt Bé Thảo - Bình Thạnh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
 -- Câu chuyện cho quán: Bún Riêu & Canh Bún 30 - Bình Thạnh
 MERGE RestaurantStories AS target
 USING (
@@ -4664,6 +3403,19 @@ USING (
     SELECT id AS restaurant_id, N'Cơm Bắc Ngon là nơi lý tưởng để bạn khám phá hương vị Bắc Bộ mộc mạc, thân thương giữa lòng Bình Thạnh. Mỗi món ăn, từ cơm gà rang gừng sả thơm lừng đến thịt luộc cà pháo mắm tôm đậm đà chuẩn vị, đều được chế biến bằng cả tấm lòng, gợi nhớ bữa cơm nhà ấm áp. Ghế nhà Cơm Bắc Ngon luôn sẵn sàng đón bạn, mang đến bữa ăn ngon miệng, chất lượng và đong đầy ký ức tuổi thơ.' AS story 
     FROM Restaurants 
     WHERE name = N'Cơm Bắc Ngon - Cơm - Bình Thạnh'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Yến Nhà Mình - 100% Yến Chưng Tươi Giao Nóng - Bình Thạnh
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Yến Nhà Mình ấp ủ tâm huyết trong từng chén yến chưng tươi, nơi mỗi sợi yến tinh khiết hòa quyện cùng vị ngọt thanh tự nhiên của đường phèn, hạt sen hay táo đỏ. Chúng tôi nâng niu chuẩn bị và giao nóng đến tận tay bạn, giữ trọn vẹn dưỡng chất quý giá và hương vị thơm lành. Hãy để Yến Nhà Mình trở thành món quà sức khỏe, gửi gắm yêu thương và chăm sóc bản thân mỗi ngày.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Yến Nhà Mình - 100% Yến Chưng Tươi Giao Nóng - Bình Thạnh'
 ) AS source
 ON (target.restaurant_id = source.restaurant_id)
 WHEN MATCHED THEN
@@ -4710,6 +3462,19 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
     INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
 
+-- Câu chuyện cho quán: Phở Nguyên Quận 12 - Vườn Lài
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Giữa lòng Quận 12 tấp nập, Phở Nguyên Vườn Lài là điểm dừng chân ấm áp, mang đến hương vị phở truyền thống nồng nàn không thể quên. Nồi nước dùng hầm xương kỹ lưỡng, ngọt thanh mà đậm đà, cùng thịt tươi và sợi phở mềm dẻo, mỗi tô là cả tâm huyết. Ghé Phở Nguyên để cảm nhận nét ẩm thực Việt tinh túy, một trải nghiệm vị giác chân thật, vẹn nguyên như ngày đầu.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Phở Nguyên Quận 12 - Vườn Lài'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
 -- Câu chuyện cho quán: Súp Cua Cô 8
 MERGE RestaurantStories AS target
 USING (
@@ -4723,12 +3488,181 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
     INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
 
+-- Câu chuyện cho quán: Tiệm Mùa Hạ - Trà & Bánh - Thạnh Xuân Quận 12
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tiệm Mùa Hạ mời bạn dừng chân tại một góc bình yên ở Quận 12, nơi hương trà sữa truyền thống ngọt ngào như đánh thức ký ức tuổi thơ. Nhưng điểm nhấn thực sự lại là những phần chân gà rút xương trứ danh: từ sả tắc giòn dai đến Tomyum chua cay đậm đà, mỗi món đều được chế biến thủ công với tất cả tâm huyết. Hãy đến Tiệm Mùa Hạ để tự mình khám phá sự kết hợp độc đáo, mang đến những khoảnh khắc ẩm thực thật đáng nhớ!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Tiệm Mùa Hạ - Trà & Bánh - Thạnh Xuân Quận 12'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Mì Cay Nam Hàn - Mì Cay & Tokbokki - Đông Hưng Thuận 2
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Nằm giữa lòng Quận 12, Mì Cay Nam Hàn là điểm đến lý tưởng cho những ai trót yêu hương vị cay nồng chuẩn Hàn. Mỗi tô mì cay, từ Hải Sản Đặc Biệt đến Bò đậm đà, đều được nêm nếm tinh tế, mang đến trải nghiệm bùng vị khó quên. Với không gian ấm cúng, gần gũi và mức giá bình dân, chúng tôi tự hào mang đến những bữa ăn ngon miệng, ấm lòng để bạn cùng người thân thưởng thức. Hãy đến và cảm nhận sự khác biệt từ cái tâm chúng tôi đặt vào từng món ăn!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Mì Cay Nam Hàn - Mì Cay & Tokbokki - Đông Hưng Thuận 2'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: NT Food - Mì Trộn Indo - Gà Rán & Ăn Vặt
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào bạn đến với NT Food, chốn dừng chân lý tưởng cho những bữa ăn chuẩn vị Á châu tại Quận 12. Từ mì tương đen đậm đà, đùi gà giòn rụm khó cưỡng đến cơm chiên hải sản thơm lừng, mỗi món đều được chúng tôi chăm chút tỉ mỉ. NT Food mang đến hương vị thân quen, chất lượng trong từng nguyên liệu và sự ấm áp như bữa cơm nhà. Mời bạn ghé 292 Huỳnh Thị Hai để trải nghiệm nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'NT Food - Mì Trộn Indo - Gà Rán & Ăn Vặt'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Mì Ý Happy Meal - Nui & Nước - 481/9/21 HT17
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Mì Ý Happy Meal là góc nhỏ hạnh phúc tại Quận 12, nơi mỗi đĩa mì Ý và nui sốt bò bằm phô mai đều được chế biến bằng cả tấm lòng. Chúng tôi mang đến hương vị Ý bình dân, ấm áp như bữa cơm nhà, với điểm nhấn là phần sốt sánh mịn đậm đà, quyện cùng phô mai béo ngậy khó cưỡng. Đến với Happy Meal, bạn không chỉ thưởng thức món ngon 4.6 sao mà còn tìm thấy niềm vui trong từng miếng ăn, một trải nghiệm ẩm thực đáng nhớ và tràn đầy năng lượng.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Mì Ý Happy Meal - Nui & Nước - 481/9/21 HT17'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Trà Sữa Te Amo - 109 Dương Thị Mười
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Trà Sữa Te Amo – nơi tình yêu được ủ trong từng ly nước. Tại 109 Dương Thị Mười, chúng tôi mang đến một không gian bình dị nhưng ấm cúng, nơi bạn có thể thưởng thức những hương vị đặc trưng khó quên. Từ Trà Đào Cam Sả thơm lừng, độc đáo đến Trà Sữa Bí Đao thanh mát hay Hồng Trà Trân Châu 3Q giòn dai, mỗi món đều được pha chế tỉ mỉ bằng tất cả tâm huyết. Ghé Te Amo, để vị giác được vỗ về và trái tim được thư thái!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Trà Sữa Te Amo - 109 Dương Thị Mười'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Cô Lan - Bún Thịt Nướng & Bột Chiên - Nguyễn Văn Quá
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Ẩn mình trong con hẻm nhỏ Nguyễn Văn Quá, Cô Lan là điểm hẹn quen thuộc cho những ai mê mẩn hương vị bún thịt nướng đậm đà, miếng chả giò giòn rụm và bột chiên vàng ươm, thơm nức mũi. Mỗi đĩa ăn tại đây là sự kết tinh của tình yêu và bí quyết gia truyền, mang đến bữa ăn vừa ngon miệng, vừa ấm lòng. Hãy ghé Cô Lan để tìm lại những ký ức ẩm thực thân thương và tận hưởng hương vị chuẩn nhà làm giữa lòng Sài Gòn.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Cô Lan - Bún Thịt Nướng & Bột Chiên - Nguyễn Văn Quá'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Quán Cơm Gà Mắm Tỏi 1208 - Nguyễn Văn Quá
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Quán Cơm Gà Mắm Tỏi 1208 Nguyễn Văn Quá, mỗi suất cơm là cả tâm huyết gói ghém hương vị truyền thống. Nổi bật là gà góc tư giòn rụm, quyện cùng bí quyết nước mắm tỏi trứ danh làm nên dấu ấn khó quên. Đến đây, bạn không chỉ thưởng thức bữa ăn ngon mà còn tìm thấy sự ấm áp, quen thuộc như cơm nhà. Mời bạn ghé để cảm nhận chất "bình dân" nhưng đầy tinh tế này!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Quán Cơm Gà Mắm Tỏi 1208 - Nguyễn Văn Quá'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Cá Viên Chiên TyBy - Trần Thị Hè
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Cá Viên Chiên TyBy Trần Thị Hè mời bạn đến khám phá hương vị tuổi thơ tại 621/39/2/4 Trần Thị Hè. Từng viên cá, tôm, bò chiên giòn rụm, hay hoành thánh vàng ươm, đều được chuẩn bị với tất cả tâm huyết, mang đến những combo nóng hổi, đậm đà khó quên. Đây là điểm hẹn ấm cúng, nơi mỗi món ăn vặt đều kể một câu chuyện về sự thân thuộc và niềm vui giản dị.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Cá Viên Chiên TyBy - Trần Thị Hè'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: 3 Râu - Gà Rán Pizza & Trà Sữa – 1208 Nguyễn Văn Quá
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tìm kiếm hương vị gà rán giòn rụm chuẩn fastfood bình dân tại 1208 Nguyễn Văn Quá? 3 Râu tự hào mang đến những miếng gà nóng hổi, thấm đẫm gia vị độc đáo, cùng cơm gà xốt đậm đà hay gà viên chiên giòn cực đã. Mỗi bữa ăn tại 3 Râu không chỉ ngon miệng mà còn ấm áp, vui vẻ với mức giá cực kỳ phải chăng. Hãy ghé 3 Râu để trải nghiệm bữa tiệc vị giác được lòng rất nhiều thực khách!' AS story 
+    FROM Restaurants 
+    WHERE name = N'3 Râu - Gà Rán Pizza & Trà Sữa – 1208 Nguyễn Văn Quá'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Trà Sữa HongKong Baley - Phan Văn Hớn
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Trà Sữa HongKong Baley, chúng mình ủ ấp từng hương vị để mang đến bạn những khoảnh khắc ngọt ngào nhất. Từ Trà Sữa Khoai Môn Tươi béo ngậy đến Trà Sữa Kem Trứng Nướng thơm lừng, mỗi ly đều là sự kết hợp của tâm huyết và nét đặc trưng Hong Kong. Ghé 93 Phan Văn Hớn để tìm một góc nhỏ bình yên, thưởng thức và nạp năng lượng sau ngày dài nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Trà Sữa HongKong Baley - Phan Văn Hớn'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Cháo Sò Huyết 1999 - Hiệp Thành 13
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Đến Cháo Sò Huyết 1999 - Hiệp Thành 13 để khám phá hương vị biển cả gói trọn trong từng món ăn tươi ngon. Từ Cháo Sò Huyết nóng hổi, sánh mịn đến Sò Huyết Rang Muối Ớt cay nồng và Ốc Hương Cháy Tỏi thơm lừng, mỗi món là sự kết hợp hoàn hảo của nguyên liệu tươi mới cùng bí quyết gia truyền. Với không gian bình dị, ấm cúng và chất lượng được đánh giá 4.8/5 sao, chúng tôi tự hào mang đến trải nghiệm ẩm thực hải sản đáng nhớ, đậm đà tình quê. Hãy ghé thăm để cảm nhận sự khác biệt!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Cháo Sò Huyết 1999 - Hiệp Thành 13'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
 -- Câu chuyện cho quán: TUTIMI - Milo Dầm - Trà Sữa & Cà Phê - 71A Nguyễn Văn Quá
 MERGE RestaurantStories AS target
 USING (
     SELECT id AS restaurant_id, N'TUTIMI – nơi những ly Milo Dầm Full Topping không chỉ là thức uống, mà là cả một bầu trời tuổi thơ được gói ghém tỉ mỉ. Từng giọt cà phê kem muối biển đậm đà, hay ly trà sữa Olong trân châu trắng thanh mát đều được pha chế bằng cả tấm lòng, mang đến hương vị riêng khó quên. Dừng chân tại 71A Nguyễn Văn Quá, bạn sẽ tìm thấy không gian bình yên và những thức uống "chuẩn vị" làm say lòng.' AS story 
     FROM Restaurants 
     WHERE name = N'TUTIMI - Milo Dầm - Trà Sữa & Cà Phê - 71A Nguyễn Văn Quá'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Phở Nguyễn - Tô Ký
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Phở Nguyễn - Tô Ký, chúng tôi tin rằng mỗi món ăn là một câu chuyện. Nơi đây, giữa lòng Quận 12, bạn sẽ khám phá hương vị đặc sản Việt Nam được nâng tầm bằng phong cách riêng biệt và cái tâm truyền đời. Từ tô phở nóng hổi đến những món độc đáo, tất cả đều được chăm chút tỉ mỉ, mang đến trải nghiệm ấm lòng, khó quên. Hãy đến và thưởng thức nét tinh hoa ẩm thực chỉ có tại Phở Nguyễn!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Phở Nguyễn - Tô Ký'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Quán Ăn 7 Thức - Bún Riêu & Hủ Tiếu
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Ghé Quán Ăn 7 Thức để khám phá hương vị Việt bình dị mà tinh tế, nơi mỗi tô bún riêu, hủ tiếu được nấu bằng cả cái tâm. Nước dùng đậm đà, topping đầy đặn cùng sợi bún, hủ tiếu dai ngon sẽ đánh thức mọi giác quan của bạn. Với đánh giá 4.6/5 sao, chúng tôi tự hào là điểm hẹn ấm cúng, mang đến bữa ăn chuẩn vị nhà làm, thơm ngon khó cưỡng.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Quán Ăn 7 Thức - Bún Riêu & Hủ Tiếu'
 ) AS source
 ON (target.restaurant_id = source.restaurant_id)
 WHEN MATCHED THEN
@@ -4755,6 +3689,318 @@ USING (
     SELECT id AS restaurant_id, N'Tại PHONG VŨ, chúng tôi tự hào mang hương vị Hà Nội chuẩn mực len lỏi giữa lòng Sài Gòn, với từng chiếc bánh mì giòn rụm cùng xôi mặn đậm đà. Mỗi món ăn như Bánh mì thịt chả đặc biệt hay Xôi mặn hộp lớn đều được làm bằng tâm huyết, giữ trọn vẹn nét truyền thống. Ghé 169 Tô Ký để tận hưởng bữa sáng thơm ngon, bữa trưa tròn vị hay bữa xế ấm lòng, nơi hương vị thân quen luôn chào đón bạn!' AS story 
     FROM Restaurants 
     WHERE name = N'PHONG VŨ - BÁNH MÌ HÀ NỘI, XÔI MẶN & BÁNH BAO - TÔ KÝ'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Mì Cay Sasin - Tân Phong Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Mì Cay Sasin - Tân Phong Quận 7 là điểm hẹn lý tưởng cho những tín đồ ẩm thực Hàn Quốc mê mẩn vị cay nồng ấm lòng. Mỗi tô mì là sự kết hợp tinh tế của công thức riêng nhà Sasin, mang đến hương vị bùng nổ khó quên. Đến đây để cảm nhận sự ấm cúng và thưởng thức những món ăn được chế biến bằng cả tâm huyết, hứa hẹn một trải nghiệm ẩm thực đầy xúc cảm.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Mì Cay Sasin - Tân Phong Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng bạn đến Phan Rang Quán Quận 7, nơi hương vị mộc mạc của quê nhà được gói trọn trong từng món đặc sản. Với cái tâm của người làm bếp và không gian bình dị, chúng tôi mang đến những bữa ăn ấm cúng, đậm đà bản sắc Phan Rang ngay giữa lòng Sài Gòn. Hãy ghé 399 Lê Văn Lương để cảm nhận sự chân thành và thưởng thức ẩm thực Việt ngon như nhà làm!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Phan Rang Quán Quận 7 - Thức Ăn - Lê Văn Lương'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Ốc Trứng Muối - Chi Nhánh 17 Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Ốc Trứng Muối - Chi Nhánh 17 Quận 7, chúng tôi tự hào mang đến hương vị biển cả tươi rói hòa quyện cùng sốt trứng muối béo ngậy độc đáo, tạo nên những món ốc trứ danh. Mỗi món đặc sản là sự ấp ủ từ cái tâm của người đầu bếp, với công thức riêng không thể tìm thấy ở nơi nào khác. Hãy ghé 109 Đường Số 79 để cùng bạn bè, người thân tận hưởng không gian bình dị, ấm cúng và những bữa ăn đậm đà, khó quên.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Ốc Trứng Muối - Chi Nhánh 17 Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Link Ốc Quận 7 - Đường Số 10
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Link Ốc Quận 7 - Đường Số 10 mời gọi bạn đắm mình vào thế giới hải sản tươi ngon và những món nhậu độc đáo mang phong cách riêng không lẫn vào đâu được. Mỗi món ăn nơi đây là sự kết hợp tinh tế giữa nguyên liệu chọn lọc và gia vị bí truyền, được chế biến bằng cả tâm huyết để đánh thức mọi giác quan. Tại 1 Đường Số 10, bạn sẽ tìm thấy một không gian ấm cúng, rộn ràng tiếng cười, lý tưởng cho những cuộc hội ngộ bạn bè. Hãy đến và trải nghiệm hương vị khó quên cùng khoảnh khắc thư giãn tuyệt vời!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Link Ốc Quận 7 - Đường Số 10'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Bún Riêu Tóp Mỡ Đặc Biệt Quận 7, mỗi tô bún riêu là một bản giao hưởng của hương vị truyền thống và nét chấm phá riêng biệt. Nước lèo chua thanh đậm đà, gạch cua béo ngậy hòa quyện cùng tóp mỡ giòn tan tạo nên trải nghiệm khó quên. Đó là cái tâm, là sự tỉ mỉ chúng tôi gửi gắm, mời bạn ghé 269 Phạm Hữu Lầu để thưởng thức nét "đặc biệt" làm nên tên tuổi quán!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bún Riêu Tóp Mỡ Đặc Biệt Quận 7 - Phạm Hữu Lầu'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Lẩu Cá Đuối 79k - Lotte Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Lẩu Cá Đuối 79k mời bạn ghé thăm để khám phá món lẩu cá đuối trứ danh, nơi hương vị chua cay đậm đà của nước dùng hòa quyện cùng thịt cá tươi ngon, khiến bạn khó quên. Mỗi nồi lẩu đều được chúng tôi chuẩn bị bằng tất cả tâm huyết, từ nguyên liệu chọn lọc đến công thức riêng biệt, mang đến nét đặc sắc riêng của quán. Đây là điểm hẹn lý tưởng cho những buổi tụ họp bạn bè, gia đình cùng ''nhậu'' vui vẻ, thưởng thức món ngon chuẩn vị Việt ngay tại Quận 7.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Lẩu Cá Đuối 79k - Lotte Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Trà Sữa MayCha - Yola, Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Giữa lòng Quận 7 nhộn nhịp, Trà Sữa MayCha - Yola mở ra một không gian ấm cúng, chờ đón bạn. Nơi đây không chỉ có những ly trà sữa thơm ngon mà còn tự hào giới thiệu các món ăn đặc sản được chế biến với phong cách độc đáo, gói trọn cái tâm của người làm bếp. Mỗi hương vị là một trải nghiệm khó quên. Mời bạn ghé MayCha để cảm nhận sự khác biệt và sự tinh tế trong từng món ăn.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Trà Sữa MayCha - Yola, Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng bạn đến Trạm Mì Ý Dì Hiền Quận 7, nơi mỗi đĩa mì là hành trình vị giác ấm áp và đầy bất ngờ. Với bí quyết riêng cùng tâm huyết của Dì Hiền, từng sợi mì dai hòa quyện trong sốt độc đáo, đậm đà không lẫn vào đâu được. Ghé ngay 6 Đường 15 để thưởng thức hương vị Ý "chuẩn nhà Dì" và cảm nhận sự chân thành trong từng món ăn.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Trạm Mì Ý Dì Hiền Quận 7 - 6 Đường 15'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng bạn đến với ICHI QUÁN Quận 7, nơi hương vị Hà Nội truyền thống được kể lại theo một cách rất riêng, rất ICHI. Từng bát Bún Chả thơm lừng, đậm đà và Nem Cua Bể giòn rụm là tâm huyết của chúng tôi, hòa quyện giữa công thức chuẩn vị và nét sáng tạo độc đáo. Hãy ghé thăm để cảm nhận sự ấm áp, gần gũi và thưởng thức những món ăn đặc sản đầy say mê, như một lời mời gọi thân tình từ ICHI QUÁN.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bún Chả Hà Nội & Nem Cua Bể - ICHI QUÁN - Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Tacos Labubu Quận 7 - Đường Số 17
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tacos Labubu Đường Số 17 là điểm đến lý tưởng cho những tín đồ fastfood mê mẩn hương vị độc đáo. Chúng tôi tự hào mang đến những món taco đặc sản theo phong cách riêng, được chế biến tỉ mỉ với niềm đam mê ẩm thực. Mỗi miếng bánh giòn tan, nhân đậm đà sẽ đánh thức mọi giác quan, hứa hẹn một trải nghiệm bình dân mà chất lượng khó quên.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Tacos Labubu Quận 7 - Đường Số 17'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại Chicken 3S, chúng tôi gói trọn hương vị Hàn Quốc đích thực trong từng miếng gà rán sốt cay giòn rụm và tô mỳ cay bùng vị. Với công thức "3S" độc quyền, mỗi món ăn không chỉ là sự kết hợp hoàn hảo của gia vị mà còn là cái tâm gửi gắm, mang đến trải nghiệm ẩm thực khó quên. Ghé 475A Nguyễn Thị Thập để khám phá không gian ấm áp, nơi những bữa ăn gia đình thêm phần trọn vẹn.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Chicken 3S - Gà Rán Xốt Hàn & Mỳ Cay - Nguyễn Thị Thập Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Tứ Quý Trà - Carameo Machiato Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng đến Tứ Quý Trà - Carameo Machiato Quận 7, nơi bạn tìm thấy góc nhỏ bình yên giữa lòng Sài Gòn. Tại 79A Đường 79, chúng tôi tự hào mang đến những món đặc sản độc đáo cùng hương vị cà phê Carameo Machiato đậm đà, được chế biến với tất cả tâm huyết. Mời bạn ghé thưởng thức và cảm nhận từng dư vị riêng biệt, ấm áp như chính ngôi nhà của mình.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Tứ Quý Trà - Carameo Machiato Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Chiang Thai Delivery - Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng bạn đến với Chiang Thai Delivery - Quận 7, nơi hương vị Thái Lan đích thực được chắt chiu và biến tấu theo phong cách riêng đầy mê hoặc. Mỗi món ăn là hành trình của vị giác, từ chút chua cay nồng nàn đến vị ngọt thanh tao, tất cả đều được đội ngũ đầu bếp tận tâm gửi gắm. Với đánh giá 4.8 sao, chúng tôi tự tin mang đến cho bạn bữa tiệc chuẩn Thái ngay tại nhà, ấm áp và khó quên.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Chiang Thai Delivery - Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Tiệm Fulleaf - Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Bước vào Tiệm Fulleaf - Quận 7, bạn sẽ tìm thấy một góc bình yên để tạm gác lại bộn bề. Nơi đây, mỗi món đặc sản mang phong cách riêng đều được ấp ủ bằng cái tâm, tạo nên hương vị khó quên và không gian ấm cúng. Ghé Tiệm Fulleaf để vị giác thăng hoa và tâm hồn được vỗ về nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Tiệm Fulleaf - Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Gangnam Tanghulu - Lotte Mart Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Gangnam Tanghulu - Lotte Mart Quận 7 là điểm dừng chân lý tưởng để bạn khám phá những hương vị Á Đông đặc sắc, được chế biến theo phong cách riêng đầy sáng tạo. Từ những que Tanghulu giòn ngọt đến các món ngon độc đáo khác, mỗi món ăn đều chứa đựng tâm huyết của chúng tôi, mang đến trải nghiệm ẩm thực khó quên. Hãy để Gangnam Tanghulu làm phong phú thêm hành trình vị giác của bạn, ngay tại trung tâm mua sắm sầm uất.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Gangnam Tanghulu - Lotte Mart Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Pave Glace Chocolate Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tìm về một góc nhỏ bình yên tại Quận 7, Pave Glace Chocolate mời bạn đắm chìm vào thế giới hương vị đặc sắc. Mỗi món tráng miệng, từ socola nghệ thuật đến những chiếc bánh tinh tế, đều là tâm huyết được gửi gắm, mang đậm phong cách riêng không thể lẫn. Đây là nơi lý tưởng để tự thưởng cho mình hoặc sẻ chia niềm ngọt ngào qua những món quà ý nghĩa. Ghé Pave Glace để cảm nhận sự ngọt ngào không thể chối từ!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Pave Glace Chocolate Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Bước vào Tacos Nhà Labubu 149, bạn không chỉ ghé một quán ăn mà là đến một ngôi nhà của những hương vị độc đáo, nơi sự sáng tạo và cái tâm quyện vào từng chiếc taco. Tại số 149 Phạm Hữu Lầu, mỗi món đặc sản đều mang phong cách riêng không thể nhầm lẫn, từ nhân sốt đậm đà đến vỏ bánh giòn tan hấp dẫn. Hãy để Labubu chiêu đãi bạn một bữa ăn bình dân nhưng tràn đầy cảm hứng, xứng đáng với 4.6 sao yêu thích từ thực khách!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Tacos Nhà Labubu 149 - Phạm Hữu Lầu Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tacos Nhà LuXaBu chào đón bạn đến với thế giới Tacos bình dân nhưng đầy ắp hương vị độc đáo, được làm nên từ cái tâm và công thức riêng biệt. Mỗi chiếc bánh là sự kết hợp hoàn hảo của nguyên liệu tươi ngon, giòn tan và đậm đà, mang đến trải nghiệm khó quên. Ghé 335 Nguyễn Hữu Thọ, Quận 7 để khám phá ngay vị ngon đã tạo nên dấu ấn 4.2 sao của chúng tôi nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Tacos Nhà LuXaBu - 335 Nguyễn Hữu Thọ, Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Chào mừng bạn đến Tacos Xin Chào tại 333 Nguyễn Hữu Thọ! Nơi đây, mỗi chiếc taco không chỉ là món ăn nhanh mà là cả một trải nghiệm hương vị đặc trưng, độc đáo riêng của chúng tôi. Từ vỏ giòn rụm đến nhân đậm đà được chế biến thủ công, chúng tôi tự hào mang đến những bữa ăn ngon miệng, ấm lòng và chất lượng 4.8 sao. Ghé Tacos Xin Chào để thưởng thức ngay nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Tacos Xin Chào - 333 Nguyễn Hữu Thọ Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Mang trọn tinh hoa ẩm thực đường phố Hải Phòng về Quận 7, Bánh Mì Pate Hải Phòng - 141 Đường Số 1 chào đón bạn với hương vị pate trứ danh và những món đặc sản đầy tâm huyết. Mỗi ổ bánh mì giòn tan, thơm lừng là sự kết hợp hoàn hảo giữa công thức truyền thống và nét chấm phá riêng của quán. Tại đây, bạn sẽ tìm thấy một không gian bình dị, ấm cúng nhưng ẩn chứa những bất ngờ về hương vị. Hãy ghé thăm để cảm nhận sự gần gũi và khám phá những trải nghiệm vị giác khó quên.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Bánh Mì Pate Hải Phòng Quận 7 - 141 Đường Số 1'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Tại A Duy Food Quận 7, chúng tôi tin rằng ẩm thực là sợi dây gắn kết gia đình. Bạn sẽ được đắm mình trong hương vị độc đáo của gà quay giòn tan, sườn quay đậm đà và cơm lam dẻo thơm, tất cả đều mang phong vị riêng biệt được ấp ủ từ cái tâm của người đầu bếp. Mỗi món ăn không chỉ ngon mà còn là câu chuyện về niềm đam mê. Mời bạn ghé thăm để cùng sẻ chia những bữa ăn trọn vẹn, ấm cúng.' AS story 
+    FROM Restaurants 
+    WHERE name = N'A Duy Food - Hệ Thống Gà Quay, Sườn Quay & Cơm Lam - Chi Nhánh Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Ola Tacos Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Thèm một hương vị mới lạ, đậm đà ngay tại Quận 7? Ola Tacos Quận 7 mang đến những chiếc bánh "đặc sản" với phong cách riêng biệt, làm say lòng thực khách. Mỗi món ăn được chúng tôi chế biến từ nguyên liệu tươi ngon nhất và cái tâm truyền vào, để bạn có trải nghiệm ẩm thực bình dân mà vẫn thật đặc sắc. Ghé 50 Đường Số 10 để khám phá ngay hôm nay!' AS story 
+    FROM Restaurants 
+    WHERE name = N'Ola Tacos Quận 7'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'LaSiMi Quận 7 mời bạn ghé thăm một góc nhỏ bình yên trên Đường Số 17, nơi Trà Ngon Đậm Vị làm say lòng người. Bên cạnh những ấm trà thơm lừng, quán còn tự hào giới thiệu các món đặc sản độc đáo, mỗi món là cả tâm huyết gói trọn hương vị riêng. Hãy đến LaSiMi để tận hưởng không gian ấm cúng và khám phá những trải nghiệm ẩm thực đáng nhớ bạn nhé!' AS story 
+    FROM Restaurants 
+    WHERE name = N'LaSiMi Quận 7- Trà Ngon Đậm Vị - Đường Số 17'
+) AS source
+ON (target.restaurant_id = source.restaurant_id)
+WHEN MATCHED THEN
+    UPDATE SET target.story = source.story, target.updated_at = GETDATE()
+WHEN NOT MATCHED AND source.restaurant_id IS NOT NULL THEN
+    INSERT (restaurant_id, story, updated_at) VALUES (source.restaurant_id, source.story, GETDATE());
+
+-- Câu chuyện cho quán: Sâm Chill Me - Lý Phục Man Quận 7
+MERGE RestaurantStories AS target
+USING (
+    SELECT id AS restaurant_id, N'Ghé Sâm Chill Me Lý Phục Man, bạn sẽ tìm thấy một góc yên bình lý tưởng để gác lại âu lo. Chúng tôi tự hào mang đến những món đặc sản được chế biến với phong cách riêng biệt và trọn vẹn cái tâm, khiến mỗi hương vị đều là một khám phá thú vị. Hãy đến và thư giãn cùng Sâm Chill Me, nơi mỗi bữa ăn không chỉ ngon miệng mà còn là khoảnh khắc đáng nhớ của bạn.' AS story 
+    FROM Restaurants 
+    WHERE name = N'Sâm Chill Me - Lý Phục Man Quận 7'
 ) AS source
 ON (target.restaurant_id = source.restaurant_id)
 WHEN MATCHED THEN

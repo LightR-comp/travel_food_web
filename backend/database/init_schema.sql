@@ -132,6 +132,7 @@ CREATE TABLE Posts (
     thumbnail_url NVARCHAR(500) NULL,
     type          NVARCHAR(50) DEFAULT 'discussion',
     view_count    INT DEFAULT 0,
+    like_count    INT DEFAULT 0,
     reply_count   INT DEFAULT 0,
     is_locked     BIT DEFAULT 0,
     created_at    DATETIME DEFAULT GETDATE(),
@@ -144,6 +145,7 @@ CREATE TABLE Comments (
     id         BIGINT IDENTITY(1,1) PRIMARY KEY,
     post_id    BIGINT NOT NULL FOREIGN KEY REFERENCES Posts(id) ON DELETE CASCADE,
     author_id  INT NOT NULL FOREIGN KEY REFERENCES Users(id),
+    parent_id  BIGINT NULL FOREIGN KEY REFERENCES Comments(id),
     content    NVARCHAR(MAX) NOT NULL,
     like_count INT DEFAULT 0,
     created_at DATETIME DEFAULT GETDATE()
@@ -232,4 +234,3 @@ CREATE TABLE RestaurantStories (
     FOREIGN KEY (restaurant_id) REFERENCES Restaurants(id) ON DELETE CASCADE
 );
 GO
-ALTER TABLE Posts ADD like_count INT NOT NULL DEFAULT 0;

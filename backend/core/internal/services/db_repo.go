@@ -923,6 +923,26 @@ func CalculateDistance(lat1, lng1, lat2, lng2 float64) float64 {
 	return EarthRadius * c
 }
 
+func isOpenNow(openTime, closeTime string) bool {
+    now := time.Now()
+    // Parse về cùng ngày hôm nay để so sánh
+    parse := func(s string) time.Time {
+        t, _ := time.Parse("15:04", s)
+        return time.Date(now.Year(), now.Month(), now.Day(),
+            t.Hour(), t.Minute(), 0, 0, now.Location())
+    }
+
+    open := parse(openTime)
+    close := parse(closeTime)
+    
+    if open.Before(close) {
+        // Bình thường: 08:00 - 22:00
+        return now.After(open) && now.Before(close)
+    }
+    // Qua đêm: 22:00 - 02:00
+    return now.After(open) || now.Before(close)
+}
+
 // SearchRestaurants: Não bộ tìm kiếm trả về data thô và tổng số lượng
 func SearchRestaurants(
 	ctx context.Context,
@@ -1058,13 +1078,7 @@ func SearchRestaurants(
 		// =========================
 		// OPEN STATUS
 		// =========================
-		now := time.Now().Format("15:04")
-		if r.OpenTime <= r.CloseTime {
-			r.IsOpen = now >= r.OpenTime && now <= r.CloseTime
-		} else {
-			// qua đêm (ví dụ: 22:00 - 02:00)
-			r.IsOpen = now >= r.OpenTime || now <= r.CloseTime
-		}
+		r.IsOpen = isOpenNow(r.OpenTime, r.CloseTime)
 
 		restaurants = append(restaurants, r)
 		ids = append(ids, r.ID)
@@ -1194,6 +1208,8 @@ func GetRestaurantDetail(ctx context.Context, id int) (*models.RestaurantDetail,
 		return nil, err
 	}
 
+	rd.IsOpen = isOpenNow(rd.OpenTime, rd.CloseTime)
+
 	menuMap, err := getMenusByRestaurantIDs(ctx, []int{id})
 	if err == nil {
 		rd.Menu = menuMap[id]
@@ -1255,12 +1271,7 @@ func GetPopularRestaurants(ctx context.Context, limit int) ([]models.Restaurant,
 		r.Images = []models.RestaurantImage{}
 
 		// Logic tính toán trạng thái đóng/mở cửa dựa trên thời gian thực hệ thống
-		now := time.Now().Format("15:00")
-		if r.OpenTime <= r.CloseTime {
-			r.IsOpen = now >= r.OpenTime && now <= r.CloseTime
-		} else {
-			r.IsOpen = now >= r.OpenTime || now <= r.CloseTime
-		}
+		r.IsOpen = isOpenNow(r.OpenTime, r.CloseTime)
 
 		restaurants = append(restaurants, r)
 		ids = append(ids, r.ID)
@@ -1296,13 +1307,15 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 				r.address, 
 				r.rating, 
 				r.type,
+				r.open_time,
+				r.close_time,
 				ROW_NUMBER() OVER (PARTITION BY r.id ORDER BY m.price DESC) AS rn
 			FROM MenuItems m
 			JOIN Restaurants r ON m.restaurant_id = r.id
 		)
 		SELECT TOP (@limit) 
 			dish_id, dish_name, price, description, ingredients,
-			restaurant_id, restaurant_name, address, rating, type
+			restaurant_id, restaurant_name, address, rating, type, open_time, close_time
 		FROM RankedDishes
 		WHERE rn = 1
 		ORDER BY rating DESC, price DESC
@@ -1321,8 +1334,9 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 		var dID, rID int
 		var dName, dDesc, dIngre, rName, rAddr, rType string
 		var price, rating float64
+		var openTime, closeTime string
 
-		if err := rows.Scan(&dID, &dName, &price, &dDesc, &dIngre, &rID, &rName, &rAddr, &rating, &rType); err != nil {
+		if err := rows.Scan(&dID, &dName, &price, &dDesc, &dIngre, &rID, &rName, &rAddr, &rating, &rType, &openTime, &closeTime); err != nil {
 			continue
 		}
 
@@ -1346,6 +1360,7 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 				"address": rAddr,
 				"rating":  rating,
 				"type":    rType,
+				"is_open": isOpenNow(openTime, closeTime),
 			},
 		}
 

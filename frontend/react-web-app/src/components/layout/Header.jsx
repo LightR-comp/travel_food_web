@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import axiosInstance from '../../api/axiosInstance';
 import YumMapLogo from '../../assets/YumMap-logo.svg';
 
 // ---- Location Pin Icon ----
@@ -28,17 +29,32 @@ const Header = () => {
   const [searchQ, setSearchQ] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [address, setAddress] = useState('Đang tìm vị trí...');
+  const [weather, setWeather] = useState(null);
+
+  const fetchWeather = async (lat, lng) => {
+    try {
+      const response = await axiosInstance.get(`/utils/weather?lat=${lat}&lng=${lng}`);
+      if (response.data && response.data.success) {
+        setWeather(response.data.data);
+      }
+    } catch (err) {
+      console.error("Lỗi khi tải thời tiết từ API:", err);
+    }
+  };
 
   useEffect(() => {
+    const defaultLat = 21.0285;
+    const defaultLng = 105.8542;
+
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
+          const { latitude, longitude } = position.coords;
+          // 1. Fetch address
           try {
-            const { latitude, longitude } = position.coords;
             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
             const data = await res.json();
             if (data && data.display_name) {
-              // Lấy 3 phần đầu của địa chỉ cho gọn
               const parts = data.display_name.split(',').map(s => s.trim());
               setAddress(parts.slice(0, 3).join(', '));
             } else {
@@ -47,13 +63,17 @@ const Header = () => {
           } catch (error) {
             setAddress('Vị trí hiện tại');
           }
+          // 2. Fetch weather
+          fetchWeather(latitude, longitude);
         },
         (error) => {
-          setAddress('Chưa cấp quyền vị trí');
+          setAddress('Hà Nội, Việt Nam');
+          fetchWeather(defaultLat, defaultLng);
         }
       );
     } else {
-      setAddress('Trình duyệt không hỗ trợ định vị');
+      setAddress('Hà Nội, Việt Nam');
+      fetchWeather(defaultLat, defaultLng);
     }
   }, []);
 
@@ -123,14 +143,29 @@ const Header = () => {
 
         {/* Right: widgets + auth */}
         <div className="flex items-center gap-3">
-          {/* Weather / currency widgets (hidden on small) */}
+          {/* Weather widget - kết nối backend */}
           <div className="hidden lg:flex items-center gap-2">
-            <span className="flex items-center gap-1.5 bg-[#FFF8EE] border border-[#F5EDD8] rounded-full px-3 py-1.5 text-xs font-semibold text-[#4A3728]">
-              🌤️ 27°C
-            </span>
-            <span className="flex items-center gap-1.5 bg-[#FFF8EE] border border-[#F5EDD8] rounded-full px-3 py-1.5 text-xs font-semibold text-[#4A3728]">
-              💰 VND
-            </span>
+            {weather ? (
+              <span 
+                className="flex items-center gap-1 bg-[#FFF8EE] border border-[#F5EDD8] rounded-full px-2.5 py-1 text-xs font-semibold text-[#4A3728] transition-all hover:bg-[#F5EDD8] cursor-default"
+                title={`${weather.description || 'Thời tiết'}, Độ ẩm: ${weather.humidity || 0}%`}
+              >
+                {weather.icon_url ? (
+                  <img 
+                    src={weather.icon_url} 
+                    alt={weather.condition} 
+                    className="w-6 h-6 object-contain"
+                  />
+                ) : (
+                  <span className="mr-0.5">🌤️</span>
+                )}
+                <span>{Math.round(weather.temperature)}°C</span>
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5 bg-[#FFF8EE] border border-[#F5EDD8] rounded-full px-3 py-1.5 text-xs font-semibold text-[#4A3728] animate-pulse">
+                🌤️ Đang tải...
+              </span>
+            )}
           </div>
 
           {user ? (

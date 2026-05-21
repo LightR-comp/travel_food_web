@@ -66,6 +66,37 @@ const ForumPostPage = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [charCount, setCharCount] = useState(0);
   const textareaRef = useRef(null);
+  
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (selectedFiles.length + files.length > 4) {
+      alert("Bạn chỉ được đính kèm tối đa 4 hình ảnh.");
+      return;
+    }
+
+    const newSelected = files.map(file => ({
+      id: Math.random().toString(36).substring(2, 9),
+      file,
+      preview: URL.createObjectURL(file)
+    }));
+
+    setSelectedFiles(prev => [...prev, ...newSelected]);
+    // Reset file input value so same file can be chosen again if removed
+    e.target.value = '';
+  };
+
+  const handleRemoveFile = (id) => {
+    setSelectedFiles(prev => {
+      const target = prev.find(item => item.id === id);
+      if (target) {
+        URL.revokeObjectURL(target.preview);
+      }
+      return prev.filter(item => item.id !== id);
+    });
+  };
 
   const handleChange = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -103,11 +134,21 @@ const ForumPostPage = () => {
     try {
       setSubmitting(true);
       
-      // Gọi API createPost
+      // Upload hình ảnh lên Cloudinary trước
+      const imageUrls = [];
+      for (const item of selectedFiles) {
+        const uploadRes = await forumApi.uploadImage(item.file);
+        if (uploadRes && uploadRes.url) {
+          imageUrls.push(uploadRes.url);
+        }
+      }
+
+      // Gọi API createPost kèm image_urls
       await forumApi.createPost({
         title: form.title,
         content: form.content,
-        category: form.category
+        category: form.category,
+        image_urls: imageUrls
       });
 
       // Hiển thị popup thông báo thành công của UI và chuyển trang
@@ -248,27 +289,27 @@ const ForumPostPage = () => {
                     </div>
                   </div>
 
-                  {/* Toolbar */}
+                  {/* Toolbar - Chỉ giữ nút đính kèm ảnh hoạt động thực tế */}
                   {!preview && (
-                    <div className="flex items-center gap-1 mb-3 p-2 bg-[#FFF8EE] rounded-xl border border-[#F5EDD8]">
-                      {[
-                        { label: 'B', title: 'In đậm', cls: 'font-extrabold' },
-                        { label: 'I', title: 'In nghiêng', cls: 'italic' },
-                        { label: 'H', title: 'Tiêu đề', cls: 'font-bold' },
-                        { label: '—', title: 'Đường kẻ', cls: '' },
-                        { label: '📷', title: 'Thêm ảnh', cls: '' },
-                        { label: '🔗', title: 'Thêm link', cls: '' },
-                        { label: '📋', title: 'Danh sách', cls: '' },
-                      ].map(btn => (
+                    <div className="flex items-center justify-between mb-3 p-2 bg-[#FFF8EE] rounded-xl border border-[#F5EDD8]">
+                      <div className="flex items-center gap-2">
                         <button
-                          key={btn.label}
                           type="button"
-                          title={btn.title}
-                          className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm text-[#4A3728] hover:bg-[#E8623A]/10 hover:text-[#E8623A] transition-all ${btn.cls}`}
+                          onClick={() => fileInputRef.current?.click()}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#E8623A] hover:bg-[#C04D2B] text-white text-xs font-bold transition-all shadow-sm"
                         >
-                          {btn.label}
+                          📷 Đính kèm ảnh ({selectedFiles.length}/4)
                         </button>
-                      ))}
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleFileChange}
+                          multiple
+                          accept="image/*"
+                          className="hidden"
+                        />
+                        <span className="text-[0.65rem] text-[#7B7068]">Chỉ chọn tối đa 4 hình ảnh (JPG, PNG).</span>
+                      </div>
                     </div>
                   )}
 
@@ -281,14 +322,39 @@ const ForumPostPage = () => {
                       )}
                     </div>
                   ) : (
-                    <textarea
-                      ref={textareaRef}
-                      value={form.content}
-                      onChange={e => handleChange('content', e.target.value)}
-                      placeholder="Chia sẻ trải nghiệm ẩm thực của bạn... &#10;&#10;Mẹo: Sử dụng dấu xuống dòng để tạo đoạn văn, mô tả chi tiết hương vị, không gian, giá cả..."
-                      rows={14}
-                      className={`${inputClass} resize-none min-h-[300px]`}
-                    />
+                    <>
+                      <textarea
+                        ref={textareaRef}
+                        value={form.content}
+                        onChange={e => handleChange('content', e.target.value)}
+                        placeholder="Chia sẻ trải nghiệm ẩm thực của bạn... &#10;&#10;Mẹo: Sử dụng dấu xuống dòng để tạo đoạn văn, mô tả chi tiết hương vị, không gian, giá cả..."
+                        rows={14}
+                        className={`${inputClass} resize-none min-h-[300px]`}
+                      />
+
+                      {/* Hiển thị ảnh đã chọn để xem trước */}
+                      {selectedFiles.length > 0 && (
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 p-3 bg-[#FFF8EE]/50 border border-dashed border-[#F5EDD8] rounded-xl">
+                          {selectedFiles.map((file) => (
+                            <div key={file.id} className="relative aspect-video rounded-lg overflow-hidden border border-[#F5EDD8] bg-white group">
+                              <img
+                                src={file.preview}
+                                alt="Selected preview"
+                                className="w-full h-full object-cover"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveFile(file.id)}
+                                className="absolute top-1 right-1 bg-black/60 hover:bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[0.65rem] transition-colors shadow"
+                                title="Xóa ảnh này"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
                   )}
 
                   <div className="flex items-center justify-between mt-2">

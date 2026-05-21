@@ -1,7 +1,12 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { loginApi, registerApi, logoutApi, getMeApi } from '../api/AuthAPI';
+<<<<<<< HEAD
 //import { auth, googleProvider, facebookProvider } from '../config/firebase';
 //import { signInWithPopup } from 'firebase/auth';
+=======
+import { auth, googleProvider, facebookProvider } from '../config/firebase';
+import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
+>>>>>>> nlakien
 
 const AuthContext = createContext(null);
 
@@ -26,6 +31,29 @@ export const AuthProvider = ({ children }) => {
     } else {
       setLoading(false);
     }
+  }, []);
+
+  //useEffect để bắt redirect result
+  useEffect(() => {
+    getRedirectResult(auth).then(async (result) => {
+      if (!result) return;
+      const idToken = await result.user.getIdToken(true);
+      const data = await sendOAuthToken(idToken, 'facebook');
+      localStorage.setItem('yummap_token', data.data.token);
+      setUser(data.data.user);
+    }).catch(console.error);
+  }, []);
+
+  useEffect(() => {
+  getRedirectResult(auth)
+    .then(async (result) => {
+      if (!result) return; // không phải redirect flow, bỏ qua
+      const idToken = await result.user.getIdToken(true);
+      const data = await sendOAuthToken(idToken, 'facebook');
+      localStorage.setItem('yummap_token', data.data.token);
+      setUser(data.data.user);
+    })
+    .catch((err) => console.error('Redirect result error:', err));
   }, []);
 
   // ---- Local login ----
@@ -60,29 +88,28 @@ export const AuthProvider = ({ children }) => {
   // ---- Helper: send idToken to Go backend ----
   const sendOAuthToken = async (idToken, provider) => {
     const response = await fetch(`${API_URL}/auth/oauth`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ 
-        id_token: idToken,  
-        provider: provider  
-      }),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ id_token: idToken, provider }),
     });
 
     if (!response.ok) {
-      let errorBody = '';
-      try {
-        errorBody = await response.text();
-      } catch (e) {
-        errorBody = 'Unable to read error body';
-      }
-      console.error(`OAuth backend error (${response.status}):`, errorBody);
-      throw new Error(`HTTP ${response.status} - ${errorBody}`);
+        const errorBody = await response.text().catch(() => '');
+        throw new Error(`HTTP ${response.status} - ${errorBody}`);
     }
 
-    return response.json();
-  };
+    const data = await response.json();
 
+    // Wrap cho khớp với format backend trả về
+    return {
+        success: true,
+        data: {
+            token: data.token,
+            user:  data.user,
+        }
+    };
+  };
   // ---- Google login ----
   const loginWithGoogle = useCallback(async () => {
     setError(null);
@@ -111,15 +138,11 @@ export const AuthProvider = ({ children }) => {
       const result = await signInWithPopup(auth, facebookProvider);
       const idToken = await result.user.getIdToken(true);
       const data = await sendOAuthToken(idToken, 'facebook');
-
-      if (data.success) {
-        localStorage.setItem('yummap_token', data.data.token);
-        setUser(data.data.user);
-        return { success: true, user: data.data.user };
-      }
-      return { success: false, error: data.message };
+      localStorage.setItem('yummap_token', data.data.token);
+      setUser(data.data.user);
+      return { success: true, user: data.data.user };
     } catch (err) {
-      console.error('Facebook login error:', err);
+      console.error('Facebook login error:', err.code, err.message);
       return { success: false, error: 'Đăng nhập Facebook thất bại' };
     }
   }, []);

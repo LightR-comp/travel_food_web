@@ -17,6 +17,7 @@ import (
 type Post struct {
     ID            uint64    `json:"id"`
     AuthorID      uint64    `json:"author_id"`
+    AuthorName    string    `json:"author_name"`
     Prefix        string    `json:"prefix"`          // Ví dụ: (No prefix)
     Title         string    `json:"title"`           // "Review bánh mì Huỳnh Hoa..."
   	Content       json.RawMessage `json:"content"`
@@ -24,12 +25,14 @@ type Post struct {
     ThumbnailURL  string    `json:"thumbnail_url"`   // Ảnh minh họa cho bài viết
     Type          string    `json:"type"`            // "discussion" hoặc "poll"
     ViewCount     int       `json:"view_count"`      // Lượt xem
+    LikeCount     int       `json:"like_count"`     // Lượt thích
     ReplyCount    int       `json:"reply_count"`     // Lượt trả lời
     IsLocked      bool      `json:"is_locked"`
     CreatedAt     time.Time `json:"created_at"`
     UpdatedAt     time.Time `json:"updated_at"`
 
 	Comments []Comment `json:"comments,omitempty"`
+    Images []PostImage `json:"images,omitempty"`
 }
 
 type Comment struct {
@@ -39,6 +42,7 @@ type Comment struct {
     Content   string    `json:"content"`
     LikeCount int       `json:"like_count"`
     CreatedAt time.Time `json:"created_at"`
+    ImageURL  string    `json:"image_url,omitempty"`
 }
 
 type Attachment struct {
@@ -54,4 +58,12 @@ type Poll struct {
     Question   string   `json:"question"`
     Options    []string `json:"options"`
     TotalVotes int      `json:"total_votes"`
+}
+
+type PostImage struct {
+    ID         int       `json:"id"`
+    PostID     int       `json:"post_id"`
+    ImageURL   string    `json:"image_url"`
+    OrderIndex int       `json:"order_index"`
+    CreatedAt  time.Time `json:"created_at"`
 }

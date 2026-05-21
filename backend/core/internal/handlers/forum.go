@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -60,21 +61,28 @@ func GetPostDetail(c *gin.Context) {
 func CreatePost(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
-	var post models.Post
-	if err := c.ShouldBindJSON(&post); err != nil {
+	var req struct {
+		models.Post
+		ImageURLs []string `json:"image_urls"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Dữ liệu không hợp lệ"})
 		return
 	}
 
-	// Giá trị mặc định
-	if post.Type == "" {
-		post.Type = "discussion"
+	if req.Type == "" {
+		req.Type = "discussion"
 	}
 
-	created, err := services.CreatePost(c.Request.Context(), userID, post)
+	created, err := services.CreatePost(c.Request.Context(), userID, req.Post)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo bài viết"})
 		return
+	}
+
+	if len(req.ImageURLs) > 0 {
+		services.AddPostImages(c.Request.Context(), int(created.ID), req.ImageURLs)
+		created.Images, _ = services.GetPostImages(c.Request.Context(), int(created.ID))
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
@@ -82,7 +90,6 @@ func CreatePost(c *gin.Context) {
 		"data":    created,
 	})
 }
-
 
 // ============================================================
 // COMMENT
@@ -98,14 +105,21 @@ func AddComment(c *gin.Context) {
 	}
 
 	var req struct {
-		Content string `json:"content" binding:"required"`
+		Content  string `json:"content"`
+		ImageURL string `json:"image_url"` // optional
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Thiếu nội dung bình luận"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Dữ liệu không hợp lệ"})
 		return
 	}
 
-	comment, err := services.AddComment(c.Request.Context(), userID, postID, req.Content)
+	// Phải có ít nhất content hoặc image_url
+	if req.Content == "" && req.ImageURL == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Bình luận phải có nội dung hoặc ảnh"})
+		return
+	}
+
+	comment, err := services.AddComment(c.Request.Context(), userID, postID, req.Content, req.ImageURL)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo bình luận"})
 		return
@@ -122,24 +136,63 @@ func AddComment(c *gin.Context) {
 // ============================================================
 
 func LikePost(c *gin.Context) {
+    userID := c.GetInt("user_id")
+    postID, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "id không hợp lệ"})
+        return
+    }
+
+    liked, likeCount, err := services.LikePost(c.Request.Context(), userID, postID)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi xử lý like"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "liked":      liked,
+        "like_count": likeCount,
+    })
+}
+
+func LikeComment(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
-	postID, err := strconv.Atoi(c.Param("id"))
+	commentID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "id không hợp lệ"})
 		return
 	}
 
-	liked, err := services.LikePost(c.Request.Context(), userID, postID)
+	liked, err := services.LikeComment(c.Request.Context(), userID, commentID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi xử lý like"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi xử lý like comment"})
 		return
 	}
 
-	msg := "Đã thích bài viết"
+	msg := "Đã thích bình luận"
 	if !liked {
-		msg = "Đã bỏ thích bài viết"
+		msg = "Đã bỏ thích bình luận"
 	}
-
 	c.JSON(http.StatusOK, gin.H{"message": msg, "liked": liked})
+}
+
+func UploadImage(c *gin.Context) {
+    file, _, err := c.Request.FormFile("image")
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Không tìm thấy file ảnh"})
+        return
+    }
+    defer file.Close()
+
+    url, err := services.UploadToCloudinary(c.Request.Context(), file, "travel_food")
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Lỗi upload: %v", err)})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Upload thành công",
+        "url":     url,
+    })
 }

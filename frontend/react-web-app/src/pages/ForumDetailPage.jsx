@@ -228,7 +228,7 @@ const ForumDetailPage = () => {
       setLiked(data.liked); 
       setPost(prev => ({
         ...prev,
-        view_count: data.liked ? (prev.view_count || 0) + 1 : Math.max(0, (prev.view_count || 0) - 1)
+        like_count: data.like_count
       }));
     } catch (err) {
       alert("Không thể thực hiện thao tác thích bài viết. Vui lòng kiểm tra lại đăng nhập.");
@@ -376,7 +376,7 @@ const ForumDetailPage = () => {
                         : 'bg-[#FFF8EE] text-[#4A3728] border border-[#F5EDD8] hover:border-[#E8623A]/30'
                     }`}
                   >
-                    {liked ? '❤️' : '🤍'} {post.view_count || 0}
+                    {liked ? '❤️' : '🤍'} {post.like_count || 0}
                   </button>
                   <button
                     onClick={() => setBookmarked(!bookmarked)}

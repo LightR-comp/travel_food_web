@@ -32,15 +32,17 @@ async def generate_response_endpoint(request: ChatGenerationRequest):
 
 # Endpoint mới cho nhận diện món ăn từ ảnh (Multimodal)
 @router.post("/identify_dish", response_model=BaseResponse)
-async def identify_dish_endpoint(request: dict):
+async def identify_dish_endpoint(request: AIIdentifyDishRequest):
     """Endpoint nhận diện món ăn từ Base64 image (Multimodal)"""
     try:
-        img_b64 = request.get("image_base64")
-        if not img_b64:
-            raise HTTPException(status_code=400, detail="Thiếu dữ liệu hình ảnh (base64)")
+        # Dữ liệu đã được Pydantic xác thực.
+        # Giờ đây ta có thể truy cập trực tiếp các thuộc tính một cách an toàn.
+        # Lỗi sai tên key "image_b64" cũng được khắc phục nhờ Pydantic.
+        img_b64 = request.image_base64
+        message = request.message
             
         # Chạy logic nhận diện (chứa prompt Gemini) trong thread riêng
-        result = await asyncio.to_thread(identify_dish_from_image, img_b64)
+        result = await asyncio.to_thread(identify_dish_from_image, img_b64, message)
         return BaseResponse(success=True, message="Nhận diện thành công", data=result)
     except Exception as e:
         return BaseResponse(success=False, message="Lỗi nhận diện món ăn", error=str(e))

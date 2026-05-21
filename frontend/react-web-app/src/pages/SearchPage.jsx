@@ -13,6 +13,7 @@ const SearchPage = () => {
   const [query, setQuery] = useState(initialQ);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 1000000]);
   const [filters, setFilters] = useState([]);
   const [sort, setSort] = useState('rating');
@@ -21,6 +22,7 @@ const SearchPage = () => {
   const fetchResults = useCallback(
     debounce(async (q, price, flt, srt) => {
       setLoading(true);
+      setError(false);
       try {
         const res = await searchRestaurantsApi({
           q,
@@ -29,8 +31,15 @@ const SearchPage = () => {
           filters: flt.join(','),
           sort: srt,
         });
-        setResults(res.data.restaurants);
-        setTotal(res.data.total);
+        if (res.success === false) {
+          setResults([]);
+          setTotal(0);
+        } else {
+          setResults(res.data?.restaurants || []);
+          setTotal(res.data?.total || 0);
+        }
+      } catch (err) {
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -142,12 +151,26 @@ const SearchPage = () => {
             </div>
 
             {loading ? (
-              <div className="flex justify-center py-16"><Spinner size="lg" /></div>
+              <div className="flex flex-col gap-5">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex gap-5 bg-white border border-[#F5EDD8] rounded-2xl p-4 animate-pulse">
+                    <div className="w-[180px] h-[160px] bg-gray-200 rounded-[14px]"></div>
+                    <div className="flex-1 py-2">
+                      <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
+                      <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="text-center py-16 text-red-500">
+                <p className="font-semibold">Không thể tải danh sách quán</p>
+              </div>
             ) : results.length === 0 ? (
               <div className="text-center py-16 text-[#7B7068]">
-                <div className="text-5xl mb-3">🔍</div>
-                <p className="font-semibold">Không tìm thấy kết quả nào</p>
-                <p className="text-sm mt-1">Thử tìm với từ khóa khác nhé!</p>
+                <p className="font-semibold">Không tìm thấy quán nào phù hợp</p>
               </div>
             ) : (
               <div className="flex flex-col gap-5" id="results-list">

@@ -41,6 +41,8 @@ type RestaurantDetail struct {
 type UserRating struct {
 	ID           int       `db:"id" json:"id"`
 	UserID       int       `db:"user_id" json:"user_id"`
+	UserName     string    `db:"name" json:"user_name"`
+	UserAvatar   string    `db:"avatar_url" json:"avatar"`
 	RestaurantID int       `db:"restaurant_id" json:"restaurant_id"`
 	Rating       float64   `db:"rating" json:"rating"`
 	Comment      string    `db:"comment" json:"comment"`

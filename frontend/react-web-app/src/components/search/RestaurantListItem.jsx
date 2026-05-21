@@ -11,8 +11,13 @@ const RestaurantListItem = ({ restaurant }) => {
   // Xử lý giá tiền (price_range đang là số, VD: 150000 -> 150.000 đ)
   const formattedPrice = price_range ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price_range) : 'Đang cập nhật';
   
-  // Dùng ảnh ngẫu nhiên hoặc ảnh theo id tạm thời nếu backend chưa trả về
-  const imageUrl = restaurant.image_url || `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80`;
+  // Dùng ảnh từ CSDL (nếu có) hoặc dùng ảnh placeholder
+  let imageUrl = `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80`;
+  if (restaurant.images && restaurant.images.length > 0 && restaurant.images[0].image_url) {
+    imageUrl = restaurant.images[0].image_url;
+  } else if (restaurant.image_url) {
+    imageUrl = restaurant.image_url;
+  }
 
   const tags = type ? [type] : [];
 

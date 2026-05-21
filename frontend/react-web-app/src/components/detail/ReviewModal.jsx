@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
-const ReviewModal = ({ isOpen, onClose, restaurantName }) => {
+const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => {
+  const { id } = useParams();
   const [overallRating, setOverallRating] = useState(0);
   const [hoverOverall, setHoverOverall] = useState(0);
 
@@ -17,6 +19,7 @@ const ReviewModal = ({ isOpen, onClose, restaurantName }) => {
   const [files, setFiles] = useState([]);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   
   const fileInputRef = useRef(null);
 
@@ -41,11 +44,12 @@ const ReviewModal = ({ isOpen, onClose, restaurantName }) => {
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    if (selectedFiles.length > 0) {
-      const newFiles = selectedFiles.map(file => ({
+    const imageFiles = selectedFiles.filter(f => f.type.startsWith('image/'));
+    if (imageFiles.length > 0) {
+      const newFiles = imageFiles.map(file => ({
         file,
         preview: URL.createObjectURL(file),
-        type: file.type.startsWith('video/') ? 'video' : 'image'
+        type: 'image'
       }));
       setFiles(prev => [...prev, ...newFiles]);
     }
@@ -62,20 +66,80 @@ const ReviewModal = ({ isOpen, onClose, restaurantName }) => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (overallRating === 0) {
       alert("Vui lòng chọn số sao đánh giá tổng quan!");
       return;
     }
     
-    setIsSubmitting(true);
-    
-    // Giả lập API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      alert("Cảm ơn bạn! Đánh giá đã được đăng thành công.");
+    try {
+      const token = localStorage.getItem('yummap_token');
+      if (!token) {
+        alert("Vui lòng đăng nhập để đánh giá.");
+        return;
+      }
+
+      let uploadedUrls = [];
+
+      // Bước 1: Upload ảnh/video
+      if (files.length > 0) {
+        setIsUploading(true);
+        
+        const uploadPromises = files.map(async (item) => {
+          const formData = new FormData();
+          formData.append('image', item.file);
+
+          const res = await fetch('/api/v1/posts/upload', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            body: formData
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error || data.message || 'Upload ảnh thất bại');
+          }
+          return data.url;
+        });
+
+        uploadedUrls = await Promise.all(uploadPromises);
+        setIsUploading(false);
+      }
+
+      // Bước 2: Gửi đánh giá
+      setIsSubmitting(true);
+      const reviewPayload = {
+        rating: overallRating,
+        comment: reviewText,
+        images: uploadedUrls.map(url => ({ image_url: url }))
+      };
+
+      const reviewRes = await fetch(`/api/v1/restaurants/${id}/rating`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(reviewPayload)
+      });
+
+      const reviewData = await reviewRes.json();
+      if (!reviewRes.ok || !reviewData.success) {
+        throw new Error(reviewData.message || 'Gửi đánh giá thất bại');
+      }
+
       onClose();
-    }, 1500);
+      if (onReviewSubmitted) onReviewSubmitted();
+
+    } catch (error) {
+      console.error(error);
+      alert(`Lỗi: ${error.message}`);
+    } finally {
+      setIsUploading(false);
+      setIsSubmitting(false);
+    }
   };
 
   const StarIcon = ({ filled, onMouseEnter, onMouseLeave, onClick, size = "md" }) => {
@@ -190,12 +254,12 @@ const ReviewModal = ({ isOpen, onClose, restaurantName }) => {
                 <circle cx="8.5" cy="8.5" r="1.5"/>
                 <polyline points="21 15 16 10 5 21"/>
               </svg>
-              Thêm ảnh và video
+              Thêm hình ảnh
             </button>
             <input 
               type="file" 
               multiple 
-              accept="image/*,video/*" 
+              accept="image/*" 
               className="hidden" 
               ref={fileInputRef} 
               onChange={handleFileChange}
@@ -206,11 +270,7 @@ const ReviewModal = ({ isOpen, onClose, restaurantName }) => {
               <div className="flex gap-3 flex-wrap mt-4">
                 {files.map((item, idx) => (
                   <div key={idx} className="relative w-20 h-20 rounded-xl overflow-hidden border border-[#D9D9D9] shadow-sm group">
-                    {item.type === 'image' ? (
-                      <img src={item.preview} alt="preview" className="w-full h-full object-cover" />
-                    ) : (
-                      <video src={item.preview} className="w-full h-full object-cover" />
-                    )}
+                    <img src={item.preview} alt="preview" className="w-full h-full object-cover" />
                     <button 
                       className="absolute top-1 right-1 w-5 h-5 bg-black/60 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black"
                       onClick={() => removeFile(idx)}
@@ -236,14 +296,22 @@ const ReviewModal = ({ isOpen, onClose, restaurantName }) => {
           </button>
           <button 
             className={`px-8 py-2.5 rounded-full font-semibold transition-colors flex items-center gap-2 ${
-              overallRating > 0 && !isSubmitting 
+              overallRating > 0 && !isSubmitting && !isUploading
                 ? 'bg-[#F5A623] text-white hover:bg-[#E8960A] shadow-md' 
                 : 'bg-[#D9D9D9] text-white/70 cursor-not-allowed'
             }`}
             onClick={handleSubmit}
-            disabled={overallRating === 0 || isSubmitting}
+            disabled={overallRating === 0 || isSubmitting || isUploading}
           >
-            {isSubmitting ? (
+            {isUploading ? (
+              <>
+                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Đang upload ảnh...
+              </>
+            ) : isSubmitting ? (
               <>
                 <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -251,9 +319,7 @@ const ReviewModal = ({ isOpen, onClose, restaurantName }) => {
                 </svg>
                 Đang đăng...
               </>
-            ) : (
-              'Đăng'
-            )}
+            ) : "Đăng"}
           </button>
         </div>
       </div>

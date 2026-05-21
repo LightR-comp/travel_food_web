@@ -25,8 +25,8 @@ const ProfilePage = () => {
         if (response.success) {
           setUserData(response.data);
           setFormData({
-            full_name: response.data.full_name || '',
-            username: response.data.username || '',
+            full_name: response.data.name || '',
+            username: response.data.name || '',
             email: response.data.email || '',
           });
         }
@@ -55,7 +55,7 @@ const ProfilePage = () => {
 
     try {
       const response = await updateProfileApi({
-        full_name: formData.full_name,
+        name: formData.full_name,
       });
 
       if (response.success) {
@@ -63,7 +63,7 @@ const ProfilePage = () => {
         setIsEditing(false);
         
         // Cập nhật user context với thông tin mới
-        updateUser({ full_name: formData.full_name });
+        updateUser({ name: formData.full_name });
         
         // Refresh user data từ API
         const freshData = await getMeApi();
@@ -120,9 +120,9 @@ const ProfilePage = () => {
             </div>
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-white">
-                {userData?.full_name || user?.full_name}
+                {userData?.name || user?.name}
               </h1>
-              <p className="text-white/80">@{userData?.username || user?.username}</p>
+              <p className="text-white/80">@{userData?.name || user?.name}</p>
             </div>
             {!isEditing && (
               <button

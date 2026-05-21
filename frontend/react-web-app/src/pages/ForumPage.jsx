@@ -138,7 +138,7 @@ const ForumPage = () => {
           author: p.author_name || 'Thành viên YumMap', 
           avatar: p.avatar_url || '🧑‍🍳',
           comments: p.reply_count || 0,
-          likes: p.view_count || 0,
+          likes: p.like_count || 0,
           tags: p.tags || ['#YumMap', '#FoodReview']
         }));
         

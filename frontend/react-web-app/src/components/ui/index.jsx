@@ -6,6 +6,7 @@ export const Badge = ({ label, className = '' }) => {
     Trending:  'bg-[#E8623A] text-white',
     'Cơm tấm': 'bg-[#FFF8EE] text-[#E8623A] border border-[#E8623A]',
     'Must try badge': 'bg-[#4A3728] text-[#F5A623]',
+    'Đóng cửa': 'bg-[#EF4444] text-white',
   };
   const cls = colors[label] || 'bg-[#FFF8EE] text-[#4A3728]';
 

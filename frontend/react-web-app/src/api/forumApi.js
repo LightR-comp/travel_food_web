@@ -20,6 +20,7 @@ export const forumApi = {
     const response = await axiosInstance.post('/posts', {
       prefix: "(No prefix)",
       title: postData.title,
+      category: postData.category,
       content: JSON.stringify([{ type: "text", value: postData.content }]), 
       summary: postData.content.substring(0, 150) + "...",
       type: "discussion",

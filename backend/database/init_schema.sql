@@ -136,6 +136,7 @@ CREATE TABLE Posts (
     author_id     INT NOT NULL FOREIGN KEY REFERENCES Users(id) ON DELETE CASCADE,
     prefix        NVARCHAR(100) NULL,
     title         NVARCHAR(255) NOT NULL,
+    category      NVARCHAR(100) NULL,
     content       NVARCHAR(MAX) NOT NULL,
     summary       NVARCHAR(500) NULL,
     thumbnail_url NVARCHAR(500) NULL,

@@ -32,6 +32,13 @@ const useInView = (threshold = 0.15) => {
 const PostCard = ({ post, index }) => {
   const [ref, visible] = useInView(0.1);
   const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(post.likes || 0);
+  const [isLiking, setIsLiking] = useState(false);
+
+  useEffect(() => {
+    setLikesCount(post.likes || 0);
+  }, [post.likes]);
+
   const categoryColors = {
     review: 'bg-[#E8623A]/10 text-[#E8623A]',
     recipe: 'bg-emerald-50 text-emerald-600',
@@ -40,6 +47,24 @@ const PostCard = ({ post, index }) => {
     question: 'bg-blue-50 text-blue-600',
   };
   const catLabel = CATEGORIES.find(c => c.id === post.category);
+
+  const handleLikeClick = async () => {
+    if (isLiking) return;
+    try {
+      setIsLiking(true);
+      const response = await forumApi.likePost(post.id);
+      
+      const apiData = response.data ? response.data : response;
+      
+      setLiked(apiData.liked);
+      setLikesCount(apiData.like_count);
+    } catch (error) {
+      console.error("Lỗi khi tương tác nút thích bài viết:", error);
+      alert("Thao tác thất bại. Bạn vui lòng đăng nhập để thực hiện chức năng này.");
+    } finally {
+      setIsLiking(false);
+    }
+  };
 
   return (
     <article
@@ -95,14 +120,16 @@ const PostCard = ({ post, index }) => {
 
         {/* Actions */}
         <div className="flex items-center gap-4 pt-3 border-t border-[#F5EDD8]/60">
+          {/* Sửa lại hàm onClick gọi tới API đồng bộ thực tế */}
           <button
-            onClick={() => setLiked(!liked)}
-            className={`flex items-center gap-1.5 text-xs font-semibold transition-all duration-300, ${liked ? 'text-[#E8623A] scale-105' : 'text-[#7B7068] hover:text-[#E8623A]'}`}
+            onClick={handleLikeClick}
+            disabled={isLiking}
+            className={`flex items-center gap-1.5 text-xs font-semibold transition-all duration-300 ${liked ? 'text-[#E8623A] scale-105' : 'text-[#7B7068] hover:text-[#E8623A]'}`}
           >
             <span className={`text-base transition-transform duration-300 ${liked ? 'scale-125' : ''}`}>
               {liked ? '❤️' : '🤍'}
             </span>
-            {liked ? post.likes + 1 : post.likes}
+            {likesCount}
           </button>
           <span className="flex items-center gap-1.5 text-xs font-semibold text-[#7B7068]">
             💬 {post.comments}
@@ -271,33 +298,6 @@ const ForumPage = () => {
                   </span>
                 ))}
               </div>
-            </div>
-
-            {/* Top contributors card */}
-            <div className="bg-white rounded-2xl border border-[#F5EDD8] p-5">
-              <h3 className="font-bold text-[#2C1810] mb-4 flex items-center gap-2">
-                👑 Top đóng góp
-              </h3>
-              <ul className="space-y-3">
-                {[
-                  { name: 'Minh Anh', posts: 156, avatar: '🧑‍🍳' },
-                  { name: 'Hồng Ngọc', posts: 132, avatar: '👩‍🍳' },
-                  { name: 'Đức Thành', posts: 98, avatar: '🧔' },
-                  { name: 'Thu Hương', posts: 87, avatar: '👩' },
-                  { name: 'Quốc Bảo', posts: 72, avatar: '🧑' },
-                ].map((u, i) => (
-                  <li key={u.name} className="flex items-center gap-3 group cursor-pointer">
-                    <span className="text-xs font-bold text-[#C8BEB5] w-5">{i + 1}</span>
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FFF8EE] to-[#FDECD8] flex items-center justify-center text-sm ring-1 ring-[#F5EDD8] group-hover:ring-[#E8623A]/30 transition-all">
-                      {u.avatar}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#2C1810] truncate group-hover:text-[#E8623A] transition-colors">{u.name}</p>
-                      <p className="text-[0.65rem] text-[#7B7068]">{u.posts} bài viết</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
             </div>
 
             {/* Rules card */}

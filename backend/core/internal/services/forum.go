@@ -16,13 +16,14 @@ import (
 func GetPopularPosts(ctx context.Context) ([]models.Post, error) {
 	rows, err := db.QueryContext(ctx, `
 		SELECT TOP 10
-			p.id, p.author_id, u.name, p.prefix, p.title, p.content,
-			p.summary, p.thumbnail_url, p.type, p.view_count, p.like_count, p.reply_count,
+			p.id, p.author_id, u.name, p.prefix, p.title,p.category,  p.content,
+			p.summary, p.thumbnail_url, p.type, p.view_count, p.like_count,
+			(SELECT COUNT(*) FROM Comments c WHERE c.post_id = p.id) AS reply_count,
 			p.is_locked, p.created_at, p.updated_at
 		FROM Posts p
 		INNER JOIN Users u ON p.author_id = u.id
 		WHERE p.is_locked = 0
-		ORDER BY p.view_count DESC, p.reply_count DESC
+		ORDER BY p.view_count DESC, (SELECT COUNT(*) FROM Comments c WHERE c.post_id = p.id) DESC
 	`)
 	if err != nil {
 		return nil, fmt.Errorf("GetPopularPosts: %w", err)
@@ -39,8 +40,9 @@ func GetListPosts(ctx context.Context, page, limit int) ([]models.Post, int, err
 
 	rows, err := db.QueryContext(ctx, `
 		SELECT
-			p.id, p.author_id, u.name, p.prefix, p.title, p.content,
-			p.summary, p.thumbnail_url, p.type, p.view_count, p.like_count, p.reply_count,
+			p.id, p.author_id, u.name, p.prefix, p.title, p.category, p.content,
+			p.summary, p.thumbnail_url, p.type, p.view_count, p.like_count,
+			(SELECT COUNT(*) FROM Comments c WHERE c.post_id = p.id) AS reply_count,
 			p.is_locked, p.created_at, p.updated_at
 		FROM Posts p
 		INNER JOIN Users u ON p.author_id = u.id
@@ -65,7 +67,7 @@ func GetPostDetail(ctx context.Context, postID int) (*models.Post, error) {
 
     row := db.QueryRowContext(ctx, `
         SELECT
-            p.id, p.author_id, u.name, p.prefix, p.title, p.content,
+            p.id, p.author_id, u.name, p.prefix, p.title, p.category, p.content,
             p.summary, p.thumbnail_url, p.type, p.view_count, p.like_count, p.reply_count,
             p.is_locked, p.created_at, p.updated_at
         FROM Posts p
@@ -76,7 +78,7 @@ func GetPostDetail(ctx context.Context, postID int) (*models.Post, error) {
     var p models.Post
     var authorName, contentStr string
     err := row.Scan(
-        &p.ID, &p.AuthorID, &authorName, &p.Prefix, &p.Title, &contentStr,
+        &p.ID, &p.AuthorID, &authorName, &p.Prefix, &p.Title, &p.Category, &contentStr,
         &p.Summary, &p.ThumbnailURL, &p.Type, &p.ViewCount, &p.LikeCount, &p.ReplyCount,
         &p.IsLocked, &p.CreatedAt, &p.UpdatedAt,
     )
@@ -99,13 +101,14 @@ func CreatePost(ctx context.Context, userID int, post models.Post) (*models.Post
 	contentStr, _ := post.Content.MarshalJSON()
 
 	row := db.QueryRowContext(ctx, `
-		INSERT INTO Posts (author_id, prefix, title, content, summary, thumbnail_url, type, created_at, updated_at)
+		INSERT INTO Posts (author_id, prefix, title, p.category, content, summary, thumbnail_url, type, created_at, updated_at)
 		OUTPUT INSERTED.id, INSERTED.created_at, INSERTED.updated_at
-		VALUES (@authorID, @prefix, @title, @content, @summary, @thumbnail, @type, GETDATE(), GETDATE())
+		VALUES (@authorID, @prefix, @title, @category, @content, @summary, @thumbnail, @type, GETDATE(), GETDATE())
 	`,
 		sql.Named("authorID", userID),
 		sql.Named("prefix", post.Prefix),
 		sql.Named("title", post.Title),
+		sql.Named("category", post.Category),
 		sql.Named("content", string(contentStr)),
 		sql.Named("summary", post.Summary),
 		sql.Named("thumbnail", post.ThumbnailURL),
@@ -353,7 +356,7 @@ func scanPosts(rows *sql.Rows) ([]models.Post, error) {
         var p models.Post
         var authorName, contentStr string
         if err := rows.Scan(
-            &p.ID, &p.AuthorID, &authorName, &p.Prefix, &p.Title, &contentStr,
+            &p.ID, &p.AuthorID, &authorName, &p.Prefix, &p.Title, &p.Category, &contentStr,
             &p.Summary, &p.ThumbnailURL, &p.Type, &p.ViewCount, &p.LikeCount, &p.ReplyCount,
             &p.IsLocked, &p.CreatedAt, &p.UpdatedAt,
         ); err != nil {

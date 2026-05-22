@@ -1,8 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [overallRating, setOverallRating] = useState(0);
   const [hoverOverall, setHoverOverall] = useState(0);
 
@@ -26,6 +29,11 @@ const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => 
   // Reset form when modal opens/closes
   useEffect(() => {
     if (isOpen) {
+      if (!user) {
+        onClose();
+        navigate('/login');
+        return;
+      }
       setOverallRating(0);
       setHoverOverall(0);
       setFoodRating(0);
@@ -38,9 +46,9 @@ const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => 
       setFiles([]);
       setIsSubmitting(false);
     }
-  }, [isOpen]);
+  }, [isOpen, user, navigate, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !user) return null;
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -197,12 +205,12 @@ const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => 
           {/* User Info */}
           <div className="flex items-center gap-3 mt-2">
             <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
-              <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Avatar" className="w-full h-full object-cover" />
+              <img src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=random`} alt="Avatar" className="w-full h-full object-cover" />
             </div>
             <div>
-              <p className="font-bold text-sm text-[#2C1810]">Đình Đình Võ</p>
+              <p className="font-bold text-sm text-[#2C1810]">{user.name}</p>
               <p className="text-[11px] text-[#7B7068] flex items-center gap-1 mt-0.5">
-                Đăng công khai trên Google
+                Đăng công khai trên YumMap
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10"></circle>
                   <line x1="12" y1="16" x2="12" y2="12"></line>

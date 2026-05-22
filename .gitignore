@@ -1,49 +1,58 @@
-# If you prefer the allow list template instead of the deny list, see community template:
-# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
-#
-# Binaries for programs and plugins
+# =========================
+# 1. Thư viện & Phụ thuộc (Dependencies)
+# =========================
+node_modules/
+venv/
+vendor/
+
+# =========================
+# 2. Biến môi trường & Khóa bảo mật (Tuyệt đối không đẩy lên Git)
+# =========================
+.env
+serviceAccountKey.json
+
+# =========================
+# 3. IDE & Trình soạn thảo (VS Code, Visual Studio, v.v.)
+# =========================
+.vscode/
+.vs/
+.idea/
+*.code-workspace
+*.user
+*.userosscache
+*.sln.docstates
+
+# =========================
+# 4. Build & Binaries (Các file sinh ra khi biên dịch)
+# =========================
+bin/
+obj/
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
 
-# Test binary, built with `go test -c`
-*.test
+# =========================
+# 5. Python Cache & Artifacts
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
 
-# Code coverage profiles and other test artifacts
+# =========================
+# 6. Go Workspace & Testing
+# =========================
+go.work
+go.work.sum
+*.test
 *.out
 coverage.*
 *.coverprofile
 profile.cov
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
-
-# Go workspace file
-go.work
-go.work.sum
-
-# env file
-.env
-
-# Editor/IDE
-# .idea/
-# .vscode/
-.vscode/
-*.code-workspace
-
-# Các thư mục build
-bin/
-obj/
-
-# Các tệp cấu hình cá nhân và tệp tạm của VS
-.vs/
-*.user
-*.userosscache
-*.sln.docstates
-
-# Tệp backup và tệp log
+# =========================
+# 7. Logs (Nhật ký hệ thống)
+# =========================
 *.log
-
-serviceAccountKey.json

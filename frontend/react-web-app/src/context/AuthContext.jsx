@@ -1,12 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { loginApi, registerApi, logoutApi, getMeApi } from '../api/AuthAPI';
-<<<<<<< HEAD
-//import { auth, googleProvider, facebookProvider } from '../config/firebase';
-//import { signInWithPopup } from 'firebase/auth';
-=======
 import { auth, googleProvider, facebookProvider } from '../config/firebase';
 import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
->>>>>>> nlakien
 
 const AuthContext = createContext(null);
 

@@ -169,7 +169,6 @@ func GetPostImages(ctx context.Context, postID int) ([]models.PostImage, error) 
 // ============================================================
 
 func GetCommentsByPost(ctx context.Context, postID int) ([]models.Comment, error) {
-	// Lấy tất cả comments của bài (cả cha lẫn reply) một lần
 	rows, err := db.QueryContext(ctx, `
 		SELECT c.id, c.post_id, c.author_id, u.name,
 		       c.parent_id, c.content, c.image_url, c.like_count, c.created_at
@@ -182,21 +181,21 @@ func GetCommentsByPost(ctx context.Context, postID int) ([]models.Comment, error
 		return nil, err
 	}
 	defer rows.Close()
- 
-	// Map id -> comment để ghép replies
-	commentMap := make(map[uint64]*models.Comment)
-	var allComments []*models.Comment
- 
+
+	var allComments []models.Comment // Chứa toàn bộ comment (cả gốc lẫn con)
 	for rows.Next() {
 		var cm models.Comment
 		var authorName string
 		var imageURL sql.NullString
 		var parentID sql.NullInt64
- 
-		rows.Scan(
+
+		if err := rows.Scan(
 			&cm.ID, &cm.PostID, &cm.AuthorID, &authorName,
 			&parentID, &cm.Content, &imageURL, &cm.LikeCount, &cm.CreatedAt,
-		)
+		); err != nil {
+			return nil, err
+		}
+		
 		cm.AuthorName = authorName
 		if imageURL.Valid {
 			cm.ImageURL = imageURL.String
@@ -205,26 +204,14 @@ func GetCommentsByPost(ctx context.Context, postID int) ([]models.Comment, error
 			pid := uint64(parentID.Int64)
 			cm.ParentID = &pid
 		}
-		cm.Replies = []models.Comment{} // khởi tạo rỗng, tránh null JSON
- 
-		commentMap[cm.ID] = &cm
-		allComments = append(allComments, &cm)
+		// Đảm bảo khởi tạo mảng rỗng để không bị null JSON
+		cm.Replies = []models.Comment{} 
+
+		allComments = append(allComments, cm)
 	}
- 
-	// Ghép replies vào comment cha
-	var rootComments []models.Comment
-	for _, cm := range allComments {
-		if cm.ParentID != nil {
-			if parent, ok := commentMap[*cm.ParentID]; ok {
-				parent.Replies = append(parent.Replies, *cm)
-			}
-			// reply không thuộc của bất kỳ cha nào (dữ liệu lỗi) thì bỏ qua
-		} else {
-			rootComments = append(rootComments, *cm)
-		}
-	}
- 
-	return rootComments, nil
+
+	// 💡 TRẢ VỀ TOÀN BỘ MẢNG PHẲNG CHỨA CẢ CHA LẪN CON
+	return allComments, nil
 }
 
 func AddComment(ctx context.Context, userID, postID int, content, imageURL string, parentID *int) (*models.Comment, error) {
@@ -243,7 +230,7 @@ func AddComment(ctx context.Context, userID, postID int, content, imageURL strin
 		// Kiểm tra parent tồn tại và thuộc đúng bài viết
 		var exists int
 		db.QueryRowContext(ctx, `
-			SELECT COUNT(*) FROM Comments WHERE id = @id AND post_id = @postID AND parent_id IS NULL
+			SELECT COUNT(*) FROM Comments WHERE id = @id AND post_id = @postID
 		`, sql.Named("id", *parentID), sql.Named("postID", postID)).Scan(&exists)
 		if exists == 0 {
 			return nil, fmt.Errorf("comment cha không tồn tại hoặc không thuộc bài viết này")

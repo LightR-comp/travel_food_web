@@ -20,13 +20,14 @@ export const forumApi = {
     const response = await axiosInstance.post('/posts', {
       prefix: "(No prefix)",
       title: postData.title,
+      category: postData.category,
       content: JSON.stringify([{ type: "text", value: postData.content }]), 
       summary: postData.content.substring(0, 150) + "...",
       type: "discussion",
       thumbnail_url: postData.image_urls?.[0] || "",
       image_urls: postData.image_urls || []
     });
-    return response.data.data;
+    return response.data;
   },
 
   // POST /api/v1/posts/upload
@@ -42,9 +43,15 @@ export const forumApi = {
   },
 
   // POST /api/v1/posts/:id/comments
-  addComment: async (postId, content) => {
-    const response = await axiosInstance.post(`/posts/${postId}/comments`, { content });
-    return response.data.data;
+  addComment: async (postId, content, parentId = null) => {
+    const payload = { content };
+    
+    if (parentId) {
+      payload.parent_id = parentId; //Gửi key 'parent_id' lên Backend Go
+    }
+
+    const response = await axiosInstance.post(`/posts/${postId}/comments`, payload);
+    return response.data;
   },
 
   // POST /api/v1/posts/:id/likes

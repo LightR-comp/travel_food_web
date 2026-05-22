@@ -53,15 +53,51 @@ const StarDisplay = ({ score }) => {
 };
 
 /* ─── Component hiển thị từng bình luận ─── */
-const CommentItem = ({ comment, isReply = false }) => {
+const CommentItem = ({ comment, isReply = false, postId, onReplySubmit }) => {
   const [liked, setLiked] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyText, setReplyText] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const formatCommentTime = (timeStr) => {
     if (!timeStr) return 'Vừa xong';
     const dateObj = new Date(timeStr);
     return isNaN(dateObj.getTime()) ? timeStr : dateObj.toLocaleDateString('vi-VN');
+  };
+
+  const handleReplySubmit = async () => {
+    if (!replyText.trim() || submitting) return;
+
+    try {
+      setSubmitting(true);
+      const response = await forumApi.addComment(postId, replyText, comment.id); 
+
+      // Ép kiểu dữ liệu đồng bộ chữ thường
+      const apiReply = response.data ? response.data : response;
+
+      const newReply = {
+        id: Number(apiReply.id || apiReply.ID || Date.now()),
+        content: replyText,
+        author_name: 'Bạn', 
+        avatar_url: '👤',
+        parent_id: Number(comment.id),
+        like_count: 0,
+        created_at: new Date().toISOString(),
+        replies: []
+      };
+
+      if (onReplySubmit) {
+        onReplySubmit(comment.id, newReply);
+      }
+
+      setReplyText('');
+      setShowReplyInput(false);
+    } catch (err) {
+      console.error("Lỗi gửi reply:", err);
+      alert("Đăng phản hồi thất bại. Vui lòng kiểm tra lại đăng nhập.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -73,7 +109,7 @@ const CommentItem = ({ comment, isReply = false }) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-sm font-bold text-[#2C1810]">{comment.author_name || 'Thành viên'}</span>
-            <span className="text-[0.65rem] text-[#C8BEB5]">•</span>
+            <span className="text-[0.65rem] text-[#C8BEB5]"> • </span>
             <span className="text-[0.65rem] text-[#7B7068]">{formatCommentTime(comment.created_at)}</span>
           </div>
           <p className="text-sm text-[#4A3728] leading-relaxed mb-2">{comment.content}</p>
@@ -88,14 +124,12 @@ const CommentItem = ({ comment, isReply = false }) => {
             >
               {liked ? '❤️' : '🤍'} {liked ? (comment.like_count || 0) + 1 : (comment.like_count || 0)}
             </button>
-            {!isReply && (
-              <button
-                onClick={() => setShowReplyInput(!showReplyInput)}
-                className="text-xs font-semibold text-[#C8BEB5] hover:text-[#E8623A] transition-colors"
-              >
-                💬 Trả lời
-              </button>
-            )}
+            <button
+              onClick={() => setShowReplyInput(!showReplyInput)}
+              className="text-xs font-semibold text-[#C8BEB5] hover:text-[#E8623A] transition-colors"
+            >
+              💬 Trả lời
+            </button>
           </div>
 
           {showReplyInput && (
@@ -104,26 +138,94 @@ const CommentItem = ({ comment, isReply = false }) => {
                 type="text"
                 value={replyText}
                 onChange={e => setReplyText(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleReplySubmit()}
                 placeholder="Viết trả lời..."
+                disabled={submitting}
                 className="flex-1 px-4 py-2 rounded-full bg-[#FFF8EE] border border-[#F5EDD8] text-sm text-[#2C1810] placeholder:text-[#C8BEB5] outline-none focus:border-[#E8623A] focus:ring-2 focus:ring-[#E8623A]/15 transition-all"
               />
-              <button className="px-4 py-2 bg-gradient-to-r from-[#E8623A] to-[#C04D2B] text-white rounded-full text-xs font-bold hover:shadow-md transition-shadow">
-                Gửi
+              <button 
+                onClick={handleReplySubmit}
+                disabled={submitting || !replyText.trim()}
+                className="px-4 py-2 bg-gradient-to-r from-[#E8623A] to-[#C04D2B] text-white rounded-full text-xs font-bold hover:shadow-md transition-shadow disabled:opacity-50"
+              >
+                {submitting ? '...' : 'Gửi'}
               </button>
             </div>
           )}
         </div>
       </div>
 
-      {comment.replies?.length > 0 && (
+      {comment.replies && comment.replies.length > 0 && (
         <div className="mt-4 space-y-4">
           {comment.replies.map(reply => (
-            <CommentItem key={reply.id} comment={reply} isReply />
+            <CommentItem 
+              key={reply.id} 
+              comment={reply} 
+              isReply={true} 
+              postId={postId}
+              // 💡 GIẢI PHÁP: Truyền tiếp hàm onReplySubmit gốc của cha xuống cho các tầng sâu hơn
+              onReplySubmit={onReplySubmit} 
+            />
           ))}
         </div>
       )}
     </div>
   );
+};
+
+/* ─── Hàm dựng cây dữ liệu từ mảng thô phẳng ─── */
+const buildCommentTree = (flatComments) => {
+  if (!flatComments || flatComments.length === 0) return [];
+
+  const commentMap = {};
+  const roots = [];
+
+  flatComments.forEach(comment => {
+    const id = comment.id || comment.ID;
+    commentMap[id] = { 
+      id: Number(id),
+      post_id: Number(comment.post_id || comment.PostID),
+      author_id: Number(comment.author_id || comment.AuthorID),
+      author_name: comment.author_name || comment.AuthorName || 'Thành viên',
+      parent_id: comment.parent_id || comment.ParentID ? Number(comment.parent_id || comment.ParentID) : null,
+      content: comment.content || comment.Content,
+      like_count: comment.like_count || comment.LikeCount || 0,
+      created_at: comment.created_at || comment.CreatedAt,
+      avatar_url: comment.avatar_url || comment.AvatarUrl || '👤',
+      replies: [] 
+    };
+  });
+
+  flatComments.forEach(comment => {
+    const id = Number(comment.id || comment.ID);
+    const parentId = comment.parent_id || comment.ParentID ? Number(comment.parent_id || comment.ParentID) : null;
+    const mappedComment = commentMap[id];
+
+    if (parentId && parentId !== id) {
+      if (commentMap[parentId]) {
+        commentMap[parentId].replies.push(mappedComment);
+      } else {
+        roots.push(mappedComment);
+      }
+    } else {
+      if (!parentId) roots.push(mappedComment);
+    }
+  });
+
+  return roots;
+};
+
+/* ─── Hàm tính tổng số lượng bình luận chuẩn đệ quy ─── */
+const countTotalComments = (commentsList) => {
+  if (!commentsList) return 0;
+  let count = 0;
+  commentsList.forEach(c => {
+    count++;
+    if (c.replies && c.replies.length > 0) {
+      count += countTotalComments(c.replies);
+    }
+  });
+  return count;
 };
 
 /* ─── Component chính ForumDetailPage ─── */
@@ -141,30 +243,41 @@ const ForumDetailPage = () => {
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [id]);
 
   useEffect(() => {
+    // 💡 Chặn bảo vệ nếu id từ URL không tồn tại (Ví dụ khi ở route /forum tổng)
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
     const fetchPostData = async () => {
       try {
         setLoading(true);
-        const data = await forumApi.getPostDetail(id);
+        const res = await forumApi.getPostDetail(id);
+        const data = res.data ? res.data : res;
 
-        // Parse cột nội dung phong phú từ database chuỗi thô về JSON block
-        let parsedContent = [];
-        try {
-          parsedContent = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
-        } catch (e) {
-          parsedContent = [{ type: 'text', value: String(data.content) }];
+        if (!data) {
+          setPost(null);
+          return;
         }
+
+        let parsedContent = [];
+        const rawContent = data.content || data.Content;
+        try {
+          parsedContent = typeof rawContent === 'string' ? JSON.parse(rawContent) : rawContent;
+        } catch (e) {
+          parsedContent = [{ type: 'text', value: String(rawContent) }];
+        }
+
+        const rawComments = data.comments || data.Comments || [];
+        const treeComments = buildCommentTree(rawComments);
 
         setPost({
           ...data,
-          category: data.category || 'review', 
-          avatar: data.avatar_url || '🧑‍🍳',
-          author: data.author_name || 'Thành viên',
-          tags: data.tags || ['#YumMap', '#ẨmThực'],
           content: parsedContent,
-          comments: data.comments || []
+          comments: treeComments 
         });
       } catch (err) {
-        console.error("Lỗi rồi bạn ơi:", err);
+        console.error("Lỗi lấy chi tiết bài viết:", err);
       } finally {
         setLoading(false);
       }
@@ -192,18 +305,20 @@ const ForumDetailPage = () => {
       setSubmittingComment(true);
       const response = await forumApi.addComment(id, commentText); 
 
+      const apiComment = response.data ? response.data : response;
+
+      const newComment = {
+        id: Number(apiComment.id || apiComment.ID || Date.now()),
+        content: commentText,
+        author_name: 'Bạn', 
+        avatar_url: '👤',
+        parent_id: null,
+        replies: []
+      }; 
+
       setPost(prev => ({
         ...prev,
-        comments: [
-          ...(prev.comments || []),
-          {
-            id: response.data?.id, 
-            content: commentText,
-            author_name: 'Bạn', 
-            avatar_url: '👤',
-            created_at: new Date().toISOString()
-          }
-        ]
+        comments: [...(prev.comments || []), newComment]
       }));
       setCommentText(''); 
     } catch (err) {
@@ -213,6 +328,7 @@ const ForumDetailPage = () => {
     }
   };
 
+  // 💡 CHẶN KHI ĐANG TẢI DỮ LIỆU
   if (loading) {
     return (
       <div className="min-h-screen bg-[#FAFAF7] flex items-center justify-center">
@@ -221,6 +337,7 @@ const ForumDetailPage = () => {
     );
   }
 
+  // 💡 CHẶN BẢO VỆ TUYỆT ĐỐI NẾU KHÔNG CÓ BÀI VIẾT (Link lỗi hoặc route tổng /forum)
   if (!post) {
     return (
       <div className="min-h-screen bg-[#FAFAF7] flex flex-col items-center justify-center gap-4">
@@ -233,7 +350,7 @@ const ForumDetailPage = () => {
     );
   }
 
-  const cat = CATEGORIES_MAP[post.category];
+  const cat = CATEGORIES_MAP[post.category] || CATEGORIES_MAP['review'];
 
   return (
     <div className="min-h-screen bg-[#FAFAF7]">
@@ -259,10 +376,9 @@ const ForumDetailPage = () => {
             {/* Post header */}
             <FadeSection>
               <div className="bg-white rounded-2xl border border-[#F5EDD8] p-6 sm:p-8 mb-6">
-                {/* Meta */}
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FFF8EE] to-[#FDECD8] flex items-center justify-center text-2xl ring-2 ring-[#F5EDD8]">
-                    {post.avatar}
+                    {post.avatar || '🧑‍🍳'}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-[#2C1810]">{post.author}</p>
@@ -277,14 +393,12 @@ const ForumDetailPage = () => {
                   </span>
                 </div>
 
-                {/* Title */}
                 <h1 className="font-[Baloo_2,sans-serif] text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#2C1810] mb-4 leading-tight">
                   {post.title}
                 </h1>
 
-                {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {post.tags.map(tag => (
+                  {post.tags && post.tags.map(tag => (
                     <span key={tag} className="px-3 py-1 rounded-full bg-[#FFF8EE] text-[#E8623A] text-xs font-semibold border border-[#F5EDD8] hover:bg-[#E8623A] hover:text-white transition-all duration-300 cursor-pointer">
                       {tag}
                     </span>
@@ -368,8 +482,9 @@ const ForumDetailPage = () => {
             {/* Comments section */}
             <FadeSection delay={100}>
               <div className="bg-white rounded-2xl border border-[#F5EDD8] p-6 sm:p-8">
+                {/* 💡 Sử dụng hàm đếm tổng comment đệ quy */}
                 <h2 className="font-[Baloo_2,sans-serif] text-lg font-extrabold text-[#2C1810] mb-6 flex items-center gap-2">
-                  💬 Bình luận ({post.comments?.length || 0})
+                  💬 Bình luận ({countTotalComments(post.comments)})
                 </h2>
 
                 {/* Ô nhập bình luận mới */}
@@ -400,7 +515,46 @@ const ForumDetailPage = () => {
                 {/* Danh sách bình luận động */}
                 <div className="space-y-6">
                   {post.comments && post.comments.map(comment => (
-                    <CommentItem key={comment.id} comment={comment} />
+                    <CommentItem 
+                      key={comment.id} 
+                      comment={comment} 
+                      postId={id}
+                      onReplySubmit={(commentId, replyFromApi) => {
+                        const apiReply = replyFromApi.data ? replyFromApi.data : replyFromApi;
+                        
+                        const newReply = {
+                          id: Number(apiReply.id || apiReply.ID),
+                          content: apiReply.content || apiReply.Content,
+                          author_name: 'Bạn',
+                          avatar_url: '👤',
+                          parent_id: Number(commentId), // Gắn chuẩn ID của tầng vừa được bấm reply
+                          like_count: 0,
+                          created_at: new Date().toISOString(),
+                          replies: []
+                        };
+
+                        setPost(prev => {
+                          // Hàm đệ quy tìm kiếm sâu vào mọi ngóc ngách của cây bình luận
+                          const updateTree = (list) => {
+                            return list.map(c => {
+                              if (Number(c.id) === Number(commentId)) {
+                                // Tìm thấy đúng đích danh cha (dù ở tầng mấy), push con vào mảng replies của nó
+                                return { ...c, replies: [...(c.replies || []), newReply] };
+                              } else if (c.replies && c.replies.length > 0) {
+                                // Nếu chưa thấy nhưng có nhánh con, chui tiếp vào tầng sâu hơn để tìm
+                                return { ...c, replies: updateTree(c.replies) };
+                              }
+                              return c;
+                            });
+                          };
+                          
+                          return {
+                            ...prev,
+                            comments: updateTree(prev.comments || [])
+                          };
+                        });
+                      }}
+                    />
                   ))}
                 </div>
               </div>
@@ -412,7 +566,7 @@ const ForumDetailPage = () => {
             <FadeSection delay={150}>
               <div className="bg-white rounded-2xl border border-[#F5EDD8] p-5 text-center">
                 <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-br from-[#FFF8EE] via-[#FDECD8] to-[#FEF3C0] flex items-center justify-center text-3xl ring-3 ring-[#F5EDD8]">
-                  {post.avatar}
+                  {post.avatar || '🧑‍🍳'}
                 </div>
                 <h3 className="text-sm font-bold text-[#2C1810]">{post.author}</h3>
                 <p className="text-[0.65rem] text-[#7B7068] mt-0.5">Thành viên</p>

@@ -17,13 +17,23 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Helper chuẩn hóa dữ liệu user
+  const normalizeUserData = useCallback((u) => {
+    if (!u) return null;
+    return {
+      ...u,
+      username: u.username || u.name || u.email?.split('@')[0] || 'User',
+      full_name: u.full_name || u.name || 'User'
+    };
+  }, []);
+
   // Restore session on mount
   useEffect(() => {
     const token = localStorage.getItem('yummap_token');
     if (token) {
       getMeApi()
         .then((res) => {
-          if (res.success) setUser(res.data);
+          if (res.success) setUser(normalizeUserData(res.data));
           else localStorage.removeItem('yummap_token');
         })
         .catch(() => localStorage.removeItem('yummap_token'))
@@ -31,7 +41,7 @@ export const AuthProvider = ({ children }) => {
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [normalizeUserData]);
 
   //useEffect để bắt redirect result
   useEffect(() => {
@@ -40,9 +50,9 @@ export const AuthProvider = ({ children }) => {
       const idToken = await result.user.getIdToken(true);
       const data = await sendOAuthToken(idToken, 'facebook');
       localStorage.setItem('yummap_token', data.data.token);
-      setUser(data.data.user);
+      setUser(normalizeUserData(data.data.user));
     }).catch(console.error);
-  }, []);
+  }, [normalizeUserData]);
 
   useEffect(() => {
   getRedirectResult(auth)
@@ -51,10 +61,10 @@ export const AuthProvider = ({ children }) => {
       const idToken = await result.user.getIdToken(true);
       const data = await sendOAuthToken(idToken, 'facebook');
       localStorage.setItem('yummap_token', data.data.token);
-      setUser(data.data.user);
+      setUser(normalizeUserData(data.data.user));
     })
     .catch((err) => console.error('Redirect result error:', err));
-  }, []);
+  }, [normalizeUserData]);
 
   // ---- Local login ----
   const login = useCallback(async (credentials) => {
@@ -62,10 +72,10 @@ export const AuthProvider = ({ children }) => {
     const res = await loginApi(credentials);
     if (res.success) {
       localStorage.setItem('yummap_token', res.data.token);
-      setUser(res.data.user);
+      setUser(normalizeUserData(res.data.user));
     }
     return res;
-  }, []);
+  }, [normalizeUserData]);
 
   // ---- Register ----
   const register = useCallback(async (payload) => {
@@ -105,8 +115,8 @@ export const AuthProvider = ({ children }) => {
     return {
         success: true,
         data: {
-            token: data.token,
-            user:  data.user,
+            token: data.data?.token,
+            user:  data.data?.user,
         }
     };
   };
@@ -121,15 +131,16 @@ export const AuthProvider = ({ children }) => {
 
       if (data.success) {
         localStorage.setItem('yummap_token', data.data.token);
-        setUser(data.data.user);
-        return { success: true, user: data.data.user };
+        const normalized = normalizeUserData(data.data.user);
+        setUser(normalized);
+        return { success: true, user: normalized };
       }
       return { success: false, error: data.message };
     } catch (err) {
       console.error('Google login error:', err);
       return { success: false, error: 'Đăng nhập Google thất bại' };
     }
-  }, []);
+  }, [normalizeUserData]);
 
   // ---- Facebook login ----
   const loginWithFacebook = useCallback(async () => {
@@ -139,13 +150,14 @@ export const AuthProvider = ({ children }) => {
       const idToken = await result.user.getIdToken(true);
       const data = await sendOAuthToken(idToken, 'facebook');
       localStorage.setItem('yummap_token', data.data.token);
-      setUser(data.data.user);
-      return { success: true, user: data.data.user };
+      const normalized = normalizeUserData(data.data.user);
+      setUser(normalized);
+      return { success: true, user: normalized };
     } catch (err) {
       console.error('Facebook login error:', err.code, err.message);
       return { success: false, error: 'Đăng nhập Facebook thất bại' };
     }
-  }, []);
+  }, [normalizeUserData]);
 
   return (
     <AuthContext.Provider value={{

@@ -23,9 +23,22 @@ export const forumApi = {
       content: JSON.stringify([{ type: "text", value: postData.content }]), 
       summary: postData.content.substring(0, 150) + "...",
       type: "discussion",
-      thumbnail_url: ""
+      thumbnail_url: postData.image_urls?.[0] || "",
+      image_urls: postData.image_urls || []
     });
     return response.data;
+  },
+
+  // POST /api/v1/posts/upload
+  uploadImage: async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const response = await axiosInstance.post('/posts/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data; // { message: "...", url: "..." }
   },
 
   // POST /api/v1/posts/:id/comments

@@ -6,6 +6,8 @@ import ReviewSection from '../components/detail/ReviewSection';
 import ReviewModal from '../components/detail/ReviewModal';
 import LoginRequireModal from '../components/detail/LoginRequireModal';
 import StarRating from '../components/ui/StarRating';
+import BioModal from '../components/detail/BioModal';
+import { useAuth } from '../context/AuthContext';
 
 import { Spinner } from '../components/ui/index.jsx';
 import { getRestaurantByIdApi } from '../api/restaurantApi';
@@ -128,8 +130,8 @@ const DetailPage = () => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showLoginRequireModal, setShowLoginRequireModal] = useState(false);
   
-  // Giả lập trạng thái đăng nhập (đổi thành logic thực tế của project sau)
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user } = useAuth();
+  const isLoggedIn = !!user;
 
   const handleReviewClick = () => {
     if (isLoggedIn) {
@@ -140,22 +142,13 @@ const DetailPage = () => {
   };
 
   const handleMockLogin = () => {
-    // Giả lập đăng nhập thành công
-    setIsLoggedIn(true);
     setShowLoginRequireModal(false);
-    // Tùy chọn mở luôn form đánh giá sau khi đăng nhập xong
-    setShowReviewModal(true);
+    navigate('/login');
   };
 
-  useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    setError(null);
-    setData(null);
-
+  const fetchRestaurantData = () => {
     getRestaurantByIdApi(id)
       .then((res) => {
-        // Backend: { success, data: RestaurantDetail, ... }
         const raw = res?.data ?? null;
         if (!raw) throw new Error('Không có dữ liệu');
         const mapped = mapApiToSections(raw);
@@ -169,6 +162,14 @@ const DetailPage = () => {
         setError(msg);
       })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    setError(null);
+    setData(null);
+    fetchRestaurantData();
   }, [id]);
 
   // ── Loading ──
@@ -247,7 +248,12 @@ const DetailPage = () => {
                 )}
               </div>
               <div className="flex items-center gap-1.5 flex-shrink-0 bg-white px-3 py-1.5 rounded-full border border-[#E0D3C8] shadow-sm">
-                <StarRating rating={meta.rating} showMax={false} />
+                <svg className="text-[#f5a623] w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+                <span className="text-[#2C1810] text-sm font-bold">
+                  {Number(meta.rating).toFixed(1)}
+                </span>
                 <span className="text-[#7B7068] text-sm">({meta.review_count})</span>
               </div>
             </div>
@@ -435,126 +441,14 @@ const DetailPage = () => {
       </div>
 
       {/* ── Bio Modal ── */}
-      {showBioModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 md:p-6 transition-opacity" onClick={() => setShowBioModal(false)}>
-          <div 
-            className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col relative transform transition-transform scale-100"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 pb-4 border-b border-[#F5EDD8]">
-              <div>
-                <h2 className="font-[Baloo_2,sans-serif] text-2xl font-bold text-[#2C1810]">
-                  Tiểu sử {name}
-                </h2>
-                <p className="text-sm text-[#7B7068] mt-1 flex items-center gap-2">
-                  {restaurant_info.established_year && (
-                    <>
-                      <span className="font-medium">Thành lập: {restaurant_info.established_year}</span>
-                      <span className="w-1 h-1 rounded-full bg-[#E0D3C8]"></span>
-                    </>
-                  )}
-                  <span className="truncate max-w-[200px] sm:max-w-xs">{contact.address}</span>
-                </p>
-              </div>
-              <button 
-                onClick={() => setShowBioModal(false)}
-                className="w-10 h-10 rounded-full bg-[#FAFAF7] text-[#7B7068] flex items-center justify-center hover:bg-[#FDECE4] hover:text-[#E8623A] transition-colors flex-shrink-0"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-6 overflow-y-auto space-y-8" style={{ scrollbarWidth: 'thin' }}>
-              
-              {/* Lịch sử */}
-              {restaurant_info.history && (
-                <section>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-9 h-9 rounded-full bg-[#FFF8EE] flex items-center justify-center text-[#E8623A] shadow-sm">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" />
-                        <polyline points="14 2 14 8 20 8" />
-                        <path d="M2 15h10" />
-                        <path d="M9 18v-6H5v6z" />
-                      </svg>
-                    </div>
-                    <h3 className="text-lg font-bold text-[#2C1810]">Câu chuyện hình thành</h3>
-                  </div>
-                  <p className="text-[#4A3728] leading-relaxed text-[15px] bg-[#FAFAF7] p-5 rounded-2xl border border-[#F5EDD8] shadow-inner">
-                    {restaurant_info.history}
-                  </p>
-                </section>
-              )}
-
-              {/* Món ăn đặc trưng */}
-              {data.signature_dish && (
-                <section>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-9 h-9 rounded-full bg-[#FFF8EE] flex items-center justify-center text-[#E8623A] shadow-sm">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                      </svg>
-                    </div>
-                    <h3 className="text-lg font-bold text-[#2C1810]">Món ăn đặc trưng</h3>
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-5 bg-white border border-[#F5EDD8] p-4 rounded-2xl hover:shadow-md transition-shadow">
-                    <div className="w-full sm:w-32 h-40 sm:h-32 rounded-xl bg-[#FAFAF7] flex-shrink-0 overflow-hidden shadow-sm">
-                      {data.signature_dish.image_url ? (
-                        <img src={data.signature_dish.image_url} alt={data.signature_dish.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-4xl">🍲</div>
-                      )}
-                    </div>
-                    <div className="flex flex-col justify-center">
-                      <h4 className="font-bold text-[#2C1810] text-lg mb-1">{data.signature_dish.name}</h4>
-                      <p className="text-[#E8623A] font-bold text-sm mb-2">
-                        {data.signature_dish.price ? Number(data.signature_dish.price).toLocaleString('vi-VN') + ' đ' : 'Liên hệ'}
-                      </p>
-                      <p className="text-[15px] text-[#7B7068] line-clamp-2 sm:line-clamp-3">
-                        {data.signature_dish.description}
-                      </p>
-                    </div>
-                  </div>
-                </section>
-              )}
-
-              {/* Hình ảnh */}
-              {galleries.length > 0 && (
-                <section>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-9 h-9 rounded-full bg-[#FFF8EE] flex items-center justify-center text-[#E8623A] shadow-sm">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                        <circle cx="8.5" cy="8.5" r="1.5" />
-                        <polyline points="21 15 16 10 5 21" />
-                      </svg>
-                    </div>
-                    <h3 className="text-lg font-bold text-[#2C1810]">Hình ảnh nổi bật</h3>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {galleries.slice(0, 3).map((img, idx) => (
-                      <div key={idx} className="aspect-square rounded-xl overflow-hidden shadow-sm border border-[#F5EDD8]">
-                        <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <BioModal isOpen={showBioModal} onClose={() => setShowBioModal(false)} />
 
       {/* ── Review Modal ── */}
       <ReviewModal 
         isOpen={showReviewModal} 
         onClose={() => setShowReviewModal(false)} 
         restaurantName={name}
+        onReviewSubmitted={fetchRestaurantData}
       />
 
       {/* ── Login Require Modal ── */}

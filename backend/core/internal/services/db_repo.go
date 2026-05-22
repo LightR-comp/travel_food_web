@@ -392,7 +392,15 @@ func getImagesByMenuItemIDs(ctx context.Context, ids []int) (map[int][]models.Di
 }
 
 func CreateReview(ctx context.Context, rv models.UserRating) (*models.UserRating, error) {
-	row := db.QueryRowContext(ctx, `
+	// 1. Khởi tạo Transaction
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, fmt.Errorf("CreateReview begin tx: %w", err)
+	}
+	defer tx.Rollback() // Sẽ rollback nếu có lỗi xảy ra giữa chừng
+
+	// 2. Chèn dữ liệu vào bảng UserRatings
+	row := tx.QueryRowContext(ctx, `
 		INSERT INTO UserRatings (restaurant_id, user_id, rating, comment, created_at)
 		OUTPUT INSERTED.id, INSERTED.created_at
 		VALUES (@rid, @uid, @rating, @comment, GETDATE())
@@ -403,17 +411,96 @@ func CreateReview(ctx context.Context, rv models.UserRating) (*models.UserRating
 		sql.Named("comment", rv.Comment),
 	)
 	if err := row.Scan(&rv.ID, &rv.CreatedAt); err != nil {
-		return nil, fmt.Errorf("CreateReview: %w", err)
+		return nil, fmt.Errorf("CreateReview scan rating: %w", err)
 	}
+
+	// 3. Nếu có danh sách ảnh kèm theo, tiến hành chèn vào bảng UserRatingImages
+	if len(rv.Images) > 0 {
+		stmt, err := tx.PrepareContext(ctx, `
+			INSERT INTO UserRatingImages (user_rating_id, image_url, created_at)
+			OUTPUT INSERTED.id, INSERTED.created_at
+			VALUES (@ratingId, @imgUrl, GETDATE())
+		`)
+		if err != nil {
+			return nil, fmt.Errorf("CreateReview prepare img stmt: %w", err)
+		}
+		defer stmt.Close()
+
+		for i, img := range rv.Images {
+			var newImgID int
+			var newImgCreatedAt time.Time
+			
+			err := stmt.QueryRowContext(ctx,
+				sql.Named("ratingId", rv.ID),
+				sql.Named("imgUrl", img.ImageURL),
+			).Scan(&newImgID, &newImgCreatedAt)
+			
+			if err != nil {
+				return nil, fmt.Errorf("CreateReview insert img failed at index %d: %w", i, err)
+			}
+			
+			// Cập nhật lại thông tin ID và ngày tạo của ảnh vào struct để trả về
+			rv.Images[i].ID = newImgID
+			rv.Images[i].UserRatingID = rv.ID
+			rv.Images[i].CreatedAt = newImgCreatedAt
+		}
+	} else {
+		// Đảm bảo không bị null ở JSON response
+		rv.Images = []models.UserRatingImage{}
+	}
+
+	// 4. Commit transaction thành công
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("CreateReview commit tx: %w", err)
+	}
+
 	return &rv, nil
+}
+
+func getImagesByUserRatingIDs(ctx context.Context, ratingIDs []int) (map[int][]models.UserRatingImage, error) {
+	result := make(map[int][]models.UserRatingImage)
+	if len(ratingIDs) == 0 {
+		return result, nil
+	}
+
+	placeholders := make([]string, len(ratingIDs))
+	args := make([]interface{}, len(ratingIDs))
+	for i, id := range ratingIDs {
+		paramName := fmt.Sprintf("rid%d", i)
+		placeholders[i] = "@" + paramName
+		args[i] = sql.Named(paramName, id)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT id, user_rating_id, image_url, created_at
+		FROM UserRatingImages
+		WHERE user_rating_id IN (%s)
+		ORDER BY id ASC
+	`, strings.Join(placeholders, ","))
+
+	rows, err := db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var img models.UserRatingImage
+		if err := rows.Scan(&img.ID, &img.UserRatingID, &img.ImageURL, &img.CreatedAt); err != nil {
+			continue
+		}
+		result[img.UserRatingID] = append(result[img.UserRatingID], img)
+	}
+	return result, nil
 }
 
 func GetReviewsByRestaurant(ctx context.Context, restaurantID int) ([]models.UserRating, error) {
 	rows, err := db.QueryContext(ctx, `
-		SELECT id, user_id, restaurant_id, rating, comment, created_at
-		FROM UserRatings
-		WHERE restaurant_id = @rid
-		ORDER BY created_at DESC
+		SELECT ur.id, ur.user_id, ISNULL(u.name, N'Ẩn danh'), ISNULL(u.avatar_url, ''), ur.restaurant_id, ur.rating, ur.comment, ur.created_at
+		FROM UserRatings ur
+		LEFT JOIN Users u ON ur.user_id = u.id
+		WHERE ur.restaurant_id = @rid
+		ORDER BY ur.created_at DESC
 	`, sql.Named("rid", restaurantID))
 	if err != nil {
 		return nil, err
@@ -421,23 +508,45 @@ func GetReviewsByRestaurant(ctx context.Context, restaurantID int) ([]models.Use
 	defer rows.Close()
 
 	var reviews []models.UserRating
+	var reviewIDs []int
+
 	for rows.Next() {
 		var rv models.UserRating
-		if err := rows.Scan(&rv.ID, &rv.UserID, &rv.RestaurantID, &rv.Rating, &rv.Comment, &rv.CreatedAt); err != nil {
+		if err := rows.Scan(&rv.ID, &rv.UserID, &rv.UserName, &rv.UserAvatar, &rv.RestaurantID, &rv.Rating, &rv.Comment, &rv.CreatedAt); err != nil {
 			continue
 		}
+		rv.Images = []models.UserRatingImage{} // khởi tạo mảng rỗng mặc định
 		reviews = append(reviews, rv)
+		reviewIDs = append(reviewIDs, rv.ID)
 	}
 
-	if reviews == nil {
+	if len(reviewIDs) == 0 {
 		return []models.UserRating{}, nil
+	}
+
+	// Gọi hàm Helper để map đống ảnh vào từng bài review tương ứng
+	imgMap, err := getImagesByUserRatingIDs(ctx, reviewIDs)
+	if err == nil {
+		for i := range reviews {
+			if imgs, found := imgMap[reviews[i].ID]; found {
+				reviews[i].Images = imgs
+			}
+		}
 	}
 
 	return reviews, nil
 }
 
 func UpdateReview(ctx context.Context, reviewID int, userID int, update models.UserRating) error {
-	result, err := db.ExecContext(ctx, `
+	// 1. Khởi tạo Transaction để đảm bảo tính toàn vẹn dữ liệu
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("UpdateReview begin tx: %w", err)
+	}
+	defer tx.Rollback() // Rollback nếu có lỗi xảy ra giữa chừng
+
+	// 2. Cập nhật nội dung review (kiểm tra luôn quyền sở hữu qua user_id)
+	result, err := tx.ExecContext(ctx, `
 		UPDATE UserRatings SET rating = @rating, comment = @comment
 		WHERE id = @id AND user_id = @uid
 	`,
@@ -447,16 +556,73 @@ func UpdateReview(ctx context.Context, reviewID int, userID int, update models.U
 		sql.Named("uid", userID),
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("UpdateReview update rating: %w", err)
 	}
+
 	n, _ := result.RowsAffected()
 	if n == 0 {
 		return fmt.Errorf("không tìm thấy review hoặc không có quyền")
 	}
+
+	// 3. Xóa sạch các liên kết ảnh cũ của review này trong DB
+	_, err = tx.ExecContext(ctx, `
+		DELETE FROM UserRatingImages WHERE user_rating_id = @id
+	`, sql.Named("id", reviewID))
+	if err != nil {
+		return fmt.Errorf("UpdateReview delete old images: %w", err)
+	}
+
+	// 4. Chèn danh sách ảnh mới (nếu có)
+	if len(update.Images) > 0 {
+		stmt, err := tx.PrepareContext(ctx, `
+			INSERT INTO UserRatingImages (user_rating_id, image_url, created_at)
+			VALUES (@ratingId, @imgUrl, GETDATE())
+		`)
+		if err != nil {
+			return fmt.Errorf("UpdateReview prepare img stmt: %w", err)
+		}
+		defer stmt.Close()
+
+		for _, img := range update.Images {
+			_, err := stmt.ExecContext(ctx,
+				sql.Named("ratingId", reviewID),
+				sql.Named("imgUrl", img.ImageURL),
+			)
+			if err != nil {
+				return fmt.Errorf("UpdateReview insert image failed: %w", err)
+			}
+		}
+	}
+
+	// 5. Commit hoàn tất transaction
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("UpdateReview commit tx: %w", err)
+	}
+
 	return nil
 }
 
 func DeleteReview(ctx context.Context, reviewID int, userID int) error {
+	// 1. (Tùy chọn) Lấy danh sách link ảnh cũ để xóa file vật lý trên server nếu cần
+	rows, err := db.QueryContext(ctx, `
+		SELECT uri.image_url FROM UserRatingImages uri
+		INNER JOIN UserRatings ur ON uri.user_rating_id = ur.id
+		WHERE ur.id = @id AND ur.user_id = @uid
+	`, sql.Named("id", reviewID), sql.Named("uid", userID))
+	
+	var imageUrls []string
+	if err == nil {
+		for rows.Next() {
+			var url string
+			if err := rows.Scan(&url); err == nil {
+				imageUrls = append(imageUrls, url)
+			}
+		}
+		rows.Close()
+	}
+
+	// 2. Thực hiện xóa Review trong DB
+	// Nhờ hiệu ứng ON DELETE CASCADE, các bản ghi ảnh trong DB tự động biến mất
 	result, err := db.ExecContext(ctx, `
 		DELETE FROM UserRatings WHERE id = @id AND user_id = @uid
 	`,
@@ -464,14 +630,28 @@ func DeleteReview(ctx context.Context, reviewID int, userID int) error {
 		sql.Named("uid", userID),
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("DeleteReview: %w", err)
 	}
+
 	n, _ := result.RowsAffected()
 	if n == 0 {
 		return fmt.Errorf("không tìm thấy review hoặc không có quyền")
 	}
+
+	// 3. (Tùy chọn) Tiến hành xóa file vật lý trên ổ cứng server sau khi DB đã xóa thành công
+	// Giả sử đường dẫn lưu file của bạn có dạng: "/uploads/reviews/xxx.jpg"
+	for _, url := range imageUrls {
+		// Loại bỏ dấu "/" ở đầu nếu đường dẫn lưu trong DB là đường dẫn tuyệt đối dạng web
+		filePath := strings.TrimPrefix(url, "/") 
+		if err := os.Remove(filePath); err != nil {
+			log.Printf("[WARN] Không thể xóa file ảnh vật lý %s: %v", filePath, err)
+			// Chỉ log cảnh báo, không chặn luồng chạy chính của user
+		}
+	}
+
 	return nil
 }
+
 
 func updateAvgRating(restaurantID int) {
 	_, err := db.Exec(`
@@ -744,6 +924,26 @@ func CalculateDistance(lat1, lng1, lat2, lng2 float64) float64 {
 	return EarthRadius * c
 }
 
+func isOpenNow(openTime, closeTime string) bool {
+    now := time.Now()
+    // Parse về cùng ngày hôm nay để so sánh
+    parse := func(s string) time.Time {
+        t, _ := time.Parse("15:04", s)
+        return time.Date(now.Year(), now.Month(), now.Day(),
+            t.Hour(), t.Minute(), 0, 0, now.Location())
+    }
+
+    open := parse(openTime)
+    close := parse(closeTime)
+    
+    if open.Before(close) {
+        // Bình thường: 08:00 - 22:00
+        return now.After(open) && now.Before(close)
+    }
+    // Qua đêm: 22:00 - 02:00
+    return now.After(open) || now.Before(close)
+}
+
 // SearchRestaurants: Não bộ tìm kiếm trả về data thô và tổng số lượng
 func SearchRestaurants(
 	ctx context.Context,
@@ -879,13 +1079,7 @@ func SearchRestaurants(
 		// =========================
 		// OPEN STATUS
 		// =========================
-		now := time.Now().Format("15:04")
-		if r.OpenTime <= r.CloseTime {
-			r.IsOpen = now >= r.OpenTime && now <= r.CloseTime
-		} else {
-			// qua đêm (ví dụ: 22:00 - 02:00)
-			r.IsOpen = now >= r.OpenTime || now <= r.CloseTime
-		}
+		r.IsOpen = isOpenNow(r.OpenTime, r.CloseTime)
 
 		restaurants = append(restaurants, r)
 		ids = append(ids, r.ID)
@@ -1015,6 +1209,8 @@ func GetRestaurantDetail(ctx context.Context, id int) (*models.RestaurantDetail,
 		return nil, err
 	}
 
+	rd.IsOpen = isOpenNow(rd.OpenTime, rd.CloseTime)
+
 	menuMap, err := getMenusByRestaurantIDs(ctx, []int{id})
 	if err == nil {
 		rd.Menu = menuMap[id]
@@ -1076,12 +1272,7 @@ func GetPopularRestaurants(ctx context.Context, limit int) ([]models.Restaurant,
 		r.Images = []models.RestaurantImage{}
 
 		// Logic tính toán trạng thái đóng/mở cửa dựa trên thời gian thực hệ thống
-		now := time.Now().Format("15:00")
-		if r.OpenTime <= r.CloseTime {
-			r.IsOpen = now >= r.OpenTime && now <= r.CloseTime
-		} else {
-			r.IsOpen = now >= r.OpenTime || now <= r.CloseTime
-		}
+		r.IsOpen = isOpenNow(r.OpenTime, r.CloseTime)
 
 		restaurants = append(restaurants, r)
 		ids = append(ids, r.ID)
@@ -1117,13 +1308,15 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 				r.address, 
 				r.rating, 
 				r.type,
+				r.open_time,
+				r.close_time,
 				ROW_NUMBER() OVER (PARTITION BY r.id ORDER BY m.price DESC) AS rn
 			FROM MenuItems m
 			JOIN Restaurants r ON m.restaurant_id = r.id
 		)
 		SELECT TOP (@limit) 
 			dish_id, dish_name, price, description, ingredients,
-			restaurant_id, restaurant_name, address, rating, type
+			restaurant_id, restaurant_name, address, rating, type, open_time, close_time
 		FROM RankedDishes
 		WHERE rn = 1
 		ORDER BY rating DESC, price DESC
@@ -1142,8 +1335,9 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 		var dID, rID int
 		var dName, dDesc, dIngre, rName, rAddr, rType string
 		var price, rating float64
+		var openTime, closeTime string
 
-		if err := rows.Scan(&dID, &dName, &price, &dDesc, &dIngre, &rID, &rName, &rAddr, &rating, &rType); err != nil {
+		if err := rows.Scan(&dID, &dName, &price, &dDesc, &dIngre, &rID, &rName, &rAddr, &rating, &rType, &openTime, &closeTime); err != nil {
 			continue
 		}
 
@@ -1162,11 +1356,14 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 				"image_url":   "",
 			},
 			"restaurant_info": map[string]interface{}{
-				"id":      rID,
-				"name":    rName,
-				"address": rAddr,
-				"rating":  rating,
-				"type":    rType,
+				"id":         rID,
+				"name":       rName,
+				"address":    rAddr,
+				"rating":     rating,
+				"type":       rType,
+				"is_open":    isOpenNow(openTime, closeTime),
+				"open_time":  openTime,
+				"close_time": closeTime,
 			},
 		}
 

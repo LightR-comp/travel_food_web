@@ -8,10 +8,33 @@ const PhotoGallery = ({ images = [], restaurantName }) => {
   const main = images[0];
   const thumbs = images.slice(1, 7);
 
+  const len = images.length;
+  
+  // Điều chỉnh layout tuỳ theo số lượng ảnh
+  let gridContainerClass = "grid gap-2 h-[380px] rounded-2xl overflow-hidden";
+  let mainImageClass = "relative group cursor-pointer";
+  
+  if (len === 1) {
+    gridContainerClass += " grid-cols-1 grid-rows-1";
+    mainImageClass += " col-span-1 row-span-1";
+  } else if (len === 2) {
+    gridContainerClass += " grid-cols-2 grid-rows-1";
+    mainImageClass += " col-span-1 row-span-1";
+  } else if (len === 3) {
+    gridContainerClass += " grid-cols-2 grid-rows-2";
+    mainImageClass += " col-span-1 row-span-2";
+  } else if (len === 4) {
+    gridContainerClass += " grid-cols-3 grid-rows-2";
+    mainImageClass += " col-span-2 row-span-2";
+  } else {
+    gridContainerClass += " grid-cols-5 grid-rows-2";
+    mainImageClass += " col-span-2 row-span-2";
+  }
+
   return (
-    <div className="grid grid-cols-5 grid-rows-2 gap-2 h-[380px] rounded-2xl overflow-hidden" id="photo-gallery">
+    <div className={gridContainerClass} id="photo-gallery">
       {/* Main large image */}
-      <div className="col-span-2 row-span-2 relative group cursor-pointer" onClick={() => setActive(0)}>
+      <div className={mainImageClass} onClick={() => setActive(0)}>
         <img
           src={main}
           alt={restaurantName}

@@ -4,10 +4,11 @@ package handlers
 import (
 	"backend/core/internal/models"
 	"backend/core/internal/services"
+	"context"
 	"net/http"
 	"strconv"
 	"time"
-	"context"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -178,14 +179,17 @@ func GetTrendingDishes(c *gin.Context) {
 	})
 }
 
+type ImageInput struct {
+	ImageURL string `json:"image_url" binding:"required"`
+}
 
 type ReviewInput struct {
-	Rating  float64 `json:"rating" binding:"required,min=1,max=5"`
-	Comment string  `json:"comment" binding:"required"`
+	Rating  float64      `json:"rating" binding:"required,min=1,max=5"`
+	Comment string       `json:"comment"`
+	Images  []ImageInput `json:"images"` 
 }
 
 func CreateComment(c *gin.Context) {
-	// 1. Lấy restaurant_id từ URL đường dẫn (Param)
 	restaurantIDStr := c.Param("id")
 	restaurantID, err := strconv.Atoi(restaurantIDStr)
 	if err != nil {
@@ -193,47 +197,158 @@ func CreateComment(c *gin.Context) {
 		return
 	}
 
-	// 2. Lấy userID của người dùng đang đăng nhập (Thường bốc từ Middleware Auth ra)
-	// Giả sử Nhựt lưu userID trong context sau khi check JWT là "userID"
-	userIDVal, exists := c.Get("userID")
+	userIDVal, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Chưa đăng nhập"})
 		return
 	}
 	userID := userIDVal.(int)
 
-	// 3. Bind dữ liệu JSON từ Frontend gửi lên
 	var input ReviewInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Dữ liệu đánh giá không hợp lệ"})
 		return
 	}
 
-	// 4. Đóng gói dữ liệu vào struct UserRating của models
+	// Chuyển đổi mảng ảnh từ input sang model
+	var reviewImages []models.UserRatingImage
+	for _, img := range input.Images {
+		reviewImages = append(reviewImages, models.UserRatingImage{
+			ImageURL: img.ImageURL,
+		})
+	}
+
 	reviewData := models.UserRating{
 		RestaurantID: restaurantID,
 		UserID:       userID,
 		Rating:       input.Rating,
 		Comment:      input.Comment,
+		Images:       reviewImages, // Đưa mảng ảnh vào service
 	}
 
-	// 5. Gọi xuống tầng service/repository để lưu vào DB
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	insertedReview, err := services.CreateReview(ctx, reviewData) // Gọi hàm trong db_repo.go của Nhựt
+	insertedReview, err := services.CreateReview(ctx, reviewData)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Không thể lưu đánh giá"})
 		return
 	}
 
-	// 6. Cập nhật lại điểm Rating trung bình của quán ăn (Hàm này Nhựt cũng viết sẵn rồi!)
-	go services.UpdateAvgRating(restaurantID) // Chạy ngầm (goroutine) để không làm chậm request của user
+	go services.UpdateAvgRating(restaurantID)
 
-	// 7. Trả kết quả thành công về cho Frontend
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Đánh giá quán ăn thành công!",
 		"data":    insertedReview,
+	})
+}
+
+func GetReviews(c *gin.Context) {
+	restaurantID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "ID quán ăn không hợp lệ"})
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	reviews, err := services.GetReviewsByRestaurant(ctx, restaurantID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Không thể tải đánh giá"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Lấy danh sách đánh giá thành công",
+		"data":    gin.H{"reviews": reviews},
+		"error":   nil,
+	})
+}
+
+func UpdateComment(c *gin.Context) {
+	reviewID, err := strconv.Atoi(c.Param("reviewId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "ID đánh giá không hợp lệ"})
+		return
+	}
+
+	userIDVal, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Chưa đăng nhập"})
+		return
+	}
+	userID := userIDVal.(int)
+
+	var input ReviewInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Dữ liệu không hợp lệ"})
+		return
+	}
+
+	// Chuyển đổi danh sách ảnh mới cập nhật sang model
+	var reviewImages []models.UserRatingImage
+	for _, img := range input.Images {
+		reviewImages = append(reviewImages, models.UserRatingImage{
+			UserRatingID: reviewID,
+			ImageURL:     img.ImageURL,
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err = services.UpdateReview(ctx, reviewID, userID, models.UserRating{
+		Rating:  input.Rating,
+		Comment: input.Comment,
+		Images:  reviewImages, // Đưa mảng ảnh mới vào để xử lý đồng bộ lại
+	})
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+
+	restaurantID, _ := strconv.Atoi(c.Param("id"))
+	go services.UpdateAvgRating(restaurantID)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Cập nhật đánh giá thành công",
+		"error":   nil,
+	})
+}
+
+func DeleteComment(c *gin.Context) {
+	reviewID, err := strconv.Atoi(c.Param("reviewId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "ID đánh giá không hợp lệ"})
+		return
+	}
+
+	userIDVal, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Chưa đăng nhập"})
+		return
+	}
+	userID := userIDVal.(int)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err = services.DeleteReview(ctx, reviewID, userID)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+
+	restaurantID, _ := strconv.Atoi(c.Param("id"))
+	go services.UpdateAvgRating(restaurantID)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Xóa đánh giá thành công",
+		"error":   nil,
 	})
 }

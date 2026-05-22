@@ -107,3 +107,9 @@ class PlaceInfo(BaseModel):
 class ChatFinalData(BaseModel):
     reply: str
     suggested_places: List[PlaceInfo]
+
+# Lần gọi cho nhận diện hình ảnh
+class AIIdentifyDishRequest(BaseModel):
+    user_id: Optional[int] = None
+    image_base64: str = Field(..., description="Chuỗi base64 của hình ảnh món ăn.")
+    message: Optional[str] = ""

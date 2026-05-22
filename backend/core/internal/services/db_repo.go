@@ -429,16 +429,16 @@ func CreateReview(ctx context.Context, rv models.UserRating) (*models.UserRating
 		for i, img := range rv.Images {
 			var newImgID int
 			var newImgCreatedAt time.Time
-			
+
 			err := stmt.QueryRowContext(ctx,
 				sql.Named("ratingId", rv.ID),
 				sql.Named("imgUrl", img.ImageURL),
 			).Scan(&newImgID, &newImgCreatedAt)
-			
+
 			if err != nil {
 				return nil, fmt.Errorf("CreateReview insert img failed at index %d: %w", i, err)
 			}
-			
+
 			// Cập nhật lại thông tin ID và ngày tạo của ảnh vào struct để trả về
 			rv.Images[i].ID = newImgID
 			rv.Images[i].UserRatingID = rv.ID
@@ -609,7 +609,7 @@ func DeleteReview(ctx context.Context, reviewID int, userID int) error {
 		INNER JOIN UserRatings ur ON uri.user_rating_id = ur.id
 		WHERE ur.id = @id AND ur.user_id = @uid
 	`, sql.Named("id", reviewID), sql.Named("uid", userID))
-	
+
 	var imageUrls []string
 	if err == nil {
 		for rows.Next() {
@@ -642,7 +642,7 @@ func DeleteReview(ctx context.Context, reviewID int, userID int) error {
 	// Giả sử đường dẫn lưu file của bạn có dạng: "/uploads/reviews/xxx.jpg"
 	for _, url := range imageUrls {
 		// Loại bỏ dấu "/" ở đầu nếu đường dẫn lưu trong DB là đường dẫn tuyệt đối dạng web
-		filePath := strings.TrimPrefix(url, "/") 
+		filePath := strings.TrimPrefix(url, "/")
 		if err := os.Remove(filePath); err != nil {
 			log.Printf("[WARN] Không thể xóa file ảnh vật lý %s: %v", filePath, err)
 			// Chỉ log cảnh báo, không chặn luồng chạy chính của user
@@ -651,7 +651,6 @@ func DeleteReview(ctx context.Context, reviewID int, userID int) error {
 
 	return nil
 }
-
 
 func updateAvgRating(restaurantID int) {
 	_, err := db.Exec(`
@@ -925,23 +924,23 @@ func CalculateDistance(lat1, lng1, lat2, lng2 float64) float64 {
 }
 
 func isOpenNow(openTime, closeTime string) bool {
-    now := time.Now()
-    // Parse về cùng ngày hôm nay để so sánh
-    parse := func(s string) time.Time {
-        t, _ := time.Parse("15:04", s)
-        return time.Date(now.Year(), now.Month(), now.Day(),
-            t.Hour(), t.Minute(), 0, 0, now.Location())
-    }
+	now := time.Now()
+	// Parse về cùng ngày hôm nay để so sánh
+	parse := func(s string) time.Time {
+		t, _ := time.Parse("15:04", s)
+		return time.Date(now.Year(), now.Month(), now.Day(),
+			t.Hour(), t.Minute(), 0, 0, now.Location())
+	}
 
-    open := parse(openTime)
-    close := parse(closeTime)
-    
-    if open.Before(close) {
-        // Bình thường: 08:00 - 22:00
-        return now.After(open) && now.Before(close)
-    }
-    // Qua đêm: 22:00 - 02:00
-    return now.After(open) || now.Before(close)
+	open := parse(openTime)
+	close := parse(closeTime)
+
+	if open.Before(close) {
+		// Bình thường: 08:00 - 22:00
+		return now.After(open) && now.Before(close)
+	}
+	// Qua đêm: 22:00 - 02:00
+	return now.After(open) || now.Before(close)
 }
 
 // SearchRestaurants: Não bộ tìm kiếm trả về data thô và tổng số lượng
@@ -1468,6 +1467,14 @@ func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interf
 	if err == nil {
 		for i := range restaurants {
 			restaurants[i].Menu = menuMap[restaurants[i].ID]
+		}
+	}
+
+	// Lấy ảnh cho các nhà hàng
+	imageMap, err := getImagesByRestaurantIDs(ctx, ids)
+	if err == nil {
+		for i := range restaurants {
+			restaurants[i].Images = imageMap[restaurants[i].ID]
 		}
 	}
 

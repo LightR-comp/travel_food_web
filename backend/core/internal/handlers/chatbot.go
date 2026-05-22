@@ -276,6 +276,7 @@ func handleImageIdentification(c *gin.Context) {
 	}
 
 	userID, _ := strconv.Atoi(c.PostForm("user_id"))
+	message := c.PostForm("message") // Lấy message từ form
 	if userID == 0 {
 		userID = c.GetInt("user_id")
 	}
@@ -310,6 +311,7 @@ func handleImageIdentification(c *gin.Context) {
 	aiReq := dto.AIIdentifyDishRequest{
 		UserID:   userID,
 		ImageB64: imgBase64,
+		Message:  message, // Thêm message vào request
 	}
 
 	aiRes, err := services.CallAIIdentifyDish(aiReq)
@@ -324,12 +326,17 @@ func handleImageIdentification(c *gin.Context) {
 	}
 
 	if userID > 0 {
-		botReply := fmt.Sprintf("Tôi nhận ra đây là món **%s**.\n\n**Nguyên liệu chính:** %s\n\n**Công thức:**\n%s",
-			aiRes.DishName,
-			strings.Join(aiRes.Ingredients, ", "),
-			aiRes.Recipe,
-		)
-		_, errDB := services.SaveChatHistory(c.Request.Context(), userID, imageURL, botReply)
+		var botReply strings.Builder
+		botReply.WriteString(fmt.Sprintf("Tôi nhận ra đây là món **%s**.", aiRes.DishName))
+		if len(aiRes.Ingredients) > 0 {
+			botReply.WriteString(fmt.Sprintf("\n\n**Nguyên liệu chính:** %s", strings.Join(aiRes.Ingredients, ", ")))
+		}
+		// Chỉ thêm công thức nếu nó không rỗng
+		if aiRes.Recipe != "" {
+			botReply.WriteString(fmt.Sprintf("\n\n**Công thức:**\n%s", aiRes.Recipe))
+		}
+
+		_, errDB := services.SaveChatHistory(c.Request.Context(), userID, imageURL, botReply.String())
 		if errDB != nil {
 			log.Printf("[Identify] Lỗi lưu lịch sử DB cho UserID %d: %v", userID, errDB)
 		}

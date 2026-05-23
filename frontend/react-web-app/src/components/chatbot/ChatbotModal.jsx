@@ -334,28 +334,70 @@ const ChatbotModal = ({ onClose }) => {
   );
 };
 
-export const ChatbotButton = ({ onClick, isOpen }) => (
-  <button
-    onClick={onClick}
-    id="chatbot-btn"
-    title="Gợi ý AI"
-    className={`
-      fixed bottom-7 right-7 z-[200]
-      flex items-center gap-2
-      bg-gradient-to-r from-[#E8623A] to-[#C04D2B] text-white
-      px-5 py-3 rounded-full text-sm font-bold
-      shadow-[0_8px_28px_rgba(232,98,58,0.4)]
-      hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-[0_14px_36px_rgba(232,98,58,0.5)]
-      transition-all duration-200
-      ${!isOpen ? 'animate-pulse-glow' : ''}
-    `}
-  >
-    {isOpen
-      ? <span className="text-xl">💬</span>
-      : <img src={botAvatar} alt="bot" className="w-6 h-6 rounded-full object-cover" />
+export const ChatbotButton = ({ onClick, isOpen }) => {
+  const [showAutoTooltip, setShowAutoTooltip] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShowAutoTooltip(false);
+      return;
     }
-    <span>AI Gợi ý</span>
-  </button>
-);
+
+    // Tự động hiển thị sau 15 giây
+    const timer = setTimeout(() => {
+      setShowAutoTooltip(true);
+
+      // Tự động tắt sau 8 giây tiếp theo để tránh gây phiền cho người dùng
+      const dismissTimer = setTimeout(() => {
+        setShowAutoTooltip(false);
+      }, 8000);
+
+      return () => clearTimeout(dismissTimer);
+    }, 15000);
+
+    return () => clearTimeout(timer);
+  }, [isOpen]);
+
+  const tooltipClasses = `
+    absolute bottom-[68px] right-0 bg-gradient-to-r from-[#F4836A] to-[#E85D42] text-white text-[0.8rem] font-bold px-4 py-2.5 rounded-2xl rounded-br-sm shadow-[0_8px_30px_rgba(232,98,58,0.25)] border border-[#E85D42]/20 whitespace-nowrap transition-all duration-300
+    ${showAutoTooltip 
+      ? 'opacity-100 pointer-events-auto translate-y-0' 
+      : 'opacity-0 pointer-events-none translate-y-2 group-hover:opacity-100 group-hover:pointer-events-auto group-hover:translate-y-0'}
+  `;
+
+  return (
+    <div className="fixed bottom-7 right-7 z-[200] flex flex-col items-end group">
+      {/* Speech bubble tooltip on hover or auto timer */}
+      {!isOpen && (
+        <div className={tooltipClasses}>
+          <div className="relative">
+            Bạn cần giúp gì không?
+            {/* Tiny arrow at the bottom right */}
+            <div className="absolute -bottom-4 right-5 w-0 h-0 border-8 border-transparent border-t-[#E85D42]" />
+          </div>
+        </div>
+      )}
+
+      <button
+        onClick={onClick}
+        id="chatbot-btn"
+        className={`
+          w-14 h-14 rounded-full flex items-center justify-center p-0 overflow-hidden
+          bg-gradient-to-r from-[#E8623A] to-[#C04D2B] text-white
+          shadow-[0_8px_28px_rgba(232,98,58,0.4)]
+          hover:-translate-y-0.5 hover:scale-[1.05] hover:shadow-[0_14px_36px_rgba(232,98,58,0.5)]
+          transition-all duration-300 cursor-pointer
+          ${!isOpen ? 'animate-pulse-glow' : ''}
+        `}
+      >
+        {isOpen ? (
+          <span className="text-xl font-bold transition-transform duration-200 rotate-90">✕</span>
+        ) : (
+          <img src={botAvatar} alt="bot" className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-300" />
+        )}
+      </button>
+    </div>
+  );
+};
 
 export default ChatbotModal;

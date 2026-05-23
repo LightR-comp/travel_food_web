@@ -15,10 +15,13 @@ export const AuthProvider = ({ children }) => {
   // Helper chuẩn hóa dữ liệu user
   const normalizeUserData = useCallback((u) => {
     if (!u) return null;
+    const avatar = u.avatar_url || u.avatar || '';
     return {
       ...u,
       username: u.username || u.name || u.email?.split('@')[0] || 'User',
-      full_name: u.full_name || u.name || 'User'
+      full_name: u.full_name || u.name || 'User',
+      avatar_url: avatar,
+      avatar: avatar
     };
   }, []);
 

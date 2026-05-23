@@ -123,9 +123,17 @@ const ProfilePage = () => {
           <div className="absolute inset-0 bg-black/25 backdrop-blur-[0.5px]" />
 
           <div className="relative flex items-center gap-4 z-10">
-            <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white text-3xl font-bold border border-white/25">
-              {userData?.username?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
-            </div>
+            {userData?.avatar_url || user?.avatar_url ? (
+              <img
+                src={userData?.avatar_url || user?.avatar_url}
+                alt={userData?.name || user?.name}
+                className="w-20 h-20 rounded-full object-cover border border-white/40 shadow-sm"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white text-3xl font-bold border border-white/25">
+                {userData?.username?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
+              </div>
+            )}
             <div className="flex-1">
               <h1 className="text-2xl font-bold text-white drop-shadow-md">
                 {userData?.name || user?.name}

@@ -95,6 +95,19 @@ func UpsertUser(ctx context.Context, providerID, email, name, avatar string, pro
 		}
 	} else if err != nil {
 		return nil, fmt.Errorf("UpsertUser check: %w", err)
+	} else {
+		// Đã tồn tại → Cập nhật name và avatar_url nếu cần thiết
+		_, _ = db.ExecContext(ctx, `
+			UPDATE Users
+			SET name = CASE WHEN name = '' OR name IS NULL THEN @name ELSE name END,
+			    avatar_url = CASE WHEN @avatar != '' THEN @avatar ELSE avatar_url END,
+			    updated_at = GETDATE()
+			WHERE id = @userID
+		`,
+			sql.Named("name", name),
+			sql.Named("avatar", avatar),
+			sql.Named("userID", userID),
+		)
 	}
 
 	return GetUserByID(ctx, userID)

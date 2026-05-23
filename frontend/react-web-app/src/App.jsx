@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { LocationProvider } from './context/LocationContext';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
+import NavTabs from './components/layout/NavTabs';
 import ChatbotModal, { ChatbotButton } from './components/chatbot/ChatbotModal';
 
 // ---- Pages ----
@@ -40,8 +41,9 @@ const AppLayout = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen pb-20">
       <Header />
+      <NavTabs />
 
       <main className="flex-1">
         <Routes>

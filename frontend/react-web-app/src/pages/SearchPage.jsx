@@ -67,31 +67,6 @@ const SearchPage = () => {
 
   return (
     <div className="min-h-screen bg-[#FAFAF7]">
-      {/* Clean header bar (matches Search.png) */}
-      <div className="bg-[#F5EDD8] border-b border-[#EDD8C0] py-3 px-6">
-        <div className="max-w-[1200px] mx-auto flex items-center justify-between flex-wrap gap-3">
-          {/* Nav links */}
-          <nav className="flex gap-8 text-sm font-medium text-[#4A3728]">
-            {[
-              { label: 'Trang chủ', path: '/' },
-              { label: 'Tìm kiếm', path: '/search' },
-              { label: 'Diễn đàn', path: '/forum' },
-              { label: 'Về chúng tôi', path: '/about' },
-              { label: 'Hỗ trợ', path: '/support' },
-            ].map(({ label, path }) => (
-              <a
-                key={label}
-                href={path}
-                className={`hover:text-[#E8623A] transition-colors ${path === '/search' ? 'text-[#E8623A] font-bold' : ''}`}
-              >
-                {label}
-              </a>
-            ))}
-          </nav>
-
-
-        </div>
-      </div>
 
       <div className="max-w-[1200px] mx-auto px-6 py-8">
         <div className="flex gap-8 flex-col lg:flex-row">

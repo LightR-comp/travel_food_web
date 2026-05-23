@@ -451,16 +451,7 @@ const DetailPage = () => {
                 </div>
               )}
 
-              {/* Parking */}
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-[#2563EB] rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                  P
-                </div>
-                <div>
-                  <p className="text-xs text-[#7B7068] mb-0.5">Bãi đỗ xe</p>
-                  <p className="text-sm font-medium text-[#2C1810]">Có (xe máy)</p>
-                </div>
-              </div>
+
             </div>
 
           </div>

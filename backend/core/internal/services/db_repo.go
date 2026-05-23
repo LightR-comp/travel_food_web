@@ -1033,9 +1033,7 @@ func SearchRestaurants(
 			r.type
 		FROM Restaurants r
 		%s
-		ORDER BY r.id
-		OFFSET 0 ROWS FETCH NEXT %d ROWS ONLY
-	`, whereClause, limit)
+	`, whereClause)
 
 	rows, err := db.QueryContext(ctx, query, args...)
 	if err != nil {
@@ -1179,9 +1177,22 @@ func SearchRestaurants(
 				return restaurants[i].DistanceKm < restaurants[j].DistanceKm
 			})
 		}
+	case "price_asc":
+		sort.Slice(restaurants, func(i, j int) bool {
+			return restaurants[i].PriceRange < restaurants[j].PriceRange
+		})
+	case "price_desc":
+		sort.Slice(restaurants, func(i, j int) bool {
+			return restaurants[i].PriceRange > restaurants[j].PriceRange
+		})
 	}
 
-	return restaurants, len(restaurants), nil
+	totalCount := len(restaurants)
+	if totalCount > limit {
+		restaurants = restaurants[:limit]
+	}
+
+	return restaurants, totalCount, nil
 }
 
 // GetRestaurantDetail: Lấy chi tiết nhà hàng, bao gồm menu và reviews

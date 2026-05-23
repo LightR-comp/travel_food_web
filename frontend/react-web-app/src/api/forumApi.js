@@ -58,5 +58,10 @@ export const forumApi = {
   likePost: async (postId) => {
     const response = await axiosInstance.post(`/posts/${postId}/likes`);
     return response.data;
-  }
+  },
+
+  likeComment: async (commentId) => {
+  const response = await axiosInstance.post(`/posts/comments/${commentId}/likes`);
+  return response.data;
+}
 };

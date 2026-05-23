@@ -95,6 +95,19 @@ func UpsertUser(ctx context.Context, providerID, email, name, avatar string, pro
 		}
 	} else if err != nil {
 		return nil, fmt.Errorf("UpsertUser check: %w", err)
+	} else {
+		// Đã tồn tại → Cập nhật name và avatar_url nếu cần thiết
+		_, _ = db.ExecContext(ctx, `
+			UPDATE Users
+			SET name = CASE WHEN name = '' OR name IS NULL THEN @name ELSE name END,
+			    avatar_url = CASE WHEN @avatar != '' THEN @avatar ELSE avatar_url END,
+			    updated_at = GETDATE()
+			WHERE id = @userID
+		`,
+			sql.Named("name", name),
+			sql.Named("avatar", avatar),
+			sql.Named("userID", userID),
+		)
 	}
 
 	return GetUserByID(ctx, userID)
@@ -1003,10 +1016,18 @@ func SearchRestaurants(
 	// =========================
 	for _, filter := range filters {
 		switch filter {
-		case "highly_rated":
+		case "favorite":
 			conditions = append(conditions, "r.rating >= 4.5")
-		case "budget":
-			conditions = append(conditions, "r.price_range <= 50000")
+		case "good_rating":
+			conditions = append(conditions, "r.rating >= 4.0")
+		case "restaurant":
+			conditions = append(conditions, "r.type LIKE N'%sang trọng%'")
+		case "popular":
+			conditions = append(conditions, "r.type LIKE N'%bình dân%'")
+		case "bakery":
+			conditions = append(conditions, "r.type LIKE N'%bakery%'")
+		case "family":
+			conditions = append(conditions, "r.type LIKE N'%gia đình%'")
 		}
 	}
 
@@ -1033,9 +1054,7 @@ func SearchRestaurants(
 			r.type
 		FROM Restaurants r
 		%s
-		ORDER BY r.id
-		OFFSET 0 ROWS FETCH NEXT %d ROWS ONLY
-	`, whereClause, limit)
+	`, whereClause)
 
 	rows, err := db.QueryContext(ctx, query, args...)
 	if err != nil {
@@ -1179,9 +1198,22 @@ func SearchRestaurants(
 				return restaurants[i].DistanceKm < restaurants[j].DistanceKm
 			})
 		}
+	case "price_asc":
+		sort.Slice(restaurants, func(i, j int) bool {
+			return restaurants[i].PriceRange < restaurants[j].PriceRange
+		})
+	case "price_desc":
+		sort.Slice(restaurants, func(i, j int) bool {
+			return restaurants[i].PriceRange > restaurants[j].PriceRange
+		})
 	}
 
-	return restaurants, len(restaurants), nil
+	totalCount := len(restaurants)
+	if totalCount > limit {
+		restaurants = restaurants[:limit]
+	}
+
+	return restaurants, totalCount, nil
 }
 
 // GetRestaurantDetail: Lấy chi tiết nhà hàng, bao gồm menu và reviews

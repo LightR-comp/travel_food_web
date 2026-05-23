@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import HeroBanner from '../components/dashboard/HeroBanner';
-import NavTabs from '../components/layout/NavTabs';
 import FoodCardCarousel from '../components/dashboard/FoodCardCarousel';
 import PopularPosts from '../components/dashboard/PopularPosts';
 import AIRecommendModal from '../components/dashboard/AIRecommendModal';
@@ -57,7 +56,6 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-[#FAFAF7]">
       <HeroBanner onOpenRecommend={() => setShowRecommend(true)} />
-      <NavTabs />
 
       {loading ? (
         <div className="flex justify-center items-center py-24">
@@ -67,7 +65,7 @@ const HomePage = () => {
         <main id="main-content">
           <FoodCardCarousel
             restaurants={trending}
-            title="TOP TRENDINGS"
+            title="XU HƯỚNG"
             emoji="🔥"
             sectionId="top-trendings"
           />

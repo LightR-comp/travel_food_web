@@ -7,10 +7,10 @@ import { getRecommendationsApi } from '../../api/restaurantApi';
 const MOODS = [
   { value: 'happy',     label: 'Vui vẻ',     emoji: '😄' },
   { value: 'romantic',  label: 'Lãng mạn',   emoji: '🥰' },
-  { value: 'casual',    label: 'Thư giãn',   emoji: '😌' },
-  { value: 'business',  label: 'Công việc',  emoji: '💼' },
-  { value: 'adventure', label: 'Khám phá',   emoji: '🌟' },
-  { value: 'comfort',   label: 'Ấm cúng',    emoji: '🏠' },
+  { value: 'chill',     label: 'Thư giãn',   emoji: '😌' },
+  { value: 'stress',    label: 'Công việc',  emoji: '💼' },
+  { value: 'excited',   label: 'Khám phá',   emoji: '🌟' },
+  { value: 'family',    label: 'Ấm cúng',    emoji: '🏠' },
 ];
 
 const FOOD_TYPES = [
@@ -32,14 +32,15 @@ const DIETARY = [
   { value: 'none',        label: 'Không hạn chế' },
 ];
 
-const BUDGET_OPTIONS = [
-  { value: 1, label: 'Dưới 100k', desc: 'Bình dân' },
-  { value: 2, label: '100k–250k', desc: 'Trung bình' },
-  { value: 3, label: '250k–500k', desc: 'Khá' },
-  { value: 4, label: 'Trên 500k', desc: 'Cao cấp' },
-];
-
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80';
+
+// Helper to determine active preset based on budget amount
+const getActivePreset = (b) => {
+  if (b < 100000) return 1;
+  if (b >= 100000 && b <= 250000) return 2;
+  if (b > 250000 && b <= 500000) return 3;
+  return 4;
+};
 
 // ─── Step indicator ────────────────────────────────────────────────
 const StepDot = ({ active, done, label }) => (
@@ -67,7 +68,7 @@ const ResultCard = ({ r, onClick }) => {
     >
       <div className="h-[130px] bg-gradient-to-br from-[#3D1A0A] to-[#8B3A1A] relative overflow-hidden">
         <img
-          src={DEFAULT_IMAGE}
+          src={info.image_url || DEFAULT_IMAGE}
           alt={info.name}
           className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500"
         />
@@ -117,7 +118,7 @@ const AIRecommendModal = ({ onClose }) => {
   const [form, setForm] = useState({
     mood:       '',
     food_types: [],
-    budget:     2,
+    budget:     180000, // Mặc định ở giữa mức 100k-250k (được đổi sang VNĐ thực tế)
     people:     2,
     dietary:    [],
     radius:     5, // Default 5km
@@ -165,7 +166,7 @@ const AIRecommendModal = ({ onClose }) => {
           people:     form.people,
           dietary:    form.dietary.length ? form.dietary : ['none'],
           food_types: form.food_types.length ? form.food_types : [],
-          mood:       form.mood || 'casual',
+          mood:       form.mood || 'chill',
           weather:    'sunny',
         },
       };
@@ -241,22 +242,59 @@ const AIRecommendModal = ({ onClose }) => {
     <div className="animate-fade-up space-y-5">
       {/* Budget */}
       <div>
-        <h3 className="text-[0.95rem] font-bold text-[#2C1810] mb-3">💰 Ngân sách mỗi người</h3>
-        <div className="grid grid-cols-2 gap-2">
-          {BUDGET_OPTIONS.map(b => (
-            <button
-              key={b.value}
-              id={`budget-btn-${b.value}`}
-              onClick={() => setForm(p => ({ ...p, budget: b.value }))}
-              className={`p-3 rounded-xl border-2 text-left transition-all duration-200
-                ${form.budget === b.value
-                  ? 'border-[#E8623A] bg-[#FFF3EE]'
-                  : 'border-[#F5EDD8] bg-white hover:border-[#E8623A]/40'}`}
-            >
-              <p className="font-bold text-[0.82rem] text-[#2C1810]">{b.label}</p>
-              <p className="text-[0.7rem] text-[#8B6F5E]">{b.desc}</p>
-            </button>
-          ))}
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="text-[0.95rem] font-bold text-[#2C1810]">💰 Ngân sách mỗi người</h3>
+          <span className="text-sm font-extrabold text-[#E8623A] bg-[#FFF3EE] border border-[#F5EDD8] rounded-full px-3.5 py-0.5 shadow-sm">
+            {form.budget.toLocaleString('vi-VN')} đ
+          </span>
+        </div>
+
+        {/* Thanh trượt ngân sách thông minh (Budget Slider) */}
+        <div className="px-1 py-3 mb-4">
+          <input
+            type="range"
+            min={20000}
+            max={1000000}
+            step={10000}
+            value={form.budget}
+            onChange={(e) => setForm(p => ({ ...p, budget: Number(e.target.value) }))}
+            className="w-full h-1.5 bg-[#F5EDD8] rounded-full appearance-none outline-none cursor-pointer accent-[#E8623A]"
+          />
+          <div className="flex justify-between text-[0.68rem] text-[#7B7068] mt-1.5">
+            <span>20k đ</span>
+            <span>200k đ</span>
+            <span>400k đ</span>
+            <span>600k đ</span>
+            <span>800k đ</span>
+            <span>1.0M đ</span>
+          </div>
+        </div>
+
+        {/* Thẻ Preset chọn nhanh ngân sách */}
+        <div className="grid grid-cols-4 gap-2">
+          {[
+            { value: 80000,   presetId: 1, label: 'Dưới 100k', desc: 'Bình dân' },
+            { value: 180000,  presetId: 2, label: '100k–250k', desc: 'Trung bình' },
+            { value: 350000,  presetId: 3, label: '250k–500k', desc: 'Khá' },
+            { value: 750000,  presetId: 4, label: 'Trên 500k', desc: 'Cao cấp' },
+          ].map(b => {
+            const activePreset = getActivePreset(form.budget);
+            const isActive = activePreset === b.presetId;
+            return (
+              <button
+                key={b.presetId}
+                id={`budget-btn-${b.presetId}`}
+                onClick={() => setForm(p => ({ ...p, budget: b.value }))}
+                className={`p-2 rounded-xl border-2 text-center transition-all duration-200
+                  ${isActive
+                    ? 'border-[#E8623A] bg-[#FFF3EE] scale-[1.02] shadow-sm'
+                    : 'border-[#F5EDD8] bg-white hover:border-[#E8623A]/40'}`}
+              >
+                <p className="font-bold text-[0.75rem] text-[#2C1810] leading-snug">{b.label}</p>
+                <p className="text-[0.62rem] text-[#8B6F5E]">{b.desc}</p>
+              </button>
+            );
+          })}
         </div>
       </div>
 

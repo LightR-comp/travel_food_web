@@ -24,6 +24,9 @@ const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isHomePage = location.pathname === '/';
+  const isSearchPage = location.pathname === '/search';
+  const hideHeaderSearch = isHomePage || isSearchPage;
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQ, setSearchQ] = useState('');
@@ -127,19 +130,21 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Center search (hidden on mobile) */}
-        <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-sm mx-4">
-          <div className="flex w-full items-center bg-[#FFF8EE] border border-[#F5EDD8] rounded-full px-4 py-2 gap-2 focus-within:border-[#E8623A] focus-within:shadow-[0_0_0_2px_rgba(232,98,58,0.15)] transition-all">
-            <SearchIcon />
-            <input
-              type="text"
-              value={searchQ}
-              onChange={(e) => setSearchQ(e.target.value)}
-              placeholder="Tìm món ăn, quán ăn..."
-              className="flex-1 bg-transparent outline-none text-sm text-[#2C1810] placeholder:text-[#C8BEB5]"
-            />
-          </div>
-        </form>
+        {/* Center search (hidden on mobile, homepage, and search page) */}
+        {!hideHeaderSearch && (
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-sm mx-4">
+            <div className="flex w-full items-center bg-[#FFF8EE] border border-[#F5EDD8] rounded-full px-4 py-2 gap-2 focus-within:border-[#E8623A] focus-within:shadow-[0_0_0_2px_rgba(232,98,58,0.15)] transition-all">
+              <SearchIcon />
+              <input
+                type="text"
+                value={searchQ}
+                onChange={(e) => setSearchQ(e.target.value)}
+                placeholder="Tìm món ăn, quán ăn..."
+                className="flex-1 bg-transparent outline-none text-sm text-[#2C1810] placeholder:text-[#C8BEB5]"
+              />
+            </div>
+          </form>
+        )}
 
         {/* Right: widgets + auth */}
         <div className="flex items-center gap-3">
@@ -175,9 +180,17 @@ const Header = () => {
                 onClick={() => setDropdownOpen((v) => !v)}
                 className="flex items-center gap-2 bg-[#FFF8EE] hover:bg-[#F5EDD8] border border-[#F5EDD8] rounded-full px-3 py-1.5 transition-colors"
               >
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#E8623A] to-[#C04D2B] flex items-center justify-center text-white font-bold text-xs">
-                  {user.username?.[0]?.toUpperCase() || 'U'}
-                </div>
+                {user.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt={user.username}
+                    className="w-7 h-7 rounded-full object-cover border border-[#E8623A]/15"
+                  />
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#E8623A] to-[#C04D2B] flex items-center justify-center text-white font-bold text-xs">
+                    {user.username?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                )}
                 <span className="hidden sm:block text-sm font-semibold text-[#4A3728] max-w-[80px] truncate">
                   {user.username}
                 </span>
@@ -246,16 +259,18 @@ const Header = () => {
       {/* Mobile Menu */}
       {mobileOpen && (
         <nav className="md:hidden px-6 pb-4 border-t border-[#F5EDD8] bg-white flex flex-col gap-1">
-          <form onSubmit={handleSearch} className="flex items-center bg-[#FFF8EE] border border-[#F5EDD8] rounded-full px-4 py-2 gap-2 mt-3 mb-2">
-            <SearchIcon />
-            <input
-              type="text"
-              value={searchQ}
-              onChange={(e) => setSearchQ(e.target.value)}
-              placeholder="Tìm món ăn..."
-              className="flex-1 bg-transparent outline-none text-sm text-[#2C1810] placeholder:text-[#C8BEB5]"
-            />
-          </form>
+          {!hideHeaderSearch && (
+            <form onSubmit={handleSearch} className="flex items-center bg-[#FFF8EE] border border-[#F5EDD8] rounded-full px-4 py-2 gap-2 mt-3 mb-2">
+              <SearchIcon />
+              <input
+                type="text"
+                value={searchQ}
+                onChange={(e) => setSearchQ(e.target.value)}
+                placeholder="Tìm món ăn..."
+                className="flex-1 bg-transparent outline-none text-sm text-[#2C1810] placeholder:text-[#C8BEB5]"
+              />
+            </form>
+          )}
           {[
             { to: '/', label: '🏠 Dashboard' },
             { to: '/search', label: '🔍 Tìm kiếm' },

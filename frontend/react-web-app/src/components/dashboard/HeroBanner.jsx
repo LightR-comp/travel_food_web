@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import introVideo from '../../assets/Intro.mp4';
 
 const HeroBanner = ({ onOpenRecommend }) => {
   const navigate = useNavigate();
@@ -11,16 +12,27 @@ const HeroBanner = ({ onOpenRecommend }) => {
   };
 
   return (
-    <section className="relative h-[420px] overflow-hidden" id="hero-section">
-      {/* Background image */}
-      <div className="absolute inset-0">
+    <section className="relative h-[calc(100vh-85px)] min-h-[450px] overflow-hidden" id="hero-section">
+      {/* Cinematic Background Video with Image Fallback */}
+      <div className="absolute inset-0 bg-[#2C1810]">
+        {/* Fallback Static Image (Shown while video loads or if autoplay is blocked) */}
         <img
           src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=1600&q=80"
           alt="TP. Hồ Chí Minh"
-          className="w-full h-full object-cover object-[center_30%] hover:scale-[1.04] transition-transform duration-[8s]"
+          className="absolute inset-0 w-full h-full object-cover object-[center_30%] opacity-40"
         />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/15 to-[rgba(44,24,16,0.60)]" />
+        {/* Loop video of professional cooking */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-50"
+        >
+          <source src={introVideo} type="video/mp4" />
+        </video>
+        {/* Elegant Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/45 to-[rgba(44,24,16,0.75)]" />
       </div>
 
       {/* Content */}
@@ -75,6 +87,17 @@ const HeroBanner = ({ onOpenRecommend }) => {
             <polyline points="9,18 15,12 9,6" />
           </svg>
         </button>
+      </div>
+
+      {/* Left Side Scroll Indicator */}
+      <div className="absolute left-6 sm:left-8 bottom-16 z-20 hidden lg:flex flex-col items-center gap-4">
+        <div className="text-[0.7rem] text-white/75 font-semibold tracking-[0.2em] uppercase select-none [writing-mode:vertical-lr] rotate-180">
+          Kéo xuống để khám phá
+        </div>
+        <div className="w-px h-12 bg-gradient-to-b from-white/70 to-transparent animate-pulse" />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4 text-white/70 animate-bounce">
+          <polyline points="6,9 12,15 18,9" />
+        </svg>
       </div>
     </section>
   );

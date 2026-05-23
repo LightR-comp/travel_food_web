@@ -113,25 +113,32 @@ const ProfilePage = () => {
     <div className="max-w-[1200px] mx-auto px-6 py-8">
       <div className="bg-white rounded-2xl shadow-lg border border-[#F5EDD8] overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#E8623A] to-[#C04D2B] px-6 py-8">
-          <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white text-3xl font-bold">
-              {userData?.username?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
-            </div>
+        <div
+          className="px-6 py-8 relative overflow-hidden bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url('https://24hstore.vn/upload_images/images/hinh-nen-may-tinh/hinh_nen_phong_canh_(5).jpg')`
+          }}
+        >
+          {/* Subtle overlay to guarantee readability of white text */}
+          <div className="absolute inset-0 bg-black/25 backdrop-blur-[0.5px]" />
+
+          <div className="relative flex items-center gap-4 z-10">
+            {userData?.avatar_url || user?.avatar_url ? (
+              <img
+                src={userData?.avatar_url || user?.avatar_url}
+                alt={userData?.name || user?.name}
+                className="w-20 h-20 rounded-full object-cover border border-white/40 shadow-sm"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white text-3xl font-bold border border-white/25">
+                {userData?.username?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
+              </div>
+            )}
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-white">
+              <h1 className="text-2xl font-bold text-white drop-shadow-md">
                 {userData?.name || user?.name}
               </h1>
-              <p className="text-white/80">@{userData?.name || user?.name}</p>
             </div>
-            {!isEditing && (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full text-white text-sm font-semibold transition-colors"
-              >
-                ✏️ Chỉnh sửa
-              </button>
-            )}
           </div>
         </div>
 
@@ -244,13 +251,6 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              {/* Recent activity placeholder */}
-              <div>
-                <h2 className="text-lg font-semibold text-[#2C1810] mb-3">Hoạt động gần đây</h2>
-                <div className="bg-[#FFF8EE] rounded-xl p-8 text-center text-[#7B7068]">
-                  🍽️ Chưa có hoạt động nào
-                </div>
-              </div>
             </div>
           )}
         </div>

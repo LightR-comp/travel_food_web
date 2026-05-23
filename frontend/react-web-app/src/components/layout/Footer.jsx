@@ -1,5 +1,9 @@
 import { Link } from 'react-router-dom';
 import YumMapLogo from '../../assets/YumMap-logo.svg';
+import FacebookIcon from '../icon/Facebook-icon.png';
+import InstagramIcon from '../icon/Instagram-icon.png';
+import TikTokIcon from '../icon/TikTok-icon.png';
+import YoutubeIcon from '../icon/Youtube-icon.png';
 
 const FOOTER_LINKS = {
   'Trợ giúp': [
@@ -16,10 +20,10 @@ const FOOTER_LINKS = {
 };
 
 const SOCIAL_LINKS = [
-  { name: 'Facebook', icon: '🔵', bg: '#1877F2', char: 'f' },
-  { name: 'Instagram', icon: '📷', bg: 'linear-gradient(135deg, #f09433, #dc2743, #bc1888)' },
-  { name: 'Tiktok', icon: '🎵', bg: '#000' },
-  { name: 'Youtube', icon: '▶', bg: '#FF0000' },
+  { name: 'Facebook', icon: FacebookIcon },
+  { name: 'Instagram', icon: InstagramIcon },
+  { name: 'Tiktok', icon: TikTokIcon },
+  { name: 'Youtube', icon: YoutubeIcon },
 ];
 
 const Footer = () => (
@@ -51,9 +55,9 @@ const Footer = () => (
               <li key={name}>
                 <Link
                   to="#"
-                  className="flex items-center gap-2.5 text-sm text-white/75 hover:text-white hover:translate-x-1 transition-all"
+                  className="flex items-center gap-2.5 text-sm text-white/65 hover:text-[#F4845A] hover:translate-x-1 transition-all"
                 >
-                  <span className="text-base">{icon}</span>
+                  <img src={icon} alt={name} className="w-5 h-5 object-contain" />
                   {name}
                 </Link>
               </li>

@@ -116,22 +116,34 @@ func GetRecommendations(c *gin.Context) {
 	for _, aiRes := range aiResp.RecommendedRestaurants {
 		log.Printf("[DEBUG] AI trả về ID: %d", aiRes.ID)
 		if original, exists := resMap[aiRes.ID]; exists {
+			var imageURL string
+			for _, img := range original.Images {
+				if img.IsThumbnail {
+					imageURL = img.ImageURL
+					break
+				}
+			}
+			if imageURL == "" && len(original.Images) > 0 {
+				imageURL = original.Images[0].ImageURL
+			}
+
 			summary := dto.RestaurantSummary{
 				ID: original.ID,
 				RestaurantInfo: dto.InfoDTO{
-					Name: original.Name,
-					Contact: dto.ContactDTO{Address: original.Address},
+					Name:     original.Name,
+					ImageURL: imageURL,
+					Contact:  dto.ContactDTO{Address: original.Address},
 					OperatingHours: dto.HoursDTO{
-						Schedule: original.OpenTime + " - " + original.CloseTime,
+						Schedule:  original.OpenTime + " - " + original.CloseTime,
 						IsOpenNow: original.IsOpen,
 					},
 				},
 				Meta: dto.MetaDTO{
-					Rating: original.Rating,
+					Rating:     original.Rating,
 					DistanceKm: original.DistanceKm,
 				},
 				AIAnalysis: dto.AIAnalysisDTO{
-					Score: aiRes.Score,
+					Score:  aiRes.Score,
 					Reason: aiRes.Reason,
 				},
 			} 

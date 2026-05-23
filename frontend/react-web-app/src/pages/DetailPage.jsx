@@ -8,9 +8,23 @@ import LoginRequireModal from '../components/detail/LoginRequireModal';
 import StarRating from '../components/ui/StarRating';
 import BioModal from '../components/detail/BioModal';
 import { useAuth } from '../context/AuthContext';
+import { useLocation as useGeoLocation } from '../context/LocationContext';
 
 import { Spinner } from '../components/ui/index.jsx';
 import { getRestaurantByIdApi } from '../api/restaurantApi';
+
+// Helper: Haversine distance in km
+const haversineDistance = (lat1, lon1, lat2, lon2) => {
+  if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+  const toRad = (v) => (v * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
 
 // ============================================================
 // Helper: map flat RestaurantDetail (từ backend) → các section
@@ -117,7 +131,7 @@ function mapApiToSections(raw) {
   // user_ratings để ReviewSection dùng sau này
   const user_ratings = Array.isArray(raw.user_ratings) ? raw.user_ratings : [];
 
-  return { restaurant_info, meta, ai_analysis, signature_dish, galleries, menu, tags, user_ratings };
+  return { restaurant_info, meta, ai_analysis, signature_dish, galleries, menu, tags, user_ratings, lat: raw.lat, lng: raw.lng };
 }
 
 const DetailPage = () => {
@@ -132,6 +146,7 @@ const DetailPage = () => {
   
   const { user } = useAuth();
   const isLoggedIn = !!user;
+  const geoLocation = useGeoLocation();
 
   const handleReviewClick = () => {
     if (isLoggedIn) {
@@ -195,6 +210,14 @@ const DetailPage = () => {
 
   const { restaurant_info, meta, ai_analysis, galleries, tags } = data;
   const { name, contact, operating_hours } = restaurant_info;
+
+  // Compute distance from user location to restaurant
+  const computedDistance = haversineDistance(geoLocation.lat, geoLocation.lon, data.lat, data.lng);
+  const distanceDisplay = computedDistance != null
+    ? (computedDistance < 1
+        ? `${Math.round(computedDistance * 1000)} m`
+        : `${computedDistance.toFixed(1)} km`)
+    : null;
 
   return (
     <div className="min-h-screen bg-[#FAFAF7]">
@@ -262,6 +285,11 @@ const DetailPage = () => {
             <p className="flex items-start gap-2 mb-4">
               <span className="text-pink-500 text-lg flex-shrink-0 mt-0.5">📍</span>
               <span className="text-[#4A3728] text-sm leading-relaxed">{contact.address}</span>
+              {distanceDisplay && (
+                <span className="inline-flex items-center gap-1 text-xs text-[#7B7068] bg-[#FFF8EE] px-2 py-0.5 rounded-md border border-[#F5EDD8] flex-shrink-0 mt-0.5">
+                  📍 {distanceDisplay}
+                </span>
+              )}
             </p>
 
             {/* ── Hours + Phone/Facebook (2 columns) ── */}

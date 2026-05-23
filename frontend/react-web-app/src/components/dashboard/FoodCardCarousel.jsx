@@ -1,8 +1,37 @@
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, StarRating, Distance, PriceTag, Tag } from '../ui/index.jsx';
+import { useLocation } from '../../context/LocationContext';
 
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80';
+
+// Helper: Haversine distance in km between two lat/lng points
+const haversineDistance = (lat1, lon1, lat2, lon2) => {
+  if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+  const toRad = (v) => (v * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
+
+// Helper: Format price as "40.000 đ"
+const formatPriceVND = (val) => {
+  if (val == null || val === '' || isNaN(val)) return null;
+  return new Intl.NumberFormat('vi-VN').format(Number(val)) + ' đ';
+};
+
+// Helper: Extract image URL from various data shapes
+const extractImageUrl = (images) => {
+  if (!images || images.length === 0) return DEFAULT_IMAGE;
+  const first = images[0];
+  if (typeof first === 'string') return first || DEFAULT_IMAGE;
+  if (first?.image_url) return first.image_url;
+  return DEFAULT_IMAGE;
+};
 
 // ---- Scroll Arrow Button ----
 const ScrollBtn = ({ direction, onClick }) => (
@@ -54,8 +83,9 @@ const checkIsOpenRealTime = (openTimeStr, closeTimeStr) => {
 };
 
 // ---- Single Food Card ----
-export const FoodCard = ({ restaurant, featured = false }) => {
+export const FoodCard = ({ restaurant, featured = false, variant = 'trending' }) => {
   const navigate = useNavigate();
+  const userLocation = useLocation();
 
   // API trả về flat structure
   const {
@@ -64,7 +94,8 @@ export const FoodCard = ({ restaurant, featured = false }) => {
     rating,
     price_range,
     type,
-    distance_km,
+    lat,
+    lng,
     images,
     is_open,
     open_time,
@@ -72,7 +103,17 @@ export const FoodCard = ({ restaurant, featured = false }) => {
   } = restaurant;
 
   const tags = type ? type.split(',').map(t => t.trim()) : [];
-  const image_url = images?.[0] || DEFAULT_IMAGE;
+  const image_url = extractImageUrl(images);
+
+  // Calculate real distance from user location
+  const computedDistance = haversineDistance(userLocation.lat, userLocation.lon, lat, lng);
+  const distanceDisplay = computedDistance != null
+    ? (computedDistance < 1
+        ? `${Math.round(computedDistance * 1000)} m`
+        : `${computedDistance.toFixed(1)} km`)
+    : null;
+
+  const isSpots = variant === 'spots';
 
   // Tính trạng thái mở cửa theo thời gian thực tế của client
   const isOpenRealTime = checkIsOpenRealTime(open_time, close_time);
@@ -83,10 +124,20 @@ export const FoodCard = ({ restaurant, featured = false }) => {
         className="bg-white rounded-2xl overflow-hidden shadow-sm hover:-translate-y-1.5 hover:shadow-md transition-all cursor-pointer flex-shrink-0 w-[200px]"
         onClick={() => navigate(`/detail/${id}`)}
       >
-        <div className="relative h-[145px] bg-gradient-to-br from-[#3D1A0A] to-[#6B2D15] flex items-center justify-center">
+        <div className="relative h-[145px] overflow-hidden flex items-center justify-center">
+          <img
+            src={image_url}
+            alt={name}
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+          />
+          {/* Premium dark gradient overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[rgba(61,26,10,0.65)] to-[rgba(107,45,21,0.92)] mix-blend-multiply" />
+          <div className="absolute inset-0 bg-black/20" />
+
           {!isOpenRealTime && <Badge label="Đóng cửa" className="!left-auto right-2 animate-pulse" />}
-          <div className="text-center px-3">
-            <p className="text-[0.65rem] text-white/70 font-semibold tracking-widest uppercase mb-1">
+          <div className="relative z-10 text-center px-3">
+            <p className="text-[0.65rem] text-white/80 font-semibold tracking-widest uppercase mb-1">
               {name?.split(' ').slice(0, 2).join(' ')}
             </p>
             <span className="inline-block bg-[#F5A623] text-white text-[0.55rem] font-extrabold px-2 py-0.5 rounded tracking-widest uppercase mb-1">
@@ -95,7 +146,7 @@ export const FoodCard = ({ restaurant, featured = false }) => {
             <h3 className="font-[Baloo_2,sans-serif] text-xl font-extrabold text-white leading-none">
               {tags[0]?.toUpperCase()}
             </h3>
-            <p className="text-[0.6rem] text-white/70 italic mt-1">ăn PHÚC, uống LỘC, sống THỌ</p>
+            <p className="text-[0.6rem] text-white/80 italic mt-1">ăn PHÚC, uống LỘC, sống THỌ</p>
           </div>
         </div>
         <div className="p-3">
@@ -105,9 +156,9 @@ export const FoodCard = ({ restaurant, featured = false }) => {
           </div>
           <div className="flex gap-2 flex-wrap mb-1.5">
             <StarRating rating={rating} count={null} />
-            <Distance km={distance_km} />
+            {distanceDisplay && <Distance km={distanceDisplay} raw />}
           </div>
-          <PriceTag priceRange={price_range} />
+          {!isSpots && formatPriceVND(price_range) && <PriceTag priceRange={formatPriceVND(price_range)} />}
           {open_time && close_time && (
             <p className="text-[0.72rem] text-[#7B7068] flex items-center gap-1.5 mt-2 flex-wrap">
               <span>🕐</span>
@@ -149,9 +200,9 @@ export const FoodCard = ({ restaurant, featured = false }) => {
         </div>
         <div className="flex gap-2 flex-wrap mb-1.5">
           <StarRating rating={rating} count={null} />
-          <Distance km={distance_km} />
+          {distanceDisplay && <Distance km={distanceDisplay} raw />}
         </div>
-        <PriceTag priceRange={price_range} />
+        {!isSpots && formatPriceVND(price_range) && <PriceTag priceRange={formatPriceVND(price_range)} />}
         {open_time && close_time && (
           <p className="text-[0.72rem] text-[#7B7068] flex items-center gap-1.5 mt-2 flex-wrap">
             <span>🕐</span>
@@ -169,6 +220,7 @@ export const FoodCard = ({ restaurant, featured = false }) => {
 // ---- Horizontal Carousel ----
 const FoodCardCarousel = ({ restaurants = [], title, emoji, sectionId }) => {
   const scrollRef = useRef(null);
+  const variant = sectionId === 'good-spots' ? 'spots' : 'trending';
 
   const scroll = (dir) => {
     if (!scrollRef.current) return;
@@ -192,7 +244,8 @@ const FoodCardCarousel = ({ restaurants = [], title, emoji, sectionId }) => {
               <FoodCard
                 key={r.id}
                 restaurant={r}
-                featured={i === 2 && sectionId === 'good-spots'}
+                featured={false}
+                variant={variant}
               />
             ))}
           </div>

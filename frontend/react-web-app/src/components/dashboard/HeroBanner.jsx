@@ -29,7 +29,7 @@ const HeroBanner = ({ onOpenRecommend }) => {
           Khám Phá Ẩm Thực Sài Gòn
         </h1>
         <p className="text-[clamp(0.9rem,2.5vw,1.15rem)] text-white/90 mb-7 font-light animate-fade-up" style={{ animationDelay: '0.15s' }}>
-          AI gợi ý quán ngon – Đúng khẩu vị, đúng khoảnh khắc
+          "Thổ địa số" gợi ý quán ngon – Đúng khẩu vị, đúng khoảnh khắc
         </p>
 
         {/* Search bar */}

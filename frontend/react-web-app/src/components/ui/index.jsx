@@ -44,10 +44,10 @@ export const StarRating = ({ rating, count, size = 'sm' }) => {
 };
 
 /** Distance display */
-export const Distance = ({ km }) => (
+export const Distance = ({ km, raw = false }) => (
   <span className="inline-flex items-center gap-1 text-xs text-[#7B7068]">
     <span>📍</span>
-    <span>{km} km</span>
+    <span>{raw ? km : `${km} km`}</span>
   </span>
 );
 

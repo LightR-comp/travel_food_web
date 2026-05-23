@@ -5,6 +5,7 @@ import RestaurantListItem from '../components/search/RestaurantListItem';
 import { Spinner } from '../components/ui/index.jsx';
 import { searchRestaurantsApi } from '../api/restaurantApi';
 import { debounce } from '../utils/formatters';
+import { useLocation as useGeoLocation } from '../context/LocationContext';
 
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -18,9 +19,11 @@ const SearchPage = () => {
   const [filters, setFilters] = useState([]);
   const [sort, setSort] = useState('rating');
   const [total, setTotal] = useState(0);
+  
+  const geoLocation = useGeoLocation();
 
   const fetchResults = useCallback(
-    debounce(async (q, price, flt, srt) => {
+    debounce(async (q, price, flt, srt, lat, lng) => {
       setLoading(true);
       setError(false);
       try {
@@ -29,7 +32,9 @@ const SearchPage = () => {
           min_price: price[0],
           max_price: price[1],
           filters: flt.join(','),
-          sort: srt,
+          sort_by: srt,
+          lat: lat || undefined,
+          lng: lng || undefined,
         });
         if (res.success === false) {
           setResults([]);
@@ -48,8 +53,8 @@ const SearchPage = () => {
   );
 
   useEffect(() => {
-    fetchResults(query, priceRange, filters, sort);
-  }, [query, priceRange, filters, sort]);
+    fetchResults(query, priceRange, filters, sort, geoLocation.lat, geoLocation.lon);
+  }, [query, priceRange, filters, sort, geoLocation.lat, geoLocation.lon]);
 
   // Sync query to URL
   useEffect(() => {

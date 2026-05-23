@@ -1305,6 +1305,8 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 				r.id AS restaurant_id, 
 				r.name AS restaurant_name, 
 				r.address, 
+				r.lat,
+				r.lng,
 				r.rating, 
 				r.type,
 				r.open_time,
@@ -1315,7 +1317,7 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 		)
 		SELECT TOP (@limit) 
 			dish_id, dish_name, price, description, ingredients,
-			restaurant_id, restaurant_name, address, rating, type, open_time, close_time
+			restaurant_id, restaurant_name, address, lat, lng, rating, type, open_time, close_time
 		FROM RankedDishes
 		WHERE rn = 1
 		ORDER BY rating DESC, price DESC
@@ -1333,10 +1335,10 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 	for rows.Next() {
 		var dID, rID int
 		var dName, dDesc, dIngre, rName, rAddr, rType string
-		var price, rating float64
+		var price, rating, rLat, rLng float64
 		var openTime, closeTime string
 
-		if err := rows.Scan(&dID, &dName, &price, &dDesc, &dIngre, &rID, &rName, &rAddr, &rating, &rType, &openTime, &closeTime); err != nil {
+		if err := rows.Scan(&dID, &dName, &price, &dDesc, &dIngre, &rID, &rName, &rAddr, &rLat, &rLng, &rating, &rType, &openTime, &closeTime); err != nil {
 			continue
 		}
 
@@ -1358,6 +1360,8 @@ func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}
 				"id":         rID,
 				"name":       rName,
 				"address":    rAddr,
+				"lat":        rLat,
+				"lng":        rLng,
 				"rating":     rating,
 				"type":       rType,
 				"is_open":    isOpenNow(openTime, closeTime),

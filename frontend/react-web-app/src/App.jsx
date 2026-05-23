@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { LocationProvider } from './context/LocationContext';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import ChatbotModal, { ChatbotButton } from './components/chatbot/ChatbotModal';
@@ -81,7 +82,9 @@ const AppLayout = () => {
 const App = () => (
   <BrowserRouter>
     <AuthProvider>
-      <AppLayout />
+      <LocationProvider>
+        <AppLayout />
+      </LocationProvider>
     </AuthProvider>
   </BrowserRouter>
 );

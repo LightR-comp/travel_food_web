@@ -24,6 +24,8 @@ const HomePage = () => {
             rating: item.restaurant_info?.rating,
             price_range: item.dish_info?.price,
             type: item.restaurant_info?.type,
+            lat: item.restaurant_info?.lat,
+            lng: item.restaurant_info?.lng,
             images: [item.dish_info?.image_url],
             badge: item.dish_info?.badge,
             is_open: item.restaurant_info?.is_open,

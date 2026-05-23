@@ -1003,10 +1003,18 @@ func SearchRestaurants(
 	// =========================
 	for _, filter := range filters {
 		switch filter {
-		case "highly_rated":
+		case "favorite":
 			conditions = append(conditions, "r.rating >= 4.5")
-		case "budget":
-			conditions = append(conditions, "r.price_range <= 50000")
+		case "good_rating":
+			conditions = append(conditions, "r.rating >= 4.0")
+		case "restaurant":
+			conditions = append(conditions, "r.type LIKE N'%sang trọng%'")
+		case "popular":
+			conditions = append(conditions, "r.type LIKE N'%bình dân%'")
+		case "bakery":
+			conditions = append(conditions, "r.type LIKE N'%bakery%'")
+		case "family":
+			conditions = append(conditions, "r.type LIKE N'%gia đình%'")
 		}
 	}
 

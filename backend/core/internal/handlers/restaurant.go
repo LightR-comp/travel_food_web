@@ -7,6 +7,7 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -26,7 +27,15 @@ func SearchRestaurants(c *gin.Context) {
 	userLat, _ := strconv.ParseFloat(c.Query("lat"), 64)
 	userLng, _ := strconv.ParseFloat(c.Query("lng"), 64)
 	sortBy := c.DefaultQuery("sort_by", "rating")
-	filters := c.QueryArray("filters")
+	
+	var filters []string
+	rawFilters := c.Query("filters")
+	if rawFilters != "" {
+		filters = strings.Split(rawFilters, ",")
+	} else {
+		filters = c.QueryArray("filters")
+	}
+
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
 
 	// =========================

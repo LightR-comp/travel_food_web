@@ -37,6 +37,7 @@ type RestaurantSummary struct {
 
 type InfoDTO struct {
     Name           string            `json:"name"`
+    ImageURL       string            `json:"image_url"`
     Contact        ContactDTO        `json:"contact"`
     OperatingHours HoursDTO          `json:"operating_hours"`
     History        string            `json:"history"`// Câu chuyện về nhà hàng

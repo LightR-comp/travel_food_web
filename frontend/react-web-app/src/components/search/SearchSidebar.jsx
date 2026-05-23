@@ -3,7 +3,7 @@ const FILTER_OPTIONS = [
   { id: 'good_rating', label: 'Đánh giá tốt' },
   { id: 'restaurant', label: 'Nhà hàng' },
   { id: 'popular', label: 'Bình dân' },
-  { id: 'cheapest', label: 'Giá thấp nhất' },
+  { id: 'bakery', label: 'Tiệm bánh (Bakery)' },
   { id: 'family', label: 'Phù hợp cho gia đình' },
 ];
 

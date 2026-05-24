@@ -101,7 +101,7 @@ func CreatePost(ctx context.Context, userID int, post models.Post) (*models.Post
 	contentStr, _ := post.Content.MarshalJSON()
 
 	row := db.QueryRowContext(ctx, `
-		INSERT INTO Posts (author_id, prefix, title, p.category, content, summary, thumbnail_url, type, created_at, updated_at)
+		INSERT INTO Posts (author_id, prefix, title, category, content, summary, thumbnail_url, type, created_at, updated_at)
 		OUTPUT INSERTED.id, INSERTED.created_at, INSERTED.updated_at
 		VALUES (@authorID, @prefix, @title, @category, @content, @summary, @thumbnail, @type, GETDATE(), GETDATE())
 	`,
@@ -313,36 +313,42 @@ func LikePost(ctx context.Context, userID, postID int) (bool, int, error) {
     return true, likeCount, nil
 }
 
-func LikeComment(ctx context.Context, userID, commentID int) (bool, error) {
+func LikeComment(ctx context.Context, userID int, commentID uint64) (bool, error) {
 	var count int
-	db.QueryRowContext(ctx, `
+	err := db.QueryRowContext(ctx, `
 		SELECT COUNT(*) FROM CommentLikes WHERE comment_id = @commentID AND user_id = @userID
 	`,
 		sql.Named("commentID", commentID),
 		sql.Named("userID", userID),
 	).Scan(&count)
 
+	if err != nil {
+		return false, fmt.Errorf("LikeComment Check: %w", err)
+	}
+
 	if count > 0 {
-		db.ExecContext(ctx, `DELETE FROM CommentLikes WHERE comment_id = @commentID AND user_id = @userID`,
-			sql.Named("commentID", commentID), sql.Named("userID", userID))
-		db.ExecContext(ctx, `UPDATE Comments SET like_count = like_count - 1 WHERE id = @id`,
-			sql.Named("id", commentID))
+		_, err = db.ExecContext(ctx, `
+			DELETE FROM CommentLikes WHERE comment_id = @commentID AND user_id = @userID
+			UPDATE Comments SET like_count = CASE WHEN like_count > 0 THEN like_count - 1 ELSE 0 END WHERE id = @commentID
+		`, sql.Named("commentID", commentID), sql.Named("userID", userID))
+		if err != nil {
+			return false, fmt.Errorf("LikeComment Delete: %w", err)
+		}
 		return false, nil
 	}
 
-	_, err := db.ExecContext(ctx, `
+	_, err = db.ExecContext(ctx, `
 		INSERT INTO CommentLikes (comment_id, user_id, created_at)
 		VALUES (@commentID, @userID, GETDATE())
+		UPDATE Comments SET like_count = like_count + 1 WHERE id = @commentID
 	`,
 		sql.Named("commentID", commentID),
 		sql.Named("userID", userID),
 	)
 	if err != nil {
-		fmt.Printf("[LikeComment] lỗi insert: %v\n", err)
-		return false, fmt.Errorf("LikeComment: %w", err)
+		fmt.Printf("[LikeComment] lỗi insert DB: %v\n", err)
+		return false, fmt.Errorf("LikeComment Insert: %w", err)
 	}
-	db.ExecContext(ctx, `UPDATE Comments SET like_count = like_count + 1 WHERE id = @id`,
-		sql.Named("id", commentID))
 	return true, nil
 }
 

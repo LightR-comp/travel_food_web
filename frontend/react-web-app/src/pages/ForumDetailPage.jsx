@@ -55,9 +55,15 @@ const StarDisplay = ({ score }) => {
 /* ─── Component hiển thị từng bình luận ─── */
 const CommentItem = ({ comment, isReply = false, postId, onReplySubmit }) => {
   const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(comment.like_count || 0);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
+
+  useEffect(() => {
+    setLikesCount(comment.like_count || 0);
+  }, [comment.like_count]);
 
   const formatCommentTime = (timeStr) => {
     if (!timeStr) return 'Vừa xong';
@@ -65,14 +71,30 @@ const CommentItem = ({ comment, isReply = false, postId, onReplySubmit }) => {
     return isNaN(dateObj.getTime()) ? timeStr : dateObj.toLocaleDateString('vi-VN');
   };
 
+  const handleLikeCommentClick = async () => {
+    if (isLiking) return;
+    try {
+      setIsLiking(true);
+      // Gọi API sang hàm vừa sửa ở Bước 1
+      const response = await forumApi.likeComment(comment.id);
+      const apiData = response.data ? response.data : response;
+
+      setLiked(apiData.liked);
+      setLikesCount(prev => apiData.liked ? prev + 1 : (prev > 0 ? prev - 1 : 0));
+    } catch (error) {
+      console.error("Lỗi khi tương tác nút like comment:", error);
+      alert("Thao tác thất bại. Bạn vui lòng đăng nhập để thích bình luận.");
+    } finally {
+      setIsLiking(false);
+    }
+  };
+
   const handleReplySubmit = async () => {
     if (!replyText.trim() || submitting) return;
-
     try {
       setSubmitting(true);
       const response = await forumApi.addComment(postId, replyText, comment.id); 
 
-      // Ép kiểu dữ liệu đồng bộ chữ thường
       const apiReply = response.data ? response.data : response;
 
       const newReply = {
@@ -114,15 +136,17 @@ const CommentItem = ({ comment, isReply = false, postId, onReplySubmit }) => {
           </div>
           <p className="text-sm text-[#4A3728] leading-relaxed mb-2">{comment.content}</p>
           <div className="flex items-center gap-4">
+            {/* Thay đổi hàm onClick gọi tới API đồng bộ database */}
             <button
-              onClick={() => setLiked(!liked)}
+              onClick={handleLikeCommentClick}
+              disabled={isLiking}
               className={`flex items-center gap-1 text-xs font-semibold transition-all duration-300 ${
                 liked
                   ? 'bg-[#E8623A] text-white shadow-[0_4px_14px_rgba(232,98,58,0.3)] scale-105 px-3 py-1.5 rounded-full'
                   : 'text-[#C8BEB5] hover:text-[#E8623A]'
               }`}
             >
-              {liked ? '❤️' : '🤍'} {liked ? (comment.like_count || 0) + 1 : (comment.like_count || 0)}
+              {liked ? '❤️' : '🤍'} {likesCount}
             </button>
             <button
               onClick={() => setShowReplyInput(!showReplyInput)}
@@ -163,7 +187,6 @@ const CommentItem = ({ comment, isReply = false, postId, onReplySubmit }) => {
               comment={reply} 
               isReply={true} 
               postId={postId}
-              // 💡 GIẢI PHÁP: Truyền tiếp hàm onReplySubmit gốc của cha xuống cho các tầng sâu hơn
               onReplySubmit={onReplySubmit} 
             />
           ))}

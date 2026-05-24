@@ -159,9 +159,9 @@ func LikePost(c *gin.Context) {
 func LikeComment(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
-	commentID, err := strconv.Atoi(c.Param("id"))
+	commentID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "id không hợp lệ"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id bình luận không hợp lệ"})
 		return
 	}
 

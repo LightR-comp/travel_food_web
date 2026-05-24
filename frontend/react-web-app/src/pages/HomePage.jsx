@@ -72,7 +72,7 @@ const HomePage = () => {
           <PopularPosts posts={posts} />
           <FoodCardCarousel
             restaurants={spots}
-            title="GOOD SPOTS FOR FOOD"
+            title="GỢI Ý QUÁN NGON"
             sectionId="good-spots"
           />
         </main>

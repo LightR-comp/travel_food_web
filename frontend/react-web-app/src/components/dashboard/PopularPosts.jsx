@@ -36,15 +36,17 @@ const PostCard = ({ post }) => {
 const PopularPosts = ({ posts = [] }) => (
   <section className="py-12 bg-[#FFF8EE]" id="popular-posts">
     <div className="max-w-[1200px] mx-auto px-6">
-      <div className="mb-6">
-        <h2 className="font-iciel text-2xl font-extrabold text-[#2C1810] tracking-wide">
-          POPULAR POSTS
-        </h2>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
+      <div className="max-w-[960px] mx-auto">
+        <div className="mb-6 text-right">
+          <h2 className="font-iciel text-2xl font-extrabold text-[#2C1810] tracking-wide">
+            BÀI ĐĂNG PHỔ BIẾN
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {posts.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))}
+        </div>
       </div>
     </div>
   </section>

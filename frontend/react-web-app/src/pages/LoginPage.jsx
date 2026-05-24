@@ -4,6 +4,7 @@ import InputField from '../components/ui/InputField';
 import AuthButton from '../components/ui/AuthButton';
 import { useAuth } from '../context/AuthContext';
 import YumMapLogo from '../assets/YumMap-logo.svg';
+import IntroBg from '../assets/Intro.mp4';
 
 // Facebook icon
 const FacebookIcon = () => (
@@ -92,13 +93,39 @@ const LoginPage = () => {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-5 py-16 relative"
-      style={{
-        background: '#F0786A',
-        backgroundImage: 'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.12) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(200,60,30,0.18) 0%, transparent 50%)',
-      }}
-    >
+    <div className="min-h-screen flex items-center justify-center px-5 py-16 relative">
+      {/* Video Background */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          zIndex: -1,
+        }}
+      >
+        <source src={IntroBg} type="video/mp4" />
+      </video>
+
+      {/* Dark Overlay */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: -1,
+        }}
+      ></div>
+
       {/* Back button */}
       <Link
         to="/"
@@ -213,10 +240,16 @@ const LoginPage = () => {
           className="hidden md:flex w-[300px] flex-shrink-0 flex-col items-center justify-center gap-2.5 px-6 py-9"
           style={{ background: 'linear-gradient(160deg, #FEF3C0 0%, #FDEAA0 100%)' }}
         >
-          <h2 className="font-[Dancing_Script,cursive] text-[1.65rem] font-bold text-[#5C2A1A] text-center leading-snug">
+          <h2 
+            className="text-[1.65rem] font-bold text-[#5C2A1A] text-center leading-snug"
+            style={{ fontFamily: "'Nabila', cursive" }}
+          >
             Chào mừng trở lại
           </h2>
-          <p className="font-[Dancing_Script,cursive] text-base text-[#8B4513] italic text-center -mt-1 mb-2">
+          <p 
+            className="text-base text-[#8B4513] italic text-center -mt-1 mb-2"
+            style={{ fontFamily: "'Nabila', cursive" }}
+          >
             Du lịch thả ga cùng tớ nha
           </p>
           <div className="relative w-[220px] rounded-[20px_20px_60px_20px] overflow-hidden border-[3px] border-white/70 shadow-[0_12px_36px_rgba(60,20,10,0.2)]">

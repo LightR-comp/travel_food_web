@@ -5,6 +5,7 @@ import AuthButton from '../components/ui/AuthButton';
 import { useAuth } from '../context/AuthContext';
 import { isValidEmail } from '../utils/formatters';
 import YumMapLogo from '../assets/YumMap-logo.svg';
+import IntroBg from '../assets/Intro.mp4';
 
 const SignupPage = () => {
   const { register } = useAuth();
@@ -54,13 +55,39 @@ const SignupPage = () => {
   };
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center px-5 py-16 relative"
-      style={{
-        background: '#F0786A',
-        backgroundImage: 'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.12) 0%, transparent 50%)',
-      }}
-    >
+    <div className="min-h-screen flex flex-col items-center justify-center px-5 py-16 relative">
+      {/* Video Background */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          zIndex: -1,
+        }}
+      >
+        <source src={IntroBg} type="video/mp4" />
+      </video>
+
+      {/* Dark Overlay */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: -1,
+        }}
+      ></div>
+
       {/* Back button */}
       <Link
         to="/"
@@ -80,7 +107,7 @@ const SignupPage = () => {
       </div>
 
       {/* Card */}
-      <div className="bg-white rounded-[28px] shadow-[0_24px_64px_rgba(60,20,10,0.22)] w-full max-w-[480px] overflow-hidden flex animate-fade-up pt-7">
+      <div className="bg-white rounded-[28px] shadow-[0_24px_64px_rgba(60,20,10,0.22)] w-full max-w-[540px] overflow-hidden flex animate-fade-up pt-7">
 
         {/* Right: peach form panel */}
         <div

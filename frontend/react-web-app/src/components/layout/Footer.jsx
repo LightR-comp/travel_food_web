@@ -66,9 +66,19 @@ const Footer = () => (
         </div>
 
         {/* Logo col */}
-        <div className="flex flex-col items-center gap-3">
-          <img src={YumMapLogo} alt="YumMap" className="h-20 w-auto" />
-          <p className="text-xs text-white/50 italic text-center">Ẩm thực Việt – Đúng vị, đúng nơi</p>
+        <div className="relative flex flex-col items-center justify-center p-5 rounded-2xl bg-[#372017] border border-white/[0.08] transition-all duration-300 hover:border-[#F4845A]/30 hover:shadow-2xl hover:shadow-[#F4845A]/5 hover:-translate-y-1 h-full w-full overflow-hidden group">
+          {/* Decorative subtle ambient glow */}
+          <div className="absolute -inset-10 bg-gradient-to-r from-[#F4845A]/10 to-[#F29F05]/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+          
+          <img 
+            src={YumMapLogo} 
+            alt="YumMap" 
+            className="h-20 w-auto relative z-10 transition-transform duration-300 group-hover:scale-105" 
+          />
+          
+          <p className="mt-4 text-[13px] font-medium tracking-wide text-white/80 group-hover:text-white relative z-10 italic text-center transition-colors duration-300">
+            Ẩm thực Việt <span className="text-[#F4845A] font-bold mx-1">–</span> Đúng vị, đúng nơi
+          </p>
         </div>
 
       </div>

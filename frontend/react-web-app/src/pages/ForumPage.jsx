@@ -134,9 +134,6 @@ const PostCard = ({ post, index }) => {
           <span className="flex items-center gap-1.5 text-xs font-semibold text-[#7B7068]">
             💬 {post.comments}
           </span>
-          <button className="ml-auto text-xs text-[#7B7068] hover:text-[#E8623A] transition-colors font-medium">
-            Chia sẻ ↗
-          </button>
         </div>
       </div>
     </article>
@@ -148,7 +145,6 @@ const ForumPage = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('all');
-  const [heroRef, heroVisible] = useInView(0.2);
 
   // Gọi API lấy danh sách bài viết thực tế khi component được load
   useEffect(() => {
@@ -198,34 +194,26 @@ const ForumPage = () => {
     <div className="min-h-screen bg-[#FAFAF7]">
       {/* Hero Section */}
       <section
-        ref={heroRef}
-        className={`relative overflow-hidden bg-gradient-to-br from-[#2C1810] via-[#4A3728] to-[#2C1810] text-white py-16 sm:py-20 transition-all duration-1000 ${heroVisible ? 'opacity-100' : 'opacity-0'}`}
+        className="relative overflow-hidden text-white py-28 sm:py-36"
+        style={{
+          backgroundImage: "url('https://i.pinimg.com/1200x/2e/52/56/2e52566bc149cdee1ec66c676571bd0b.jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
       >
+        {/* Warm overlay for text legibility */}
+        <div className="absolute inset-0 bg-[#2C1810]/45 backdrop-blur-[0.5px]" />
+
         <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#E8623A]/20 rounded-full blur-[100px] animate-pulse" />
         <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-[#F5A623]/15 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '1s' }} />
 
-        <div className="relative max-w-[1200px] mx-auto px-6 text-center">
-          <span className="inline-block text-5xl mb-4 animate-bounce" style={{ animationDuration: '2s' }}>💬</span>
-          <h1 className="font-iciel text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 text-[#F4845A] pb-2">
+        <div className="relative z-10 max-w-[1200px] mx-auto px-6 text-left">
+          <h1 className="font-iciel text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 text-[#F4845A] pb-2 drop-shadow-md">
             Diễn Đàn Ẩm Thực
           </h1>
-          <p className="text-white/70 max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
+          <p className="text-white/95 max-w-3xl text-sm sm:text-base leading-relaxed drop-shadow-sm font-medium">
             Chia sẻ trải nghiệm, khám phá công thức và kết nối với cộng đồng yêu ẩm thực Việt Nam
           </p>
-
-          {/* Stats */}
-          <div className="flex items-center justify-center gap-6 mt-8">
-            {[
-              { number: '12.5K', label: 'Thành viên' },
-              { number: posts.length || '3.2K', label: 'Bài viết' },
-              { number: '18K', label: 'Bình luận' },
-            ].map(stat => (
-              <div key={stat.label} className="text-center">
-                <p className="text-xl sm:text-2xl font-extrabold text-[#F4845A]">{stat.number}</p>
-                <p className="text-[0.7rem] text-white/50 mt-0.5">{stat.label}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -286,20 +274,6 @@ const ForumPage = () => {
 
           {/* Right: Sidebar column */}
           <aside className="w-full lg:w-80 flex-shrink-0 space-y-6">
-            {/* Trending tags card */}
-            <div className="bg-white rounded-2xl border border-[#F5EDD8] p-5">
-              <h3 className="font-bold text-[#2C1810] mb-4 flex items-center gap-2">
-                🔥 Xu hướng
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {TRENDING_TAGS.map(tag => (
-                  <span key={tag} className="px-3 py-1.5 rounded-full bg-[#FFF8EE] text-[#E8623A] text-xs font-semibold border border-[#F5EDD8] hover:bg-[#E8623A] hover:text-white transition-all duration-300 cursor-pointer">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-
             {/* Rules card */}
             <div className="bg-gradient-to-br from-[#FFF8EE] to-[#FDECD8] rounded-2xl border border-[#F5EDD8] p-5">
               <h3 className="font-bold text-[#2C1810] mb-3 flex items-center gap-2">

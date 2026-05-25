@@ -113,21 +113,34 @@ func UpsertUser(ctx context.Context, providerID, email, name, avatar string, pro
 	return GetUserByID(ctx, userID)
 }
 
-func GetUserByID(ctx context.Context, id int) (*models.User, error) {
-	row := db.QueryRowContext(ctx, `
-		SELECT id, email, name, avatar_url, created_at, updated_at
-		FROM Users WHERE id = @id
-	`, sql.Named("id", id))
+func GetUserByID(ctx context.Context, userID int) (*models.User, error) {
+	if db == nil {
+		return nil, fmt.Errorf("database not initialized")
+	}
 
-	var u models.User
-	err := row.Scan(&u.ID, &u.Email, &u.Name, &u.AvatarURL, &u.CreatedAt, &u.UpdatedAt)
-	if err == sql.ErrNoRows {
-		return nil, fmt.Errorf("user không tồn tại")
-	}
+	var user models.User
+	// SỬA: $1 thành @p1 cho SQL Server
+	query := `SELECT id, email, name, avatar_url, created_at, updated_at FROM users WHERE id = @p1`
+
+	err := db.QueryRowContext(ctx, query, sql.Named("p1", userID)).Scan(
+		&user.ID,
+		&user.Email,
+		&user.Name,
+		&user.AvatarURL,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
 	if err != nil {
-		return nil, fmt.Errorf("GetUserByID: %w", err)
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
-	return &u, nil
+
+	fmt.Printf("GetUserByID - UserID: %d, AvatarURL: '%s'\n", user.ID, user.AvatarURL)
+
+	return &user, nil
 }
 
 func UpdateUserPreferences(ctx context.Context, userID int, prefs models.UserPreferences) error {
@@ -1693,4 +1706,20 @@ func GetChatHistoryByUserID(ctx context.Context, userID int) ([]ChatHistoryEntry
 		}
 	}
 	return history, nil
+}
+
+// GetDB trả về database connection để các handler có thể sử dụng
+func GetDB() *sql.DB {
+	return db
+}
+
+func UpdateUserName(ctx context.Context, userID int, name string) error {
+	_, err := db.ExecContext(ctx, `
+        UPDATE Users SET name = @name, updated_at = GETDATE()
+        WHERE id = @id
+    `,
+		sql.Named("name", name),
+		sql.Named("id", userID),
+	)
+	return err
 }

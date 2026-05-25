@@ -92,10 +92,12 @@ const ChatbotModal = ({ onClose }) => {
     { id: 1, role: 'bot', text: 'Xin chào! Tôi là trợ lý ẩm thực YumMap 🍜 Bạn muốn tìm quán gì hôm nay?', timestamp: 'Vừa xong', suggestedPlaces: [] },
     { id: 2, role: 'bot', text: 'Hãy cho tôi biết: ngân sách, số người, và bạn muốn ăn gì?', timestamp: null, suggestedPlaces: [] },
   ]);
-  const [input, setInput]             = useState('');
-  const [typing, setTyping]           = useState(false);
+  const [input, setInput] = useState('');
+  const [typing, setTyping] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
-
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  
   const bodyRef      = useRef(null);
   const inputRef     = useRef(null);
   const fileInputRef = useRef(null);
@@ -116,64 +118,7 @@ const ChatbotModal = ({ onClose }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showOptions]);
 
-  const sendImageMessage = async (imageFile) => {
-    const previewUrl = URL.createObjectURL(imageFile);
-
-    const userMsg = {
-      id: Date.now(),
-      role: 'user',
-      text: '',
-      image: previewUrl,
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-      suggestedPlaces: [],
-    };
-    setMessages((prev) => [...prev, userMsg]);
-    setTyping(true);
-    setShowOptions(false);
-
-    try {
-    const res = await sendChatMessageApi({
-      user_id: user?.id || 0,
-      message: 'Hãy xem ảnh này và gợi ý món ăn phù hợp',
-      image: imageFile,
-    });
-
-    if (!res.success) throw new Error(res.error || res.message);
-
-    let replyText = '';
-    if (res.data?.reply) {
-      // Luồng chat thường
-      replyText = res.data.reply;
-    } else if (res.data?.dish_name) {
-      // Luồng nhận diện ảnh
-      replyText = `🍽️ Tôi nhận ra đây là món **${res.data.dish_name}**!\n\n` +
-        `**Nguyên liệu:** ${res.data.ingredients?.join(', ')}\n\n` +
-        `**Công thức:** ${res.data.recipe}`;
-    } else {
-      replyText = 'Đã xử lý ảnh nhưng không có kết quả.';
-    }
-
-    const botMsg = {
-      id: Date.now() + 1,
-      role: 'bot',
-      text: replyText,
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-      suggestedPlaces: res.data?.suggested_places || [],
-    };
-    setMessages((prev) => [...prev, botMsg]);
-  } catch {
-      setMessages((prev) => [...prev, {
-        id: Date.now() + 1,
-        role: 'bot',
-        text: '😅 Xin lỗi, có lỗi xảy ra khi xử lý ảnh. Vui lòng thử lại!',
-        timestamp: null,
-        suggestedPlaces: [],
-      }]);
-    } finally {
-      setTyping(false);
-    }
-  };
-
+  // Xử lý chọn ảnh (giữ nguyên từ version 2)
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file || !file.type.startsWith('image/')) return;
@@ -190,39 +135,73 @@ const ChatbotModal = ({ onClose }) => {
       return;
     }
 
-    sendImageMessage(file);
-    e.target.value = '';
+    setSelectedImage(file);
+    setImagePreview(URL.createObjectURL(file));
+    setShowOptions(false);
+    inputRef.current?.focus();
   };
 
+  // Hàm xử lý gửi tin nhắn (kết hợp cả text và ảnh từ version 2)
   const handleSend = async () => {
     const msg = input.trim();
-    if (!msg || typing) return;
+    if ((!msg && !selectedImage) || typing) return;
 
+    // Tạo tin nhắn user
     const userMsg = {
       id: Date.now(),
       role: 'user',
-      text: msg,
-      timestamp: null,
+      text: msg || (selectedImage ? '📸 Đã gửi một ảnh' : ''),
+      image: imagePreview,
+      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
       suggestedPlaces: [],
     };
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
+    
+    // Lưu lại ảnh để gửi
+    const imageToSend = selectedImage;
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
     setTyping(true);
+    setShowOptions(false);
 
     try {
-      const res = await sendChatMessageApi({ user_id: user?.id || 0, message: msg });
+      // Gửi message lên API (tương tự version 1 nhưng hỗ trợ cả ảnh)
+      const res = await sendChatMessageApi({
+        user_id: user?.id || 0,
+        message: msg || (imageToSend ? 'Hãy xem ảnh này và gợi ý món ăn phù hợp' : ''),
+        image: imageToSend,
+      });
 
       if (!res.success) throw new Error(res.error || res.message);
+
+      let replyText = '';
+      
+      // Xử lý response giống version 1
+      if (res.data?.reply) {
+        replyText = res.data.reply;
+      } else if (res.data?.dish_name) {
+        // Luồng nhận diện ảnh
+        replyText = `🍽️ Tôi nhận ra đây là món **${res.data.dish_name}**!\n\n` +
+          `**Nguyên liệu:** ${res.data.ingredients?.join(', ')}\n\n` +
+          `**Công thức:** ${res.data.recipe}`;
+      } else {
+        replyText = 'Đã xử lý ảnh nhưng không có kết quả.';
+      }
 
       const botMsg = {
         id: Date.now() + 1,
         role: 'bot',
-        text: res.data.reply,
+        text: replyText,
         timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-        suggestedPlaces: res.data.suggested_places || [],
+        suggestedPlaces: res.data?.suggested_places || [],
       };
       setMessages((prev) => [...prev, botMsg]);
-    } catch {
+    } catch (error) {
+      console.error('Chat error:', error);
       setMessages((prev) => [...prev, {
         id: Date.now() + 1,
         role: 'bot',
@@ -236,7 +215,10 @@ const ChatbotModal = ({ onClose }) => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+    if (e.key === 'Enter' && !e.shiftKey) { 
+      e.preventDefault(); 
+      handleSend(); 
+    }
   };
 
   return (
@@ -274,6 +256,24 @@ const ChatbotModal = ({ onClose }) => {
         ))}
         {typing && <TypingIndicator />}
       </div>
+
+      {/* Preview ảnh - tính năng mới từ version 2 */}
+      {imagePreview && (
+        <div className="px-3 py-2 border-t border-[#F5EDD8] bg-white flex items-center gap-2">
+          <img src={imagePreview} alt="Preview" className="w-10 h-10 rounded-lg object-cover" />
+          <p className="text-xs text-[#7B7068] flex-1 truncate">{selectedImage?.name}</p>
+          <button
+            onClick={() => {
+              setSelectedImage(null);
+              setImagePreview(null);
+              if (fileInputRef.current) fileInputRef.current.value = "";
+            }}
+            className="w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-xs text-gray-600 transition-colors flex-shrink-0"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <div className="relative" id="chatbot-options">
         {showOptions && (
@@ -320,7 +320,7 @@ const ChatbotModal = ({ onClose }) => {
 
           <button
             onClick={handleSend}
-            disabled={!input.trim() || typing}
+            disabled={(!input.trim() && !selectedImage) || typing}
             id="chatbot-send"
             className="w-8 h-8 rounded-full bg-[#F4836A] flex items-center justify-center text-white flex-shrink-0 hover:bg-[#E85D42] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >

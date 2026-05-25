@@ -226,7 +226,7 @@ const AboutPage = () => {
               href="/search"
               className="inline-flex items-center gap-2 bg-white text-[#E8623A] px-8 py-3 rounded-full font-bold text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
             >
-              Khám phá ngay 🔍
+              Khám phá ngay
             </a>
           </div>
         </section>

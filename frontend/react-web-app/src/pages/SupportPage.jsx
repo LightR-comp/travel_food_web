@@ -29,7 +29,7 @@ const FadeSection = ({ children, className = '', delay = 0 }) => {
 
 const FAQ_DATA = [
   {
-    category: '🔍 Tìm kiếm',
+    category: 'Tìm kiếm',
     questions: [
       { q: 'Làm sao để tìm quán ăn gần tôi?', a: 'Bật định vị trên thiết bị, YumMap sẽ tự động gợi ý các quán ăn trong phạm vi 5km xung quanh bạn. Bạn cũng có thể điều chỉnh bán kính tìm kiếm trong bộ lọc.' },
       { q: 'Tôi có thể lọc theo loại món ăn không?', a: 'Có! Bạn có thể lọc theo nhiều tiêu chí: loại món (phở, bún, cơm, ...), khoảng giá, đánh giá, khoảng cách, và trạng thái mở/đóng cửa.' },
@@ -37,7 +37,7 @@ const FAQ_DATA = [
     ],
   },
   {
-    category: '👤 Tài khoản',
+    category: 'Tài khoản',
     questions: [
       { q: 'Làm sao để tạo tài khoản?', a: 'Nhấn nút "Đăng ký" ở góc trên, điền thông tin email, mật khẩu và họ tên. Bạn cũng có thể đăng ký nhanh bằng tài khoản Google.' },
       { q: 'Tôi quên mật khẩu, phải làm sao?', a: 'Tại trang đăng nhập, nhấn "Quên mật khẩu", nhập email đăng ký. Chúng tôi sẽ gửi link đặt lại mật khẩu trong vài phút.' },
@@ -45,14 +45,14 @@ const FAQ_DATA = [
     ],
   },
   {
-    category: '🤖 AI Chatbot',
+    category: 'AI Chatbot',
     questions: [
       { q: 'AI Chatbot có thể giúp gì cho tôi?', a: 'AI Chatbot giúp gợi ý quán ăn theo sở thích, trả lời câu hỏi về ẩm thực, chia sẻ công thức nấu ăn, và tư vấn lộ trình food tour.' },
       { q: 'Dữ liệu chat có được lưu không?', a: 'Lịch sử chat được lưu trong phiên làm việc để chatbot hiểu ngữ cảnh tốt hơn. Bạn có thể xóa lịch sử bất cứ lúc nào.' },
     ],
   },
   {
-    category: '📝 Đánh giá & Bài viết',
+    category: 'Đánh giá & Bài viết',
     questions: [
       { q: 'Làm sao để viết đánh giá?', a: 'Mở trang chi tiết quán ăn, kéo xuống phần Đánh giá và nhấn "Viết đánh giá". Bạn cần đăng nhập để thực hiện.' },
       { q: 'Đánh giá của tôi bị ẩn?', a: 'Đánh giá có thể bị ẩn nếu vi phạm quy tắc cộng đồng (ngôn từ không phù hợp, spam, ...). Bạn có thể liên hệ hỗ trợ để khiếu nại.' },
@@ -92,7 +92,6 @@ const SupportPage = () => {
           <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-[#F5A623]/15 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '1s' }} />
 
           <div className="relative max-w-[1200px] mx-auto px-6 text-center">
-            <span className="inline-block text-5xl mb-4" style={{ animation: 'float 3s ease-in-out infinite' }}>🎧</span>
             <h1 className="font-iciel text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 text-[#F4845A] pb-2">
               Trung Tâm Hỗ Trợ
             </h1>
@@ -119,23 +118,6 @@ const SupportPage = () => {
         </section>
       </FadeSection>
 
-      {/* Contact channels */}
-      <section className="relative -mt-8 z-10 max-w-[900px] mx-auto px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {CONTACT_CHANNELS.map((ch, i) => (
-            <FadeSection key={ch.label} delay={i * 100}>
-              <div className="bg-white rounded-2xl border border-[#F5EDD8] p-5 text-center hover:shadow-lg hover:border-[#E8623A]/20 hover:-translate-y-1 transition-all duration-500 group cursor-pointer">
-                <div className={`w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br ${ch.color} flex items-center justify-center text-xl shadow-md group-hover:scale-110 transition-transform duration-300`}>
-                  {ch.icon}
-                </div>
-                <h3 className="text-sm font-bold text-[#2C1810]">{ch.label}</h3>
-                <p className="text-sm font-semibold text-[#E8623A] mt-1">{ch.value}</p>
-                <p className="text-[0.65rem] text-[#7B7068] mt-0.5">{ch.desc}</p>
-              </div>
-            </FadeSection>
-          ))}
-        </div>
-      </section>
 
       {/* FAQ */}
       <div className="max-w-[900px] mx-auto px-6 py-16">
@@ -212,18 +194,12 @@ const SupportPage = () => {
               href="/contact"
               className="inline-flex items-center gap-2 bg-white text-[#E8623A] px-8 py-3 rounded-full font-bold text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
             >
-              Liên hệ chúng tôi 📬
+              Liên hệ chúng tôi
             </a>
           </div>
         </section>
       </FadeSection>
 
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-12px); }
-        }
-      `}</style>
     </div>
   );
 };

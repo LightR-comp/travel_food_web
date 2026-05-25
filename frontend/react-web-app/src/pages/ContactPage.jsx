@@ -1,4 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
+import FacebookIcon from '../components/icon/Facebook-icon.png';
+import InstagramIcon from '../components/icon/Instagram-icon.png';
+import TikTokIcon from '../components/icon/TikTok-icon.png';
+import YoutubeIcon from '../components/icon/Youtube-icon.png';
+import MapsIcon from '../components/icon/Maps-icon.png';
+import MailIcon from '../components/icon/Mail-icon.png';
+import ClockIcon from '../components/icon/Clock-icon.png';
 
 /* ─── Intersection Observer hook ─── */
 const useInView = (threshold = 0.15) => {
@@ -28,14 +35,13 @@ const FadeSection = ({ children, className = '', delay = 0 }) => {
 };
 
 const CONTACT_INFO = [
-  { icon: '📍', label: 'Địa chỉ', value: '268 Lý Thường Kiệt, Quận 10, TP. Hồ Chí Minh', color: 'from-[#E8623A] to-[#C04D2B]' },
-  { icon: '📧', label: 'Email', value: 'hello@yummap.vn', color: 'from-[#F5A623] to-[#E8623A]' },
-  { icon: '📞', label: 'Điện thoại', value: '+84 (28) 3863 1234', color: 'from-[#C04D2B] to-[#E8623A]' },
-  { icon: '⏰', label: 'Giờ làm việc', value: 'Thứ 2 – Thứ 6: 08:00 – 17:30', color: 'from-[#E8623A] to-[#F4845A]' },
+  { icon: MapsIcon, label: 'Địa chỉ', value: 'Khu đô thị ĐHQG-HCM, Khu Phố 6, Đông Hòa, Hồ Chí Minh', color: 'from-[#E8623A] to-[#C04D2B]' },
+  { icon: MailIcon, label: 'Email', value: 'support.yummap@gmail.com', color: 'from-[#F5A623] to-[#E8623A]' },
+  { icon: ClockIcon, label: 'Giờ làm việc', value: 'Thứ 2 – Thứ 6: 08:00 – 17:30', color: 'from-[#E8623A] to-[#F4845A]' },
 ];
 
 const ContactPage = () => {
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+  const [form, setForm] = useState({ name: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
 
@@ -44,12 +50,23 @@ const ContactPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSending(true);
-    // Simulate send
-    await new Promise(r => setTimeout(r, 1500));
+
+    // Construct mailto link to send email directly to support.yummap@gmail.com
+    const emailTo = 'support.yummap@gmail.com';
+    const subjectLine = encodeURIComponent(`[YumMap] ${form.subject ? form.subject.toUpperCase() : 'LIÊN HỆ'} - ${form.name}`);
+    const emailBody = encodeURIComponent(
+      `Họ và tên: ${form.name}\n` +
+      `Chủ đề: ${form.subject || 'Khác'}\n\n` +
+      `Nội dung:\n${form.message}`
+    );
+    
+    // Open user's email client
+    window.location.href = `mailto:${emailTo}?subject=${subjectLine}&body=${emailBody}`;
+
     setSending(false);
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 5000);
-    setForm({ name: '', email: '', subject: '', message: '' });
+    setForm({ name: '', subject: '', message: '' });
   };
 
   const inputClass = `
@@ -63,17 +80,26 @@ const ContactPage = () => {
     <div className="min-h-screen bg-[#FAFAF7]">
       {/* Hero */}
       <FadeSection>
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#2C1810] via-[#4A3728] to-[#2C1810] text-white py-16 sm:py-20">
+        <section
+          className="relative overflow-hidden text-white py-20 sm:py-24"
+          style={{
+            backgroundImage: "url('https://i.pinimg.com/1200x/91/8a/7c/918a7c33fb1333c3daeed806202ed0c1.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+          {/* Warm overlay for text legibility */}
+          <div className="absolute inset-0 bg-[#2C1810]/45 backdrop-blur-[0.5px]" />
+
           <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#E8623A]/20 rounded-full blur-[100px] animate-pulse" />
           <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-[#F5A623]/15 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '1s' }} />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-white/5 rounded-full" />
 
-          <div className="relative max-w-[1200px] mx-auto px-6 text-center">
-            <span className="inline-block text-5xl mb-4" style={{ animation: 'float 3s ease-in-out infinite' }}>📬</span>
-            <h1 className="font-[Baloo_2,sans-serif] text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 bg-gradient-to-r from-white via-[#F4845A] to-[#F5A623] bg-clip-text text-transparent">
+          <div className="relative z-10 max-w-[1200px] mx-auto px-6 text-center">
+            <h1 className="font-[Baloo_2,sans-serif] text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 bg-gradient-to-r from-white via-[#F4845A] to-[#F5A623] bg-clip-text text-transparent drop-shadow-md">
               Liên Hệ Chúng Tôi
             </h1>
-            <p className="text-white/65 max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
+            <p className="text-white/95 max-w-lg mx-auto text-sm sm:text-base leading-relaxed drop-shadow-sm font-medium">
               Bạn có câu hỏi, đóng góp hay phản hồi? Chúng tôi luôn sẵn lòng lắng nghe!
             </p>
           </div>
@@ -82,12 +108,12 @@ const ContactPage = () => {
 
       {/* Contact info cards */}
       <section className="relative -mt-8 z-10 max-w-[1000px] mx-auto px-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {CONTACT_INFO.map((info, i) => (
             <FadeSection key={info.label} delay={i * 100}>
-              <div className="bg-white rounded-2xl border border-[#F5EDD8] p-5 text-center hover:shadow-lg hover:border-[#E8623A]/20 hover:-translate-y-1 transition-all duration-500 group">
-                <div className={`w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br ${info.color} flex items-center justify-center text-xl shadow-md group-hover:scale-110 transition-transform duration-300`}>
-                  {info.icon}
+              <div className="bg-white rounded-2xl border border-[#F5EDD8] p-5 text-center hover:shadow-lg hover:border-[#E8623A]/20 hover:-translate-y-1 transition-all duration-500 group h-full">
+                <div className="w-16 h-16 mx-auto mb-3 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <img src={info.icon} alt={info.label} className="w-16 h-16 object-contain" />
                 </div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-[#7B7068] mb-1">{info.label}</h3>
                 <p className="text-sm font-semibold text-[#2C1810]">{info.value}</p>
@@ -115,21 +141,12 @@ const ContactPage = () => {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-[#4A3728] mb-1.5">Họ và tên *</label>
-                    <input
-                      type="text" name="name" required value={form.name} onChange={handleChange}
-                      placeholder="Nguyễn Văn A" className={inputClass}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-[#4A3728] mb-1.5">Email *</label>
-                    <input
-                      type="email" name="email" required value={form.email} onChange={handleChange}
-                      placeholder="email@example.com" className={inputClass}
-                    />
-                  </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#4A3728] mb-1.5">Họ và tên *</label>
+                  <input
+                    type="text" name="name" required value={form.name} onChange={handleChange}
+                    placeholder="Nguyễn Văn A" className={inputClass}
+                  />
                 </div>
 
                 <div>
@@ -170,7 +187,7 @@ const ContactPage = () => {
                       Đang gửi...
                     </span>
                   ) : (
-                    'Gửi tin nhắn 📤'
+                    'Gửi tin nhắn'
                   )}
                 </button>
               </form>
@@ -180,44 +197,24 @@ const ContactPage = () => {
           {/* Sidebar info */}
           <FadeSection className="lg:col-span-2" delay={200}>
             <div className="space-y-6">
-              {/* Map placeholder */}
-              <div className="bg-gradient-to-br from-[#FFF8EE] to-[#FDECD8] rounded-2xl border border-[#F5EDD8] p-6 overflow-hidden relative min-h-[250px] flex items-center justify-center">
-                <div className="text-center">
-                  <span className="text-5xl block mb-3">🗺️</span>
-                  <p className="text-sm font-bold text-[#2C1810]">268 Lý Thường Kiệt</p>
-                  <p className="text-xs text-[#7B7068] mt-1">Quận 10, TP. Hồ Chí Minh</p>
-                  <a
-                    href="https://maps.google.com/?q=268+Ly+Thuong+Kiet,+Quan+10,+HCMC"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 mt-3 text-xs font-semibold text-[#E8623A] hover:underline"
-                  >
-                    Xem trên Google Maps ↗
-                  </a>
-                </div>
-                {/* Decorative grid */}
-                <div className="absolute inset-0 opacity-10" style={{
-                  backgroundImage: 'radial-gradient(circle, #E8623A 1px, transparent 1px)',
-                  backgroundSize: '20px 20px',
-                }} />
-              </div>
+
 
               {/* Social links */}
               <div className="bg-white rounded-2xl border border-[#F5EDD8] p-5">
                 <h3 className="font-[Baloo_2,sans-serif] font-bold text-[#2C1810] mb-4">Kết nối với chúng tôi</h3>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { name: 'Facebook', icon: '🔵', href: '#' },
-                    { name: 'Instagram', icon: '📷', href: '#' },
-                    { name: 'TikTok', icon: '🎵', href: '#' },
-                    { name: 'Youtube', icon: '▶️', href: '#' },
+                    { name: 'Facebook', icon: FacebookIcon, href: '#' },
+                    { name: 'Instagram', icon: InstagramIcon, href: '#' },
+                    { name: 'TikTok', icon: TikTokIcon, href: '#' },
+                    { name: 'Youtube', icon: YoutubeIcon, href: '#' },
                   ].map(social => (
                     <a
                       key={social.name}
                       href={social.href}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FFF8EE] border border-[#F5EDD8] text-sm font-semibold text-[#4A3728] hover:border-[#E8623A]/30 hover:text-[#E8623A] transition-all duration-300"
+                      className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#FFF8EE] border border-[#F5EDD8] text-sm font-semibold text-[#4A3728] hover:border-[#E8623A]/30 hover:text-[#E8623A] transition-all duration-300"
                     >
-                      <span>{social.icon}</span>
+                      <img src={social.icon} alt={social.name} className="w-5 h-5 object-contain" />
                       {social.name}
                     </a>
                   ))}
@@ -232,7 +229,7 @@ const ContactPage = () => {
                   href="/support"
                   className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold hover:bg-white/25 transition-colors"
                 >
-                  Trung tâm hỗ trợ 🎧
+                  Trung tâm hỗ trợ
                 </a>
               </div>
             </div>

@@ -1,3 +1,7 @@
+import starIcon from '../icon/star-icon.png';
+import locationIcon from '../icon/location-icon.png';
+import priceTagIcon from '../icon/price tag-icon.png';
+
 /** Badge chip – Popular / Must try / Trending */
 export const Badge = ({ label, className = '' }) => {
   const colors = {
@@ -34,9 +38,10 @@ export const Tag = ({ label }) => (
 /** Star rating display */
 export const StarRating = ({ rating, count, size = 'sm' }) => {
   const sizes = { sm: 'text-xs', md: 'text-sm', lg: 'text-base' };
+  const iconSizes = { sm: 'w-3 h-3', md: 'w-3.5 h-3.5', lg: 'w-4 h-4' };
   return (
     <span className={`inline-flex items-center gap-1 ${sizes[size]}`}>
-      <span className="text-[#F5A623]">⭐</span>
+      <img src={starIcon} alt="star" className={`${iconSizes[size]} object-contain`} />
       <span className="font-semibold text-[#4A3728]">{rating}</span>
       {count && <span className="text-[#7B7068]">({count})</span>}
     </span>
@@ -46,7 +51,7 @@ export const StarRating = ({ rating, count, size = 'sm' }) => {
 /** Distance display */
 export const Distance = ({ km, raw = false }) => (
   <span className="inline-flex items-center gap-1 text-xs text-[#7B7068]">
-    <span>📍</span>
+    <img src={locationIcon} alt="location" className="w-3 h-3 object-contain" />
     <span>{raw ? km : `${km} km`}</span>
   </span>
 );
@@ -54,7 +59,7 @@ export const Distance = ({ km, raw = false }) => (
 /** Price display */
 export const PriceTag = ({ priceRange }) => (
   <span className="inline-flex items-center gap-1 text-xs font-bold text-[#E8623A] bg-[rgba(232,98,58,0.08)] px-2 py-0.5 rounded-md">
-    <span>🔥</span>
+    <img src={priceTagIcon} alt="price tag" className="w-3 h-3 object-contain" />
     {priceRange}
   </span>
 );

@@ -8,7 +8,6 @@ import YoutubeIcon from '../icon/Youtube-icon.png';
 const FOOTER_LINKS = {
   'Trợ giúp': [
     { label: 'Trung tâm trợ giúp', to: '/support' },
-    { label: 'Câu hỏi thường gặp', to: '/support' },
     { label: 'Chính sách bảo mật', to: '/policy' },
     { label: 'Điều khoản sử dụng', to: '/terms' },
   ],

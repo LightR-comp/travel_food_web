@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, StarRating, Distance, PriceTag, Tag } from '../ui/index.jsx';
 import { useLocation } from '../../context/LocationContext';
+import ClockIcon from '../icon/Clock-icon.png';
 
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80';
 
@@ -161,7 +162,7 @@ export const FoodCard = ({ restaurant, featured = false, variant = 'trending' })
           {!isSpots && formatPriceVND(price_range) && <PriceTag priceRange={formatPriceVND(price_range)} />}
           {open_time && close_time && (
             <p className="text-[0.72rem] text-[#7B7068] flex items-center gap-1.5 mt-2 flex-wrap">
-              <span>🕐</span>
+              <img src={ClockIcon} alt="clock" className="w-3.5 h-3.5 object-contain" />
               <span>{open_time} - {close_time}</span>
               <span className={`text-[0.68rem] font-bold px-1.5 py-0.5 rounded transition-colors ${isOpenRealTime ? 'text-green-600 bg-green-50' : 'text-red-500 bg-red-50'}`}>
                 {isOpenRealTime ? 'Đang mở cửa' : 'Đã đóng cửa'}
@@ -205,7 +206,7 @@ export const FoodCard = ({ restaurant, featured = false, variant = 'trending' })
         {!isSpots && formatPriceVND(price_range) && <PriceTag priceRange={formatPriceVND(price_range)} />}
         {open_time && close_time && (
           <p className="text-[0.72rem] text-[#7B7068] flex items-center gap-1.5 mt-2 flex-wrap">
-            <span>🕐</span>
+            <img src={ClockIcon} alt="clock" className="w-3.5 h-3.5 object-contain" />
             <span>{open_time} - {close_time}</span>
             <span className={`text-[0.68rem] font-bold px-1.5 py-0.5 rounded transition-colors ${isOpenRealTime ? 'text-green-600 bg-green-50' : 'text-red-500 bg-red-50'}`}>
               {isOpenRealTime ? 'Đang mở cửa' : 'Đã đóng cửa'}

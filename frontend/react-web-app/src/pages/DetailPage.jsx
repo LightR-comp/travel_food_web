@@ -9,6 +9,10 @@ import StarRating from '../components/ui/StarRating';
 import BioModal from '../components/detail/BioModal';
 import { useAuth } from '../context/AuthContext';
 import { useLocation as useGeoLocation } from '../context/LocationContext';
+import locationIcon from '../components/icon/location-icon.png';
+import priceTagIcon from '../components/icon/price tag-icon.png';
+import clockIcon from '../components/icon/Clock-icon.png';
+import starIcon from '../components/icon/star-icon.png';
 
 import { Spinner } from '../components/ui/index.jsx';
 import { getRestaurantByIdApi } from '../api/restaurantApi';
@@ -244,16 +248,11 @@ const DetailPage = () => {
           {/* Left: info */}
           <div className="flex-1">
 
-            {/* ── Name + bookmark ── */}
-            <div className="flex items-start justify-between mb-3">
-              <h1 className="font-[Baloo_2,sans-serif] text-3xl font-extrabold text-[#2C1810] leading-tight pr-3">
+            {/* ── Name ── */}
+            <div className="mb-3">
+              <h1 className="font-[Baloo_2,sans-serif] text-3xl font-extrabold text-[#2C1810] leading-tight">
                 {name}
               </h1>
-              <button className="flex-shrink-0 w-9 h-9 rounded-full border border-[#E0D3C8] flex items-center justify-center hover:bg-[#FFF8EE] transition-colors mt-1">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7B7068" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
-                </svg>
-              </button>
             </div>
 
             {/* ── Tags row + rating ── */}
@@ -283,11 +282,11 @@ const DetailPage = () => {
 
             {/* ── Address ── */}
             <p className="flex items-start gap-2 mb-4">
-              <span className="text-pink-500 text-lg flex-shrink-0 mt-0.5">📍</span>
+              <img src={locationIcon} alt="location" className="w-5 h-5 object-contain flex-shrink-0 mt-0.5" />
               <span className="text-[#4A3728] text-sm leading-relaxed">{contact.address}</span>
               {distanceDisplay && (
                 <span className="inline-flex items-center gap-1 text-xs text-[#7B7068] bg-[#FFF8EE] px-2 py-0.5 rounded-md border border-[#F5EDD8] flex-shrink-0 mt-0.5">
-                  📍 {distanceDisplay}
+                  <img src={locationIcon} alt="location" className="w-3.5 h-3.5 object-contain" /> {distanceDisplay}
                 </span>
               )}
             </p>
@@ -296,7 +295,7 @@ const DetailPage = () => {
             <div className="grid grid-cols-2 gap-4 mb-5">
               {/* Left: hours */}
               <div className="flex items-start gap-2">
-                <span className="text-lg flex-shrink-0 mt-0.5">🕐</span>
+                <img src={clockIcon} alt="clock" className="w-5 h-5 object-contain flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-[#2C1810] text-sm">Giờ mở cửa:</p>
                   <p className="text-sm text-[#4A3728]">• {operating_hours.schedule}</p>
@@ -404,7 +403,7 @@ const DetailPage = () => {
 
               {/* Rating */}
               <div className="flex items-start gap-3 mb-4">
-                <span className="text-2xl flex-shrink-0 mt-0.5">⭐</span>
+                <img src={starIcon} alt="star" className="w-6 h-6 object-contain flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs text-[#7B7068] mb-1">Đánh giá</p>
                   <StarRating rating={meta.rating} showMax={false} />
@@ -413,7 +412,7 @@ const DetailPage = () => {
 
               {/* Hours */}
               <div className="flex items-start gap-3 mb-4">
-                <span className="text-2xl flex-shrink-0 mt-0.5">🕐</span>
+                <img src={clockIcon} alt="clock" className="w-6 h-6 object-contain flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs text-[#7B7068] mb-1">Giờ mở cửa</p>
                   <p className={`text-sm font-semibold mb-1 ${operating_hours.is_open_now ? 'text-green-600' : 'text-red-500'}`}>
@@ -427,7 +426,7 @@ const DetailPage = () => {
 
               {/* Price range */}
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-2xl flex-shrink-0">🏷️</span>
+                <img src={priceTagIcon} alt="price tag" className="w-6 h-6 object-contain flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs text-[#7B7068] mb-0.5">Khoảng giá</p>
                   <p className="text-sm font-medium text-[#2C1810]">{meta.price_range}</p>

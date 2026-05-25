@@ -366,52 +366,6 @@ const ForumPostPage = () => {
                 </div>
               </FadeSection>
 
-              {/* Tags */}
-              <FadeSection delay={240}>
-                <div className="bg-white rounded-2xl border border-[#F5EDD8] p-6 sm:p-8 mb-6">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#7B7068] mb-2">
-                    🏷️ Tags (tối đa 5)
-                  </label>
-
-                  <div className="flex flex-wrap items-center gap-2 p-3 rounded-xl bg-[#FFF8EE] border border-[#F5EDD8] focus-within:border-[#E8623A] focus-within:ring-2 focus-within:ring-[#E8623A]/15 transition-all min-h-[48px]">
-                    {form.tags.map(tag => (
-                      <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#E8623A] text-white text-xs font-semibold animate-scale-in">
-                        {tag}
-                        <button type="button" onClick={() => removeTag(tag)} className="hover:bg-white/20 rounded-full w-4 h-4 flex items-center justify-center text-[0.6rem] transition-colors">
-                          ✕
-                        </button>
-                      </span>
-                    ))}
-                    {form.tags.length < 5 && (
-                      <input
-                        type="text"
-                        value={tagInput}
-                        onChange={e => setTagInput(e.target.value)}
-                        onKeyDown={handleTagKeyDown}
-                        placeholder={form.tags.length === 0 ? 'Nhập tag rồi nhấn Enter...' : 'Thêm tag...'}
-                        className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-[#2C1810] placeholder:text-[#C8BEB5]"
-                      />
-                    )}
-                  </div>
-
-                  {/* Suggested tags */}
-                  <div className="mt-3">
-                    <span className="text-[0.65rem] text-[#7B7068] font-medium">Gợi ý:</span>
-                    <div className="flex flex-wrap gap-1.5 mt-1.5">
-                      {POPULAR_TAGS.filter(t => !form.tags.includes(t)).slice(0, 8).map(tag => (
-                        <button
-                          key={tag}
-                          type="button"
-                          onClick={() => addTag(tag)}
-                          className="px-2.5 py-1 rounded-full bg-[#FFF8EE] text-[#E8623A] text-[0.65rem] font-semibold border border-[#F5EDD8] hover:bg-[#E8623A] hover:text-white transition-all duration-300"
-                        >
-                          + {tag}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </FadeSection>
 
               {/* Submit */}
               <FadeSection delay={320}>

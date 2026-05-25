@@ -277,7 +277,7 @@ const ForumPage = () => {
             {/* Rules card */}
             <div className="bg-gradient-to-br from-[#FFF8EE] to-[#FDECD8] rounded-2xl border border-[#F5EDD8] p-5">
               <h3 className="font-bold text-[#2C1810] mb-3 flex items-center gap-2">
-                📋 Nội quy
+                   Nội quy
               </h3>
               <ul className="space-y-2 text-xs text-[#4A3728]">
                 <li className="flex items-start gap-2"><span className="text-[#E8623A] mt-0.5">•</span> Tôn trọng mọi thành viên</li>

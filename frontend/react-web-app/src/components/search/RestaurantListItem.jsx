@@ -1,5 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { StarRating, Distance, PriceTag, Tag, Badge } from '../ui/index.jsx';
+import locationIcon from '../icon/location-icon.png';
+import priceTagIcon from '../icon/price tag-icon.png';
+import clockIcon from '../icon/Clock-icon.png';
 
 // Helper: Check open status in real-time based on current local time
 const checkIsOpenRealTime = (openTimeStr, closeTimeStr) => {
@@ -90,7 +93,7 @@ const RestaurantListItem = ({ restaurant }) => {
 
           {/* Address */}
           <p className="flex items-start gap-1.5 mt-2 text-sm text-[#4A3728]">
-            <span className="flex-shrink-0 mt-0.5">📍</span>
+            <img src={locationIcon} alt="location" className="w-4 h-4 object-contain flex-shrink-0 mt-0.5" />
             <span>
               {address}
               {distance_km > 0 && (
@@ -101,14 +104,14 @@ const RestaurantListItem = ({ restaurant }) => {
 
           {/* Price */}
           <p className="flex items-center gap-1.5 mt-2 text-sm text-[#4A3728]">
-            <span>🏷️</span>
+            <img src={priceTagIcon} alt="price tag" className="w-4 h-4 object-contain flex-shrink-0" />
             <span className="font-medium">{formattedPrice}</span>
           </p>
 
           {/* Operating hours */}
           {open_time && close_time && (
             <p className="flex items-center gap-1.5 mt-2 text-sm text-[#4A3728]">
-              <span>🕐</span>
+              <img src={clockIcon} alt="clock" className="w-4 h-4 object-contain flex-shrink-0" />
               <span>
                 {open_time} - {close_time}
                 <span className={`ml-2 text-xs font-semibold ${isOpenRealTime ? 'text-green-600' : 'text-red-500'}`}>

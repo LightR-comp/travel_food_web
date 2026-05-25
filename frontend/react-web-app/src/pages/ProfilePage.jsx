@@ -197,8 +197,13 @@ const ProfilePage = () => {
   return (
     <div className="max-w-[1200px] mx-auto px-6 py-8">
       <div className="bg-white rounded-2xl shadow-lg border border-[#F5EDD8] overflow-hidden">
-
-        <div className="bg-gradient-to-r from-[#E8623A] to-[#C04D2B] px-6 py-8">
+      {/* Header */}
+        <div
+          className="px-6 py-8 relative overflow-hidden bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url('https://24hstore.vn/upload_images/images/hinh-nen-may-tinh/hinh_nen_phong_canh_(5).jpg')`
+          }}
+        >
           <div className="flex items-center gap-4">
 
             <div className="relative group">

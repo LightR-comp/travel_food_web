@@ -6,9 +6,9 @@ from core.ai_config import shared_model
 
 def identify_dish_from_image(image_b64: str, message: str):
     """
-    Sử dụng Gemini Multimodal để nhận diện món ăn và trả về công thức.
+    Sử dụng Gemini Multimodal để nhận diện món ăn.
     :param image_b64: Chuỗi base64 của hình ảnh.
-    :param message: Tin nhắn của người dùng, dùng để xác định có cần công thức không.
+    :param message: Tin nhắn của người dùng, dùng để xác định có cần nguyên liệu không.
     """
     try:
         # 1. Giải mã ảnh
@@ -22,7 +22,7 @@ def identify_dish_from_image(image_b64: str, message: str):
             Bạn là một chuyên gia ẩm thực tài ba. Hãy nhìn vào bức ảnh này và:
             1. Xác định chính xác tên món ăn (Vietnamese Name).
             2. Liệt kê các nguyên liệu chính để làm món này.
-            3. Cung cấp các bước thực hiện món ăn đó (công thức tóm tắt).
+            3. Cung cấp công thức (nếu người user có yêu cầu).
 
             Yêu cầu trả về định dạng JSON duy nhất như sau:
             {

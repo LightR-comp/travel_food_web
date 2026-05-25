@@ -58,7 +58,7 @@ const ChatBubble = ({ role, text, timestamp, suggestedPlaces = [], user, image }
 
       {!isBot && (
         user?.avatar_url ? (
-          <img src={user.avatar_url} alt="user" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+          <img src={user.avatar_url} alt="user" referrerPolicy="no-referrer" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
         ) : (
           <div className="w-8 h-8 rounded-full bg-[#E8623A] flex items-center justify-center flex-shrink-0 text-white font-bold text-xs">
             {user?.name?.[0]?.toUpperCase() || 'U'}

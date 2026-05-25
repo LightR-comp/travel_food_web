@@ -184,6 +184,7 @@ const Header = () => {
                   <img
                     src={user.avatar_url}
                     alt={user.username}
+                    referrerPolicy="no-referrer"
                     className="w-7 h-7 rounded-full object-cover border border-[#E8623A]/15"
                   />
                 ) : (

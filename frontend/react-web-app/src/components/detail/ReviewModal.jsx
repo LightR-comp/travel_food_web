@@ -9,14 +9,6 @@ const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => 
   const [overallRating, setOverallRating] = useState(0);
   const [hoverOverall, setHoverOverall] = useState(0);
 
-  const [foodRating, setFoodRating] = useState(0);
-  const [hoverFood, setHoverFood] = useState(0);
-
-  const [serviceRating, setServiceRating] = useState(0);
-  const [hoverService, setHoverService] = useState(0);
-
-  const [ambianceRating, setAmbianceRating] = useState(0);
-  const [hoverAmbiance, setHoverAmbiance] = useState(0);
 
   const [reviewText, setReviewText] = useState("");
   const [files, setFiles] = useState([]);
@@ -36,12 +28,6 @@ const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => 
       }
       setOverallRating(0);
       setHoverOverall(0);
-      setFoodRating(0);
-      setHoverFood(0);
-      setServiceRating(0);
-      setHoverService(0);
-      setAmbianceRating(0);
-      setHoverAmbiance(0);
       setReviewText("");
       setFiles([]);
       setIsSubmitting(false);
@@ -168,23 +154,6 @@ const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => 
     );
   };
 
-  const RatingRow = ({ label, rating, hover, setRating, setHover }) => (
-    <div className="flex items-center justify-between py-2">
-      <span className="text-[#4A3728] font-medium">{label}</span>
-      <div className="flex items-center gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <StarIcon 
-            key={star}
-            size="md"
-            filled={star <= (hover || rating)}
-            onMouseEnter={() => setHover(star)}
-            onMouseLeave={() => setHover(0)}
-            onClick={() => setRating(star)}
-          />
-        ))}
-      </div>
-    </div>
-  );
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-opacity" onClick={!isSubmitting ? onClose : undefined}>
@@ -205,7 +174,7 @@ const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => 
           {/* User Info */}
           <div className="flex items-center gap-3 mt-2">
             <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
-              <img src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=random`} alt="Avatar" className="w-full h-full object-cover" />
+              <img src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=random`} alt="Avatar" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
             </div>
             <div>
               <p className="font-bold text-sm text-[#2C1810]">{user.name}</p>
@@ -234,12 +203,6 @@ const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => 
             ))}
           </div>
 
-          {/* Criteria Ratings */}
-          <div className="bg-[#F6EFE0] rounded-2xl p-4 border border-[#E8DFC9] space-y-1 shadow-sm">
-            <RatingRow label="Đồ ăn" rating={foodRating} hover={hoverFood} setRating={setFoodRating} setHover={setHoverFood} />
-            <RatingRow label="Dịch vụ" rating={serviceRating} hover={hoverService} setRating={setServiceRating} setHover={setHoverService} />
-            <RatingRow label="Bầu không khí" rating={ambianceRating} hover={hoverAmbiance} setRating={setAmbianceRating} setHover={setHoverAmbiance} />
-          </div>
 
           {/* Textarea */}
           <div>

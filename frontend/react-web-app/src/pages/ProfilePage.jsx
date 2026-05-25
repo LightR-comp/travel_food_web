@@ -127,6 +127,7 @@ const ProfilePage = () => {
               <img
                 src={userData?.avatar_url || user?.avatar_url}
                 alt={userData?.name || user?.name}
+                referrerPolicy="no-referrer"
                 className="w-20 h-20 rounded-full object-cover border border-white/40 shadow-sm"
               />
             ) : (

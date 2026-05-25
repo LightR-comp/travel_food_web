@@ -18,9 +18,7 @@ import ForumDetailPage from './pages/ForumDetailPage';
 import ForumPostPage from './pages/ForumPostPage';
 import AboutPage  from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
-import PolicyPage from './pages/PolicyPage';
 import SupportPage from './pages/SupportPage';
-import TermsPage  from './pages/TermsPage';
 import ProfilePage from './pages/ProfilePage';
 
 // Pages that should NOT show the main layout (header/footer/chatbot)
@@ -41,7 +39,7 @@ const AppLayout = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen pb-20">
+    <div className="flex flex-col min-h-screen">
       <Header />
       <NavTabs />
 
@@ -56,9 +54,7 @@ const AppLayout = () => {
           <Route path="/forum/:id" element={<ForumDetailPage />} />
           <Route path="/about"     element={<AboutPage />} />
           <Route path="/contact"   element={<ContactPage />} />
-          <Route path="/policy"    element={<PolicyPage />} />
           <Route path="/support"   element={<SupportPage />} />
-          <Route path="/terms"     element={<TermsPage />} />
           {/* Catch-all */}
           <Route path="*" element={
             <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">

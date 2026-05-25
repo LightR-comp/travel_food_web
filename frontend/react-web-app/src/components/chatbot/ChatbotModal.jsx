@@ -5,6 +5,14 @@ import botAvatar from '../../assets/avatar_chatbot.jpg';
 
 const ChatBubble = ({ role, text, timestamp, suggestedPlaces = [], user, image }) => {
   const isBot = role === 'bot';
+  
+  const getFullAvatarUrl = (avatarPath) => {
+    if (!avatarPath) return null;
+    if (avatarPath.startsWith('http')) return avatarPath;
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+    return `${API_BASE_URL}${avatarPath}`;
+  };
+
   return (
     <div className={`flex items-end gap-2 ${isBot ? 'flex-row' : 'flex-row-reverse'}`}>
       {isBot && (
@@ -58,7 +66,7 @@ const ChatBubble = ({ role, text, timestamp, suggestedPlaces = [], user, image }
 
       {!isBot && (
         user?.avatar_url ? (
-          <img src={user.avatar_url} alt="user" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+          <img src={getFullAvatarUrl(user.avatar_url)} alt="user" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
         ) : (
           <div className="w-8 h-8 rounded-full bg-[#E8623A] flex items-center justify-center flex-shrink-0 text-white font-bold text-xs">
             {user?.name?.[0]?.toUpperCase() || 'U'}
@@ -118,7 +126,13 @@ const ChatbotModal = ({ onClose }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showOptions]);
 
-  // Xử lý chọn ảnh (giữ nguyên từ version 2)
+  const getFullAvatarUrl = (avatarPath) => {
+    if (!avatarPath) return null;
+    if (avatarPath.startsWith('http')) return avatarPath;
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+    return `${API_BASE_URL}${avatarPath}`;
+  };
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file || !file.type.startsWith('image/')) return;
@@ -141,12 +155,10 @@ const ChatbotModal = ({ onClose }) => {
     inputRef.current?.focus();
   };
 
-  // Hàm xử lý gửi tin nhắn (kết hợp cả text và ảnh từ version 2)
   const handleSend = async () => {
     const msg = input.trim();
     if ((!msg && !selectedImage) || typing) return;
 
-    // Tạo tin nhắn user
     const userMsg = {
       id: Date.now(),
       role: 'user',
@@ -158,7 +170,6 @@ const ChatbotModal = ({ onClose }) => {
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
     
-    // Lưu lại ảnh để gửi
     const imageToSend = selectedImage;
     setSelectedImage(null);
     setImagePreview(null);
@@ -169,7 +180,6 @@ const ChatbotModal = ({ onClose }) => {
     setShowOptions(false);
 
     try {
-      // Gửi message lên API (tương tự version 1 nhưng hỗ trợ cả ảnh)
       const res = await sendChatMessageApi({
         user_id: user?.id || 0,
         message: msg || (imageToSend ? 'Hãy xem ảnh này và gợi ý món ăn phù hợp' : ''),
@@ -180,11 +190,9 @@ const ChatbotModal = ({ onClose }) => {
 
       let replyText = '';
       
-      // Xử lý response giống version 1
       if (res.data?.reply) {
         replyText = res.data.reply;
       } else if (res.data?.dish_name) {
-        // Luồng nhận diện ảnh
         replyText = `🍽️ Tôi nhận ra đây là món **${res.data.dish_name}**!\n\n` +
           `**Nguyên liệu:** ${res.data.ingredients?.join(', ')}\n\n` +
           `**Công thức:** ${res.data.recipe}`;
@@ -228,7 +236,15 @@ const ChatbotModal = ({ onClose }) => {
       id="chatbot-modal"
     >
       <div className="flex items-center gap-3 px-4 py-3.5 bg-gradient-to-r from-[#F4836A] to-[#E85D42] text-white flex-shrink-0">
-        <img src={botAvatar} alt="bot" className="w-9 h-9 rounded-full object-cover" />
+        {user?.avatar_url ? (
+          <img 
+            src={`${getFullAvatarUrl(user.avatar_url)}?t=${Date.now()}`}
+            alt="user" 
+            className="w-9 h-9 rounded-full object-cover border-2 border-white/50"
+          />
+        ) : (
+          <img src={botAvatar} alt="bot" className="w-9 h-9 rounded-full object-cover" />
+        )}
         <div className="flex-1">
           <p className="font-bold text-sm">Trợ lý ẩm thực</p>
           <p className="text-xs opacity-80">YumMap AI • Đang hoạt động</p>
@@ -257,7 +273,6 @@ const ChatbotModal = ({ onClose }) => {
         {typing && <TypingIndicator />}
       </div>
 
-      {/* Preview ảnh - tính năng mới từ version 2 */}
       {imagePreview && (
         <div className="px-3 py-2 border-t border-[#F5EDD8] bg-white flex items-center gap-2">
           <img src={imagePreview} alt="Preview" className="w-10 h-10 rounded-lg object-cover" />
@@ -343,15 +358,11 @@ export const ChatbotButton = ({ onClick, isOpen }) => {
       return;
     }
 
-    // Tự động hiển thị sau 15 giây
     const timer = setTimeout(() => {
       setShowAutoTooltip(true);
-
-      // Tự động tắt sau 8 giây tiếp theo để tránh gây phiền cho người dùng
       const dismissTimer = setTimeout(() => {
         setShowAutoTooltip(false);
       }, 8000);
-
       return () => clearTimeout(dismissTimer);
     }, 15000);
 
@@ -367,12 +378,10 @@ export const ChatbotButton = ({ onClick, isOpen }) => {
 
   return (
     <div className="fixed bottom-7 right-7 z-[200] flex flex-col items-end group">
-      {/* Speech bubble tooltip on hover or auto timer */}
       {!isOpen && (
         <div className={tooltipClasses}>
           <div className="relative">
             Bạn cần giúp gì không?
-            {/* Tiny arrow at the bottom right */}
             <div className="absolute -bottom-4 right-5 w-0 h-0 border-8 border-transparent border-t-[#E85D42]" />
           </div>
         </div>

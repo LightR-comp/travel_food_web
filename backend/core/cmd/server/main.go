@@ -13,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"backend/core/internal/config"
+	"backend/core/internal/handlers"
 	"backend/core/internal/routes"
 	"backend/core/internal/services"
 )
@@ -20,16 +21,23 @@ import (
 func main() {
 	// Load config
 	config.LoadConfig()
-	// Khởi tạo Database (
+
+	// Khởi tạo Database
 	services.InitDB()
+
+	services.InitServiceDB(services.GetDB())
+
+	// Khởi tạo Cloudinary
 	services.InitCloudinary()
-	// Init Firebase (THÊM DÒNG NÀY)
+
+	// Init Firebase
 	if err := services.InitFirebase(context.Background()); err != nil {
 		panic(err)
 	}
 
-	// Init Cloudinary
-	services.InitCloudinary()
+	// Khởi tạo handlers với database connection
+	handlers.InitUserHandler(services.GetDB())
+
 	// Tạo server
 	r := gin.Default()
 
@@ -59,6 +67,6 @@ func main() {
 	port := config.AppConfig.Port
 	fmt.Println("Server is running on port:", port)
 
-	// CHẠY SERVER (QUAN TRỌNG)
+	// CHẠY SERVER
 	r.Run(":" + port)
 }

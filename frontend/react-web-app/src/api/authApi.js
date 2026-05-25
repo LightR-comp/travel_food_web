@@ -4,7 +4,16 @@ import axiosInstance from './axiosInstance';
 // Auth API – Go backend
 // Base URL (axiosInstance): /api/v1
 // ============================================================
-
+axiosInstance.interceptors.response.use(
+  (response) => {
+    console.log('API Response:', response.config.url, response.data);
+    return response;
+  },
+  (error) => {
+    console.error('API Error:', error.config?.url, error.response?.data);
+    return Promise.reject(error);
+  }
+);
 /**
  * POST /api/v1/auth/login
  * Body: { username, password }
@@ -49,5 +58,49 @@ export const getMeApi = async () => {
  */
 export const updateProfileApi = async (payload) => {
   const { data } = await axiosInstance.put('/me', payload);
+  return data;
+};
+
+// ============================================================
+// Avatar API – Thêm mới
+// ============================================================
+
+/**
+ * POST /api/v1/me/avatar
+ * Upload avatar file
+ * Body: FormData với key 'avatar'
+ * Response: { success, message, data: { avatar_url }, error }
+ */
+export const uploadAvatarApi = async (file) => {
+  const formData = new FormData();
+  formData.append('avatar', file);
+  
+  const { data } = await axiosInstance.post('/me/avatar', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  
+  return data;
+};
+
+/**
+ * DELETE /api/v1/me/avatar
+ * Xóa avatar
+ * Response: { success, message, error }
+ */
+export const deleteAvatarApi = async () => {
+  const { data } = await axiosInstance.delete('/me/avatar');
+  return data;
+};
+
+/**
+ * PUT /api/v1/me/avatar
+ * Cập nhật avatar URL (nếu backend hỗ trợ update trực tiếp URL)
+ * Body: { avatar_url }
+ * Response: { success, message, data: { avatar_url }, error }
+ */
+export const updateAvatarApi = async (avatarUrl) => {
+  const { data } = await axiosInstance.put('/me/avatar', { avatar_url: avatarUrl });
   return data;
 };

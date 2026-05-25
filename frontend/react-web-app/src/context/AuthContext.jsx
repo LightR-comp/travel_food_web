@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { loginApi, registerApi, logoutApi, getMeApi } from '../api/AuthAPI';
+import { loginApi, registerApi, logoutApi, getMeApi, uploadAvatarApi, deleteAvatarApi } from '../api/AuthAPI';
 import { auth, googleProvider, facebookProvider } from '../config/firebase';
 import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 
@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   // Helper chuẩn hóa dữ liệu user
   const normalizeUserData = useCallback((u) => {
@@ -20,8 +21,7 @@ export const AuthProvider = ({ children }) => {
       ...u,
       username: u.username || u.name || u.email?.split('@')[0] || 'User',
       full_name: u.full_name || u.name || 'User',
-      avatar_url: avatar,
-      avatar: avatar
+      avatar_url: u.avatar_url || u.avatar || null,
     };
   }, []);
 
@@ -41,27 +41,15 @@ export const AuthProvider = ({ children }) => {
     }
   }, [normalizeUserData]);
 
-  //useEffect để bắt redirect result
+  // useEffect để bắt redirect result (fix duplicate)
   useEffect(() => {
     getRedirectResult(auth).then(async (result) => {
       if (!result) return;
       const idToken = await result.user.getIdToken(true);
-      const data = await sendOAuthToken(idToken, 'facebook');
+      const data = await sendOAuthToken(idToken, result.providerId === 'google.com' ? 'google' : 'facebook');
       localStorage.setItem('yummap_token', data.data.token);
       setUser(normalizeUserData(data.data.user));
     }).catch(console.error);
-  }, [normalizeUserData]);
-
-  useEffect(() => {
-  getRedirectResult(auth)
-    .then(async (result) => {
-      if (!result) return; // không phải redirect flow, bỏ qua
-      const idToken = await result.user.getIdToken(true);
-      const data = await sendOAuthToken(idToken, 'facebook');
-      localStorage.setItem('yummap_token', data.data.token);
-      setUser(normalizeUserData(data.data.user));
-    })
-    .catch((err) => console.error('Redirect result error:', err));
   }, [normalizeUserData]);
 
   // ---- Local login ----
@@ -93,6 +81,99 @@ export const AuthProvider = ({ children }) => {
     setUser(prev => ({ ...prev, ...updatedData }));
   }, []);
 
+  // ========== AVATAR FUNCTIONS ==========
+  
+  // Upload avatar
+  const uploadAvatar = useCallback(async (file) => {
+    setUploadingAvatar(true);
+    setError(null);
+    
+    try {
+      const response = await uploadAvatarApi(file);
+      
+      if (response.success) {
+        const newAvatarUrl = response.data?.avatar_url;
+        
+        // Cập nhật user state
+        setUser(prev => ({ 
+          ...prev, 
+          avatar_url: newAvatarUrl,
+          avatar: newAvatarUrl 
+        }));
+        
+        // Cập nhật localStorage nếu cần
+        const storedUser = localStorage.getItem('yummap_user');
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          userData.avatar_url = newAvatarUrl;
+          localStorage.setItem('yummap_user', JSON.stringify(userData));
+        }
+        
+        return { success: true, avatar_url: newAvatarUrl };
+      }
+      
+      return { success: false, error: response.message };
+    } catch (err) {
+      console.error('Upload avatar error:', err);
+      setError(err.message || 'Upload avatar thất bại');
+      return { success: false, error: err.message };
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }, []);
+
+  // Delete avatar
+  const deleteAvatar = useCallback(async () => {
+    setUploadingAvatar(true);
+    setError(null);
+    
+    try {
+      const response = await deleteAvatarApi();
+      
+      if (response.success) {
+        // Cập nhật user state
+        setUser(prev => ({ 
+          ...prev, 
+          avatar_url: null,
+          avatar: null 
+        }));
+        
+        // Cập nhật localStorage
+        const storedUser = localStorage.getItem('yummap_user');
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          userData.avatar_url = null;
+          localStorage.setItem('yummap_user', JSON.stringify(userData));
+        }
+        
+        return { success: true };
+      }
+      
+      return { success: false, error: response.message };
+    } catch (err) {
+      console.error('Delete avatar error:', err);
+      setError(err.message || 'Xóa avatar thất bại');
+      return { success: false, error: err.message };
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }, []);
+
+  // Refresh user data (lấy thông tin mới nhất từ server)
+  const refreshUser = useCallback(async () => {
+    try {
+      const response = await getMeApi();
+      if (response.success) {
+        setUser(normalizeUserData(response.data));
+        return { success: true, user: response.data };
+      }
+      return { success: false, error: response.message };
+    } catch (err) {
+      console.error('Refresh user error:', err);
+      return { success: false, error: err.message };
+    }
+  }, [normalizeUserData]);
+
   // ---- Helper: send idToken to Go backend ----
   const sendOAuthToken = async (idToken, provider) => {
     const response = await fetch(`${API_URL}/auth/oauth`, {
@@ -118,12 +199,12 @@ export const AuthProvider = ({ children }) => {
         }
     };
   };
+  
   // ---- Google login ----
   const loginWithGoogle = useCallback(async () => {
     setError(null);
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      // Force refresh token
       const idToken = await result.user.getIdToken(true);
       const data = await sendOAuthToken(idToken, 'google');
 
@@ -162,6 +243,10 @@ export const AuthProvider = ({ children }) => {
       user,
       setUser,
       updateUser,
+      uploadAvatar,      // Thêm function upload avatar
+      deleteAvatar,      // Thêm function xóa avatar
+      refreshUser,       // Thêm function refresh user data
+      uploadingAvatar,   // Thêm state upload status
       loading,
       error,
       login,

@@ -96,7 +96,7 @@ const ContactPage = () => {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-white/5 rounded-full" />
 
           <div className="relative z-10 max-w-[1200px] mx-auto px-6 text-center">
-            <h1 className="font-[Baloo_2,sans-serif] text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 bg-gradient-to-r from-white via-[#F4845A] to-[#F5A623] bg-clip-text text-transparent drop-shadow-md">
+            <h1 className="font-iciel text-3xl sm:text-4xl lg:text-5xl mb-4 bg-gradient-to-r from-white via-[#F4845A] to-[#F5A623] bg-clip-text text-transparent drop-shadow-md py-2 leading-normal">
               Liên Hệ Chúng Tôi
             </h1>
             <p className="text-white/95 max-w-lg mx-auto text-sm sm:text-base leading-relaxed drop-shadow-sm font-medium">

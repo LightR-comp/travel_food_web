@@ -136,6 +136,13 @@ const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => 
     }
   };
 
+  const getFullAvatarUrl = (avatarPath) => {
+    if (!avatarPath) return null;
+    if (avatarPath.startsWith('http')) return avatarPath;
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+    return `${API_BASE_URL}${avatarPath}`;
+  };
+
   const StarIcon = ({ filled, onMouseEnter, onMouseLeave, onClick, size = "md" }) => {
     const baseClass = size === "lg" ? "w-10 h-10" : "w-7 h-7";
     return (
@@ -174,10 +181,24 @@ const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => 
           {/* User Info */}
           <div className="flex items-center gap-3 mt-2">
             <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
-              <img src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=random`} alt="Avatar" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+              {(user.avatar_url || user.avatar) ? (
+                <img 
+                  src={getFullAvatarUrl(user.avatar_url || user.avatar)} 
+                  alt="Avatar" 
+                  referrerPolicy="no-referrer" 
+                  className="w-full h-full object-cover" 
+                />
+              ) : (
+                <img 
+                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name || user.username || user.name || 'User')}&background=random`} 
+                  alt="Avatar" 
+                  referrerPolicy="no-referrer" 
+                  className="w-full h-full object-cover" 
+                />
+              )}
             </div>
             <div>
-              <p className="font-bold text-sm text-[#2C1810]">{user.name}</p>
+              <p className="font-bold text-sm text-[#2C1810]">{user.full_name || user.username || user.name}</p>
               <p className="text-[11px] text-[#7B7068] flex items-center gap-1 mt-0.5">
                 Đăng công khai trên YumMap
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"os"
 	"sync"
-
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
 	"google.golang.org/api/option"
@@ -23,23 +22,27 @@ func InitFirebase(ctx context.Context) error {
 	var errInit error
 
 	once.Do(func() {
-		credPath := os.Getenv("FIREBASE_CREDENTIAL_PATH")
-		if credPath == "" {
-			errInit = fmt.Errorf("missing FIREBASE_CREDENTIAL_PATH")
-			return
+		firebaseJSON := os.Getenv("FIREBASE_CREDENTIALS")
+		var opt option.ClientOption
+
+		if firebaseJSON != "" {
+			opt = option.WithCredentialsJSON([]byte(firebaseJSON))
+		} else {
+			opt = option.WithCredentialsFile("../../config/serviceAccountKey.json")
 		}
 
-		app, err := firebase.NewApp(ctx, nil, option.WithCredentialsFile(credPath))
+		app, err := firebase.NewApp(ctx, nil, opt)
 		if err != nil {
-			errInit = err
+			errInit = fmt.Errorf("failed to initialize firebase app: %v", err)
 			return
 		}
 
 		client, err := app.Auth(ctx)
 		if err != nil {
-			errInit = err
+			errInit = fmt.Errorf("failed to initialize firebase auth client: %v", err)
 			return
 		}
+		
 		firebaseAuth = client
 	})
 

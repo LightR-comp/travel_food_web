@@ -1,5 +1,5 @@
-USE travel_food_db
-GO
+--USE travel_food_db
+--GO
 
 -- ==========================================
 -- BÌNH THẠNH

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { getMeApi, updateProfileApi, uploadAvatarApi, deleteAvatarApi } from '../api/AuthAPI';
+import { getMeApi, updateProfileApi, uploadAvatarApi, deleteAvatarApi } from '../api/authApi';
 
 const ProfilePage = () => {
   const { user, updateUser } = useAuth();

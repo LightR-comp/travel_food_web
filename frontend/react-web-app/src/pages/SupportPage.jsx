@@ -87,7 +87,16 @@ const SupportPage = () => {
     <div className="min-h-screen bg-[#FAFAF7]">
       {/* Hero */}
       <FadeSection>
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#2C1810] via-[#4A3728] to-[#2C1810] text-white py-16 sm:py-20">
+        <section 
+          className="relative overflow-hidden text-white py-16 sm:py-20"
+          style={{
+            backgroundImage: "url('https://i.pinimg.com/736x/93/34/5e/93345e29805f58551673f2da34a356bc.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+          {/* Dark overlay for text legibility */}
+          <div className="absolute inset-0 bg-[#2C1810]/60 backdrop-blur-[0.5px]" />
           <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#E8623A]/20 rounded-full blur-[100px] animate-pulse" />
           <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-[#F5A623]/15 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '1s' }} />
 

@@ -27,9 +27,12 @@ func InitDB() {
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
+	user := os.Getenv("DB_USER")        
+	password := os.Getenv("DB_PASSWORD") 
 
-	connStr := fmt.Sprintf("sqlserver://%s:%s?database=%s&trusted_connection=yes",
-		host, port, dbName)
+	// Thêm tham số &encrypt=true&trustServerCertificate=true để bẻ khóa TLS Handshake lỗi ban nãy
+	connStr := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s&encrypt=true&trustServerCertificate=true",
+		user, password, host, port, dbName)
 
 	var err error
 	db, err = sql.Open("sqlserver", connStr)
@@ -44,8 +47,12 @@ func InitDB() {
 	db.SetMaxOpenConns(25)
 	db.SetMaxIdleConns(10)
 
-	log.Println("[DB] Kết nối MSSQL thành công.")
+	log.Println("[DB] Kết nối Database thành công.")
 	log.Println("[DB] Database:", os.Getenv("DB_NAME"))
+}
+
+func GetDB() *sql.DB {
+	return db
 }
 
 // ============================================================
@@ -1709,9 +1716,7 @@ func GetChatHistoryByUserID(ctx context.Context, userID int) ([]ChatHistoryEntry
 }
 
 // GetDB trả về database connection để các handler có thể sử dụng
-func GetDB() *sql.DB {
-	return db
-}
+
 
 func UpdateUserName(ctx context.Context, userID int, name string) error {
 	_, err := db.ExecContext(ctx, `

@@ -1,20 +1,20 @@
-USE master; -- Chuyển sang database hệ thống trước
-GO
+-- USE master; -- Chuyển sang database hệ thống trước
+-- GO
 
--- Ngắt tất cả kết nối đang truy cập vào travel_food_db
-ALTER DATABASE travel_food_db SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-GO
+-- -- Ngắt tất cả kết nối đang truy cập vào travel_food_db
+-- ALTER DATABASE travel_food_db SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+-- GO
 
--- Bây giờ mới xóa
-DROP DATABASE IF EXISTS travel_food_db;
-GO
+-- -- Bây giờ mới xóa
+-- DROP DATABASE IF EXISTS travel_food_db;
+-- GO
 
--- Tạo lại
-CREATE DATABASE travel_food_db;
-GO
+-- -- Tạo lại
+-- CREATE DATABASE travel_food_db;
+-- GO
 
-USE travel_food_db;
-GO
+-- USE travel_food_db;
+-- GO
 
 
 -- Bảng Users: Chứa thông tin cơ bản

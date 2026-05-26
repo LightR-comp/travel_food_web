@@ -7,6 +7,7 @@ const TABS = [
   { id: 'search',    label: 'Search',    path: '/search' },
   { id: 'forum',     label: 'Forum',     path: '/forum' },
   { id: 'about',     label: 'About us',  path: '/about' },
+  { id: 'contact',   label: 'Contact',   path: '/contact' },
   { id: 'support',   label: 'Support',   path: '/support' },
 ];
 

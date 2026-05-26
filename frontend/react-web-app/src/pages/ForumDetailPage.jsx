@@ -420,13 +420,7 @@ const ForumDetailPage = () => {
                   {post.title}
                 </h1>
 
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {post.tags && post.tags.map(tag => (
-                    <span key={tag} className="px-3 py-1 rounded-full bg-[#FFF8EE] text-[#E8623A] text-xs font-semibold border border-[#F5EDD8] hover:bg-[#E8623A] hover:text-white transition-all duration-300 cursor-pointer">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+
 
                 {/* Content Render */}
                 <div className="space-y-4">
@@ -485,19 +479,7 @@ const ForumDetailPage = () => {
                   >
                     {liked ? '❤️' : '🤍'} {post.like_count || 0}
                   </button>
-                  <button
-                    onClick={() => setBookmarked(!bookmarked)}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
-                      bookmarked
-                        ? 'bg-[#F5A623] text-white shadow-md'
-                        : 'bg-[#FFF8EE] text-[#4A3728] border border-[#F5EDD8] hover:border-[#F5A623]/30'
-                    }`}
-                  >
-                    {bookmarked ? '🔖' : '📑'} {bookmarked ? 'Đã lưu' : 'Lưu bài'}
-                  </button>
-                  <button className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-[#FFF8EE] text-[#4A3728] border border-[#F5EDD8] hover:border-[#E8623A]/30 transition-all duration-300 ml-auto">
-                    ↗ Chia sẻ
-                  </button>
+
                 </div>
               </div>
             </FadeSection>

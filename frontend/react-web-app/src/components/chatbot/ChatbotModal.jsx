@@ -5,6 +5,14 @@ import botAvatar from '../../assets/avatar_chatbot.jpg';
 
 const ChatBubble = ({ role, text, timestamp, suggestedPlaces = [], user, image }) => {
   const isBot = role === 'bot';
+  
+  const getFullAvatarUrl = (avatarPath) => {
+    if (!avatarPath) return null;
+    if (avatarPath.startsWith('http')) return avatarPath;
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+    return `${API_BASE_URL}${avatarPath}`;
+  };
+
   return (
     <div className={`flex items-end gap-2 ${isBot ? 'flex-row' : 'flex-row-reverse'}`}>
       {isBot && (
@@ -58,7 +66,7 @@ const ChatBubble = ({ role, text, timestamp, suggestedPlaces = [], user, image }
 
       {!isBot && (
         user?.avatar_url ? (
-          <img src={user.avatar_url} alt="user" referrerPolicy="no-referrer" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+          <img src={getFullAvatarUrl(user.avatar_url)} alt="user" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
         ) : (
           <div className="w-8 h-8 rounded-full bg-[#E8623A] flex items-center justify-center flex-shrink-0 text-white font-bold text-xs">
             {user?.name?.[0]?.toUpperCase() || 'U'}
@@ -92,10 +100,12 @@ const ChatbotModal = ({ onClose }) => {
     { id: 1, role: 'bot', text: 'Xin chào! Tôi là trợ lý ẩm thực YumMap 🍜 Bạn muốn tìm quán gì hôm nay?', timestamp: 'Vừa xong', suggestedPlaces: [] },
     { id: 2, role: 'bot', text: 'Hãy cho tôi biết: ngân sách, số người, và bạn muốn ăn gì?', timestamp: null, suggestedPlaces: [] },
   ]);
-  const [input, setInput]             = useState('');
-  const [typing, setTyping]           = useState(false);
+  const [input, setInput] = useState('');
+  const [typing, setTyping] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
-
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  
   const bodyRef      = useRef(null);
   const inputRef     = useRef(null);
   const fileInputRef = useRef(null);
@@ -116,62 +126,11 @@ const ChatbotModal = ({ onClose }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showOptions]);
 
-  const sendImageMessage = async (imageFile) => {
-    const previewUrl = URL.createObjectURL(imageFile);
-
-    const userMsg = {
-      id: Date.now(),
-      role: 'user',
-      text: '',
-      image: previewUrl,
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-      suggestedPlaces: [],
-    };
-    setMessages((prev) => [...prev, userMsg]);
-    setTyping(true);
-    setShowOptions(false);
-
-    try {
-    const res = await sendChatMessageApi({
-      user_id: user?.id || 0,
-      message: 'Hãy xem ảnh này và gợi ý món ăn phù hợp',
-      image: imageFile,
-    });
-
-    if (!res.success) throw new Error(res.error || res.message);
-
-    let replyText = '';
-    if (res.data?.reply) {
-      // Luồng chat thường
-      replyText = res.data.reply;
-    } else if (res.data?.dish_name) {
-      // Luồng nhận diện ảnh
-      replyText = `🍽️ Tôi nhận ra đây là món **${res.data.dish_name}**!\n\n` +
-        `**Nguyên liệu:** ${res.data.ingredients?.join(', ')}\n\n` +
-        `**Công thức:** ${res.data.recipe}`;
-    } else {
-      replyText = 'Đã xử lý ảnh nhưng không có kết quả.';
-    }
-
-    const botMsg = {
-      id: Date.now() + 1,
-      role: 'bot',
-      text: replyText,
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-      suggestedPlaces: res.data?.suggested_places || [],
-    };
-    setMessages((prev) => [...prev, botMsg]);
-  } catch {
-      setMessages((prev) => [...prev, {
-        id: Date.now() + 1,
-        role: 'bot',
-        text: '😅 Xin lỗi, có lỗi xảy ra khi xử lý ảnh. Vui lòng thử lại!',
-        timestamp: null,
-        suggestedPlaces: [],
-      }]);
-    } finally {
-      setTyping(false);
-    }
+  const getFullAvatarUrl = (avatarPath) => {
+    if (!avatarPath) return null;
+    if (avatarPath.startsWith('http')) return avatarPath;
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+    return `${API_BASE_URL}${avatarPath}`;
   };
 
   const handleImageUpload = (e) => {
@@ -190,39 +149,67 @@ const ChatbotModal = ({ onClose }) => {
       return;
     }
 
-    sendImageMessage(file);
-    e.target.value = '';
+    setSelectedImage(file);
+    setImagePreview(URL.createObjectURL(file));
+    setShowOptions(false);
+    inputRef.current?.focus();
   };
 
   const handleSend = async () => {
     const msg = input.trim();
-    if (!msg || typing) return;
+    if ((!msg && !selectedImage) || typing) return;
 
     const userMsg = {
       id: Date.now(),
       role: 'user',
-      text: msg,
-      timestamp: null,
+      text: msg || (selectedImage ? '📸 Đã gửi một ảnh' : ''),
+      image: imagePreview,
+      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
       suggestedPlaces: [],
     };
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
+    
+    const imageToSend = selectedImage;
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
     setTyping(true);
+    setShowOptions(false);
 
     try {
-      const res = await sendChatMessageApi({ user_id: user?.id || 0, message: msg });
+      const res = await sendChatMessageApi({
+        user_id: user?.id || 0,
+        message: msg || (imageToSend ? 'Hãy xem ảnh này và gợi ý món ăn phù hợp' : ''),
+        image: imageToSend,
+      });
 
       if (!res.success) throw new Error(res.error || res.message);
+
+      let replyText = '';
+      
+      if (res.data?.reply) {
+        replyText = res.data.reply;
+      } else if (res.data?.dish_name) {
+        replyText = `🍽️ Tôi nhận ra đây là món **${res.data.dish_name}**!\n\n` +
+          `**Nguyên liệu:** ${res.data.ingredients?.join(', ')}\n\n` +
+          `**Công thức:** ${res.data.recipe}`;
+      } else {
+        replyText = 'Đã xử lý ảnh nhưng không có kết quả.';
+      }
 
       const botMsg = {
         id: Date.now() + 1,
         role: 'bot',
-        text: res.data.reply,
+        text: replyText,
         timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-        suggestedPlaces: res.data.suggested_places || [],
+        suggestedPlaces: res.data?.suggested_places || [],
       };
       setMessages((prev) => [...prev, botMsg]);
-    } catch {
+    } catch (error) {
+      console.error('Chat error:', error);
       setMessages((prev) => [...prev, {
         id: Date.now() + 1,
         role: 'bot',
@@ -236,7 +223,10 @@ const ChatbotModal = ({ onClose }) => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+    if (e.key === 'Enter' && !e.shiftKey) { 
+      e.preventDefault(); 
+      handleSend(); 
+    }
   };
 
   return (
@@ -246,7 +236,15 @@ const ChatbotModal = ({ onClose }) => {
       id="chatbot-modal"
     >
       <div className="flex items-center gap-3 px-4 py-3.5 bg-gradient-to-r from-[#F4836A] to-[#E85D42] text-white flex-shrink-0">
-        <img src={botAvatar} alt="bot" className="w-9 h-9 rounded-full object-cover" />
+        {user?.avatar_url ? (
+          <img 
+            src={`${getFullAvatarUrl(user.avatar_url)}?t=${Date.now()}`}
+            alt="user" 
+            className="w-9 h-9 rounded-full object-cover border-2 border-white/50"
+          />
+        ) : (
+          <img src={botAvatar} alt="bot" className="w-9 h-9 rounded-full object-cover" />
+        )}
         <div className="flex-1">
           <p className="font-bold text-sm">Trợ lý ẩm thực</p>
           <p className="text-xs opacity-80">YumMap AI • Đang hoạt động</p>
@@ -274,6 +272,23 @@ const ChatbotModal = ({ onClose }) => {
         ))}
         {typing && <TypingIndicator />}
       </div>
+
+      {imagePreview && (
+        <div className="px-3 py-2 border-t border-[#F5EDD8] bg-white flex items-center gap-2">
+          <img src={imagePreview} alt="Preview" className="w-10 h-10 rounded-lg object-cover" />
+          <p className="text-xs text-[#7B7068] flex-1 truncate">{selectedImage?.name}</p>
+          <button
+            onClick={() => {
+              setSelectedImage(null);
+              setImagePreview(null);
+              if (fileInputRef.current) fileInputRef.current.value = "";
+            }}
+            className="w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-xs text-gray-600 transition-colors flex-shrink-0"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <div className="relative" id="chatbot-options">
         {showOptions && (
@@ -320,7 +335,7 @@ const ChatbotModal = ({ onClose }) => {
 
           <button
             onClick={handleSend}
-            disabled={!input.trim() || typing}
+            disabled={(!input.trim() && !selectedImage) || typing}
             id="chatbot-send"
             className="w-8 h-8 rounded-full bg-[#F4836A] flex items-center justify-center text-white flex-shrink-0 hover:bg-[#E85D42] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
@@ -343,15 +358,11 @@ export const ChatbotButton = ({ onClick, isOpen }) => {
       return;
     }
 
-    // Tự động hiển thị sau 15 giây
     const timer = setTimeout(() => {
       setShowAutoTooltip(true);
-
-      // Tự động tắt sau 8 giây tiếp theo để tránh gây phiền cho người dùng
       const dismissTimer = setTimeout(() => {
         setShowAutoTooltip(false);
       }, 8000);
-
       return () => clearTimeout(dismissTimer);
     }, 15000);
 
@@ -367,12 +378,10 @@ export const ChatbotButton = ({ onClick, isOpen }) => {
 
   return (
     <div className="fixed bottom-7 right-7 z-[200] flex flex-col items-end group">
-      {/* Speech bubble tooltip on hover or auto timer */}
       {!isOpen && (
         <div className={tooltipClasses}>
           <div className="relative">
             Bạn cần giúp gì không?
-            {/* Tiny arrow at the bottom right */}
             <div className="absolute -bottom-4 right-5 w-0 h-0 border-8 border-transparent border-t-[#E85D42]" />
           </div>
         </div>

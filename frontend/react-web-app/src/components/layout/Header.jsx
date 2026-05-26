@@ -18,8 +18,6 @@ const SearchIcon = () => (
   </svg>
 );
 
-
-
 const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -33,6 +31,21 @@ const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [address, setAddress] = useState('Đang tìm vị trí...');
   const [weather, setWeather] = useState(null);
+  const [avatarTimestamp, setAvatarTimestamp] = useState(Date.now());
+
+  // Force reload avatar khi user thay đổi
+  useEffect(() => {
+    if (user?.avatar_url) {
+      setAvatarTimestamp(Date.now());
+    }
+  }, [user?.avatar_url]);
+
+  const getFullAvatarUrl = (avatarPath) => {
+    if (!avatarPath) return null;
+    if (avatarPath.startsWith('http')) return avatarPath;
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+    return `${API_BASE_URL}${avatarPath}`;
+  };
 
   const fetchWeather = async (lat, lng) => {
     try {
@@ -53,7 +66,6 @@ const Header = () => {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          // 1. Fetch address
           try {
             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
             const data = await res.json();
@@ -66,7 +78,6 @@ const Header = () => {
           } catch (error) {
             setAddress('Vị trí hiện tại');
           }
-          // 2. Fetch weather
           fetchWeather(latitude, longitude);
         },
         (error) => {
@@ -86,7 +97,6 @@ const Header = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Close mobile on route change
   useEffect(() => setMobileOpen(false), [location]);
 
   const handleSearch = (e) => {
@@ -121,7 +131,6 @@ const Header = () => {
               className="h-16 w-auto group-hover:scale-105 transition-transform"
             />
           </Link>
-          {/* Address display */}
           <div className="hidden md:flex items-center gap-1.5 bg-[#FFF8EE] border border-[#F5EDD8] rounded-full px-3 py-2 transition-all group cursor-default" title={address}>
             <LocationIcon />
             <span className="w-44 truncate bg-transparent text-xs font-medium text-[#2C1810]">
@@ -130,7 +139,7 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Center search (hidden on mobile, homepage, and search page) */}
+        {/* Center search */}
         {!hideHeaderSearch && (
           <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-sm mx-4">
             <div className="flex w-full items-center bg-[#FFF8EE] border border-[#F5EDD8] rounded-full px-4 py-2 gap-2 focus-within:border-[#E8623A] focus-within:shadow-[0_0_0_2px_rgba(232,98,58,0.15)] transition-all">
@@ -148,7 +157,7 @@ const Header = () => {
 
         {/* Right: widgets + auth */}
         <div className="flex items-center gap-3">
-          {/* Weather widget - kết nối backend */}
+          {/* Weather widget */}
           <div className="hidden lg:flex items-center gap-2">
             {weather ? (
               <span 
@@ -174,7 +183,6 @@ const Header = () => {
           </div>
 
           {user ? (
-            /* User avatar + dropdown */
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen((v) => !v)}
@@ -182,18 +190,18 @@ const Header = () => {
               >
                 {user.avatar_url ? (
                   <img
-                    src={user.avatar_url}
+                    src={`${getFullAvatarUrl(user.avatar_url)}?t=${avatarTimestamp}`}
                     alt={user.username}
                     referrerPolicy="no-referrer"
                     className="w-7 h-7 rounded-full object-cover border border-[#E8623A]/15"
                   />
                 ) : (
                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#E8623A] to-[#C04D2B] flex items-center justify-center text-white font-bold text-xs">
-                    {user.username?.[0]?.toUpperCase() || 'U'}
+                    {user.username?.[0]?.toUpperCase() || user.name?.[0]?.toUpperCase() || 'U'}
                   </div>
                 )}
                 <span className="hidden sm:block text-sm font-semibold text-[#4A3728] max-w-[80px] truncate">
-                  {user.username}
+                  {user.username || user.name}
                 </span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3 text-[#7B7068]">
                   <polyline points="6,9 12,15 18,9" />
@@ -203,19 +211,17 @@ const Header = () => {
               {dropdownOpen && (
                 <div className="absolute right-0 top-full mt-2 min-w-[200px] max-w-[280px] bg-white rounded-2xl shadow-xl border border-[#F5EDD8] py-2 z-50">
                   <div className="px-4 py-2 border-b border-[#F5EDD8]">
-                  <p className="text-sm font-bold text-[#2C1810] truncate">{user.full_name}</p>
-                  <p className="text-xs text-[#7B7068] truncate">{user.email}</p>
-                </div>
+                    <p className="text-sm font-bold text-[#2C1810] truncate">{user.name || user.full_name}</p>
+                    <p className="text-xs text-[#7B7068] truncate">{user.email}</p>
+                  </div>
 
-                {/* Profile page */}
-                <Link
-                  to="/profile"
-                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[#2C1810] hover:bg-[#FFF8EE] transition-colors"
-                  onClick={() => setDropdownOpen(false)}
-                >
-                  👤 Trang cá nhân
-                </Link>
-
+                  <Link
+                    to="/profile"
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[#2C1810] hover:bg-[#FFF8EE] transition-colors"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    👤 Trang cá nhân
+                  </Link>
 
                   <button
                     onClick={handleLogout}
@@ -227,7 +233,6 @@ const Header = () => {
               )}
             </div>
           ) : (
-            /* Login / Signup buttons */
             <>
               <Link
                 to="/login"
@@ -292,7 +297,6 @@ const Header = () => {
               🔑 Đăng nhập
             </Link>
           )}
-          {/* Address display in mobile menu */}
           <div className="flex items-center gap-1.5 bg-[#FFF8EE] border border-[#F5EDD8] rounded-full px-4 py-2 gap-2 mb-1" title={address}>
             <LocationIcon />
             <span className="flex-1 truncate bg-transparent text-sm font-medium text-[#2C1810]">
@@ -301,7 +305,6 @@ const Header = () => {
           </div>
         </nav>
       )}
-
     </header>
   );
 };

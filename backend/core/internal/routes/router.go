@@ -8,82 +8,82 @@ import (
 )
 
 func SetupRouter(r *gin.Engine) {
+	// Serve static files cho avatar
+	r.Static("/uploads", "./uploads")
+
 	v1 := r.Group("/api/v1")
 	{
 		// --- NHÓM CHATBOT AI ---
 		chat := v1.Group("/chat")
 		{
-			chat.POST("/message", handlers.ChatbotProcess)             // Xử lý tin nhắn (Intent -> DB -> Gen text)
-			chat.GET("/history/:userId", handlers.GetChatHistory)      // Lấy lịch sử chat
+			chat.POST("/message", handlers.ChatbotProcess)
+			chat.GET("/history/:userId", handlers.GetChatHistory)
 		}
-
 
 		// --- NHÓM GỢI Ý QUÁN ĂN ---
 		v1.POST("/recommend", handlers.GetRecommendations)
 
-
 		// --- NHÓM XÁC THỰC & NGƯỜI DÙNG ---
 		auth := v1.Group("/auth")
 		{
-			auth.POST("/oauth",           handlers.Login)
-			auth.POST("/register",        handlers.Register)
-			auth.POST("/login",           handlers.LocalLogin)
+			auth.POST("/oauth", handlers.Login)
+			auth.POST("/register", handlers.Register)
+			auth.POST("/login", handlers.LocalLogin)
 			auth.POST("/forgot-password", handlers.ForgotPassword)
-			auth.POST("/reset-password",  handlers.ResetPassword)
+			auth.POST("/reset-password", handlers.ResetPassword)
 		}
 
 		protected := v1.Group("", middlewares.FirebaseAuthMiddleware())
 		{
 			protected.GET("/me", handlers.GetProfile)
 			protected.PUT("/me", handlers.UpdateProfile)
+
+			// --- AVATAR ---
+			protected.POST("/me/avatar", handlers.UploadAvatar)
+			protected.DELETE("/me/avatar", handlers.DeleteAvatar)
+			protected.PUT("/me/avatar", handlers.UpdateAvatar)
 		}
 
 		// --- NHÓM NHÀ HÀNG & MÓN ĂN ---
 		restaurants := v1.Group("/restaurants")
 		{
-			restaurants.GET("/popular", handlers.GetPopularRestaurants) // Good spots for food
-		 	restaurants.GET("/search", handlers.SearchRestaurants)      // Bộ lọc & Tìm kiếm (q, price, sort...)
-			restaurants.GET("/:id", handlers.GetRestaurantDetail)       // Chi tiết nhà hàng.
-			restaurants.GET("/:id/ratings", handlers.GetReviews)         
+			restaurants.GET("/popular", handlers.GetPopularRestaurants)
+			restaurants.GET("/search", handlers.SearchRestaurants)
+			restaurants.GET("/:id", handlers.GetRestaurantDetail)
+			restaurants.GET("/:id/ratings", handlers.GetReviews)
 
-    			// Routes cần auth
-    			restaurantAuth := restaurants.Group("", middlewares.FirebaseAuthMiddleware())
-    			{
-        			restaurantAuth.POST("/:id/rating", handlers.CreateComment)
-        			restaurantAuth.PUT("/:id/rating/:reviewId", handlers.UpdateComment)
-        			restaurantAuth.DELETE("/:id/rating/:reviewId", handlers.DeleteComment) 
-    			}
+			restaurantAuth := restaurants.Group("", middlewares.FirebaseAuthMiddleware())
+			{
+				restaurantAuth.POST("/:id/rating", handlers.CreateComment)
+				restaurantAuth.PUT("/:id/rating/:reviewId", handlers.UpdateComment)
+				restaurantAuth.DELETE("/:id/rating/:reviewId", handlers.DeleteComment)
+			}
 		}
 
 		v1.GET("/dishes/trending", handlers.GetTrendingDishes)
 
-		//--- NHÓM BÀI VIẾT (POSTS) ---
+		// --- NHÓM BÀI VIẾT (POSTS) ---
 		posts := v1.Group("/posts")
 		{
-			// Public routes (Xem không cần đăng nhập)
-			posts.GET("/popular", handlers.GetPopularPosts) // Bài review hot
-			posts.GET("", handlers.GetListPosts)            // Danh sách bài viết (Phân trang/Topic)
-			posts.GET("/:id", handlers.GetPostDetail)       // Chi tiết bài viết + Comments
+			posts.GET("/popular", handlers.GetPopularPosts)
+			posts.GET("", handlers.GetListPosts)
+			posts.GET("/:id", handlers.GetPostDetail)
 
-
-			// Private routes (Cần Middleware Auth)
 			authorized := posts.Group("")
-			
 			authorized.Use(middlewares.FirebaseAuthMiddleware())
 			{
-				authorized.POST("", handlers.CreatePost)                // Đăng bài mới
-				authorized.POST("/:id/comments", handlers.AddComment)    // Bình luận bài viết, :id là ID bài viết
-				authorized.POST("/:id/likes", handlers.LikePost)   // Like bài viết, :id là ID bài viết
-				authorized.POST("/comments/:id/likes", handlers.LikeComment) // Like comment, :id là ID comment
+				authorized.POST("", handlers.CreatePost)
+				authorized.POST("/:id/comments", handlers.AddComment)
+				authorized.POST("/:id/likes", handlers.LikePost)
+				authorized.POST("/comments/:id/likes", handlers.LikeComment)
 				authorized.POST("/upload", handlers.UploadImage)
 			}
 		}
 
-		// // --- NHÓM TIỆN ÍCH (Vị trí, Thời tiết, Tiền tệ) ---
+		// --- NHÓM TIỆN ÍCH ---
 		utils := v1.Group("/utils")
 		{
-		 	utils.GET("/weather", handlers.GetWeather)
-		// 	utils.GET("/currency", handlers.GetExchangeRate)
+			utils.GET("/weather", handlers.GetWeather)
 		}
 	}
-	}
+}

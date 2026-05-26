@@ -1,16 +1,27 @@
 package handlers
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
 	"backend/core/internal/models"
 	"backend/core/internal/services"
 )
+
+// Khai báo biến DB toàn cục
+var db *sql.DB
+
+// InitUserHandler khởi tạo DB cho handlers
+func InitUserHandler(database *sql.DB) {
+	db = database
+}
 
 // ---- Helper trả về format chuẩn ----
 func successResponse(c *gin.Context, message string, data any) {
@@ -127,15 +138,20 @@ func LocalLogin(c *gin.Context) {
 	})
 }
 
-// GetProfile lấy thông tin user hiện tại
 func GetProfile(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
+	fmt.Printf("GetProfile called - userID: %d\n", userID)
+
 	user, err := services.GetUserByID(c.Request.Context(), userID)
 	if err != nil {
+		fmt.Printf("GetProfile error: %v\n", err)
 		errorResponse(c, http.StatusNotFound, "Không tìm thấy user", err.Error())
 		return
 	}
+
+	fmt.Printf("GetProfile success - user: %+v\n", user)
+	fmt.Printf("AvatarURL: '%s'\n", user.AvatarURL)
 
 	successResponse(c, "Lấy thông tin thành công", user)
 }
@@ -143,19 +159,131 @@ func GetProfile(c *gin.Context) {
 // UpdateProfile cập nhật preferences
 func UpdateProfile(c *gin.Context) {
 	userID := c.GetInt("user_id")
+	log.Printf("[UpdateProfile] userID=%d, raw=%v", userID, c.Keys)
 
-	var prefs models.UserPreferences
-	if err := c.ShouldBindJSON(&prefs); err != nil {
+	var req struct {
+		Name string `json:"name"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
 		errorResponse(c, http.StatusBadRequest, "Dữ liệu không hợp lệ", err.Error())
 		return
 	}
 
-	if err := services.UpdateUserPreferences(c.Request.Context(), userID, prefs); err != nil {
-		errorResponse(c, http.StatusInternalServerError, "Lỗi cập nhật profile", err.Error())
+	if err := services.UpdateUserName(c.Request.Context(), userID, req.Name); err != nil {
+		errorResponse(c, http.StatusInternalServerError, "Lỗi cập nhật tên", err.Error())
 		return
 	}
 
 	successResponse(c, "Cập nhật thành công", nil)
+}
+
+// ========== AVATAR HANDLERS ==========
+
+// UploadAvatar - POST /api/v1/me/avatar
+func UploadAvatar(c *gin.Context) {
+	userID := c.GetInt("user_id")
+
+	fmt.Printf("===== START UploadAvatar =====\n")
+	fmt.Printf("UserID: %d\n", userID)
+
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		fmt.Printf("ERROR FormFile: %v\n", err)
+		errorResponse(c, http.StatusBadRequest, "Không tìm thấy file ảnh", err.Error())
+		return
+	}
+
+	fmt.Printf("File name: %s\n", file.Filename)
+	fmt.Printf("File size: %d bytes\n", file.Size)
+
+	allowedTypes := map[string]bool{
+		".jpg":  true,
+		".jpeg": true,
+		".png":  true,
+		".gif":  true,
+		".webp": true,
+	}
+	ext := strings.ToLower(filepath.Ext(file.Filename))
+	fmt.Printf("File extension: %s\n", ext)
+
+	if !allowedTypes[ext] {
+		fmt.Printf("ERROR: Invalid file type\n")
+		errorResponse(c, http.StatusBadRequest, "Định dạng file không hợp lệ", "")
+		return
+	}
+
+	if file.Size > 5*1024*1024 {
+		fmt.Printf("ERROR: File too large\n")
+		errorResponse(c, http.StatusBadRequest, "Kích thước file không được vượt quá 5MB", "")
+		return
+	}
+
+	fmt.Printf("Calling services.UploadAvatar...\n")
+	avatarURL, err := services.UploadAvatar(c.Request.Context(), userID, file)
+	if err != nil {
+		fmt.Printf("ERROR UploadAvatar service: %v\n", err)
+		errorResponse(c, http.StatusInternalServerError, "Upload avatar thất bại", err.Error())
+		return
+	}
+
+	fmt.Printf("Upload success: %s\n", avatarURL)
+
+	// ✅ Lấy lại thông tin user mới nhất sau khi update
+	user, err := services.GetUserByID(c.Request.Context(), userID)
+	if err != nil {
+		fmt.Printf("WARNING: Cannot get updated user: %v\n", err)
+		successResponse(c, "Upload avatar thành công", gin.H{
+			"avatar_url": avatarURL,
+		})
+		return
+	}
+
+	fmt.Printf("User updated successfully, avatar_url: %s\n", user.AvatarURL)
+	fmt.Printf("===== END UploadAvatar =====\n")
+
+	// ✅ Trả về đầy đủ thông tin user
+	successResponse(c, "Upload avatar thành công", gin.H{
+		"avatar_url": user.AvatarURL,
+		"user":       user,
+	})
+}
+
+// DeleteAvatar - DELETE /api/v1/me/avatar
+func DeleteAvatar(c *gin.Context) {
+	userID := c.GetInt("user_id")
+
+	// Xóa avatar - Truyền db vào
+	err := services.DeleteAvatar(c.Request.Context(), userID)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "Xóa avatar thất bại", err.Error())
+		return
+	}
+
+	successResponse(c, "Xóa avatar thành công", nil)
+}
+
+// UpdateAvatar - PUT /api/v1/me/avatar (cập nhật URL trực tiếp)
+func UpdateAvatar(c *gin.Context) {
+	userID := c.GetInt("user_id")
+
+	var req struct {
+		AvatarURL string `json:"avatar_url" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		errorResponse(c, http.StatusBadRequest, "Thiếu avatar_url", err.Error())
+		return
+	}
+
+	// Cập nhật avatar URL - Truyền db vào
+	err := services.UpdateAvatarURL(c.Request.Context(), userID, req.AvatarURL)
+	if err != nil {
+		errorResponse(c, http.StatusInternalServerError, "Cập nhật avatar thất bại", err.Error())
+		return
+	}
+
+	successResponse(c, "Cập nhật avatar thành công", gin.H{
+		"avatar_url": req.AvatarURL,
+	})
 }
 
 // ForgotPassword gửi reset link qua email

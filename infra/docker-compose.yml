@@ -1,0 +1,74 @@
+version: '3.9'
+
+services:
+
+  # ============================================================
+  # FRONTEND — React + Vite
+  # ============================================================
+  frontend:
+    build:
+      context: ./frontend/react-web-app
+      dockerfile: Dockerfile
+    container_name: yummap_frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:8080/api/v1
+      - VITE_AI_URL=http://localhost:8000
+    restart: unless-stopped
+    networks:
+      - yummap_network
+
+  # ============================================================
+  # BACKEND — Go + Gin
+  # ============================================================
+  backend:
+    build:
+      context: ./backend/core
+      dockerfile: Dockerfile
+    container_name: yummap_backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ai
+    env_file:
+      - ./backend/core/.env
+    environment:
+      - DB_HOST=host.docker.internal  # Trỏ vào SQL Server local trên Windows
+      - DB_PORT=1433
+      - DB_NAME=travel_food_db
+      - AI_SERVICE_URL=http://ai:8000
+      - FRONTEND_URL=http://localhost:5173
+      - PORT=8080
+    volumes:
+      - ./backend/core/uploads:/app/uploads           # Lưu ảnh upload
+      - ./backend/core/serviceAccountKey.json:/app/serviceAccountKey.json:ro
+    restart: unless-stopped
+    networks:
+      - yummap_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Cho phép kết nối SQL Server local
+
+  # ============================================================
+  # AI SERVICE — Python + FastAPI
+  # ============================================================
+  ai:
+    build:
+      context: ./backend/ai
+      dockerfile: Dockerfile
+    container_name: yummap_ai
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/ai/.env
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    restart: unless-stopped
+    networks:
+      - yummap_network
+
+networks:
+  yummap_network:
+    driver: bridge

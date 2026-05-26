@@ -18,10 +18,10 @@ const MenuSection = ({ menu = [], isLoading = false, isError = false }) => {
 
   if (isLoading) {
     return (
-      <div id="menu-section" className="mt-10">
+      <div id="menu-section" className="">
         <h2 className="font-[Baloo_2,sans-serif] text-2xl font-extrabold text-[#2C1810] mb-6">Menu</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map(i => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {[1, 2, 3].map(i => (
             <div key={i} className="animate-pulse flex flex-col rounded-2xl shadow-sm border border-[#F0E8DF] overflow-hidden bg-white">
               <div className="w-full aspect-[4/3] bg-[#F5EDD8] bg-opacity-50"></div>
               <div className="p-4 space-y-3">
@@ -37,7 +37,7 @@ const MenuSection = ({ menu = [], isLoading = false, isError = false }) => {
 
   if (isError) {
     return (
-      <div id="menu-section" className="mt-10">
+      <div id="menu-section" className="">
         <h2 className="font-[Baloo_2,sans-serif] text-2xl font-extrabold text-[#2C1810] mb-6">Menu</h2>
         <p className="text-sm text-[#E8623A] italic font-medium">Không thể tải menu</p>
       </div>
@@ -46,7 +46,7 @@ const MenuSection = ({ menu = [], isLoading = false, isError = false }) => {
 
   if (!menu || menu.length === 0) {
     return (
-      <div id="menu-section" className="mt-10">
+      <div id="menu-section" className="">
         <h2 className="font-[Baloo_2,sans-serif] text-2xl font-extrabold text-[#2C1810] mb-6">Menu</h2>
         <p className="text-sm text-[#7B7068] italic">Quán chưa cập nhật menu</p>
       </div>
@@ -59,7 +59,7 @@ const MenuSection = ({ menu = [], isLoading = false, isError = false }) => {
   const items = grouped[currentTab] || [];
 
   return (
-    <div id="menu-section" className="mt-10">
+    <div id="menu-section" className="">
       <h2 className="font-[Baloo_2,sans-serif] text-2xl font-extrabold text-[#2C1810] mb-6">Menu</h2>
 
       {/* Category tabs */}
@@ -82,7 +82,7 @@ const MenuSection = ({ menu = [], isLoading = false, isError = false }) => {
       )}
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         {items.map((item, idx) => {
           const imageSrc = (item.images && item.images.length > 0 && item.images[0].image_url) 
                             ? item.images[0].image_url 

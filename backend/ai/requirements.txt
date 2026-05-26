@@ -79,7 +79,7 @@ huggingface_hub==1.9.0
 hyperframe==6.1.0
 idna==3.10
 ipykernel==7.2.0
-ipython==9.13.0
+ipython
 ipython_pygments_lexers==1.1.1
 ipywidgets==8.1.8
 isoduration==20.11.0

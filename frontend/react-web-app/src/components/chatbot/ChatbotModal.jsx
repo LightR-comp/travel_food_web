@@ -188,14 +188,22 @@ const ChatbotModal = ({ onClose }) => {
 
       if (!res.success) throw new Error(res.error || res.message);
 
-      let replyText = '';
+       let replyText = '';
       
       if (res.data?.reply) {
         replyText = res.data.reply;
       } else if (res.data?.dish_name) {
-        replyText = `🍽️ Tôi nhận ra đây là món **${res.data.dish_name}**!\n\n` +
-          `**Nguyên liệu:** ${res.data.ingredients?.join(', ')}\n\n` +
-          `**Công thức:** ${res.data.recipe}`;
+        // Build the reply string step-by-step for clarity and robustness
+        let dishReply = `🍽️ Tôi nhận ra đây là món **${res.data.dish_name}**!`;
+        if (res.data.ingredients && res.data.ingredients.length > 0) {
+          dishReply += `\n\n**Nguyên liệu:** ${res.data.ingredients.join(', ')}`;
+        }
+        // The backend now only sends the 'recipe' field if it has content.
+        // This check correctly handles cases where the recipe is absent.
+        if (res.data.recipe) {
+          dishReply += `\n\n**Công thức:** ${res.data.recipe}`;
+        }
+        replyText = dishReply;
       } else {
         replyText = 'Đã xử lý ảnh nhưng không có kết quả.';
       }

@@ -14,24 +14,7 @@ const useInView = (threshold = 0.15) => {
   return [ref, visible];
 };
 
-/* ─── AnimatedCounter ─── */
-const AnimatedCounter = ({ target, suffix = '' }) => {
-  const [count, setCount] = useState(0);
-  const [ref, visible] = useInView(0.3);
-  useEffect(() => {
-    if (!visible) return;
-    let start = 0;
-    const end = parseInt(target);
-    const increment = end / 60;
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= end) { setCount(end); clearInterval(timer); }
-      else setCount(Math.ceil(start));
-    }, 20);
-    return () => clearInterval(timer);
-  }, [visible, target]);
-  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
-};
+
 
 /* ─── Section Component ─── */
 const FadeSection = ({ children, className = '', delay = 0 }) => {
@@ -49,10 +32,13 @@ const FadeSection = ({ children, className = '', delay = 0 }) => {
 
 /* ─── Team data ─── */
 const TEAM = [
-  { name: 'Phạm Nguyễn Quang Sáng', role: 'Founder & CEO', avatar: '👨‍💼', bio: 'Đam mê ẩm thực và công nghệ, 10 năm kinh nghiệm trong lĩnh vực F&B.' },
-  { name: 'Nguyễn Khánh Đăng', role: 'CTO', avatar: '👩‍💻', bio: 'Chuyên gia AI/ML, xây dựng hệ thống gợi ý thông minh cho YumMap.' },
-  { name: 'Nguyễn Lê Anh Kiên', role: 'Head of Design', avatar: '🧑‍🎨', bio: 'Thiết kế trải nghiệm người dùng tuyệt vời, yêu thích typography.' },
-  { name: 'Võ Đình Đình', role: 'Content Lead', avatar: '👩‍✈️', bio: 'Food blogger nổi tiếng, kết nối cộng đồng ẩm thực Việt Nam.' },
+  { name: 'Phạm Nguyễn Quang Sáng', avatar: 'https://scontent.fsgn5-5.fna.fbcdn.net/v/t39.30808-6/706982659_981718768152296_6804290194071511298_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeFNo3eTa1CsZ797rvZvmoFQLS3XgifLZ5AtLdeCJ8tnkCvJNAXdvqC5E6tFhmoodPu2vPeXzJ6RqfiTitZjMrN1&_nc_ohc=ASBlmMCtMXcQ7kNvwF1Jcig&_nc_oc=AdpPpsWTxrltopqk7BRYHxZ5oohgYcpD5YTX9NyQdP2Op2YwjvdCrXm9odNf7N4gCmU&_nc_zt=23&_nc_ht=scontent.fsgn5-5.fna&_nc_gid=go84TmteFtGjt0sPttNTZA&_nc_ss=7b2a8&oh=00_Af7Q_nG2Vh-dJch70WGXBWr0WHoDbPHmf2nbj_As8ihHNg&oe=6A1A38A6' },
+  { name: 'Nguyễn Khánh Đăng', avatar: 'https://scontent.fsgn5-10.fna.fbcdn.net/v/t39.30808-6/707523633_981721194818720_2529786717978328982_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeGOk5u2Ebl2n50kv_Nab_OpxDuUSk-_fIfEO5RKT798h1ulCbIqjYe6pP6LJWspwrWWUJVKoC0NzPuPQRYl9jaX&_nc_ohc=dpqt7yyDj0IQ7kNvwEF9Soq&_nc_oc=AdqUGu4pnH6kr1xsUF_NxSSmKC2XPoAedDgeGxgEpCIiTfk3ADcw04X_EAwgqAD7-tc&_nc_zt=23&_nc_ht=scontent.fsgn5-10.fna&_nc_gid=QDDa4w9zFMBm4gv7ZDdaZA&_nc_ss=7b2a8&oh=00_Af5g1YD5HEifUnW4PE-0RAQVnWey4N7H6FYFuSTejX3h3Q&oe=6A1A4982' },
+  { name: 'Nguyễn Lê Anh Kiên', avatar: 'https://scontent.fsgn5-6.fna.fbcdn.net/v/t39.30808-6/707581292_981718764818963_4570806076034280643_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeG7jP4ALAMfaWtgjTrAgrrZEtFI5stleisS0Ujmy2V6K1dKAriGkB9sumJjPLOSYAXOHc74rqBV_EFubE1-KVt5&_nc_ohc=JGselX1zEIcQ7kNvwE6HHZB&_nc_oc=AdqtN4ObrIN4_e7Db3YHr6XwSLM7jLPXvGX6BAK4lcygdifcAD8HVh_mW6tiUEPbkSI&_nc_zt=23&_nc_ht=scontent.fsgn5-6.fna&_nc_gid=FrYYOABTsiPwMclEO4T1BQ&_nc_ss=7b2a8&oh=00_Af6UQmCUA3sabRiqPYnlKOIwc41-GIiZjNEe0bPARzBlkw&oe=6A1A6578' },
+  { name: 'Võ Đình Đình', avatar: 'https://scontent.fsgn5-6.fna.fbcdn.net/v/t1.6435-9/180089779_1215226415559099_8337677280890062923_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeE6Hq46QLQBOFLBEt9KwGHgDxo2EODPm_IPGjYQ4M-b8pwua2Tiu_GjBEOaDeqWvzSTKHxJd-t4gxU_ifecOuJ6&_nc_ohc=Z5ANywLzqm8Q7kNvwFt-QYF&_nc_oc=Adq_Ql70mLinUz1YHSNsPxE9nP54PM22EW5qC-h3d3G0Lmsf08BQ-IgH0AA-efQTGLY&_nc_zt=23&_nc_ht=scontent.fsgn5-6.fna&_nc_gid=jgWN5UTYKwDT_5vFdwYjJA&_nc_ss=7b2a8&oh=00_Af7C7h9PHpKR5rnYv--vtIPC_yig9rQvATDGEZ9HZ4XWLw&oe=6A3BD4B6' },
+  { name: 'Nguyễn Thành Đạt', avatar: 'https://scontent.fsgn5-12.fna.fbcdn.net/v/t39.30808-6/634479725_900784659579041_3756430268885978532_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeFtJWvX3y4pvh0sdg66bnIsNMBzfseVhMM0wHN-x5WEw8IFsriiAEcHIClceMLjIq67DqzEFjw3c-2j51DD5Bhd&_nc_ohc=BiaYEVqU67UQ7kNvwF3KwvP&_nc_oc=AdqeBx8fd7cfEPtDPtKLz69Vk53hKL5GQGhTDsJykWZmuYGXRItCjzZkuprZL41NSXQ&_nc_zt=23&_nc_ht=scontent.fsgn5-12.fna&_nc_gid=-K3qtQaYAQmJxIPlwsgYxQ&_nc_ss=7b2a8&oh=00_Af6JpO2GACHwuo648nPC43caa2KWnkVyFxTFI2xcVw-MaA&oe=6A1A4EC9' },
+  { name: 'Võ Nhật Minh', avatar: 'https://scontent.fsgn5-6.fna.fbcdn.net/v/t39.30808-6/701020015_1021196827043692_6399698190642810280_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeGKnr7XcZgnKTOpnGiNSboOA57NCTQxE_4Dns0JNDET_k-eCKuf4nFE6zdE4ED1VXW_CKuLpdtNfNWW-uNYfZgb&_nc_ohc=5Yo-pr76sakQ7kNvwHzwwv-&_nc_oc=AdptirUHVh72BUyQ3XHz_wH8dRj-sUp99eGBqkXZ9CnJ2JEqofh9ZJVgldQKhslmRPs&_nc_zt=23&_nc_ht=scontent.fsgn5-6.fna&_nc_gid=Ul7ZcSGe4lRFvj-watqRbQ&_nc_ss=7b2a8&oh=00_Af4xSqobM4vn2A4kN4h95nLjsz6b5PkXnoYkkrENUQQ7Yg&oe=6A1A4843' },
+  { name: 'Lê Công Minh Nhựt', avatar: 'https://scontent.fsgn5-5.fna.fbcdn.net/v/t39.30808-6/707393616_981718761485630_3023176207231412308_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeGx3QFYqLqyU40a7vVGurD1aeohgfl99t1p6iGB-X323SVOqtv72nnYWufKjesctmOIRRuf774FqI8J-5IWS65d&_nc_ohc=dXmpJd8TG5YQ7kNvwExrBZq&_nc_oc=AdrY3ofK5i5V6MQwNyqmGRpKpQ-JYTwn0nyehu21f7J99iYYjdnxAv8YR5ftRnnatEM&_nc_zt=23&_nc_ht=scontent.fsgn5-5.fna&_nc_gid=b3CpJ1VrqkBILFzB1AOqyQ&_nc_ss=7b2a8&oh=00_Af4g0yORuafVSwE4yAe_mju811levED-4NZaqTm3vzcELw&oe=6A1A39D8' },
 ];
 
 const VALUES = [
@@ -62,12 +48,7 @@ const VALUES = [
   { icon: '🚀', title: 'Sáng tạo', desc: 'Ứng dụng AI và công nghệ hiện đại để mang lại trải nghiệm tốt nhất.' },
 ];
 
-const MILESTONES = [
-  { year: '2024', event: 'YumMap ra đời với ý tưởng ban đầu', icon: '💡' },
-  { year: '2025', event: 'Ra mắt phiên bản beta, 1000 người dùng đầu tiên', icon: '🎉' },
-  { year: '2026', event: 'Tích hợp AI Chatbot, mở rộng 63 tỉnh thành', icon: '🤖' },
-  { year: '2027', event: 'Mục tiêu 1 triệu người dùng trên toàn quốc', icon: '🌟' },
-];
+
 
 const AboutPage = () => {
   return (
@@ -96,25 +77,7 @@ const AboutPage = () => {
         </section>
       </FadeSection>
 
-      {/* Stats bar */}
-      <section className="relative -mt-8 z-10 max-w-[900px] mx-auto px-6">
-        <div className="bg-white rounded-2xl shadow-[0_8px_40px_rgba(44,24,16,0.08)] border border-[#F5EDD8]/60 p-6 grid grid-cols-2 sm:grid-cols-4 gap-6">
-          {[
-            { value: 50000, suffix: '+', label: 'Người dùng', icon: '👥' },
-            { value: 2500, suffix: '+', label: 'Quán ăn', icon: '🏪' },
-            { value: 63, suffix: '', label: 'Tỉnh thành', icon: '📍' },
-            { value: 4.8, suffix: '⭐', label: 'Đánh giá', icon: '✨' },
-          ].map(stat => (
-            <div key={stat.label} className="text-center">
-              <span className="text-2xl block mb-1">{stat.icon}</span>
-              <p className="text-xl sm:text-2xl font-extrabold text-[#E8623A]">
-                <AnimatedCounter target={stat.value} suffix={stat.suffix} />
-              </p>
-              <p className="text-xs text-[#7B7068] mt-1">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+
 
       {/* Mission */}
       <FadeSection className="max-w-[1200px] mx-auto px-6 py-16 sm:py-20">
@@ -150,39 +113,7 @@ const AboutPage = () => {
         </div>
       </FadeSection>
 
-      {/* Timeline */}
-      <section className="bg-gradient-to-b from-[#FFF8EE] to-[#FAFAF7] py-16 sm:py-20">
-        <FadeSection className="max-w-[800px] mx-auto px-6">
-          <div className="text-center mb-12">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#E8623A] mb-3 block">Hành trình</span>
-            <h2 className="font-[Baloo_2,sans-serif] text-2xl sm:text-3xl font-extrabold text-[#2C1810]">
-              Câu Chuyện Của Chúng Tôi
-            </h2>
-          </div>
 
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute left-6 sm:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#E8623A] via-[#F4845A] to-[#F5EDD8]" />
-
-            {MILESTONES.map((m, i) => (
-              <FadeSection key={m.year} delay={i * 150} className={`relative flex items-center gap-6 mb-10 last:mb-0 ${i % 2 === 0 ? 'sm:flex-row' : 'sm:flex-row-reverse'}`}>
-                {/* Node */}
-                <div className="absolute left-6 sm:left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white border-2 border-[#E8623A] flex items-center justify-center text-xl z-10 shadow-md">
-                  {m.icon}
-                </div>
-
-                {/* Card */}
-                <div className={`ml-20 sm:ml-0 sm:w-[calc(50%-40px)] ${i % 2 === 0 ? 'sm:pr-4 sm:text-right' : 'sm:pl-4'}`}>
-                  <div className="bg-white rounded-2xl border border-[#F5EDD8] p-5 shadow-sm hover:shadow-md hover:border-[#E8623A]/20 transition-all duration-500">
-                    <span className="text-lg font-extrabold text-[#E8623A]">{m.year}</span>
-                    <p className="text-sm text-[#4A3728] mt-1">{m.event}</p>
-                  </div>
-                </div>
-              </FadeSection>
-            ))}
-          </div>
-        </FadeSection>
-      </section>
 
       {/* Team */}
       <FadeSection className="max-w-[1200px] mx-auto px-6 py-16 sm:py-20">
@@ -200,12 +131,14 @@ const AboutPage = () => {
               delay={i * 100}
               className="group bg-white rounded-2xl border border-[#F5EDD8] p-6 text-center hover:shadow-xl hover:border-[#E8623A]/20 hover:-translate-y-1 transition-all duration-500"
             >
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#FFF8EE] via-[#FDECD8] to-[#FEF3C0] flex items-center justify-center text-4xl ring-3 ring-[#F5EDD8] group-hover:ring-[#E8623A]/30 transition-all duration-500 group-hover:scale-105">
-                {member.avatar}
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#FFF8EE] via-[#FDECD8] to-[#FEF3C0] flex items-center justify-center overflow-hidden ring-3 ring-[#F5EDD8] group-hover:ring-[#E8623A]/30 transition-all duration-500 group-hover:scale-105">
+                {member.avatar.startsWith('http') || member.avatar.startsWith('/') || member.avatar.startsWith('data:') ? (
+                  <img src={member.avatar} alt={member.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-4xl">{member.avatar}</span>
+                )}
               </div>
               <h3 className="text-sm font-bold text-[#2C1810] group-hover:text-[#E8623A] transition-colors">{member.name}</h3>
-              <p className="text-[0.7rem] font-semibold text-[#E8623A] mt-0.5">{member.role}</p>
-              <p className="text-xs text-[#7B7068] mt-2 leading-relaxed">{member.bio}</p>
             </FadeSection>
           ))}
         </div>

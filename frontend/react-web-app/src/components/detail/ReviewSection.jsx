@@ -96,6 +96,7 @@ const ReviewSection = ({ reviews = [], rating = 0 }) => {
                       <img
                         src={avatar}
                         alt={userName}
+                        referrerPolicy="no-referrer"
                         className="w-12 h-12 rounded-full object-cover border-2 border-[#F5EDD8]"
                       />
                     ) : (

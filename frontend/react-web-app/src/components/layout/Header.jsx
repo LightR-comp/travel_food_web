@@ -192,6 +192,7 @@ const Header = () => {
                   <img
                     src={`${getFullAvatarUrl(user.avatar_url)}?t=${avatarTimestamp}`}
                     alt={user.username}
+                    referrerPolicy="no-referrer"
                     className="w-7 h-7 rounded-full object-cover border border-[#E8623A]/15"
                   />
                 ) : (

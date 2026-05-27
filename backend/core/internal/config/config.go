@@ -1,6 +1,3 @@
-// config.go chứa cấu hình hệ thống, bao gồm các thông tin kết nối cơ sở dữ liệu, cổng server, URL của dịch vụ AI, v.v.
-// ta sẽ sử dụng thư viện godotenv để load các biến môi trường từ file .env vào biến global Config, giúp dễ dàng quản lý và thay đổi cấu hình mà không cần phải sửa code.
-
 package config
 
 import (
@@ -10,52 +7,50 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// AppConfig chứa toàn bộ cấu hình hệ thống
+// Config struct chứa toàn bộ cấu hình hệ thống
 type Config struct {
-	Port                   string
-	DBHost                 string
-	DBPort                 string
-	DBUser                 string
-	DBPassword             string
-	DBName                 string
-	AIServiceURL           string
-	GoongMapsAPIKey        string
-	GeminiAPIKey           string
-	FirebaseCredentialPath string
-	CloudinaryCloudName    string
-	CloudinaryAPIKey       string
-	CloudinaryAPISecret    string
+	Port                string
+	DBHost              string
+	DBPort              string
+	DBUser              string
+	DBPassword          string
+	DBName              string
+	AIServiceURL        string
+	GoongMapsAPIKey     string
+	GeminiAPIKey        string
+	FirebaseCredentials string 
+	CloudinaryCloudName string
+	CloudinaryAPIKey    string
+	CloudinaryAPISecret string
 }
 
-// biến global để DB Repo, AI Client gọi
 var AppConfig Config
 
-// LoadConfig load cấu hình từ file .env vào biến global Config
 func LoadConfig() {
-	// Load .env file
 	err := godotenv.Load("../../config/.env")
 	if err != nil {
-		log.Printf("Error loading .env file: %v", err)
+		log.Printf("Chạy môi trường Production (Render) hoặc thiếu file .env local: %v", err)
 	}
 
+	// Gán trực tiếp bằng os.Getenv hoặc os.LookupEnv thông qua hàm getEnv
 	AppConfig = Config{
-		Port:                   getEnv("PORT", "8080"),
-		DBHost:                 getEnv("DB_HOST", "127.0.0.1"),
-		DBPort:                 getEnv("DB_PORT", "1433"),
-		DBUser:                 getEnv("DB_USER", "sa"),
-		DBPassword:             getEnv("DB_PASSWORD", ""),
-		DBName:                 getEnv("DB_NAME", "travel_food_db"),
-		AIServiceURL:           getEnv("AI_SERVICE_URL", "http://localhost:8000"),
-		GoongMapsAPIKey:        getEnv("GOOng_MAPS_API_KEY", ""),
-		GeminiAPIKey:           getEnv("GEMINI_API_KEY", ""),
-		FirebaseCredentialPath: getEnv("FIREBASE_CREDENTIAL_PATH", "../../config/serviceAccountKey.json"),
-		CloudinaryCloudName:    getEnv("CLOUDINARY_CLOUD_NAME", ""),
-		CloudinaryAPIKey:       getEnv("CLOUDINARY_API_KEY", ""),
-		CloudinaryAPISecret:    getEnv("CLOUDINARY_API_SECRET", ""),
+		Port:                getEnv("PORT", "8080"),
+		DBHost:              getEnv("DB_HOST", "127.0.0.1"),
+		DBPort:              getEnv("DB_PORT", "1433"),
+		DBUser:              getEnv("DB_USER", "sa"),
+		DBPassword:          getEnv("DB_PASSWORD", ""),
+		DBName:              getEnv("DB_NAME", "travel_food_db"),
+		AIServiceURL:        getEnv("AI_SERVICE_URL", "http://localhost:8000"),
+		GoongMapsAPIKey:     getEnv("GOONG_MAPS_API_KEY", ""),
+		GeminiAPIKey:        getEnv("GEMINI_API_KEY", ""),
+		FirebaseCredentials: getEnv("FIREBASE_CREDENTIALS", ""), 
+		CloudinaryCloudName: getEnv("CLOUDINARY_CLOUD_NAME", ""),
+		CloudinaryAPIKey:    getEnv("CLOUDINARY_API_KEY", ""),
+		CloudinaryAPISecret: getEnv("CLOUDINARY_API_SECRET", ""),
 	}
 }
 
-// getEnv lấy giá trị từ biến môi trường, nếu không có thì trả về giá trị mặc định
+// getEnv giúp lấy giá trị từ biến môi trường, nếu rỗng thì đè giá trị mặc định vào
 func getEnv(key string, defaultValue string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"mime/multipart"
 	"strings"
-	"time"
 )
 
 var avatarDB *sql.DB

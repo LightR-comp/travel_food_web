@@ -49,6 +49,7 @@ func main() {
 		"http://localhost:3000",
 		"http://127.0.0.1:5173",
 		"http://127.0.0.1:3000",
+		"https://travelfoodweb1.vercel.app",
 	}
 	if envOrigins := os.Getenv("ALLOWED_ORIGINS"); envOrigins != "" {
 		for _, origin := range strings.Split(envOrigins, ",") {

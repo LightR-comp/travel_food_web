@@ -38,8 +38,7 @@ export const registerApi = async (payload) => {
  * POST /api/v1/auth/logout
  */
 export const logoutApi = async () => {
-  const { data } = await axiosInstance.post('/auth/logout');
-  return data;
+  return { success: true, message: "Đăng xuất thành công" };
 };
 
 /**

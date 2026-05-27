@@ -420,13 +420,7 @@ const ForumDetailPage = () => {
                   {post.title}
                 </h1>
 
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {post.tags && post.tags.map(tag => (
-                    <span key={tag} className="px-3 py-1 rounded-full bg-[#FFF8EE] text-[#E8623A] text-xs font-semibold border border-[#F5EDD8] hover:bg-[#E8623A] hover:text-white transition-all duration-300 cursor-pointer">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+
 
                 {/* Content Render */}
                 <div className="space-y-4">
@@ -485,19 +479,7 @@ const ForumDetailPage = () => {
                   >
                     {liked ? '❤️' : '🤍'} {post.like_count || 0}
                   </button>
-                  <button
-                    onClick={() => setBookmarked(!bookmarked)}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
-                      bookmarked
-                        ? 'bg-[#F5A623] text-white shadow-md'
-                        : 'bg-[#FFF8EE] text-[#4A3728] border border-[#F5EDD8] hover:border-[#F5A623]/30'
-                    }`}
-                  >
-                    {bookmarked ? '🔖' : '📑'} {bookmarked ? 'Đã lưu' : 'Lưu bài'}
-                  </button>
-                  <button className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-[#FFF8EE] text-[#4A3728] border border-[#F5EDD8] hover:border-[#E8623A]/30 transition-all duration-300 ml-auto">
-                    ↗ Chia sẻ
-                  </button>
+
                 </div>
               </div>
             </FadeSection>
@@ -586,19 +568,6 @@ const ForumDetailPage = () => {
 
           {/* Sidebar */}
           <aside className="w-full lg:w-80 flex-shrink-0 space-y-6">
-            <FadeSection delay={150}>
-              <div className="bg-white rounded-2xl border border-[#F5EDD8] p-5 text-center">
-                <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-br from-[#FFF8EE] via-[#FDECD8] to-[#FEF3C0] flex items-center justify-center text-3xl ring-3 ring-[#F5EDD8]">
-                  {post.avatar || '🧑‍🍳'}
-                </div>
-                <h3 className="text-sm font-bold text-[#2C1810]">{post.author}</h3>
-                <p className="text-[0.65rem] text-[#7B7068] mt-0.5">Thành viên</p>
-                <button className="mt-4 w-full py-2 rounded-full border-2 border-[#E8623A] text-[#E8623A] text-xs font-bold hover:bg-[#E8623A] hover:text-white transition-all duration-300">
-                  👤 Theo dõi
-                </button>
-              </div>
-            </FadeSection>
-
             <FadeSection delay={350}>
               <Link
                 to="/forum"

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { getMeApi, updateProfileApi, uploadAvatarApi, deleteAvatarApi } from '../api/AuthAPI';
+import { getMeApi, updateProfileApi, uploadAvatarApi, deleteAvatarApi } from '../api/authApi';
 
 const ProfilePage = () => {
   const { user, updateUser } = useAuth();
@@ -348,22 +348,9 @@ const ProfilePage = () => {
                     <span className="text-[#7B7068]">Họ và tên:</span>
                     <span className="font-medium text-[#2C1810]">{displayName}</span>
                   </div>
-                  {/* 👉 THÊM: Hiển thị thông tin avatar URL để debug */}
-                  {fullAvatarUrl && (
-                    <div className="flex flex-col sm:flex-row sm:justify-between py-2 border-t border-[#F5EDD8] mt-2 pt-2">
-                      <span className="text-[#7B7068] text-sm">Avatar URL:</span>
-                      <span className="font-mono text-xs text-[#2C1810] break-all">{fullAvatarUrl}</span>
-                    </div>
-                  )}
                 </div>
               </div>
 
-              <div>
-                <h2 className="text-lg font-semibold text-[#2C1810] mb-3">Hoạt động gần đây</h2>
-                <div className="bg-[#FFF8EE] rounded-xl p-8 text-center text-[#7B7068]">
-                  🍽️ Chưa có hoạt động nào
-                </div>
-              </div>
             </div>
           )}
         </div>

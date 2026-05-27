@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { loginApi, registerApi, logoutApi, getMeApi, uploadAvatarApi, deleteAvatarApi } from '../api/AuthAPI';
+import { loginApi, registerApi, logoutApi, getMeApi, uploadAvatarApi, deleteAvatarApi } from '../api/authApi';
 import { auth, googleProvider, facebookProvider } from '../config/firebase';
 import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 
@@ -179,7 +179,6 @@ export const AuthProvider = ({ children }) => {
     const response = await fetch(`${API_URL}/auth/oauth`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ id_token: idToken, provider }),
     });
 

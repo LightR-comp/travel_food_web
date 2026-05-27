@@ -109,14 +109,7 @@ const PostCard = ({ post, index }) => {
           {post.excerpt}
         </p>
 
-        {/* Tags */}
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {post.tags.map(tag => (
-            <span key={tag} className="text-[0.7rem] font-medium text-[#E8623A]/80 bg-[#FFF8EE] px-2 py-0.5 rounded-md hover:bg-[#E8623A]/10 transition-colors cursor-pointer">
-              {tag}
-            </span>
-          ))}
-        </div>
+
 
         {/* Actions */}
         <div className="flex items-center gap-4 pt-3 border-t border-[#F5EDD8]/60">

@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { sendChatMessageApi } from '../../api/chatbotApi';
 import { useAuth } from '../../context/AuthContext';
 import botAvatar from '../../assets/avatar_chatbot.jpg';
 
 const ChatBubble = ({ role, text, timestamp, suggestedPlaces = [], user, image }) => {
   const isBot = role === 'bot';
+  const navigate = useNavigate();
   
   const getFullAvatarUrl = (avatarPath) => {
     if (!avatarPath) return null;
@@ -39,12 +41,16 @@ const ChatBubble = ({ role, text, timestamp, suggestedPlaces = [], user, image }
         {isBot && suggestedPlaces.length > 0 && (
           <div className="flex flex-col gap-2 mt-1 w-full">
             {suggestedPlaces.map(({ restaurant, ai_reason, tags }) => (
-              <div key={restaurant.id} className="bg-white border border-[#F5EDD8] rounded-xl p-3 shadow-sm">
+              <div
+                key={restaurant.id}
+                onClick={() => navigate(`/detail/${restaurant.id}`)}
+                className="bg-white border border-[#F5EDD8] rounded-xl p-3 shadow-sm hover:shadow-md hover:border-[#F4836A]/40 hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer transition-all duration-200 group"
+              >
                 <div className="flex items-center gap-2 mb-1.5">
                   {restaurant.image_url && (
                     <img src={restaurant.image_url} alt={restaurant.res_name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
                   )}
-                  <span className="font-semibold text-xs text-[#2C1810]">{restaurant.res_name}</span>
+                  <span className="font-semibold text-xs text-[#2C1810] group-hover:text-[#E8623A] transition-colors">{restaurant.res_name}</span>
                 </div>
                 {ai_reason && <p className="text-xs text-[#7B7068] italic">{ai_reason}</p>}
                 {tags && (
@@ -188,14 +194,22 @@ const ChatbotModal = ({ onClose }) => {
 
       if (!res.success) throw new Error(res.error || res.message);
 
-      let replyText = '';
+       let replyText = '';
       
       if (res.data?.reply) {
         replyText = res.data.reply;
       } else if (res.data?.dish_name) {
-        replyText = `🍽️ Tôi nhận ra đây là món **${res.data.dish_name}**!\n\n` +
-          `**Nguyên liệu:** ${res.data.ingredients?.join(', ')}\n\n` +
-          `**Công thức:** ${res.data.recipe}`;
+        // Build the reply string step-by-step for clarity and robustness
+        let dishReply = `🍽️ Tôi nhận ra đây là món **${res.data.dish_name}**!`;
+        if (res.data.ingredients && res.data.ingredients.length > 0) {
+          dishReply += `\n\n**Nguyên liệu:** ${res.data.ingredients.join(', ')}`;
+        }
+        // The backend now only sends the 'recipe' field if it has content.
+        // This check correctly handles cases where the recipe is absent.
+        if (res.data.recipe) {
+          dishReply += `\n\n**Công thức:** ${res.data.recipe}`;
+        }
+        replyText = dishReply;
       } else {
         replyText = 'Đã xử lý ảnh nhưng không có kết quả.';
       }

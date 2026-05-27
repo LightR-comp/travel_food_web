@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import axiosInstance from '../../api/axiosInstance';
 
 const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => {
   const { id } = useParams();
@@ -83,19 +84,13 @@ const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => 
           const formData = new FormData();
           formData.append('image', item.file);
 
-          const res = await fetch('/api/v1/posts/upload', {
-            method: 'POST',
+          const res = await axiosInstance.post('/posts/upload', formData, {
             headers: {
-              'Authorization': `Bearer ${token}`
-            },
-            body: formData
+              'Content-Type': 'multipart/form-data'
+            }
           });
 
-          const data = await res.json();
-          if (!res.ok) {
-            throw new Error(data.error || data.message || 'Upload ảnh thất bại');
-          }
-          return data.url;
+          return res.data.url;
         });
 
         uploadedUrls = await Promise.all(uploadPromises);
@@ -110,18 +105,9 @@ const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => 
         images: uploadedUrls.map(url => ({ image_url: url }))
       };
 
-      const reviewRes = await fetch(`/api/v1/restaurants/${id}/rating`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(reviewPayload)
-      });
-
-      const reviewData = await reviewRes.json();
-      if (!reviewRes.ok || !reviewData.success) {
-        throw new Error(reviewData.message || 'Gửi đánh giá thất bại');
+      const reviewRes = await axiosInstance.post(`/restaurants/${id}/rating`, reviewPayload);
+      if (!reviewRes.data || !reviewRes.data.success) {
+        throw new Error(reviewRes.data?.message || 'Gửi đánh giá thất bại');
       }
 
       onClose();
@@ -129,7 +115,8 @@ const ReviewModal = ({ isOpen, onClose, restaurantName, onReviewSubmitted }) => 
 
     } catch (error) {
       console.error(error);
-      alert(`Lỗi: ${error.message}`);
+      const errMsg = error.response?.data?.message || error.message || 'Có lỗi xảy ra';
+      alert(`Lỗi: ${errMsg}`);
     } finally {
       setIsUploading(false);
       setIsSubmitting(false);

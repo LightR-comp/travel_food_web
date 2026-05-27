@@ -179,7 +179,6 @@ export const AuthProvider = ({ children }) => {
     const response = await fetch(`${API_URL}/auth/oauth`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ id_token: idToken, provider }),
     });
 

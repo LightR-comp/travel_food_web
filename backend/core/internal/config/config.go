@@ -7,7 +7,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// Config struct chứa toàn bộ cấu hình hệ thống
 type Config struct {
 	Port                string
 	DBHost              string
@@ -32,7 +31,6 @@ func LoadConfig() {
 		log.Printf("Chạy môi trường Production (Render) hoặc thiếu file .env local: %v", err)
 	}
 
-	// Gán trực tiếp bằng os.Getenv hoặc os.LookupEnv thông qua hàm getEnv
 	AppConfig = Config{
 		Port:                getEnv("PORT", "8080"),
 		DBHost:              getEnv("DB_HOST", "127.0.0.1"),
@@ -50,7 +48,7 @@ func LoadConfig() {
 	}
 }
 
-// getEnv giúp lấy giá trị từ biến môi trường, nếu rỗng thì đè giá trị mặc định vào
+
 func getEnv(key string, defaultValue string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value

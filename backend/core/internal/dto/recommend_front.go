@@ -6,7 +6,6 @@ package dto
 
 import "backend/core/internal/models"
 
-// RecommendRequest: Định nghĩa cấu trúc dữ liệu Request nhận từ client (frontend) gửi lên Go backend
 type RecommendRequest struct {
 	UserID int `json:"user_id"`
 
@@ -15,7 +14,6 @@ type RecommendRequest struct {
 	Preferences models.ContextPreferences `json:"preferences"`
 }
 
-// RecommendResponse: Định nghĩa cấu trúc dữ liệu Response trả về cho client sau khi xử lý xong yêu cầu gợi ý
 type RecommendResponse struct {
     Success bool                     `json:"success"`
     Message string                   `json:"message"`
@@ -31,7 +29,7 @@ type RestaurantSummary struct {
     ID             int               `json:"id"`
     RestaurantInfo InfoDTO           `json:"restaurant_info"`
     SignatureDish  SignatureDishDTO  `json:"signature_dish"`
-    Meta           MetaDTO           `json:"meta"`// Thông tin meta như rating, khoảng cách, mức giá, v.v.
+    Meta           MetaDTO           `json:"meta"`
     AIAnalysis     AIAnalysisDTO     `json:"ai_analysis"`
 }
 
@@ -40,8 +38,8 @@ type InfoDTO struct {
     ImageURL       string            `json:"image_url"`
     Contact        ContactDTO        `json:"contact"`
     OperatingHours HoursDTO          `json:"operating_hours"`
-    History        string            `json:"history"`// Câu chuyện về nhà hàng
-    FunFacts       []string          `json:"fun_facts"`// Những thông tin thú vị về nhà hàng
+    History        string            `json:"history"`
+    FunFacts       []string          `json:"fun_facts"`
 }
 
 type ContactDTO struct {
@@ -50,15 +48,15 @@ type ContactDTO struct {
 }
 
 type HoursDTO struct {
-    Schedule   string `json:"schedule"` // Ví dụ: "10:00 AM - 10:00 PM"
+    Schedule   string `json:"schedule"` 
     IsOpenNow  bool   `json:"is_open_now"`
-    StatusText string `json:"status_text"` // Ví dụ: "Đang mở cửa"
+    StatusText string `json:"status_text"` 
 }
 
 type SignatureDishDTO struct {
     DishName       string   `json:"dish_name"`
-    Description    string   `json:"description"`// Mô tả về món ăn đặc trưng của nhà hàn
-    Trivia         []string `json:"trivia"`// Những thông tin thú vị về món ăn, có thể được sử dụng để gợi ý nếu người dùng quan tâm đến trải nghiệm ẩm thực
+    Description    string   `json:"description"`
+    Trivia         []string `json:"trivia"`
 }
 
 type MetaDTO struct {

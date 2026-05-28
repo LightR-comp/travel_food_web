@@ -1,5 +1,4 @@
-//Tạo token cho account local, dùng để xử lí các endpoint private
-//go mod tidy nha
+
 package services
 
 import (

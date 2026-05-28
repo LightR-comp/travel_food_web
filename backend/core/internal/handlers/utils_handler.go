@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"backend/core/internal/services" // Thay bằng đúng đường dẫn import trong project của bạn
+	"backend/core/internal/services" 
 
 	"github.com/gin-gonic/gin"
 )

@@ -11,9 +11,6 @@ import (
 	"backend/core/internal/services"
 )
 
-// ============================================================
-// POST
-// ============================================================
 
 func GetPopularPosts(c *gin.Context) {
 	posts, err := services.GetPopularPosts(c.Request.Context())
@@ -91,10 +88,6 @@ func CreatePost(c *gin.Context) {
 	})
 }
 
-// ============================================================
-// COMMENT
-// ============================================================
-
 func AddComment(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
@@ -106,15 +99,14 @@ func AddComment(c *gin.Context) {
 
 	var req struct {
 		Content  string `json:"content"`
-		ImageURL string `json:"image_url"` // optional
-		ParentID *int   `json:"parent_id"` // nil = comment gốc, có giá trị = reply
+		ImageURL string `json:"image_url"` 
+		ParentID *int   `json:"parent_id"` 
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Dữ liệu không hợp lệ"})
 		return
 	}
 
-	// Phải có ít nhất content hoặc image_url
 	if req.Content == "" && req.ImageURL == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Bình luận phải có nội dung hoặc ảnh"})
 		return
@@ -132,9 +124,6 @@ func AddComment(c *gin.Context) {
 	})
 }
 
-// ============================================================
-// LIKE
-// ============================================================
 
 func LikePost(c *gin.Context) {
     userID := c.GetInt("user_id")

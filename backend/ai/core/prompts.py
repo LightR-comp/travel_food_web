@@ -1,8 +1,4 @@
-# prompts.py chứa các hàm để xây dựng các prompt cho AI, bao gồm việc xây dựng prompt
-# Đây là nơi chúng ta sẽ xây dựng các hàm để tạo ra các prompt phù hợp
-# dùng để sinh text reason, sinh câu trả lời chatbot, sinh funfact về top quán ăn dược chấm điểm cao,..
 
-# --- Các Template gốc ---
 ALLERGY_FILTER_TEMPLATE = """
 Dựa trên thông tin dị ứng của người dùng: {allergies}.
 Hãy kiểm tra danh sách món ăn: {menu}.
@@ -23,7 +19,6 @@ Hãy viết một dòng "Bạn có biết?" (Fun Fact) thú vị về sự phổ
 Yêu cầu: Ngắn gọn, sáng tạo, tối đa 2 câu.
 """
 
-# --- Các hàm xây dựng Prompt ---
 
 def build_allergy_prompt(allergies, menu):
     """Hàm xây dựng prompt lọc dị ứng"""

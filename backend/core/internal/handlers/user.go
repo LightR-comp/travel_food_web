@@ -15,15 +15,12 @@ import (
 	"backend/core/internal/services"
 )
 
-// Khai báo biến DB toàn cục
 var db *sql.DB
 
-// InitUserHandler khởi tạo DB cho handlers
 func InitUserHandler(database *sql.DB) {
 	db = database
 }
 
-// ---- Helper trả về format chuẩn ----
 func successResponse(c *gin.Context, message string, data any) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -42,7 +39,6 @@ func errorResponse(c *gin.Context, status int, message string, err string) {
 	})
 }
 
-// Login OAuth (Google/Facebook)
 func Login(c *gin.Context) {
 	var req struct {
 		IDToken  string `json:"id_token" binding:"required"`
@@ -85,7 +81,6 @@ func Login(c *gin.Context) {
 	})
 }
 
-// Register tài khoản local
 func Register(c *gin.Context) {
 	var req struct {
 		Username string `json:"username"  binding:"required"`
@@ -108,7 +103,6 @@ func Register(c *gin.Context) {
 	successResponse(c, "Đăng ký thành công", gin.H{"user_id": user.ID})
 }
 
-// LocalLogin đăng nhập bằng username/password
 func LocalLogin(c *gin.Context) {
 	var req struct {
 		Username string `json:"username" binding:"required"`
@@ -156,7 +150,6 @@ func GetProfile(c *gin.Context) {
 	successResponse(c, "Lấy thông tin thành công", user)
 }
 
-// UpdateProfile cập nhật preferences
 func UpdateProfile(c *gin.Context) {
 	userID := c.GetInt("user_id")
 	log.Printf("[UpdateProfile] userID=%d, raw=%v", userID, c.Keys)
@@ -177,9 +170,7 @@ func UpdateProfile(c *gin.Context) {
 	successResponse(c, "Cập nhật thành công", nil)
 }
 
-// ========== AVATAR HANDLERS ==========
 
-// UploadAvatar - POST /api/v1/me/avatar
 func UploadAvatar(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
@@ -228,7 +219,6 @@ func UploadAvatar(c *gin.Context) {
 
 	fmt.Printf("Upload success: %s\n", avatarURL)
 
-	// ✅ Lấy lại thông tin user mới nhất sau khi update
 	user, err := services.GetUserByID(c.Request.Context(), userID)
 	if err != nil {
 		fmt.Printf("WARNING: Cannot get updated user: %v\n", err)
@@ -241,18 +231,15 @@ func UploadAvatar(c *gin.Context) {
 	fmt.Printf("User updated successfully, avatar_url: %s\n", user.AvatarURL)
 	fmt.Printf("===== END UploadAvatar =====\n")
 
-	// ✅ Trả về đầy đủ thông tin user
 	successResponse(c, "Upload avatar thành công", gin.H{
 		"avatar_url": user.AvatarURL,
 		"user":       user,
 	})
 }
 
-// DeleteAvatar - DELETE /api/v1/me/avatar
 func DeleteAvatar(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
-	// Xóa avatar - Truyền db vào
 	err := services.DeleteAvatar(c.Request.Context(), userID)
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "Xóa avatar thất bại", err.Error())
@@ -262,7 +249,6 @@ func DeleteAvatar(c *gin.Context) {
 	successResponse(c, "Xóa avatar thành công", nil)
 }
 
-// UpdateAvatar - PUT /api/v1/me/avatar (cập nhật URL trực tiếp)
 func UpdateAvatar(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
@@ -274,7 +260,6 @@ func UpdateAvatar(c *gin.Context) {
 		return
 	}
 
-	// Cập nhật avatar URL - Truyền db vào
 	err := services.UpdateAvatarURL(c.Request.Context(), userID, req.AvatarURL)
 	if err != nil {
 		errorResponse(c, http.StatusInternalServerError, "Cập nhật avatar thất bại", err.Error())
@@ -286,7 +271,6 @@ func UpdateAvatar(c *gin.Context) {
 	})
 }
 
-// ForgotPassword gửi reset link qua email
 func ForgotPassword(c *gin.Context) {
 	var req struct {
 		Username string `json:"username" binding:"required"`
@@ -321,7 +305,6 @@ func ForgotPassword(c *gin.Context) {
 	successResponse(c, "Nếu tài khoản tồn tại, hướng dẫn đặt lại mật khẩu đã được gửi", nil)
 }
 
-// ResetPassword đổi mật khẩu mới
 func ResetPassword(c *gin.Context) {
 	var req struct {
 		Token       string `json:"token"        binding:"required"`

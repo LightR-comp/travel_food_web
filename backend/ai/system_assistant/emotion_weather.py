@@ -1,4 +1,4 @@
-# 10 loại Mood và các tag không gian quán tương ứng
+
 MOOD_MAPPING = {
     "romantic": ["yen_tinh", "sang_trong", "view_dep", "den_mo"],
     "sad": ["am_cung", "nhac_nhe", "yen_tinh", "ngot_ngao"],
@@ -12,7 +12,6 @@ MOOD_MAPPING = {
     "family": ["rong_rai", "ban_lon", "khu_vui_choi", "am_cung"]
 }
 
-# Các tag đồ ăn/không gian phù hợp với thời tiết
 WEATHER_MAPPING = {
     "rainy": ["lau", "nuong", "sup", "nong_hoi", "am_cung", "trong_nha"],
     "hot": ["mat_me", "trai_cay", "kem", "salad", "khong_gian_lanh", "may_lanh"],
@@ -26,7 +25,6 @@ def calculate_emotion_weather_match(user_mood, current_weather, restaurant_tags,
     """
     resto_tags_set = set(restaurant_tags)
     
-    # --- 1. CHẤM ĐIỂM MOOD (Tối đa 0.6) ---
     mood_score = 0.0
     target_mood_tags = set(MOOD_MAPPING.get(user_mood, []))
     
@@ -37,15 +35,13 @@ def calculate_emotion_weather_match(user_mood, current_weather, restaurant_tags,
         elif mood_match_count == 1:
             mood_score = 0.4
         else:
-            # Bù trừ bằng rating nếu tag không khớp hoàn toàn
             if user_mood in ["romantic", "family", "chill"] and restaurant_rating >= 4.5:
                 mood_score = 0.3
             else:
                 mood_score = 0.1
     else:
-        mood_score = 0.6 # Nếu Frontend không truyền mood, cho mặc định full điểm phần này
+        mood_score = 0.6 
 
-    # --- 2. CHẤM ĐIỂM WEATHER (Tối đa 0.4) ---
     weather_score = 0.0
     target_weather_tags = set(WEATHER_MAPPING.get(current_weather, []))
     
@@ -56,6 +52,6 @@ def calculate_emotion_weather_match(user_mood, current_weather, restaurant_tags,
         else:
             weather_score = 0.1
     else:
-        weather_score = 0.4 # Nếu Frontend không truyền thời tiết, mặc định full điểm
+        weather_score = 0.4
         
     return round(mood_score + weather_score, 2)

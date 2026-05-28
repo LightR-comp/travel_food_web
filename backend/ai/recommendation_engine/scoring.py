@@ -1,7 +1,3 @@
-# scoring.py chứa các hàm để tính toán điểm số cho các quán ăn dựa trên các tiêu chí của nhóm
-# Đây là nơi chúng ta sẽ xây dựng các hàm để tính toán điểm số cho các quán ăn dựa trên các tiêu chí đã xác định trong giai đoạn thiết kế.
-# Các hàm này sẽ được sử dụng trong quá trình gợi ý quán ăn
-# trả về điểm số cho từng quán ăn
 
 import math
 import sys
@@ -34,16 +30,10 @@ def calculate_budget_fit(
 
     tags = set(tag.lower() for tag in virtual_tags)
 
-    # =========================
-    # Base preference profile
-    # =========================
-
+    
     mu = 0.9
     sigma = 0.22
 
-    # =========================
-    # Tag-driven adaptation
-    # =========================
 
     premium_tags = {
         "steak", "sushi", "fine dining",
@@ -60,44 +50,31 @@ def calculate_budget_fit(
         "fast food", "snack"
     }
 
-    # Premium restaurant
     if tags & premium_tags:
         mu += 0.18
         sigma += 0.05
 
-    # Group dining
     if people >= 4 and tags & group_tags:
         mu += 0.12
         sigma += 0.08
 
-    # Cheap casual food
     if tags & cheap_tags:
         mu -= 0.15
-
-    # =========================
-    # Gaussian utility score
-    # =========================
 
     score = math.exp(
         -((x - mu) ** 2) / (2 * sigma ** 2)
     )
 
-    # =========================
-    # Saturation handling
-    # =========================
-
-    # Quá mắc → phạt thêm
+    
     if x > 1.6:
         score *= 0.6
 
-    # Quá rẻ → giảm nhẹ vì mismatch expectation
     if x < 0.4:
         score *= 0.85
 
     return round(max(0.0, min(score, 1.0)), 3)
 
 def determine_dynamic_weights(prefs):
-    """Điều chỉnh trọng số thông minh."""
     budget = prefs.get("budget", 0)
     people = max(1, prefs.get("people", 1))
     budget_per_person = budget / people
@@ -129,9 +106,6 @@ def calculate_total_score(
 
     return round(score, 4)
 
-# ==========================================
-# 3. HÀM XỬ LÝ CHÍNH GIAO TIẾP VỚI GO BACKEND
-# ==========================================
 
 def process_scoring(ai_input_data):
     user_context = ai_input_data.get("user_context", {})
@@ -142,17 +116,14 @@ def process_scoring(ai_input_data):
     results = []
 
     for r_data in restaurants:
-        # 0. Chuẩn bị dữ liệu và r_id
         r = r_data if isinstance(r_data, dict) else r_data.dict()
-        r_id = r.get("id") # Định nghĩa r_id ở đây để tránh lỗi Pylance
+        r_id = r.get("id") 
         
         v_tags = _get_virtual_tags(r.get("type", ""), r.get("featured_dishes", []))
         
-        # 1. Firewall (Lọc dị ứng/chế độ ăn)
         if not is_safe_for_diet(prefs.get("dietary", []), v_tags):
             continue 
 
-        # 2. Tính điểm thành phần (Dùng tên biến s_ để ngắn gọn)
         s_taste = calculate_taste_match(prefs.get("food_types", []), v_tags)
         s_emotion = calculate_emotion_weather_match(
             prefs.get("mood", ""), 
@@ -167,15 +138,12 @@ def process_scoring(ai_input_data):
             v_tags
         )
 
-        # 3. Tổng hợp điểm theo trọng số
         total_score = max(0.1,calculate_total_score(s_taste, s_emotion, s_budget, weights))
         
-        # 4. Phạt khoảng cách
         dist = r.get("distance_km", 0)
         if dist > 1.0:
             total_score *= math.pow(0.9, dist - 1.0)
 
-        # 5. SINH LÝ DO (Đã sửa lỗi trùng tên biến taste_score -> s_taste)
         scores_map = {
             "taste": s_taste,
             "emotion": s_emotion,

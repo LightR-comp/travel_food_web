@@ -9,9 +9,6 @@ import (
 	"backend/core/internal/models"
 )
 
-// ============================================================
-// POST
-// ============================================================
 
 func GetPopularPosts(ctx context.Context) ([]models.Post, error) {
 	rows, err := db.QueryContext(ctx, `
@@ -123,9 +120,6 @@ func CreatePost(ctx context.Context, userID int, post models.Post) (*models.Post
 	return &post, nil
 }
 
-// ============================================================
-// POST IMAGES
-// ============================================================
 
 func AddPostImages(ctx context.Context, postID int, imageURLs []string) error {
 	for i, url := range imageURLs {
@@ -167,9 +161,6 @@ func GetPostImages(ctx context.Context, postID int) ([]models.PostImage, error) 
 	return images, nil
 }
 
-// ============================================================
-// COMMENT
-// ============================================================
 
 func GetCommentsByPost(ctx context.Context, postID int) ([]models.Comment, error) {
 	rows, err := db.QueryContext(ctx, `
@@ -185,7 +176,7 @@ func GetCommentsByPost(ctx context.Context, postID int) ([]models.Comment, error
 	}
 	defer rows.Close()
 
-	var allComments []models.Comment // Chứa toàn bộ comment (cả gốc lẫn con)
+	var allComments []models.Comment 
 	for rows.Next() {
 		var cm models.Comment
 		var authorName string
@@ -207,13 +198,11 @@ func GetCommentsByPost(ctx context.Context, postID int) ([]models.Comment, error
 			pid := uint64(parentID.Int64)
 			cm.ParentID = &pid
 		}
-		// Đảm bảo khởi tạo mảng rỗng để không bị null JSON
 		cm.Replies = []models.Comment{} 
 
 		allComments = append(allComments, cm)
 	}
 
-	// 💡 TRẢ VỀ TOÀN BỘ MẢNG PHẲNG CHỨA CẢ CHA LẪN CON
 	return allComments, nil
 }
 
@@ -227,10 +216,8 @@ func AddComment(ctx context.Context, userID, postID int, content, imageURL strin
 		imgParam = nil
 	}
  
-	// parentID có thể nil (comment gốc) hoặc có giá trị (reply)
 	var parentParam interface{}
 	if parentID != nil {
-		// Kiểm tra parent tồn tại và thuộc đúng bài viết
 		var exists int
 		db.QueryRowContext(ctx, `
 			SELECT COUNT(*) FROM Comments WHERE id = @id AND post_id = @postID
@@ -259,7 +246,6 @@ func AddComment(ctx context.Context, userID, postID int, content, imageURL strin
 		return nil, fmt.Errorf("AddComment: %w", err)
 	}
  
-	// Chỉ tăng reply_count cho bài viết khi là comment gốc
 	if parentID == nil {
 		db.ExecContext(ctx, `UPDATE Posts SET reply_count = reply_count + 1 WHERE id = @id`,
 			sql.Named("id", postID))
@@ -277,9 +263,6 @@ func AddComment(ctx context.Context, userID, postID int, content, imageURL strin
 	return &cm, nil
 }
 
-// ============================================================
-// LIKE
-// ============================================================
 
 func LikePost(ctx context.Context, userID, postID int) (bool, int, error) {
     var count int
@@ -352,9 +335,6 @@ func LikeComment(ctx context.Context, userID int, commentID uint64) (bool, error
 	return true, nil
 }
 
-// ============================================================
-// HELPER
-// ============================================================
 
 func scanPosts(rows *sql.Rows) ([]models.Post, error) {
     var posts []models.Post

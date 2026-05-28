@@ -24,12 +24,10 @@ func GetRecommendations(c *gin.Context) {
 		})
 		return
 	}
-	// CHỐT BẢO MẬT: LẤY ID TỪ TOKEN
 	authUserID := c.GetInt("user_id")
 	if authUserID > 0 {
 		req.UserID = authUserID
 	}
-	// Dùng toạ độ từ frontend gửi lên (nếu có), nếu không có thì mặc định trung tâm TP.HCM
 	if req.Location.Lat == 0 && req.Location.Lng == 0 {
 		req.Location.Lat = 10.7769
 		req.Location.Lng = 106.7009
@@ -41,7 +39,6 @@ func GetRecommendations(c *gin.Context) {
 
 	ctx := c.Request.Context()
 
-	// Ưu tiên 1: Lấy từ DB lấp vào chỗ trống
 	if req.UserID > 0 {
 		prefs, err := services.GetUserPreferences(ctx, req.UserID)
 		if err == nil {
@@ -57,26 +54,21 @@ func GetRecommendations(c *gin.Context) {
 		}
 	}
 
-	// Ưu tiên 2: Xử lý giá trị mặc định
 	if req.Preferences.Budget == 0 { req.Preferences.Budget = 100000 }
 	if req.Preferences.People == 0 { req.Preferences.People = 1 }
-	// Đảm bảo Dietary và FoodTypes không bị null khi lên JSON
+
 	if req.Preferences.Dietary == nil {
     		req.Preferences.Dietary = []string{}
 	}
 	if req.Preferences.FoodTypes == nil {
     		req.Preferences.FoodTypes = []string{}
 	}
-	// Truy vấn quán ăn quanh vị trí
 	restaurants, err := services.GetRestaurantsNearby(ctx, services.NearbyQuery{
 		Latitude:  req.Location.Lat,
 		Longitude: req.Location.Lng,
 		RadiusKm:  req.Location.RadiusKm,
 	})
-	// log.Printf("[DEBUG] Số lượng quán lấy từ DB: %d", len(restaurants))
-	// for _, r := range restaurants {
-	// 	log.Printf("[DEBUG] Restaurant ID trong DB: %d - Tên: %s", r.ID, r.Name)
-	// }
+	
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.RecommendResponse{Success: false, Message: "Lỗi DB"})
 		return
@@ -87,7 +79,6 @@ func GetRecommendations(c *gin.Context) {
 		return
 	}
 
-	// Payload gửi Python AI
 	var aiInput []dto.AIRestaurantInput
 	for _, r := range restaurants {
 		aiInput = append(aiInput, utils.BuildAIInput(r))
@@ -97,16 +88,13 @@ func GetRecommendations(c *gin.Context) {
 		UserIntent:  utils.ToUserContext(req),
 		Restaurants: aiInput,
 	}
-	// // Thêm log này:
-	//log.Printf("[DEBUG] Payload gửi sang AI: %+v", aiReq)
-	// Gọi Python Service chấm điểm
+	
 	aiResp, err := services.CallPythonEngine(aiReq)
 	if err != nil {
 		c.JSON(http.StatusServiceUnavailable, dto.RecommendResponse{Success: false, Message: "AI Service lỗi", Error: err.Error()})
 		return
 	}
 
-	// Map kết quả trả về cho Frontend
 	var finalResults []dto.RestaurantSummary
 	resMap := make(map[int]models.Restaurant)
 	for _, r := range restaurants {

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getRecommendationsApi } from '../../api/restaurantApi';
+import { useLocation as useGeoLocation } from '../../context/LocationContext';
 
 // ─── Constants ────────────────────────────────────────────────────
 const MOODS = [
@@ -109,6 +110,7 @@ const ResultCard = ({ r, onClick }) => {
 const AIRecommendModal = ({ onClose }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const geoLocation = useGeoLocation();
 
   const [step, setStep]         = useState(1); // 1=mood, 2=food, 3=options, 4=results
   const [loading, setLoading]   = useState(false);
@@ -150,13 +152,18 @@ const AIRecommendModal = ({ onClose }) => {
     try {
       // Try to get user location
       let lat = 10.7769, lng = 106.7009; // default: Quận 1, TP.HCM
-      try {
-        const pos = await new Promise((res, rej) =>
-          navigator.geolocation.getCurrentPosition(res, rej, { timeout: 3000 })
-        );
-        lat = pos.coords.latitude;
-        lng = pos.coords.longitude;
-      } catch (_) { /* dùng default */ }
+      if (geoLocation && geoLocation.lat && geoLocation.lon) {
+        lat = geoLocation.lat;
+        lng = geoLocation.lon;
+      } else {
+        try {
+          const pos = await new Promise((res, rej) =>
+            navigator.geolocation.getCurrentPosition(res, rej, { timeout: 3000 })
+          );
+          lat = pos.coords.latitude;
+          lng = pos.coords.longitude;
+        } catch (_) { /* dùng default */ }
+      }
 
       const payload = {
         user_id: user?.id || 0,
@@ -184,7 +191,7 @@ const AIRecommendModal = ({ onClose }) => {
     } finally {
       setLoading(false);
     }
-  }, [form, user]);
+  }, [form, user, geoLocation]);
 
   const goToDetail = (id) => {
     onClose();

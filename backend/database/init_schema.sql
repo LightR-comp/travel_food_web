@@ -1,23 +1,19 @@
--- USE master; -- Chuyển sang database hệ thống trước
--- GO
+USE master; -- Chuyển sang database hệ thống trước
+GO
 
--- -- Ngắt tất cả kết nối đang truy cập vào travel_food_db
--- ALTER DATABASE travel_food_db SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
--- GO
+ALTER DATABASE travel_food_db SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+GO
 
--- -- Bây giờ mới xóa
--- DROP DATABASE IF EXISTS travel_food_db;
--- GO
+DROP DATABASE IF EXISTS travel_food_db;
+GO
 
--- -- Tạo lại
--- CREATE DATABASE travel_food_db;
--- GO
+CREATE DATABASE travel_food_db;
+GO
 
--- USE travel_food_db;
--- GO
+USE travel_food_db;
+GO
 
 
--- Bảng Users: Chứa thông tin cơ bản
 CREATE TABLE Users (
     id INT IDENTITY(1,1) PRIMARY KEY,
     email NVARCHAR(255) NOT NULL,
@@ -28,7 +24,6 @@ CREATE TABLE Users (
 )
 GO
 
--- Bảng UserAuth: Chứa thông tin đăng nhập (Local, Google, Firebase)
 CREATE TABLE UserAuth (
     id INT IDENTITY(1,1) PRIMARY KEY,
     user_id INT NOT NULL FOREIGN KEY REFERENCES Users(id) ON DELETE CASCADE,
@@ -39,18 +34,16 @@ CREATE TABLE UserAuth (
 )
 GO
 
--- Bảng UserPreferences: Lưu sở thích ăn uống, budget của user
 CREATE TABLE UserPreferences (
     user_id INT PRIMARY KEY FOREIGN KEY REFERENCES Users(id) ON DELETE CASCADE,
     budget_per_person FLOAT DEFAULT 0,
-    dietary NVARCHAR(MAX),     -- VD: "vegan,vegetarian"
-    food_types NVARCHAR(MAX),  -- VD: "japanese,bbq"
+    dietary NVARCHAR(MAX),     
+    food_types NVARCHAR(MAX),  
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE()
 )
 GO
 
--- Bảng Restaurants: Danh sách quán ăn
 CREATE TABLE Restaurants (
     id INT IDENTITY(1,1) PRIMARY KEY,
     name NVARCHAR(255) NOT NULL,
@@ -67,7 +60,6 @@ CREATE TABLE Restaurants (
 )
 GO
 
--- Bảng MenuItems: Danh sách món ăn thuộc về quán
 CREATE TABLE MenuItems (
     id INT IDENTITY(1,1) PRIMARY KEY,
     restaurant_id INT NOT NULL FOREIGN KEY REFERENCES Restaurants(id) ON DELETE CASCADE,
@@ -75,14 +67,13 @@ CREATE TABLE MenuItems (
     description NVARCHAR(MAX),
     price FLOAT NOT NULL,
     food_type NVARCHAR(100),
-    ingredients NVARCHAR(MAX), -- VD: "chicken,garlic"
-    story NVARCHAR(MAX),       -- Câu chuyện món ăn
+    ingredients NVARCHAR(MAX), 
+    story NVARCHAR(MAX),       
     created_at DATETIME DEFAULT GETDATE(),
     updated_at DATETIME DEFAULT GETDATE()
 )
 GO
 
--- Bảng UserRatings: Lưu review/đánh giá của user cho quán ăn
 CREATE TABLE UserRatings (
     id INT IDENTITY(1,1) PRIMARY KEY,
     user_id INT NOT NULL FOREIGN KEY REFERENCES Users(id),
@@ -102,7 +93,6 @@ CREATE TABLE UserRatingImages (
         REFERENCES UserRatings(id) ON DELETE CASCADE
 );
 
--- Bảng ChatHistory: Lưu lịch sử chat
 CREATE TABLE ChatHistory (
     id INT IDENTITY(1,1) PRIMARY KEY,
     user_id INT NOT NULL FOREIGN KEY REFERENCES Users(id) ON DELETE CASCADE,
@@ -112,13 +102,11 @@ CREATE TABLE ChatHistory (
 );
 GO
 
--- Bảng ChatSuggestionLog: Lưu chi tiết các nhà hàng được gợi ý trong một tin nhắn chat
--- Thiết kế này giúp truy vấn và phân tích dữ liệu gợi ý dễ dàng hơn nhiều so với việc lưu JSON.
 CREATE TABLE ChatSuggestionLog (
     id INT IDENTITY(1,1) PRIMARY KEY,
     chat_history_id INT NOT NULL FOREIGN KEY REFERENCES ChatHistory(id) ON DELETE CASCADE,
     restaurant_id INT NOT NULL,
-    restaurant_name NVARCHAR(255), -- Denormalized for easier analysis
+    restaurant_name NVARCHAR(255), 
     score FLOAT NOT NULL,
     created_at DATETIME DEFAULT GETDATE()
 );
@@ -130,7 +118,6 @@ ADD reset_token     NVARCHAR(255) NULL,
     reset_token_exp DATETIME      NULL;
 GO
 
--- Bảng Posts: Bài viết forum
 CREATE TABLE Posts (
     id            BIGINT IDENTITY(1,1) PRIMARY KEY,
     author_id     INT NOT NULL FOREIGN KEY REFERENCES Users(id) ON DELETE CASCADE,
@@ -150,7 +137,6 @@ CREATE TABLE Posts (
 )
 GO
 
--- Bảng Comments: Bình luận bài viết
 CREATE TABLE Comments (
     id         BIGINT IDENTITY(1,1) PRIMARY KEY,
     post_id    BIGINT NOT NULL FOREIGN KEY REFERENCES Posts(id) ON DELETE CASCADE,
@@ -162,7 +148,6 @@ CREATE TABLE Comments (
 )
 GO
 
--- Bảng PostLikes: Like bài viết
 CREATE TABLE PostLikes (
     id         BIGINT IDENTITY(1,1) PRIMARY KEY,
     post_id    BIGINT NOT NULL FOREIGN KEY REFERENCES Posts(id) ON DELETE CASCADE,
@@ -172,7 +157,6 @@ CREATE TABLE PostLikes (
 )
 GO
 
--- Bảng Attachments: File đính kèm
 CREATE TABLE Attachments (
     id        BIGINT IDENTITY(1,1) PRIMARY KEY,
     post_id   BIGINT NOT NULL FOREIGN KEY REFERENCES Posts(id) ON DELETE CASCADE,
@@ -181,7 +165,6 @@ CREATE TABLE Attachments (
 )
 GO
 
--- Bảng Polls: Bình chọn
 CREATE TABLE Polls (
     id          BIGINT IDENTITY(1,1) PRIMARY KEY,
     post_id     BIGINT NOT NULL FOREIGN KEY REFERENCES Posts(id) ON DELETE CASCADE,
@@ -227,19 +210,17 @@ CREATE TABLE DishImages (
     is_thumbnail BIT NOT NULL DEFAULT 1,
     created_at DATETIME NOT NULL DEFAULT GETDATE(),
     
-    -- Liên kết khóa ngoại tới bảng MenuItems để đảm bảo toàn vẹn dữ liệu
     CONSTRAINT FK_DishImages_MenuItems FOREIGN KEY (menu_item_id) 
         REFERENCES MenuItems(id) ON DELETE CASCADE
 );
 GO
 
--- Tạo Index để tối ưu tốc độ truy vấn khi hàm getImagesByMenuItemIDs tìm kiếm bằng IN (...)
 CREATE INDEX IX_DishImages_MenuItemID ON DishImages(menu_item_id);
 GO
 
 CREATE TABLE RestaurantStories (
     restaurant_id INT PRIMARY KEY,
-    story NVARCHAR(MAX) NULL, -- NULL nghĩa là được phép trống thoải mái
+    story NVARCHAR(MAX) NULL, 
     updated_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (restaurant_id) REFERENCES Restaurants(id) ON DELETE CASCADE
 );

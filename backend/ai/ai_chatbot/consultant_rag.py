@@ -5,10 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# The API key and model are now configured centrally in core/ai_config.py
-# We no longer need to load .env or configure genai here.
-# The shared_model is imported directly.
-# Tự động tìm file .env ở bất kỳ đâu trong dự án
+
 load_dotenv(find_dotenv())
 
 
@@ -28,19 +25,14 @@ def _filter_restaurants(request: ChatGenerationRequest, user_allergies: set):
 
     for res in request.found_restaurants:
         try:
-            # Lấy tất cả ingredients từ các món ăn và chuyển thành một set để kiểm tra hiệu quả
             restaurant_ingredients = set()
             featured_dishes = res.get('featured_dishes', [])
             for dish in featured_dishes:
-                # Chuyển thành chữ thường để so sánh không phân biệt hoa/thường
                 ingredients_in_dish = [ing.lower().strip() for ing in dish.get('ingredients', [])]
                 restaurant_ingredients.update(ingredients_in_dish)
             
-            # Kiểm tra xem có bất kỳ dị ứng nào của người dùng nằm trong danh sách nguyên liệu của nhà hàng không
-            # Dùng set intersection (&) để kiểm tra nhanh và chính xác, tránh lỗi so khớp chuỗi con (substring matching)
             found_allergens_set = user_allergies & restaurant_ingredients
             if found_allergens_set:
-                # Tìm ra các chất gây dị ứng cụ thể để cung cấp lý do rõ ràng hơn
                 found_allergens_str = ", ".join(found_allergens_set)
                 warning_restaurants.append((res, f"Có thể chứa nguyên liệu bạn dị ứng: {found_allergens_str}"))
             else:
@@ -48,23 +40,20 @@ def _filter_restaurants(request: ChatGenerationRequest, user_allergies: set):
 
         except Exception as e:
             logger.warning(f"Lỗi khi xử lý nhà hàng ID {res.get('id')}: {e}")
-            continue  # Bỏ qua nhà hàng lỗi, xử lý tiếp
+            continue  
 
     return safe_restaurants, warning_restaurants
 
 
 def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
-
-    # --- Bước 1: Xử lý dị ứng ---
+    
     user_allergies = set()
     if request.user_context and request.user_context.preferences:
         dietary = request.user_context.preferences.dietary or []
         user_allergies = set(a.lower() for a in dietary)
 
-    # --- Bước 2: Phân loại nhà hàng ---
     safe_restaurants, warning_restaurants = _filter_restaurants(request, user_allergies)
 
-    # Hàm hỗ trợ để lấy tất cả ingredients từ một nhà hàng cho việc tạo prompt
     def _get_all_ingredients_for_prompt(restaurant_dict):
         all_ings = set() # Dùng set để tránh lặp lại nguyên liệu
         for dish in restaurant_dict.get("featured_dishes", []):
@@ -95,9 +84,7 @@ def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
     4. Giọng văn phải thật tự nhiên, như đang nói chuyện với một người bạn.
     """
 
-    # --- Bước 3: Gọi AI ---
     try:
-        # The API key check is now handled centrally at startup.
         response = shared_model.generate_content(
             prompt,
             safety_settings={
@@ -112,20 +99,14 @@ def generate_final_response(request: ChatGenerationRequest) -> ChatFinalData:
         logger.error(f"Lỗi giá trị đầu vào cho Gemini: {ve}")
         ai_reply = f"Dạ, câu hỏi này làm AI bối rối một chút. (Lỗi chi tiết: {str(ve)})"
     except Exception as e:
-        # Lỗi không xác định — log đầy đủ để debug
         logger.exception(f"Lỗi không xác định khi gọi Gemini: {e}")
         ai_reply = f"Dạ, em đang gặp chút sự cố ạ. (Lỗi AI: {str(e)})"
 
-    # --- Bước 4: Build response — lỗi ở đây không ảnh hưởng ai_reply ---
     suggested_places = []
     try:
         for is_safe, items in [(True, safe_restaurants), (False, warning_restaurants)]:
             for res, reason in items:
-                # LƯU Ý: Schema `PlaceInfo` trong `payloads.py` cần được bổ sung trường `score: Optional[float] = None`
-                # để có thể chứa điểm số đã được re-rank từ Go.
-
-                # Lấy điểm số đã được Go tính toán, nếu không có thì dùng rating gốc.
-                # Giá trị này sẽ được lưu vào DB ở Go, và bị xóa đi trước khi gửi cho Frontend.
+                
                 score_to_save = res.get("final_score")
                 if score_to_save is None:
                     score_to_save = res.get("rating", 0.0)

@@ -1,5 +1,3 @@
-// strings_helper.go chứa các hàm tiện ích để xử lý chuỗi, bao gồm việc tách chuỗi CSV thành slice of strings, xây dựng bộ lọc từ ngữ cảnh người dùng và chuyển đổi giữa các mô hình dữ liệu khác nhau để giao tiếp với Python AI Service.
-// Đây là nơi chúng ta sẽ xây dựng các hàm tiện ích để giúp cho việc xử lý dữ liệu trở nên dễ dàng và hiệu quả hơn trong quá trình gợi ý quán ăn cho người dùng.
 
 
 package utils
@@ -12,7 +10,6 @@ import (
 	"backend/core/internal/dto"
 )
 
-// SplitCSV: Chuyển chuỗi CSV thành slice of strings, ví dụ "chicken,garlic" -> []string{"chicken", "garlic"}
 func SplitCSV(s string) []string {
 	if s == "" {
 		return []string{}
@@ -20,7 +17,6 @@ func SplitCSV(s string) []string {
 	return strings.Split(s, ",")
 }
 
-// BuildFilter: Chuyển đổi UserContext thành RestaurantFilter để truy vấn cơ sở dữ liệu
 func BuildFilter(ctx models.UserContext) models.RestaurantFilter {
 	return models.RestaurantFilter{
 		Lat: ctx.Location.Lat,
@@ -34,7 +30,6 @@ func BuildFilter(ctx models.UserContext) models.RestaurantFilter {
 	}
 }
 
-// Chuyển đổi RecommendRequest thành UserContext để gửi sang Python AI Service
 func ToUserContext(req dto.RecommendRequest) models.UserContext {
 	dietary := req.Preferences.Dietary
 	if dietary == nil {
@@ -62,7 +57,6 @@ func ToUserContext(req dto.RecommendRequest) models.UserContext {
 	}
 }
 
-// Chuyển đổi Restaurant thành AIRestaurantInput để gửi sang Python AI Service
 func BuildAIInput(r models.Restaurant) dto.AIRestaurantInput {
 	var imageURL string
 	for _, img := range r.Images {
@@ -87,7 +81,6 @@ func BuildAIInput(r models.Restaurant) dto.AIRestaurantInput {
 	}
 }
 
-// Hàm phụ để trích xuất thông tin món ăn đặc trưng từ menu của nhà hàng, chuyển thành định dạng phù hợp cho AI input
 func extractFeaturedDishes(menu []models.MenuItem) []dto.AISummaryDishInput {
 	dishes := []dto.AISummaryDishInput{}
 	for _, item := range menu {

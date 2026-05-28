@@ -1,4 +1,3 @@
-// services/email.go — tạo file mới
 
 package services
 
@@ -11,13 +10,12 @@ import (
 
 func SendResetEmail(username, resetLink string) error {
     smtpHost := os.Getenv("SMTP_HOST")
-    smtpPort := os.Getenv("SMTP_PORT") // vd: "587"
+    smtpPort := os.Getenv("SMTP_PORT") 
     smtpUser := os.Getenv("SMTP_USER")
     smtpPass := os.Getenv("SMTP_PASS")
     fromEmail := os.Getenv("SMTP_FROM")
 
     if smtpHost == "" {
-        // Dev mode — chỉ log ra console
         log.Printf("[DEV] Reset link for %s: %s", username, resetLink)
         return nil
     }
@@ -35,7 +33,7 @@ func SendResetEmail(username, resetLink string) error {
         smtpHost+":"+smtpPort,
         auth,
         fromEmail,
-        []string{username}, // username là email
+        []string{username}, 
         []byte(body),
     )
 }

@@ -30,7 +30,6 @@ func InitDB() {
 	user := os.Getenv("DB_USER")        
 	password := os.Getenv("DB_PASSWORD") 
 
-	// Thêm tham số &encrypt=true&trustServerCertificate=true để bẻ khóa TLS Handshake lỗi ban nãy
 	connStr := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s&encrypt=true&trustServerCertificate=true",
 		user, password, host, port, dbName)
 
@@ -55,9 +54,6 @@ func GetDB() *sql.DB {
 	return db
 }
 
-// ============================================================
-// USER
-// ============================================================
 
 func UpsertUser(ctx context.Context, providerID, email, name, avatar string, provider models.AuthProvider) (*models.User, error) {
 	// 1. Check user đã tồn tại chưa qua email
@@ -74,7 +70,6 @@ func UpsertUser(ctx context.Context, providerID, email, name, avatar string, pro
 	err := row.Scan(&userID)
 
 	if err == sql.ErrNoRows {
-		// 2. Chưa có → tạo mới User
 		newRow := db.QueryRowContext(ctx, `
 			INSERT INTO Users (email, name, avatar_url, created_at, updated_at)
 			OUTPUT INSERTED.id
@@ -88,7 +83,6 @@ func UpsertUser(ctx context.Context, providerID, email, name, avatar string, pro
 			return nil, fmt.Errorf("UpsertUser insert: %w", err)
 		}
 
-		// 3. Tạo UserAuth
 		_, err = db.ExecContext(ctx, `
 			INSERT INTO UserAuth (user_id, provider, provider_id, created_at)
 			VALUES (@userID, @provider, @providerID, GETDATE())
@@ -103,7 +97,6 @@ func UpsertUser(ctx context.Context, providerID, email, name, avatar string, pro
 	} else if err != nil {
 		return nil, fmt.Errorf("UpsertUser check: %w", err)
 	} else {
-		// Đã tồn tại → Cập nhật name và avatar_url nếu cần thiết
 		_, _ = db.ExecContext(ctx, `
 			UPDATE Users
 			SET name = CASE WHEN name = '' OR name IS NULL THEN @name ELSE name END,
@@ -126,7 +119,6 @@ func GetUserByID(ctx context.Context, userID int) (*models.User, error) {
 	}
 
 	var user models.User
-	// SỬA: $1 thành @p1 cho SQL Server
 	query := `SELECT id, email, name, avatar_url, created_at, updated_at FROM users WHERE id = @p1`
 
 	err := db.QueryRowContext(ctx, query, sql.Named("p1", userID)).Scan(
@@ -171,10 +163,6 @@ func UpdateUserPreferences(ctx context.Context, userID int, prefs models.UserPre
 	)
 	return err
 }
-
-// ============================================================
-// RESTAURANT
-// ============================================================
 
 type NearbyQuery struct {
 	Latitude  float64
@@ -230,7 +218,6 @@ func GetRestaurantsNearby(ctx context.Context, q NearbyQuery) ([]models.Restaura
 		return restaurants, nil
 	}
 
-	// Lấy menu
 	menuMap, err := getMenusByRestaurantIDs(ctx, ids)
 	if err == nil {
 		for i := range restaurants {
@@ -238,7 +225,6 @@ func GetRestaurantsNearby(ctx context.Context, q NearbyQuery) ([]models.Restaura
 		}
 	}
 
-	// Lấy ảnh
 	imageMap, err := getImagesByRestaurantIDs(ctx, ids)
 	if err == nil {
 		for i := range restaurants {
@@ -254,7 +240,6 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 		return make(map[int][]models.MenuItem), nil
 	}
 
-	// Sử dụng parameterized query để tránh SQL injection và cải thiện hiệu suất
 	placeholders := make([]string, len(ids))
 	args := make([]interface{}, len(ids))
 	for i, id := range ids {
@@ -280,7 +265,6 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 	totalItemsFetched := 0
 	for rows.Next() {
 		var item models.MenuItem
-		// Sử dụng sql.NullString cho các cột có thể là NULL trong DB để tránh lỗi scan
 		var description, ingredients, story sql.NullString
 
 		if err := rows.Scan(
@@ -288,10 +272,9 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 			&item.Price, &item.FoodType, &ingredients, &story,
 		); err != nil {
 			log.Printf("[DB_SCAN_ERROR] Lỗi khi đọc dòng MenuItem: %v", err)
-			continue // Bỏ qua dòng lỗi và tiếp tục
+			continue 
 		}
 
-		// Gán giá trị nếu nó không phải là NULL, nếu là NULL thì trường trong struct sẽ là chuỗi rỗng ""
 		if description.Valid {
 			item.Description = description.String
 		}
@@ -306,11 +289,7 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 		totalItemsFetched++
 	}
 
-	log.Printf("[DEBUG_DB] Querying MenuItems for restaurant IDs: %v", ids)
-	log.Printf("[DEBUG_DB] getMenusByRestaurantIDs: Fetched %d total menu items for %d restaurants.", totalItemsFetched, len(ids))
-
-	// Lấy ảnh cho từng món ăn vừa tìm thấy
-	// Bước 2: Gom tất cả ID món ăn để lấy ảnh (Batch query)
+	
 	var allItemIDs []int
 	for _, items := range result {
 		for _, itm := range items {
@@ -339,7 +318,6 @@ func getMenusByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.M
 	return result, nil
 }
 
-// Image handling
 func getImagesByRestaurantIDs(ctx context.Context, ids []int) (map[int][]models.RestaurantImage, error) {
 	// Sử dụng parameterized query để tránh SQL injection
 	placeholders := make([]string, len(ids))
@@ -387,7 +365,6 @@ func getImagesByMenuItemIDs(ctx context.Context, ids []int) (map[int][]models.Di
 		return make(map[int][]models.DishImage), nil
 	}
 
-	// Sử dụng parameterized query để tránh SQL injection
 	placeholders := make([]string, len(ids))
 	args := make([]interface{}, len(ids))
 	for i, id := range ids {
@@ -425,14 +402,12 @@ func getImagesByMenuItemIDs(ctx context.Context, ids []int) (map[int][]models.Di
 }
 
 func CreateReview(ctx context.Context, rv models.UserRating) (*models.UserRating, error) {
-	// 1. Khởi tạo Transaction
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, fmt.Errorf("CreateReview begin tx: %w", err)
 	}
-	defer tx.Rollback() // Sẽ rollback nếu có lỗi xảy ra giữa chừng
+	defer tx.Rollback() 
 
-	// 2. Chèn dữ liệu vào bảng UserRatings
 	row := tx.QueryRowContext(ctx, `
 		INSERT INTO UserRatings (restaurant_id, user_id, rating, comment, created_at)
 		OUTPUT INSERTED.id, INSERTED.created_at
@@ -447,7 +422,6 @@ func CreateReview(ctx context.Context, rv models.UserRating) (*models.UserRating
 		return nil, fmt.Errorf("CreateReview scan rating: %w", err)
 	}
 
-	// 3. Nếu có danh sách ảnh kèm theo, tiến hành chèn vào bảng UserRatingImages
 	if len(rv.Images) > 0 {
 		stmt, err := tx.PrepareContext(ctx, `
 			INSERT INTO UserRatingImages (user_rating_id, image_url, created_at)
@@ -472,17 +446,14 @@ func CreateReview(ctx context.Context, rv models.UserRating) (*models.UserRating
 				return nil, fmt.Errorf("CreateReview insert img failed at index %d: %w", i, err)
 			}
 
-			// Cập nhật lại thông tin ID và ngày tạo của ảnh vào struct để trả về
 			rv.Images[i].ID = newImgID
 			rv.Images[i].UserRatingID = rv.ID
 			rv.Images[i].CreatedAt = newImgCreatedAt
 		}
 	} else {
-		// Đảm bảo không bị null ở JSON response
 		rv.Images = []models.UserRatingImage{}
 	}
 
-	// 4. Commit transaction thành công
 	if err := tx.Commit(); err != nil {
 		return nil, fmt.Errorf("CreateReview commit tx: %w", err)
 	}
@@ -548,7 +519,7 @@ func GetReviewsByRestaurant(ctx context.Context, restaurantID int) ([]models.Use
 		if err := rows.Scan(&rv.ID, &rv.UserID, &rv.UserName, &rv.UserAvatar, &rv.RestaurantID, &rv.Rating, &rv.Comment, &rv.CreatedAt); err != nil {
 			continue
 		}
-		rv.Images = []models.UserRatingImage{} // khởi tạo mảng rỗng mặc định
+		rv.Images = []models.UserRatingImage{} 
 		reviews = append(reviews, rv)
 		reviewIDs = append(reviewIDs, rv.ID)
 	}
@@ -557,7 +528,6 @@ func GetReviewsByRestaurant(ctx context.Context, restaurantID int) ([]models.Use
 		return []models.UserRating{}, nil
 	}
 
-	// Gọi hàm Helper để map đống ảnh vào từng bài review tương ứng
 	imgMap, err := getImagesByUserRatingIDs(ctx, reviewIDs)
 	if err == nil {
 		for i := range reviews {
@@ -571,14 +541,12 @@ func GetReviewsByRestaurant(ctx context.Context, restaurantID int) ([]models.Use
 }
 
 func UpdateReview(ctx context.Context, reviewID int, userID int, update models.UserRating) error {
-	// 1. Khởi tạo Transaction để đảm bảo tính toàn vẹn dữ liệu
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("UpdateReview begin tx: %w", err)
 	}
-	defer tx.Rollback() // Rollback nếu có lỗi xảy ra giữa chừng
+	defer tx.Rollback() 
 
-	// 2. Cập nhật nội dung review (kiểm tra luôn quyền sở hữu qua user_id)
 	result, err := tx.ExecContext(ctx, `
 		UPDATE UserRatings SET rating = @rating, comment = @comment
 		WHERE id = @id AND user_id = @uid
@@ -597,7 +565,6 @@ func UpdateReview(ctx context.Context, reviewID int, userID int, update models.U
 		return fmt.Errorf("không tìm thấy review hoặc không có quyền")
 	}
 
-	// 3. Xóa sạch các liên kết ảnh cũ của review này trong DB
 	_, err = tx.ExecContext(ctx, `
 		DELETE FROM UserRatingImages WHERE user_rating_id = @id
 	`, sql.Named("id", reviewID))
@@ -605,7 +572,6 @@ func UpdateReview(ctx context.Context, reviewID int, userID int, update models.U
 		return fmt.Errorf("UpdateReview delete old images: %w", err)
 	}
 
-	// 4. Chèn danh sách ảnh mới (nếu có)
 	if len(update.Images) > 0 {
 		stmt, err := tx.PrepareContext(ctx, `
 			INSERT INTO UserRatingImages (user_rating_id, image_url, created_at)
@@ -627,7 +593,6 @@ func UpdateReview(ctx context.Context, reviewID int, userID int, update models.U
 		}
 	}
 
-	// 5. Commit hoàn tất transaction
 	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("UpdateReview commit tx: %w", err)
 	}
@@ -636,7 +601,6 @@ func UpdateReview(ctx context.Context, reviewID int, userID int, update models.U
 }
 
 func DeleteReview(ctx context.Context, reviewID int, userID int) error {
-	// 1. (Tùy chọn) Lấy danh sách link ảnh cũ để xóa file vật lý trên server nếu cần
 	rows, err := db.QueryContext(ctx, `
 		SELECT uri.image_url FROM UserRatingImages uri
 		INNER JOIN UserRatings ur ON uri.user_rating_id = ur.id
@@ -654,8 +618,6 @@ func DeleteReview(ctx context.Context, reviewID int, userID int) error {
 		rows.Close()
 	}
 
-	// 2. Thực hiện xóa Review trong DB
-	// Nhờ hiệu ứng ON DELETE CASCADE, các bản ghi ảnh trong DB tự động biến mất
 	result, err := db.ExecContext(ctx, `
 		DELETE FROM UserRatings WHERE id = @id AND user_id = @uid
 	`,
@@ -671,14 +633,10 @@ func DeleteReview(ctx context.Context, reviewID int, userID int) error {
 		return fmt.Errorf("không tìm thấy review hoặc không có quyền")
 	}
 
-	// 3. (Tùy chọn) Tiến hành xóa file vật lý trên ổ cứng server sau khi DB đã xóa thành công
-	// Giả sử đường dẫn lưu file của bạn có dạng: "/uploads/reviews/xxx.jpg"
 	for _, url := range imageUrls {
-		// Loại bỏ dấu "/" ở đầu nếu đường dẫn lưu trong DB là đường dẫn tuyệt đối dạng web
 		filePath := strings.TrimPrefix(url, "/")
 		if err := os.Remove(filePath); err != nil {
 			log.Printf("[WARN] Không thể xóa file ảnh vật lý %s: %v", filePath, err)
-			// Chỉ log cảnh báo, không chặn luồng chạy chính của user
 		}
 	}
 
@@ -726,10 +684,6 @@ func GetForumPostsByRestaurantID(ctx context.Context, restaurantID int) ([]model
 	}
 	return posts, nil
 }
-
-// ============================================================
-// HELPER UTILS
-// ============================================================
 
 func intSliceToSQL(ids []int) string {
 	s := ""
@@ -793,9 +747,7 @@ func GetUserPreferences(ctx context.Context, userID int) (*models.UserPreference
 	return &p, nil
 }
 
-// Local user
 func RegisterLocal(ctx context.Context, username, password, name, email string) (*models.User, error) {
-	// 1. Kiểm tra username đã tồn tại chưa
 	var count int
 	row := db.QueryRowContext(ctx, `
 		SELECT COUNT(*) FROM UserAuth 
@@ -806,13 +758,11 @@ func RegisterLocal(ctx context.Context, username, password, name, email string) 
 		return nil, fmt.Errorf("username đã được sử dụng")
 	}
 
-	// 2. Hash password
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("lỗi hash password")
 	}
 
-	// 3. Tạo user mới với email thật
 	var userID int
 	newRow := db.QueryRowContext(ctx, `
 		INSERT INTO Users (email, name, avatar_url, created_at, updated_at)
@@ -826,7 +776,6 @@ func RegisterLocal(ctx context.Context, username, password, name, email string) 
 		return nil, fmt.Errorf("lỗi tạo user: %w", err)
 	}
 
-	// 4. Lưu UserAuth
 	_, err = db.ExecContext(ctx, `
 		INSERT INTO UserAuth (user_id, provider, provider_id, password_hash, created_at)
 		VALUES (@userID, 'local', @username, @hash, GETDATE())
@@ -843,7 +792,6 @@ func RegisterLocal(ctx context.Context, username, password, name, email string) 
 }
 
 func LocalLogin(ctx context.Context, username, password string) (*models.User, error) {
-	// 1. Lấy password hash từ DB theo username
 	var userID int
 	var passwordHash string
 	row := db.QueryRowContext(ctx, `
@@ -857,7 +805,6 @@ func LocalLogin(ctx context.Context, username, password string) (*models.User, e
 		return nil, err
 	}
 
-	// 2. So sánh password
 	if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password)); err != nil {
 		return nil, fmt.Errorf("username hoặc mật khẩu không đúng")
 	}
@@ -865,7 +812,6 @@ func LocalLogin(ctx context.Context, username, password string) (*models.User, e
 	return GetUserByID(ctx, userID)
 }
 
-// Tạo reset token, lưu DB, trả về token để gửi mail
 func CreatePasswordResetToken(ctx context.Context, username string) (string, string, error) {
 	// Lấy user_id VÀ email từ DB
 	var userID int
@@ -883,7 +829,6 @@ func CreatePasswordResetToken(ctx context.Context, username string) (string, str
 		return "", "", err
 	}
 
-	// Tạo token như cũ
 	b := make([]byte, 32)
 	rand.Read(b)
 	token := hex.EncodeToString(b)
@@ -898,10 +843,9 @@ func CreatePasswordResetToken(ctx context.Context, username string) (string, str
 		sql.Named("username", username),
 	)
 
-	return token, email, nil // trả về cả email
+	return token, email, nil 
 }
 
-// Đổi mật khẩu mới sau khi xác thực token
 func ResetPassword(ctx context.Context, token, newPassword string) error {
 	var userID int
 	var expTime time.Time
@@ -939,11 +883,9 @@ func ResetPassword(ctx context.Context, token, newPassword string) error {
 	return err
 }
 
-// [Nhut]
-// SearchRestaurants, GetRestaurantDetail, GetPopularRestaurants sẽ nằm ở đây, handler chỉ gọi service.
-// CalculateDistance: Tính khoảng cách giữa 2 điểm (Lat, Lng) theo đơn vị Km
+
 func CalculateDistance(lat1, lng1, lat2, lng2 float64) float64 {
-	const EarthRadius = 6371.0 // Bán kính Trái Đất tính theo Km
+	const EarthRadius = 6371.0 
 
 	dLat := (lat2 - lat1) * (math.Pi / 180)
 	dLng := (lng2 - lng1) * (math.Pi / 180)
@@ -958,7 +900,6 @@ func CalculateDistance(lat1, lng1, lat2, lng2 float64) float64 {
 
 func isOpenNow(openTime, closeTime string) bool {
 	now := time.Now()
-	// Parse về cùng ngày hôm nay để so sánh
 	parse := func(s string) time.Time {
 		t, _ := time.Parse("15:04", s)
 		return time.Date(now.Year(), now.Month(), now.Day(),
@@ -969,18 +910,15 @@ func isOpenNow(openTime, closeTime string) bool {
 	close := parse(closeTime)
 
 	if open.Before(close) {
-		// Bình thường: 08:00 - 22:00
 		return now.After(open) && now.Before(close)
 	}
-	// Qua đêm: 22:00 - 02:00
 	return now.After(open) || now.Before(close)
 }
 
-// SearchRestaurants: Não bộ tìm kiếm trả về data thô và tổng số lượng
 func SearchRestaurants(
 	ctx context.Context,
 	q string,
-	minPrice *float64, // dùng pointer: nil = không filter, 0 = filter từ 0đ
+	minPrice *float64, 
 	maxPrice *float64,
 	filters []string,
 	sortBy string,
@@ -992,9 +930,7 @@ func SearchRestaurants(
 	var args []interface{}
 	argCount := 1
 
-	// =========================
-	// SEARCH QUERY
-	// =========================
+
 	if q != "" {
 		searchTerm := "%" + q + "%"
 
@@ -1015,10 +951,7 @@ func SearchRestaurants(
 		argCount++
 	}
 
-	// =========================
-	// PRICE FILTER
-	// dùng pointer để phân biệt "không truyền" vs "truyền 0"
-	// =========================
+
 	if minPrice != nil {
 		conditions = append(conditions, fmt.Sprintf("r.price_range >= @p%d", argCount))
 		args = append(args, *minPrice)
@@ -1031,9 +964,6 @@ func SearchRestaurants(
 		argCount++
 	}
 
-	// =========================
-	// EXTRA FILTERS
-	// =========================
 	for _, filter := range filters {
 		switch filter {
 		case "favorite":
@@ -1051,10 +981,6 @@ func SearchRestaurants(
 		}
 	}
 
-	// =========================
-	// BUILD QUERY
-	// TOP đặt sau ORDER BY hoặc dùng OFFSET/FETCH để đảm bảo limit đúng
-	// =========================
 	whereClause := ""
 	if len(conditions) > 0 {
 		whereClause = "WHERE " + strings.Join(conditions, " AND ")
@@ -1107,16 +1033,12 @@ func SearchRestaurants(
 		r.Images = []models.RestaurantImage{}
 		r.Menu = []models.MenuItem{}
 
-		// =========================
-		// DISTANCE
-		// =========================
+		
 		if userLat != 0 && userLng != 0 {
 			r.DistanceKm = CalculateDistance(userLat, userLng, r.Lat, r.Lng)
 		}
 
-		// =========================
-		// OPEN STATUS
-		// =========================
+		
 		r.IsOpen = isOpenNow(r.OpenTime, r.CloseTime)
 
 		restaurants = append(restaurants, r)
@@ -1131,9 +1053,6 @@ func SearchRestaurants(
 		return []models.Restaurant{}, 0, nil
 	}
 
-	// =========================
-	// LOAD IMAGES
-	// =========================
 	imageMap, err := getImagesByRestaurantIDs(ctx, ids)
 	if err == nil {
 		for i := range restaurants {
@@ -1143,10 +1062,6 @@ func SearchRestaurants(
 		}
 	}
 
-	// =========================
-	// LOAD MENU
-	// dùng parameterized placeholders thay vì string join để tránh SQL injection
-	// =========================
 	menuPlaceholders := make([]string, len(ids))
 	menuArgs := make([]interface{}, len(ids))
 	for i, id := range ids {
@@ -1204,9 +1119,6 @@ func SearchRestaurants(
 		}
 	}
 
-	// =========================
-	// SORT
-	// =========================
 	switch sortBy {
 	case "rating":
 		sort.Slice(restaurants, func(i, j int) bool {
@@ -1236,8 +1148,6 @@ func SearchRestaurants(
 	return restaurants, totalCount, nil
 }
 
-// GetRestaurantDetail: Lấy chi tiết nhà hàng, bao gồm menu và reviews
-// Chưa hoàn thiện vì còn thiếu bảng ảnh, nhưng sẽ trả về được menu và reviews để handler có thể hiển thị chi tiết.
 func GetRestaurantDetail(ctx context.Context, id int) (*models.RestaurantDetail, error) {
 	query := `
 		SELECT 
@@ -1289,7 +1199,6 @@ func GetRestaurantDetail(ctx context.Context, id int) (*models.RestaurantDetail,
 	return &rd, nil
 }
 
-// GetPopularRestaurants: Lấy danh sách quán ăn uy tín cho trang chủ
 func GetPopularRestaurants(ctx context.Context, limit int) ([]models.Restaurant, error) {
 	query := `
 		SELECT TOP (@limit) 
@@ -1318,18 +1227,15 @@ func GetPopularRestaurants(ctx context.Context, limit int) ([]models.Restaurant,
 			continue
 		}
 
-		// Khởi tạo mảng rỗng thay vì để null nhằm tránh lỗi phía Frontend
 		r.Menu = []models.MenuItem{}
 		r.Images = []models.RestaurantImage{}
 
-		// Logic tính toán trạng thái đóng/mở cửa dựa trên thời gian thực hệ thống
 		r.IsOpen = isOpenNow(r.OpenTime, r.CloseTime)
 
 		restaurants = append(restaurants, r)
 		ids = append(ids, r.ID)
 	}
 
-	// Đổ dữ liệu ảnh Thumbnail thực tế từ DB vào danh sách
 	if len(ids) > 0 {
 		imageMap, err := getImagesByRestaurantIDs(ctx, ids)
 		if err == nil {
@@ -1344,7 +1250,6 @@ func GetPopularRestaurants(ctx context.Context, limit int) ([]models.Restaurant,
 	return restaurants, nil
 }
 
-// GetTrendingDishes: Lấy quán ăn dựa trên các món ăn đang nổi tiếng
 func GetTrendingDishes(ctx context.Context, limit int) ([]map[string]interface{}, error) {
 	query := `
 		WITH RankedDishes AS (
@@ -1470,8 +1375,7 @@ func UpdateAvgRating(restaurantID int) {
 	}
 }
 
-// [Minh]
-// SearchRestaurantsForChatbot truy vấn quán ăn dựa trên các thực thể intent từ người dùng (Chatbot)
+
 func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interface{}) ([]models.Restaurant, error) {
 	query := `
 		SELECT r.id, r.name, r.address, r.lat, r.lng, r.rating, r.price_range, r.open_time, r.close_time, r.type
@@ -1480,13 +1384,11 @@ func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interf
 	`
 	var namedArgs []interface{}
 
-	// Lọc theo món ăn (nằm trong tên quán hoặc menu)
 	if dish, ok := entities["dish"].(string); ok && dish != "" {
 		query += ` AND (r.name LIKE @dish OR r.id IN (SELECT restaurant_id FROM MenuItems WHERE name LIKE @dish))`
 		namedArgs = append(namedArgs, sql.Named("dish", "%"+dish+"%"))
 	}
 
-	// Lọc theo vị trí (gần đúng qua address)
 	if location, ok := entities["location"].(string); ok && location != "" {
 		query += ` AND r.address LIKE @loc`
 		namedArgs = append(namedArgs, sql.Named("loc", "%"+location+"%"))
@@ -1526,7 +1428,6 @@ func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interf
 		}
 	}
 
-	// Lấy ảnh cho các nhà hàng
 	imageMap, err := getImagesByRestaurantIDs(ctx, ids)
 	if err == nil {
 		for i := range restaurants {
@@ -1537,17 +1438,14 @@ func SearchRestaurantsForChatbot(ctx context.Context, entities map[string]interf
 	return restaurants, nil
 }
 
-// tokenize là hàm nội bộ, giúp tách một chuỗi văn bản thành các từ (tokens) duy nhất.
-// Hàm này thực hiện các bước: chuyển thành chữ thường, thay thế dấu câu, và loại bỏ các từ quá ngắn.
+
 func tokenize(text string) map[string]bool {
-	// Thay thế các dấu câu phổ biến bằng khoảng trắng để tách từ tốt hơn
 	replacer := strings.NewReplacer(",", " ", ".", " ", ";", " ", ":", " ", "!", " ", "?", " ", "(", " ", ")", " ")
 	text = replacer.Replace(text)
 
 	words := strings.Fields(strings.ToLower(text))
 	tokenSet := make(map[string]bool)
 	for _, word := range words {
-		// Bỏ qua các từ rất ngắn, thường là stop-words hoặc ký tự nhiễu
 		if len(word) > 2 {
 			tokenSet[word] = true
 		}
@@ -1555,12 +1453,8 @@ func tokenize(text string) map[string]bool {
 	return tokenSet
 }
 
-// CalculateChatRelevanceScores tính điểm liên quan cho các nhà hàng dựa trên lịch sử chat của người dùng.
-// Thuật toán này đếm số lần các từ khóa trong toàn bộ cuộc trò chuyện của người dùng khớp với "tags" của nhà hàng.
-// "Tags" của nhà hàng được tổng hợp từ: tên, loại hình, tên món, mô tả món, và nguyên liệu.
+
 func CalculateChatRelevanceScores(ctx context.Context, userID int, restaurants []models.Restaurant) (map[int]int, error) {
-	// Bước 1: Lấy lịch sử chat của người dùng trong 7 ngày gần nhất để tính điểm liên quan.
-	// Việc giới hạn thời gian giúp hệ thống tự động "reset" điểm và cập nhật theo sở thích mới nhất của người dùng.
 	since := time.Now().AddDate(0, 0, -7)
 	rows, err := db.QueryContext(ctx, `
 		SELECT user_message FROM ChatHistory 
@@ -1571,7 +1465,6 @@ func CalculateChatRelevanceScores(ctx context.Context, userID int, restaurants [
 	}
 	defer rows.Close()
 
-	// Bước 2: Tổng hợp và "tokenize" tất cả các tin nhắn của người dùng thành một tập hợp từ khóa
 	var allUserMessages strings.Builder
 	for rows.Next() {
 		var msg string
@@ -1588,9 +1481,7 @@ func CalculateChatRelevanceScores(ctx context.Context, userID int, restaurants [
 
 	relevanceScores := make(map[int]int)
 
-	// Bước 3: Lặp qua từng nhà hàng để tính điểm
 	for _, r := range restaurants {
-		// Bước 3.1: Tạo "tags" cho nhà hàng từ nhiều nguồn thông tin
 		var restaurantContent strings.Builder
 		restaurantContent.WriteString(r.Name + " " + r.Type + " ")
 		for _, menuItem := range r.Menu {
@@ -1598,7 +1489,6 @@ func CalculateChatRelevanceScores(ctx context.Context, userID int, restaurants [
 		}
 		restaurantTags := tokenize(restaurantContent.String())
 
-		// Bước 3.2: Đếm số từ khóa của người dùng khớp với tags của nhà hàng
 		matchCount := 0
 		for keyword := range userKeywords {
 			if _, found := restaurantTags[keyword]; found {
@@ -1611,21 +1501,14 @@ func CalculateChatRelevanceScores(ctx context.Context, userID int, restaurants [
 	return relevanceScores, nil
 }
 
-// ============================================================
-// CHAT HISTORY
-// ============================================================
-
-// ChatHistoryEntry represents a single entry in the ChatHistory table.
 type ChatHistoryEntry struct {
 	ID          int       `json:"id"`
 	UserID      int       `json:"user_id"`
 	UserMessage string    `json:"user_message"`
 	BotReply    string    `json:"bot_reply"`
 	CreatedAt   time.Time `json:"created_at"`
-	// Các trường suggested_context và top_score đã được chuyển sang bảng ChatSuggestionLog
 }
 
-// ChatSuggestionLogEntry represents a single suggested restaurant in a chat message.
 type ChatSuggestionLogEntry struct {
 	ChatHistoryID  int64
 	RestaurantID   int
@@ -1633,7 +1516,6 @@ type ChatSuggestionLogEntry struct {
 	Score          float64
 }
 
-// SaveChatHistory saves the main chat message and returns the new history ID.
 func SaveChatHistory(ctx context.Context, userID int, userMessage, botReply string) (int64, error) {
 	var newID int64
 	query := `
@@ -1654,18 +1536,16 @@ func SaveChatHistory(ctx context.Context, userID int, userMessage, botReply stri
 	return newID, nil
 }
 
-// SaveChatSuggestions lưu top 3 nhà hàng được đề xuất.
 func SaveChatSuggestions(ctx context.Context, chatHistoryID int64, suggestions []ChatSuggestionLogEntry) error {
 	if len(suggestions) == 0 {
 		return nil
 	}
 
-	// Sử dụng transaction để đảm bảo tất cả các gợi ý được lưu hoặc không lưu gì cả.
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("lỗi bắt đầu transaction: %w", err)
 	}
-	defer tx.Rollback() // Rollback nếu có lỗi xảy ra
+	defer tx.Rollback() 
 
 	stmt, err := tx.PrepareContext(ctx, `
 		INSERT INTO ChatSuggestionLog (chat_history_id, restaurant_id, restaurant_name, score, created_at)
@@ -1685,12 +1565,11 @@ func SaveChatSuggestions(ctx context.Context, chatHistoryID int64, suggestions [
 			sql.Named("score", s.Score),
 		)
 		if err != nil {
-			// Nếu một insert lỗi, toàn bộ transaction sẽ được rollback.
 			return fmt.Errorf("lỗi thực thi insert cho suggestion (resId: %d): %w", s.RestaurantID, err)
 		}
 	}
 
-	return tx.Commit() // Hoàn tất transaction nếu không có lỗi
+	return tx.Commit() 
 }
 
 func GetChatHistoryByUserID(ctx context.Context, userID int) ([]ChatHistoryEntry, error) {
@@ -1715,7 +1594,6 @@ func GetChatHistoryByUserID(ctx context.Context, userID int) ([]ChatHistoryEntry
 	return history, nil
 }
 
-// GetDB trả về database connection để các handler có thể sử dụng
 
 
 func UpdateUserName(ctx context.Context, userID int, name string) error {

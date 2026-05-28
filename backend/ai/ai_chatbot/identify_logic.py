@@ -33,7 +33,6 @@ def identify_dish_from_image(image_b64: str, message: str):
             Ngôn ngữ sử dụng: Tiếng Việt.
             """
         else:
-            # Nếu người dùng chỉ gửi ảnh để nhận diện
             prompt = """
             Bạn là một chuyên gia ẩm thực tài ba. Hãy nhìn vào bức ảnh này và:
             1. Xác định chính xác tên món ăn (Vietnamese Name).
@@ -48,10 +47,8 @@ def identify_dish_from_image(image_b64: str, message: str):
             Ngôn ngữ sử dụng: Tiếng Việt.
             """
 
-        # 3. Gọi Gemini (Gemini 1.5 hỗ trợ truyền cả text và PIL Image)
         response = shared_model.generate_content([prompt, img])
         
-        # 4. Parse kết quả JSON (Cải thiện độ ổn định bằng cách tìm biên JSON)
         raw_text = response.text
         start_idx = raw_text.find('{')
         end_idx = raw_text.rfind('}') + 1
@@ -60,13 +57,10 @@ def identify_dish_from_image(image_b64: str, message: str):
             json_str = raw_text[start_idx:end_idx]
             parsed_result = json.loads(json_str)
 
-            # --- BƯỚC CHUẨN HÓA DỮ LIỆU ---
-            # Lấy các giá trị, có thể là None nếu AI không trả về
             dish_name = parsed_result.get("dish_name")
             ingredients = parsed_result.get("ingredients")
             recipe = parsed_result.get("recipe")
 
-            # Đảm bảo cấu trúc trả về luôn nhất quán
             final_result = {
                 "dish_name": dish_name if isinstance(dish_name, str) and dish_name else "Không thể nhận diện",
                 "ingredients": ingredients if isinstance(ingredients, list) else [],

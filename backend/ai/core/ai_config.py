@@ -6,5 +6,4 @@ if not settings.GEMINI_API_KEY:
 
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
-# Khởi tạo 1 lần dùng cho cả hội
 shared_model = genai.GenerativeModel(settings.GEMINI_MODEL_NAME)

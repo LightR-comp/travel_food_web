@@ -13,7 +13,6 @@ import (
 
 var cld *cloudinary.Cloudinary
 
-// InitCloudinary khởi tạo kết nối với Cloudinary sử dụng các biến môi trường
 func InitCloudinary() {
 	cloudName := config.AppConfig.CloudinaryCloudName
 	apiKey := config.AppConfig.CloudinaryAPIKey
@@ -37,7 +36,6 @@ func InitCloudinary() {
 	log.Println("[Cloudinary] Khởi tạo service thành công.")
 }
 
-// UploadToCloudinary thực hiện upload file và trả về URL ảnh an toàn (HTTPS)
 func UploadToCloudinary(ctx context.Context, fileReader io.Reader, folder string) (string, error) {
 	if cld == nil {
 		return "", fmt.Errorf("cloudinary service chưa được cấu hình")
